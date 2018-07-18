@@ -1,6 +1,6 @@
 <template>
 	<div class="profile-container">
-		<mobile-header :icon="teamInfo.icon ? teamInfo.icon : '/images/icon.png'"/>
+		<mobile-header :icon="teamInfo.icon ? teamInfo.icon : '/assets/images/icon.png'"/>
 		<div>{{ accountInfo.name }}</div>
 		<div>{{ accountInfo.email }}</div>
 		<img class="avatar" :src="accountInfo.photo" width="100"></img>

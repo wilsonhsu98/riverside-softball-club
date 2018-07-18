@@ -2,7 +2,7 @@
 	<div>
 		<div class="search-bar" ref="searchBar">
 			<div class="search-bar__container">
-				<img class="icon" :src="teamInfo.icon ? teamInfo.icon : '/images/icon.png'"/>
+				<img class="icon" :src="teamInfo.icon ? teamInfo.icon : '/assets/images/icon.png'"/>
 				<i class="fa fa-search"></i>
 			</div>
 			<input type="checkbox" class="toggle-search non-input" v-model="toggleSearch"/>

@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<mobile-header :icon="teamInfo.icon ? teamInfo.icon : '/images/icon.png'"/>
+		<mobile-header :icon="teamInfo.icon ? teamInfo.icon : '/assets/images/icon.png'"/>
 		<div class="gamebox-container">
 			<div class="box-summary" v-if="boxSummary.league && boxSummary.group">
 				{{ `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}` }}

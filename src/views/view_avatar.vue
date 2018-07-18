@@ -2,7 +2,7 @@
 	<div class="profile-container">
 		<mobile-header
 			:back="back_"
-			:icon="teamInfo.icon ? teamInfo.icon : '/images/icon.png'"
+			:icon="teamInfo.icon ? teamInfo.icon : '/assets/images/icon.png'"
 			:save="edit_"
 		/>
 		<h1>{{ $t('edit_avatar') }}</h1>
