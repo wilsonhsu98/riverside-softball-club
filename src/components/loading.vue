@@ -1,6 +1,6 @@
 <template>
 	<div class="loading-mask">
-		<div v-if="img" class="logo"></div>
+		<div v-if="img" class="logo" :style="`background-image: url(${defaultIcon})`"></div>
 		<div v-else class="sk-cube-grid">
 			<div class="sk-cube sk-cube1"></div>
 			<div class="sk-cube sk-cube2"></div>
@@ -28,7 +28,7 @@
 	}
 
 	.logo {
-		background: url(/images/icon.png) 50% 50% no-repeat;
+		background: 50% 50% no-repeat;
 		background-size: 320px auto;
 		height: 100vh;
 	}
@@ -112,10 +112,12 @@
 </style>
 
 <script>
+	import defaultIcon from '../images/icon.png';
 	export default {
 		props: ['text', 'img'],
 		data() {
 			return {
+				defaultIcon,
 			}
 		},
 	};
