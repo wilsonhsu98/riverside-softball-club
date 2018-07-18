@@ -28,7 +28,7 @@
 	}
 
 	.logo {
-		background: url(../images/icon.png) 50% 50% no-repeat;
+		background: url(/images/icon.png) 50% 50% no-repeat;
 		background-size: 320px auto;
 		height: 100vh;
 	}
