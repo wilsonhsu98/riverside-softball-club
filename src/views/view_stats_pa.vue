@@ -2,7 +2,7 @@
 	<div>
 		<div class="search-bar" ref="searchBar">
 			<div class="search-bar__container">
-				<img class="icon" :src="teamInfo.icon"/>
+				<img class="icon" :src="teamInfo.icon || defaultIcon"/>
 				<i class="fa fa-search"></i>
 			</div>
 			<input type="checkbox" class="toggle-search non-input" v-model="toggleSearch"/>
@@ -591,6 +591,7 @@
 <script>
 	import Vue from 'vue';
 	import { mapGetters, mapActions } from 'vuex';
+	import defaultIcon from '../images/icon.png';
 	const clickEvent = (() => {
 		if ('ontouchstart' in document.documentElement === true)
 			return 'touchstart';
@@ -603,6 +604,7 @@
 			return {
 				toggleSearch: false,
 				toggleTarget: null,
+				defaultIcon,
 			};
 		},
 		created () {

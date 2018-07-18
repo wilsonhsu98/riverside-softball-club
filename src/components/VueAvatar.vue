@@ -22,26 +22,26 @@
 </template>
 
 <style type="text/css" scoped>
-canvas {
-    width: 300px;
-    height: 300px;
-}
+    canvas {
+        width: 300px;
+        height: 300px;
+    }
 
-.cursorPointer{
-    cursor: pointer;
-}
+    .cursorPointer{
+        cursor: pointer;
+    }
 
-.cursorGrab{
-    cursor: grab;
-    cursor: -webkit-grab;
-    cursor: -moz-grab;
-}
+    .cursorGrab{
+        cursor: grab;
+        cursor: -webkit-grab;
+        cursor: -moz-grab;
+    }
 
-.cursorGrabbing{
-    cursor: grabbing;
-    cursor: -webkit-grabbing;
-    cursor: -moz-grabbing;
-}
+    .cursorGrabbing{
+        cursor: grabbing;
+        cursor: -webkit-grabbing;
+        cursor: -moz-grabbing;
+    }
 </style>
 
 <script>
