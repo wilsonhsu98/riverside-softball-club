@@ -1,0 +1,110 @@
+html {
+	background-color: #CCC;
+}
+body {
+	margin: 0;
+	font-family: 'Inconsolata', '微軟正黑體';
+	// overflow-y: scroll;
+}
+input, textarea {
+	font-family: 'Inconsolata', '微軟正黑體';
+	margin: 0;
+	&:disabled {
+		opacity: .7;
+	}
+}
+input[type=checkbox]:not(.non-input),
+input[type=radio]:not(.non-input) {
+	vertical-align: middle;
+	position: relative;
+	bottom: 1px;
+	margin-right: 2px;
+}
+input[type=radio]:not(.non-input) {
+	bottom: 2px;
+}
+
+button {
+	color: #FFF;
+	border: none;
+	border-radius: 2px;
+	background: rgba(158,158,158,.2);
+	box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+	cursor: pointer;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	margin: 0; /* Removes leftover margin */
+}
+input[type=number] { -moz-appearance: textfield; }
+
+::-webkit-scrollbar-track {
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	border-radius: 10px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+	background-color: #F5F5F5;
+}
+
+::-webkit-scrollbar-thumb {
+	border-radius: 10px;
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,.3);
+	background-color: #ccc;
+}
+
+select::-ms-expand {
+	display: none;
+}
+
+.selectdiv {
+	position: relative;
+	display: inline-block;
+}
+
+.selectdiv:after {
+	content: '\F078';
+	font: normal normal normal 12px/1 FontAwesome;
+	color: #a6a6a6;
+	right: 7px;
+	top: 2px;
+	height: 26px;
+	padding: 7px 0px 0px 4px;
+	border-left: 2px solid #a6a6a6;
+	position: absolute;
+	pointer-events: none;
+	box-sizing: border-box;
+}
+
+.selectdiv select {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	/* Add some styling */
+
+	display: block;
+	width: 100%;
+	max-width: 320px;
+	height: 50px;
+	float: right;
+	padding: 0 21px 0 8px;
+	line-height: 1.75;
+	color: #333;
+	background-color: #ffffff;
+	background-image: none;
+	border: 1px solid #0ebeff;
+	-ms-word-break: normal;
+	word-break: normal;
+}
+
+
+@media only screen and (max-width: 760px) {
+	// html {
+	// 	background-color: #fff;
+	// }
+}

@@ -1,0 +1,38 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<% for (var css in htmlWebpackPlugin.files.css) { %>
+	<link href="<%= htmlWebpackPlugin.files.css[css] %>" rel="stylesheet">
+	<% } %>
+	<script>
+		window.fbAsyncInit = function() {
+			FB.init({
+				appId            : '779076405612834',
+				autoLogAppEvents : true,
+				xfbml            : true,
+				version          : 'v2.12'
+			});
+		};
+
+		(function(d, s, id){
+			var js, fjs = d.getElementsByTagName(s)[0];
+			if (d.getElementById(id)) {return;}
+			js = d.createElement(s); js.id = id;
+			js.src = "https://connect.facebook.net/en_US/sdk.js";
+			fjs.parentNode.insertBefore(js, fjs);
+		}(document, 'script', 'facebook-jssdk'));
+	</script>
+</head>
+<body>
+	<div id="app">
+		<router-view></router-view>
+	</div>
+
+	<% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
+	<script src="<%= htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
+	<% } %>
+</body>
+</html>
