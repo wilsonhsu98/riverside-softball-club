@@ -1,6 +1,6 @@
 <template>
 	<div class="gamelist-container">
-		<mobile-header :icon="teamInfo.icon ? teamInfo.icon : '/assets/images/icon.png'"/>
+		<mobile-header :icon="teamInfo.icon"/>
 		<template v-for="item in gameList">
 			<div class="row" :data-date="item.date">
 				<template v-for="sub in item.games">

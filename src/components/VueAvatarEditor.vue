@@ -24,15 +24,14 @@
         />
       </label>
       <label v-if="hasRotation">
-        Rotation : {{rotation}}°
-        <br>
-        <input
+        <i class="fa fa-repeat" @click="rotate"/>
+        <!-- <input
           type="range"
           min=0
           max=360
           step=1
           v-model.number='rotation'
-        />
+        /> -->
       </label>
       <button @click="finished">{{ finishText }}</button>
     </div>
@@ -40,97 +39,97 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+  @import "../scss/variable";
 
-input[type=range] {
-  height: 24px;
-  -webkit-appearance: none;
-  // margin: 10px 0;
-  width: 100%;
-}
-input[type=range]:focus {
-  outline: none;
-}
-input[type=range]::-webkit-slider-runnable-track {
-  width: 100%;
-  height: 5px;
-  cursor: pointer;
-  animate: 0.2s;
-  box-shadow: 0px 0px 0px #000000;
-  background: $row_color;
-  border-radius: 1px;
-  border: 0px solid #000000;
-}
-input[type=range]::-webkit-slider-thumb {
-  box-shadow: 0px 0px 0px #000000;
-  border: 0px solid #EDF7F8;
-  height: 18px;
-  width: 18px;
-  border-radius: 25px;
-  background: $current_user_bgcolor;
-  cursor: pointer;
-  -webkit-appearance: none;
-  margin-top: -6.5px;
-}
-input[type=range]:focus::-webkit-slider-runnable-track {
-  background: $row_color;
-}
-input[type=range]::-moz-range-track {
-  width: 100%;
-  height: 5px;
-  cursor: pointer;
-  animate: 0.2s;
-  box-shadow: 0px 0px 0px #000000;
-  background: $row_color;
-  border-radius: 1px;
-  border: 0px solid #000000;
-}
-input[type=range]::-moz-range-thumb {
-  box-shadow: 0px 0px 0px #000000;
-  border: 0px solid #EDF7F8;
-  height: 18px;
-  width: 18px;
-  border-radius: 25px;
-  background: $current_user_bgcolor;
-  cursor: pointer;
-}
-input[type=range]::-ms-track {
-  width: 100%;
-  height: 5px;
-  cursor: pointer;
-  animate: 0.2s;
-  background: transparent;
-  border-color: transparent;
-  color: transparent;
-}
-input[type=range]::-ms-fill-lower {
-  background: $row_color;
-  border: 0px solid #000000;
-  border-radius: 2px;
-  box-shadow: 0px 0px 0px #000000;
-}
-input[type=range]::-ms-fill-upper {
-  background: $row_color;
-  border: 0px solid #000000;
-  border-radius: 2px;
-  box-shadow: 0px 0px 0px #000000;
-}
-input[type=range]::-ms-thumb {
-  margin-top: 1px;
-  box-shadow: 0px 0px 0px #000000;
-  border: 0px solid #EDF7F8;
-  height: 18px;
-  width: 18px;
-  border-radius: 25px;
-  background: $current_user_bgcolor;
-  cursor: pointer;
-}
-input[type=range]:focus::-ms-fill-lower {
-  background: $row_color;
-}
-input[type=range]:focus::-ms-fill-upper {
-  background: $row_color;
-}
+  input[type=range] {
+    height: 24px;
+    -webkit-appearance: none;
+    // margin: 10px 0;
+    width: 100%;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 5px;
+    cursor: pointer;
+    animate: 0.2s;
+    box-shadow: 0px 0px 0px #000000;
+    background: $row_color;
+    border-radius: 1px;
+    border: 0px solid #000000;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    box-shadow: 0px 0px 0px #000000;
+    border: 0px solid #EDF7F8;
+    height: 18px;
+    width: 18px;
+    border-radius: 25px;
+    background: $current_user_bgcolor;
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -6.5px;
+  }
+  input[type=range]:focus::-webkit-slider-runnable-track {
+    background: $row_color;
+  }
+  input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 5px;
+    cursor: pointer;
+    animate: 0.2s;
+    box-shadow: 0px 0px 0px #000000;
+    background: $row_color;
+    border-radius: 1px;
+    border: 0px solid #000000;
+  }
+  input[type=range]::-moz-range-thumb {
+    box-shadow: 0px 0px 0px #000000;
+    border: 0px solid #EDF7F8;
+    height: 18px;
+    width: 18px;
+    border-radius: 25px;
+    background: $current_user_bgcolor;
+    cursor: pointer;
+  }
+  input[type=range]::-ms-track {
+    width: 100%;
+    height: 5px;
+    cursor: pointer;
+    animate: 0.2s;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+  }
+  input[type=range]::-ms-fill-lower {
+    background: $row_color;
+    border: 0px solid #000000;
+    border-radius: 2px;
+    box-shadow: 0px 0px 0px #000000;
+  }
+  input[type=range]::-ms-fill-upper {
+    background: $row_color;
+    border: 0px solid #000000;
+    border-radius: 2px;
+    box-shadow: 0px 0px 0px #000000;
+  }
+  input[type=range]::-ms-thumb {
+    margin-top: 1px;
+    box-shadow: 0px 0px 0px #000000;
+    border: 0px solid #EDF7F8;
+    height: 18px;
+    width: 18px;
+    border-radius: 25px;
+    background: $current_user_bgcolor;
+    cursor: pointer;
+  }
+  input[type=range]:focus::-ms-fill-lower {
+    background: $row_color;
+  }
+  input[type=range]:focus::-ms-fill-upper {
+    background: $row_color;
+  }
 </style>
 
 <script>
@@ -196,6 +195,9 @@ export default {
         onImageReady () {
             this.scale = 1;
             this.rotation = 0;
+        },
+        rotate () {
+          this.rotation += 90;
         },
         finished () {
             return this.$emit('finished', this.$refs.vueavatar.getImageScaled());

@@ -2,7 +2,7 @@
 	<div class="profile-container">
 		<mobile-header
 			:back="back_"
-			:icon="teamInfo.icon ? teamInfo.icon : '/assets/images/icon.png'"
+			:icon="teamInfo.icon"
 			:save="edit_"
 		/>
 		<h1>{{ $t('edit_avatar') }}</h1>
@@ -40,7 +40,7 @@
 			class="avatar-editor"
 			@finished="genImage"
 			:hasRadius="true"
-			:hasRotation="false"
+			:hasRotation="true"
 			:width="400"
 			:height="400"
 			:zoomText="$t('zoom')"
@@ -152,8 +152,14 @@
 			justify-content: space-between;
 			align-items: center;
 			> :first-child { // progress
-				width: 200px;
+				width: 170px;
 				margin-right: 10px;
+			}
+			> :nth-child(2) { // rotate
+				font-size: 30px;
+				margin-right: 10px;
+				color: $header_bgcolor;
+				cursor: pointer;
 			}
 			> :last-child { // button
 				flex: 1;

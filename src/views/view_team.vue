@@ -2,7 +2,7 @@
 	<div>
 		<mobile-header
 			:back="back_"
-			:icon="teamInfo.icon ? teamInfo.icon : '/assets/images/icon.png'"
+			:icon="teamInfo.icon"
 			:save="editTeam_"
 		/>
 		<div class="container">

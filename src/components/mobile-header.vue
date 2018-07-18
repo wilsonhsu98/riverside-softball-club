@@ -1,7 +1,7 @@
 <template>
 	<header>
 		<i v-if="back" class="fa fa-arrow-left" @click="back_"></i>
-		<img class="icon" :src="icon"/>
+		<img class="icon" :src="icon || defaultIcon"/>
 		<div v-if="save" class="save-btn" @click="save_">{{ $t('btn_update') }}</div>
 	</header>
 </template>
@@ -57,8 +57,15 @@
 </style>
 
 <script>
+	import defaultIcon from '../images/icon.png';
+
 	export default {
 		props: ['back', 'icon', 'save'],
+		data() {
+			return {
+				defaultIcon,
+			}
+		},
 		methods: {
 			back_() {
 				if (typeof this.back === 'function') {
