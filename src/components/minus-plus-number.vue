@@ -28,9 +28,6 @@
 		border-radius: 0;
 		position: relative;
 		z-index: 1;
-		-webkit-appearance: none;
-		-moz-appearance: textfield;
-		appearance: none;
 	}
 
 	.button {

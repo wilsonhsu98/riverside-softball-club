@@ -110,9 +110,6 @@
 			border-radius: 4px;
 			font-size: $font-size;
 			width: 100%;
-			-webkit-appearance: none;
-			-moz-appearance: textfield;
-			appearance: none;
 		}
 		input    { line-height: 38px; padding: 0 10px; }
 		textarea { line-height: $font-size + 2; padding: 10px; }

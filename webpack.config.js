@@ -32,7 +32,7 @@ let config = {
 			options: {
 				limit: 7000,
 				name: 'assets/images/[name].[ext]',
-				publicPath: __PROD__ ? '../../' : '/'
+				publicPath: __PROD__ ? '' : '/'
 			}
 		}, {
 			test: /\.(ico)$/,

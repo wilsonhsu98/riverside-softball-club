@@ -9,6 +9,9 @@ body {
 input, textarea {
 	font-family: 'Inconsolata', '微軟正黑體';
 	margin: 0;
+	-webkit-appearance: none;
+	-moz-appearance: textfield;
+	appearance: none;
 	&:disabled {
 		opacity: .7;
 	}

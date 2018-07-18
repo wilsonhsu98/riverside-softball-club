@@ -2,7 +2,7 @@
 	<div class="main-container">
 		<header>
 			<div class="header-container">
-				<img class="icon" :src="teamInfo.icon"/>
+				<img class="icon" :src="teamInfo.icon || defaultIcon"/>
 				<ul class="tab">
 					<li v-if="currentTeam">
 						<router-link :to="{ name: 'games', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_games')">
@@ -180,11 +180,13 @@
 
 <script>
 	import { mapGetters, mapActions } from 'vuex';
+	import defaultIcon from '../images/icon.png';
 
 	export default {
 		data() {
 			return {
 				isFetchGame: false,
+				defaultIcon,
 			}
 		},
 		created() {
