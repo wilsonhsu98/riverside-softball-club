@@ -40,10 +40,25 @@ const actions = {
             } else {
                 photo = data.accountInfo[`${data.current}_photo`];
             }
-            return refPlayerDoc.set({
-                photo,
-                custom_photo: url,
-            }, { merge: true })
+            return new Promise((resolve, reject) => {
+                const batch = db.batch();
+                refPlayerDoc.collection('teams').get().then(querySnapshot => {
+                    querySnapshot.forEach(doc => {
+                        db.collection("teams").doc(doc.id).collection("players").where("uid", "==", data.userId).get().then(querySnapshot => {
+                            querySnapshot.forEach(doc => {
+                                batch.update(doc.ref, {
+                                    photo,
+                                });
+                            });
+                            batch.update(refPlayerDoc, {
+                                photo,
+                                custom_photo: url,
+                            });
+                            resolve(batch.commit());
+                        });
+                    });
+                });
+            });
         })
         .then(() => {
             return refPlayerDoc.get();

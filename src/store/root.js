@@ -281,7 +281,6 @@ const mutations = {
 
 const promiseImage = (img) => {
     return new Promise((resolve, reject) => {
-        console.log(img)
             if (img.indexOf('data:image/png;base64') > -1) {
                 const formData = new FormData();
                 formData.append('image', img.split(',')[1]);

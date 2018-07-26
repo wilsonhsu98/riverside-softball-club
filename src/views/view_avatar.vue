@@ -13,12 +13,7 @@
 					:class="provider"
 					@click="setCurrent(provider)"
 				>
-					<template v-if="current">
-						<i v-if="provider === current" class="fa fa-check"/>
-					</template>
-					<template v-else>
-						<i v-if="accountInfo[`${provider}_photo`] === accountInfo.photo" class="fa fa-check"/>
-					</template>
+					<i v-if="provider === current" class="fa fa-check"/>
 					<img :src="accountInfo[`${provider}_photo`]"/>
 				</span>
 				<span
@@ -26,12 +21,7 @@
 					:class="provider"
 					@click="setCurrent(provider)"
 				>
-					<template v-if="current">
-						<i v-if="provider === current" class="fa fa-check"/>
-					</template>
-					<template v-else>
-						<i v-if="accountInfo[`${provider}_photo`] === accountInfo.photo" class="fa fa-check"/>
-					</template>
+					<i v-if="provider === current" class="fa fa-check"/>
 					<img :src="img || accountInfo.custom_photo"/>
 				</span>
 			</template>
@@ -240,6 +230,12 @@
 			};
 		},
 		created() {
+			['google', 'facebook', 'line', 'github', 'custom'].some(provider => {
+				if (this.accountInfo[`${provider}_photo`] === this.accountInfo.photo) {
+					this.current = provider;
+					return true;
+				}
+			});
 		},
 		methods: {
 			...mapActions({
@@ -271,6 +267,6 @@
 				teamInfo: 'teamInfo',
 				userId: 'userId',
 			})
-		}
+		},
 	}
 </script>
