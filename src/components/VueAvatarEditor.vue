@@ -12,7 +12,7 @@
       @vue-avatar-editor:image-ready="onImageReady">
     </vue-avatar>
     <div>
-      <label v-if="hasScale">
+      <label>
         {{ zoomText }} : {{scale}}x
         <br>
         <input
@@ -22,9 +22,6 @@
           step=0.02
           v-model.number='scale'
         />
-      </label>
-      <label v-if="hasRotation">
-        <i class="fa fa-repeat" @click="rotate"/>
         <!-- <input
           type="range"
           min=0
@@ -33,7 +30,11 @@
           v-model.number='rotation'
         /> -->
       </label>
+      <label><i class="fa fa-undo" @click="rotate(-90)"/></label>
+      <label><i class="fa fa-repeat" @click="rotate(90)"/></label>
       <button @click="finished">{{ finishText }}</button>
+
+
     </div>
   </div>
 </template>
@@ -196,8 +197,8 @@ export default {
             this.scale = 1;
             this.rotation = 0;
         },
-        rotate () {
-          this.rotation += 90;
+        rotate (value) {
+          this.rotation += value;
         },
         finished () {
             return this.$emit('finished', this.$refs.vueavatar.getImageScaled());

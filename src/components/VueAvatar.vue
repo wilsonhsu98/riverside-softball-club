@@ -109,7 +109,7 @@ export default {
             return this.getDimensions().canvas.height;
         },
         rotationRadian () {
-            return this.rotation * Math.PI / 180;
+            return (this.rotation % 360) * Math.PI / 180;
         }
     },
     mounted () {
@@ -367,9 +367,15 @@ export default {
                 context.save();
                 context.globalCompositeOperation = 'destination-over';
                 let dimensions = this.getDimensions();
-                context.translate(dimensions.canvas.width / 2, dimensions.canvas.height / 2);
-                context.rotate(this.rotationRadian);
-                context.translate(-dimensions.canvas.width / 2, -dimensions.canvas.height / 2);
+                if (border === 0) {
+                    context.translate(dimensions.width / 2, dimensions.height / 2);
+                    context.rotate(this.rotationRadian);
+                    context.translate(-dimensions.width / 2, -dimensions.height / 2);
+                } else {
+                    context.translate(dimensions.canvas.width / 2, dimensions.canvas.height / 2);
+                    context.rotate(this.rotationRadian);
+                    context.translate(-dimensions.canvas.width / 2, -dimensions.canvas.height / 2);
+                }
                 context.drawImage(
                     image.resource,
                     position.x,
@@ -413,34 +419,38 @@ export default {
             const cropRect = this.getCroppingRect();
             const image = this.state.image;
 
-            // get actual pixel coordinates
-            cropRect.x *= image.resource.width;
-            cropRect.y *= image.resource.height;
-            cropRect.width *= image.resource.width;
-            cropRect.height *= image.resource.height;
+            if (image.resource) {
+                // get actual pixel coordinates
+                cropRect.x *= image.resource.width;
+                cropRect.y *= image.resource.height;
+                cropRect.width *= image.resource.width;
+                cropRect.height *= image.resource.height;
 
-            // create a canvas with the correct dimensions
-            const canvas = document.createElement('canvas');
-            canvas.width = cropRect.width;
-            canvas.height = cropRect.height;
+                // create a canvas with the correct dimensions
+                const canvas = document.createElement('canvas');
+                canvas.width = cropRect.width;
+                canvas.height = cropRect.height;
 
-            // draw the full-size image at the correct position,
-            // the image gets truncated to the size of the canvas.
-            canvas.getContext('2d').drawImage(image.resource, -cropRect.x, -cropRect.y);
+                // draw the full-size image at the correct position,
+                // the image gets truncated to the size of the canvas.
+                canvas.getContext('2d').drawImage(image.resource, -cropRect.x, -cropRect.y);
 
-            return canvas;
+                return canvas;
+            }
         },
         getImageScaled () {
-            const { width, height } = this.getDimensions();
+            if (this.state.image.resource) {
+                const { width, height } = this.getDimensions();
 
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
 
-            // don't paint a border here, as it is the resulting image
-            this.paintImage(canvas.getContext('2d'), this.state.image, 0);
+                // don't paint a border here, as it is the resulting image
+                this.paintImage(canvas.getContext('2d'), this.state.image, 0);
 
-            return canvas;
+                return canvas;
+            }
         },
         imageChanged () {
             return this.changed;

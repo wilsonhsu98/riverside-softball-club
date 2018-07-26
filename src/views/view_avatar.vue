@@ -151,15 +151,42 @@
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
+			position: relative;
 			> :first-child { // progress
 				width: 170px;
 				margin-right: 10px;
 			}
-			> :nth-child(2) { // rotate
-				font-size: 30px;
-				margin-right: 10px;
-				color: $header_bgcolor;
+			> :nth-child(2) { // rotate left
+				color: white;
+				background-color: $current_user_bgcolor;
+				border-radius: 4px;
+				width: 26px;
+				height: 26px;
+				font-size: 21px;
+				box-sizing: border-box;
 				cursor: pointer;
+				position: absolute;
+				left: 6px;
+				top: -36px;
+				> :first-child {
+					vertical-align: middle;
+				}
+			}
+			> :nth-child(3) { // rotate right
+				color: white;
+				background-color: $current_user_bgcolor;
+				border-radius: 4px;
+				width: 26px;
+				height: 26px;
+				font-size: 21px;
+				box-sizing: border-box;
+				cursor: pointer;
+				position: absolute;
+				right: 6px;
+				top: -36px;
+				> :first-child {
+					vertical-align: middle;
+				}
 			}
 			> :last-child { // button
 				flex: 1;
@@ -186,6 +213,18 @@
 				width: 64px;
 			}
 		}
+		.avatar-editor {
+			width: 200px;
+			> :first-child > :first-child {
+				width: 200px;
+				height: 200px;
+			}
+			> :last-child { // buttons area
+				> :first-child { // progress
+					width: 110px;
+				}
+			}
+		}
 	}
 </style>
 
@@ -210,7 +249,9 @@
 				this.current = provider;
 			},
 			genImage(img) {
-				this.img = img.toDataURL();
+				if (img) {
+					this.img = img.toDataURL();
+				}
 			},
 			back_() {
 				router.back();
