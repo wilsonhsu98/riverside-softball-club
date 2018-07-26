@@ -42,6 +42,10 @@ const actions = {
             }
             return new Promise((resolve, reject) => {
                 const batch = db.batch();
+                batch.update(refPlayerDoc, {
+                    photo,
+                    custom_photo: url,
+                });
                 refPlayerDoc.collection('teams').get().then(querySnapshot => {
                     querySnapshot.forEach(doc => {
                         db.collection("teams").doc(doc.id).collection("players").where("uid", "==", data.userId).get().then(querySnapshot => {
@@ -50,14 +54,14 @@ const actions = {
                                     photo,
                                 });
                             });
-                            batch.update(refPlayerDoc, {
-                                photo,
-                                custom_photo: url,
-                            });
                             resolve(batch.commit());
                         });
                     });
+                    if (querySnapshot.size === 0) {
+                        resolve(batch.commit());
+                    }
                 });
+
             });
         })
         .then(() => {
