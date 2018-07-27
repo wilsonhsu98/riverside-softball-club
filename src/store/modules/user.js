@@ -1,6 +1,8 @@
 import i18n from '../../i18n';
 import {
     types as rootTypes,
+    getters as rootGetters,
+    state as rootState,
     promiseImage,
 } from '../root';
 import router from '../../router';
@@ -59,21 +61,32 @@ const actions = {
                         resolve(batch.commit());
                     }
                 });
-
             });
         })
         .then(() => {
-            return refPlayerDoc.get();
-        })
-        .then(doc => {
-            const { accessToken, ...other } = doc.data();
-            commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
             commit(rootTypes.LOADING, false);
             router.push('/main/user');
         })
         .catch(e => {
             console.log(e);
         });
+    },
+    fetchUser({ commit }) {
+        let queryCount = 0;
+        const realtimeCount = 1;
+        db.collection("accounts").doc(rootGetters.userId(rootState))
+            .onSnapshot(snapshot => {
+                const { accessToken, ...other } = snapshot.data();
+                queryCount += 1;
+                if (queryCount > realtimeCount) {
+                    // realtime
+                    commit(rootTypes.LOADING, { text: 'New data is coming' });
+                    setTimeout(() => {
+                        commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
+                        commit(rootTypes.LOADING, false);
+                    }, 1000);
+                }
+            });
     },
 };
 

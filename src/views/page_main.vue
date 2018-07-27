@@ -192,12 +192,13 @@
 		created() {
 			this.initFromLS();
 			this.fetchGame();
+			this.fetchUser();
 		},
 		methods: {
 			...mapActions({
 				initFromLS: 'initFromLS',
 				fetchTable: 'fetchTable',
-				fetchTeamInfo: 'fetchTeamInfo',
+				fetchUser: 'fetchUser',
 			}),
 			fetchGame() {
 				if (!this.isFetchGame && this.$route.params.team) {
