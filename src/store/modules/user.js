@@ -33,9 +33,7 @@ const actions = {
         promiseImage(data.custom)
         .then(url => {
             let photo = undefined;
-            if (data.current === undefined) {
-                photo = data.accountInfo.photo;
-            } else if (data.current === 'custom') {
+            if (data.current === 'custom') {
                 photo = url;
             } else {
                 photo = data.accountInfo[`${data.current}_photo`];
