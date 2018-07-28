@@ -152,6 +152,7 @@
 				border-radius: 4px;
 				width: 26px;
 				height: 26px;
+				line-height: 26px;
 				font-size: 21px;
 				box-sizing: border-box;
 				cursor: pointer;
@@ -159,7 +160,8 @@
 				left: 6px;
 				top: -36px;
 				> :first-child {
-					vertical-align: middle;
+					height: 26px;
+					line-height: 26px;
 				}
 			}
 			> :nth-child(3) { // rotate right
@@ -168,6 +170,7 @@
 				border-radius: 4px;
 				width: 26px;
 				height: 26px;
+				line-height: 26px;
 				font-size: 21px;
 				box-sizing: border-box;
 				cursor: pointer;
@@ -175,13 +178,14 @@
 				right: 6px;
 				top: -36px;
 				> :first-child {
-					vertical-align: middle;
+					height: 26px;
+					line-height: 26px;
 				}
 			}
 			> :last-child { // button
 				flex: 1;
 				background-color: $header_bgcolor;
-				padding: 10px 15px;
+				padding: 10px;
 			}
 		}
 	}

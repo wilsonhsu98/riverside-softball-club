@@ -1,6 +1,7 @@
 <template>
   <div>
     <vue-avatar
+      :image='image'
       :width='width'
       :height='height'
       :rotation="rotation"
@@ -8,6 +9,7 @@
       :border='border'
       :color='color'
       :scale="scale"
+      :canMoveOutOfBound="canMoveOutOfBound"
       ref="vueavatar"
       @vue-avatar-editor:image-ready="onImageReady">
     </vue-avatar>
@@ -17,8 +19,8 @@
         <br>
         <input
           type="range"
-          min=1
-          max=3
+          min=0.5
+          max=2
           step=0.02
           v-model.number='scale'
         />
@@ -33,8 +35,6 @@
       <label><i class="fa fa-undo" @click="rotate(-90)"/></label>
       <label><i class="fa fa-repeat" @click="rotate(90)"/></label>
       <button @click="finished">{{ finishText }}</button>
-
-
     </div>
   </div>
 </template>
@@ -181,7 +181,11 @@ export default {
         color: {
             type: Array,
             default: () => [0, 0, 0, 0.5]
-        }
+        },
+        canMoveOutOfBound: {
+            type: Boolean,
+            default: false
+        },
     },
     data () {
         return {
@@ -189,9 +193,6 @@ export default {
             scale: 1,
         };
     },
-    // components: {
-    //     VueAvatar
-    // },
     methods: {
         onImageReady () {
             this.scale = 1;

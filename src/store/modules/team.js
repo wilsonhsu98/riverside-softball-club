@@ -3,6 +3,7 @@ import {
     types as rootTypes,
     getters as rootGetters,
     state as rootState,
+    promiseImage,
 } from '../root';
 import { db, auth, timestamp } from "../../firebase";
 
@@ -26,11 +27,13 @@ const getters = {
 };
 
 const actions = {
-    editTeam({ commit }, data) {
+    editTeam({ commit, dispatch }, data) {
         commit(rootTypes.LOADING, true);
 
         const docRef = db.collection("teams").doc(data.code);
-        docRef.get().then(doc => {
+        Promise.all([promiseImage(data.icon, 'icon'), docRef.get()])
+        .then(res => {
+            const [url, doc] = res;
             if (doc.exists && data.isNew) {
                 alert(i18n.t('msg_duplicate_team'));
                 return true;
@@ -40,6 +43,7 @@ const actions = {
                     name: data.name,
                     subNames: data.subNames,
                     intro: data.intro,
+                    icon: url,
                     timestamp,
                 });
                 data.players.forEach(item => {
@@ -62,7 +66,7 @@ const actions = {
                 return batch.commit();
             }
         }).then(() => {
-            commit(rootTypes.LOADING, false);
+            dispatch('fetchTeamInfo', data.code);
         }).catch(error => {
             console.log("Error getting document:", error);
         });

@@ -41,6 +41,25 @@
 				v-model="teamIntro"
 			/>
 
+			<div v-if="!iconEdit" class="icon-container" :style="{ background: `url(${transparentPng})` }">
+				<i class="fa fa-picture-o" @click="iconEdit = true"></i>
+				<img :src="icon"/>
+			</div>
+			<div v-else class="icon-editor-container">
+				<i class="fa fa-times" @click="iconEdit = false"></i>
+				<vue-avatar-editor
+					class="icon-editor"
+					:image="icon"
+					:hasRotation="true"
+					:width="400"
+					:height="400"
+					:zoomText="$t('zoom')"
+					:finishText="$t('gen_img')"
+					:canMoveOutOfBound="true"
+					@finished="genImage"
+				/>
+			</div>
+
 			<h2 class="player-header">{{ $t('ttl_player') }}<i class="fa fa-plus-circle" @click="players = [].concat({}, players)"></i></h2>
 			<div class="player" v-for="(player, i) in players">
 
@@ -208,6 +227,105 @@
 			display: block;
 		}
 	}
+	.icon-container {
+		text-align: center;
+		margin: 10px auto 0;
+		width: 300px;
+		height: 300px;
+		line-height: 300px;
+		position: relative;
+		i {
+			color: white;
+			background-color: $current_user_bgcolor;
+			border-radius: 4px;
+			width: 26px;
+			height: 26px;
+			line-height: 26px;
+			font-size: 18px;
+			box-sizing: border-box;
+			cursor: pointer;
+			position: absolute;
+			left: 6px;
+			top: 6px;
+		}
+		img {
+			vertical-align: middle;
+			width: 300px;
+		}
+	}
+	.icon-editor-container {
+		text-align: center;
+		margin: 10px auto 0;
+		width: 300px;
+		position: relative;
+		i {
+			color: white;
+			background-color: $current_user_bgcolor;
+			border-radius: 4px;
+			width: 26px;
+			height: 26px;
+			line-height: 26px;
+			font-size: 18px;
+			box-sizing: border-box;
+			cursor: pointer;
+			position: absolute;
+			left: 6px;
+			top: 6px;
+		}
+	}
+	.icon-editor {
+		> :last-child { // buttons area
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			position: relative;
+			> :first-child { // progress
+				width: 170px;
+				margin-right: 10px;
+			}
+			> :nth-child(2) { // rotate left
+				color: white;
+				background-color: $current_user_bgcolor;
+				border-radius: 4px;
+				width: 26px;
+				height: 26px;
+				line-height: 26px;
+				font-size: 21px;
+				box-sizing: border-box;
+				cursor: pointer;
+				position: absolute;
+				left: 6px;
+				top: -36px;
+				> :first-child {
+					height: 26px;
+					line-height: 26px;
+				}
+			}
+			> :nth-child(3) { // rotate right
+				color: white;
+				background-color: $current_user_bgcolor;
+				border-radius: 4px;
+				width: 26px;
+				height: 26px;
+				line-height: 26px;
+				font-size: 21px;
+				box-sizing: border-box;
+				cursor: pointer;
+				position: absolute;
+				right: 6px;
+				top: -36px;
+				> :first-child {
+					height: 26px;
+					line-height: 26px;
+				}
+			}
+			> :last-child { // button
+				flex: 1;
+				background-color: $header_bgcolor;
+				padding: 10px;
+			}
+		}
+	}
 
 	@media only screen and (max-width: 760px) {
 		.container {
@@ -220,6 +338,28 @@
 				display: none;
 			}
 		}
+		.icon-container {
+			width: 200px;
+			height: 200px;
+			line-height: 200px;
+			img {
+				width: 200px;
+			}
+		}
+		.icon-editor-container {
+			width: 200px;
+		}
+		.icon-editor {
+			> :first-child > :first-child {
+				width: 200px;
+				height: 200px;
+			}
+			> :last-child { // buttons area
+				> :first-child { // progress
+					width: 110px;
+				}
+			}
+		}
 	}
 </style>
 
@@ -227,6 +367,7 @@
 	import { mapGetters, mapActions } from 'vuex';
 	import { auth } from "../firebase";
 	import router from '../router';
+	import transparentPng from '../images/transparent.png';
 
 	export default {
 		data() {
@@ -239,6 +380,9 @@
 				otherNames: '',
 				players: [{}],
 				players_err: '',
+				icon: '',
+				iconEdit: false,
+				transparentPng,
 			};
 		},
 		created() {
@@ -314,6 +458,7 @@
 						subNames: this.otherNames,
 						intro: this.teamIntro,
 						players: this.players,
+						icon: this.icon,
 						isNew: !this.$route.params.team,
 					});
 				}
@@ -336,6 +481,12 @@
 					alert(this.$t('msg_self_release'));
 				}
 			},
+			genImage(img) {
+				if (img) {
+					this.icon = img.toDataURL();
+				}
+				this.iconEdit = false;
+			},
 		},
 		computed: {
 			...mapGetters({
@@ -357,6 +508,7 @@
 				this.teamName = this.teamInfo.teamName;
 				this.teamIntro = this.teamInfo.teamIntro;
 				this.otherNames = this.teamInfo.otherNames;
+				this.icon = this.teamInfo.icon;
 				this.players = JSON.parse(JSON.stringify(this.teamInfo.players));
 				const find = this.players.find(player => player.uid === this.userId)
 				if (find) {

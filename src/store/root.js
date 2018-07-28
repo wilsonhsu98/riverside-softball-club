@@ -279,12 +279,16 @@ const mutations = {
     },
 };
 
-const promiseImage = (img) => {
+const promiseImage = (img, type) => {
+    const mapping = {
+        avatar: 'albumAvatar',
+        icon: 'albumIcon',
+    };
     return new Promise((resolve, reject) => {
             if (img.indexOf('data:image/png;base64') > -1) {
                 const formData = new FormData();
                 formData.append('image', img.split(',')[1]);
-                formData.append('album', config.imgur.albumAvatar);
+                formData.append('album', config.imgur[mapping[type.toLowerCase()]]);
                 return axios.post(config.imgur.postUrl, formData, {
                     headers: {
                         Authorization: `Client-ID ${config.imgur.clientId}`

@@ -6,6 +6,9 @@ import {
 import utils from "../../libs/utils";
 import { db } from "../../firebase";
 
+let snapShotGames;
+let snapShotplayers;
+
 const types = {
     INIT_FROM_LS: 'RECORD/INIT_FROM_LS',
     GET_PERIOD: 'RECORD/GET_PERIOD',
@@ -192,7 +195,8 @@ const actions = {
         commit(rootTypes.LOADING, true);
         let queryCount = 0;
         const realtimeCount = 2;
-        db.collection('teams').doc(team).collection('games')
+        if (typeof snapShotGames === 'function') snapShotGames();
+        snapShotGames= db.collection('teams').doc(team).collection('games')
             .onSnapshot(snapshot => {
                 queryCount += 1;
                 if (queryCount > realtimeCount) {
@@ -210,7 +214,8 @@ const actions = {
                     }
                 }
             });
-        db.collection('teams').doc(team).collection('players')
+        if (typeof snapShotplayers === 'function') snapShotplayers();
+        snapShotplayers = db.collection('teams').doc(team).collection('players')
             .onSnapshot(snapshot => {
                 queryCount += 1;
                 if (queryCount > realtimeCount) {

@@ -337,7 +337,7 @@
 			goStats(key) {
 				this.setSortBy(key);
 				this.setUnlimitedPA(true);
-				router.push('/main/stats_pa');
+				router.push(`/main/stats_pa/${this.$route.params.team}`);
 			}
 		},
 		computed: {

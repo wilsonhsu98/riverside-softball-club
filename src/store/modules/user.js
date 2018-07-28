@@ -32,7 +32,7 @@ const actions = {
         commit(rootTypes.LOADING, true);
         const refPlayerDoc = db.collection("accounts").doc(data.userId);
 
-        promiseImage(data.custom)
+        promiseImage(data.custom, 'avatar')
         .then(url => {
             let photo = undefined;
             if (data.current === 'custom') {

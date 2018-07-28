@@ -143,6 +143,9 @@
 						height: 30px;
 						line-height: 30px;
 						margin: 0 auto;
+						-moz-transition: background-color .5s;
+						-webkit-transition: background-color .5s;
+						transition: background-color .5s;
 					}
 					&:after {
 						content: attr(data-label);

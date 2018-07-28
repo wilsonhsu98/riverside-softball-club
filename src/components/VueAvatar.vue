@@ -79,7 +79,11 @@ export default {
         rotation: {
             type: Number,
             default: 0
-        }
+        },
+        canMoveOutOfBound: {
+            type: Boolean,
+            default: false
+        },
     },
     data () {
         return {
@@ -337,6 +341,7 @@ export default {
             return !!str.match(/^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+=[a-z\-]+)?)?(;base64)?,[a-z0-9!$&',()*+;=\-._~:@\/?%\s]*\s*$/i); // eslint-disable-line no-useless-escape
         },
         getBoundedX (x, scale) {
+            if (this.canMoveOutOfBound) return x;
             var image = this.state.image;
             var dimensions = this.getDimensions();
             let width = Math.abs(image.width * Math.cos(this.rotationRadian)) + Math.abs(image.height * Math.sin(this.rotationRadian));
@@ -345,6 +350,7 @@ export default {
             return Math.max(-widthDiff, Math.min(x, widthDiff));
         },
         getBoundedY (y, scale) {
+            if (this.canMoveOutOfBound) return y;
             var image = this.state.image;
             var dimensions = this.getDimensions();
             let height = Math.abs(image.width * Math.sin(this.rotationRadian)) + Math.abs(image.height * Math.cos(this.rotationRadian));
