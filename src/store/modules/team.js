@@ -30,21 +30,31 @@ const actions = {
     editTeam({ commit, dispatch }, data) {
         commit(rootTypes.LOADING, true);
 
-        const docRef = db.collection("teams").doc(data.code);
-        Promise.all([promiseImage(data.icon, 'icon'), docRef.get()])
-        .then(res => {
-            const [url, doc] = res;
-            if (doc.exists && data.isNew) {
+        const refTeamDoc = db.collection("teams").doc(data.code);
+        const refPlayerDoc = db.collection("accounts").doc(auth.currentUser.uid);
+        Promise.all([
+            promiseImage(data.icon, 'icon'),
+            refTeamDoc.get(),
+            refTeamDoc.collection('players').get(),
+            refPlayerDoc.get()
+        ]).then(res => {
+            const [url, teamDoc, teamPlayersCollection, playerDoc] = res;
+            if (teamDoc.exists && data.isNew) {
                 alert(i18n.t('msg_duplicate_team'));
                 return true;
             } else {
                 const batch = db.batch();
-                batch.set(docRef, {
+                batch.set(refTeamDoc, {
                     name: data.name,
                     subNames: data.subNames,
                     intro: data.intro,
                     icon: url,
                     timestamp,
+                });
+                teamPlayersCollection.docs.forEach(item => {
+                    if (!data.players.map(player => player.name).includes(item.id)) {
+                        batch.delete(refTeamDoc.collection('players').doc(item.id));
+                    }
                 });
                 data.players.forEach(item => {
                     let obj = {
@@ -52,16 +62,15 @@ const actions = {
                         manager: item.manager,
                     };
                     if (item.self) {
-                        batch.set(db.collection('accounts').doc(auth.currentUser.uid).collection('teams').doc(data.code), {
+                        batch.set(refPlayerDoc.collection('teams').doc(data.code), {
                             role: 'manager',
-                            // icon: doc.data().icon,
                         });
                         obj = Object.assign(obj, {
-                            uid: auth.currentUser.uid,
-                            photo: auth.currentUser.photoURL,
+                            uid: playerDoc.id,
+                            photo: playerDoc.data().photo,
                         });
                     }
-                    batch.set(db.collection('teams').doc(data.code).collection('players').doc(item.name), obj);
+                    batch.set(refTeamDoc.collection('players').doc(item.name), obj);
                 });
                 return batch.commit();
             }
@@ -73,15 +82,18 @@ const actions = {
     },
     fetchTeamInfo({ commit }, teamCode) {
         commit(rootTypes.LOADING, true);
+
+        const refTeamDoc = db.collection("teams").doc(teamCode);
         Promise.all([
-            db.collection("teams").doc(teamCode).get(),
-            db.collection('teams').doc(teamCode).collection('players').get()
+            refTeamDoc.get(),
+            refTeamDoc.collection('players').get()
         ]).then(res => {
-            if (res[0].exists) {
-                const players = res[1].docs.map(doc => {
+            const [teamDoc, playerCollection] = res;
+            if (teamDoc.exists) {
+                const players = playerCollection.docs.map(doc => {
                     return Object.assign({ name: doc.id }, doc.data());
                 });
-                commit(types.FETCH_TEAM, Object.assign({ id: res[0].id }, res[0].data(), { players }));
+                commit(types.FETCH_TEAM, Object.assign({ id: teamDoc.id }, teamDoc.data(), { players }));
             }
             commit(rootTypes.LOADING, false);
         });
