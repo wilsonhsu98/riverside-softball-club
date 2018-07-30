@@ -76,24 +76,23 @@ const actions = {
                         });
                     })
                     .then(res => {
-                        return refPlayerDoc.set({
-                            accessToken: res.accessToken,
-                            name: res.name,
-                            photo: res.photo,
-                            line_photo: user.photoURL,
-                        }, { merge: true })
-                        .then(() => {
-                            return res;
-                        });
+                        const { accessToken, ...other } = res;
+                        return Promise.all([
+                            refPlayerDoc.set({
+                                accessToken: res.accessToken,
+                                name: res.name,
+                                photo: res.photo,
+                                line_photo: user.photoURL,
+                            }, { merge: true }),
+                            refPlayerDoc.collection("teams").get(),
+                            other
+                        ]);
                     })
                     .then(res => {
-                        const { accessToken, ...other } = res;
-                        refPlayerDoc.collection("teams").get()
-                            .then(snapshot => {
-                                if (snapshot.docs.length) {
-                                    commit(types.SET_AUTH, snapshot.docs.map(doc => ({ team: doc.id, role: doc.data().role })));
-                                }
-                            });
+                        const [setAction, snapshot, other] = res;
+                        if (snapshot.docs.length) {
+                            commit(types.SET_AUTH, snapshot.docs.map(doc => ({ team: doc.id, role: doc.data().role })));
+                        }
                         commit(types.SET_ACCOUNT_INFO, { ...other });
                         // commit(types.SET_USERNAME, snapshot.docs[0].id);
                         router.push('/main/user');
@@ -141,26 +140,25 @@ const actions = {
                             });
                         })
                         .then(res => {
-                            return refPlayerDoc.set({
-                                accessToken: res.accessToken,
-                                name: res.name,
-                                email: res.email,
-                                photo: res.photo,
-                                [`${providerData.providerId.split('.')[0]}_photo`]:
-                                    providerData.providerId === 'facebook.com' ? `${providerData.photoURL}?type=large` : providerData.photoURL,
-                            }, { merge: true })
-                            .then(() => {
-                                return res;
-                            })
+                            return Promise.all([
+                                refPlayerDoc.set({
+                                    accessToken: res.accessToken,
+                                    name: res.name,
+                                    email: res.email,
+                                    photo: res.photo,
+                                    [`${providerData.providerId.split('.')[0]}_photo`]:
+                                        providerData.providerId === 'facebook.com' ? `${providerData.photoURL}?type=large` : providerData.photoURL,
+                                }, { merge: true }),
+                                refPlayerDoc.collection("teams").get(),
+                                res
+                            ]);
                         })
                         .then(res => {
-                            const { accessToken, ...other } = res;
-                            refPlayerDoc.collection("teams").get()
-                                .then(snapshot => {
-                                    if (snapshot.docs.length) {
-                                        commit(types.SET_AUTH, snapshot.docs.map(doc => ({ team: doc.id, role: doc.data().role })));
-                                    }
-                                });
+                            const [setAction, snapshot, data] = res;
+                            const { accessToken, ...other } = data;
+                            if (snapshot.docs.length) {
+                                commit(types.SET_AUTH, snapshot.docs.map(doc => ({ team: doc.id, role: doc.data().role })));
+                            }
                             commit(types.SET_USERID, user.uid);
                             commit(types.SET_TOKEN, accessToken);
                             commit(types.SET_ACCOUNT_INFO, { ...other });

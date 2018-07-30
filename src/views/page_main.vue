@@ -2,7 +2,7 @@
 	<div class="main-container">
 		<header>
 			<div class="header-container">
-				<img class="icon" :src="teamInfo.icon || defaultIcon"/>
+				<img class="icon" :src="currentTeamIcon || defaultIcon"/>
 				<ul class="tab">
 					<li v-if="currentTeam">
 						<router-link :to="{ name: 'games', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_games')">
@@ -196,12 +196,14 @@
 			this.initFromLS();
 			this.fetchGame();
 			this.fetchUser();
+			this.fetchTeamIcon(this.currentTeam);
 		},
 		methods: {
 			...mapActions({
 				initFromLS: 'initFromLS',
 				fetchTable: 'fetchTable',
 				fetchUser: 'fetchUser',
+				fetchTeamIcon: 'fetchTeamIcon',
 			}),
 			fetchGame() {
 				if (!this.isFetchGame && this.$route.params.team) {
@@ -215,7 +217,7 @@
 				loading: 'loading',
 				currentTeam: 'currentTeam',
 				role: 'role',
-				teamInfo: 'teamInfo',
+				currentTeamIcon: 'currentTeamIcon',
 			})
 		},
 		watch: {

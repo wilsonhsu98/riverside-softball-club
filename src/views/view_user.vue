@@ -1,6 +1,6 @@
 <template>
 	<div class="profile-container">
-		<mobile-header :icon="teamInfo.icon"/>
+		<mobile-header :icon="currentTeamIcon"/>
 		<div>{{ accountInfo.name }}</div>
 		<div>{{ accountInfo.email }}</div>
 		<img class="avatar" :src="accountInfo.photo" width="100"></img>
@@ -83,7 +83,7 @@
 		computed: {
 			...mapGetters({
 				accountInfo: 'accountInfo',
-				teamInfo: 'teamInfo',
+				currentTeamIcon: 'currentTeamIcon',
 			})
 		}
 	}

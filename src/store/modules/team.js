@@ -9,6 +9,7 @@ import { db, auth, timestamp } from "../../firebase";
 
 const types = {
     FETCH_TEAM: 'TEAM/FETCH_TEAM',
+    FETCH_TEAMICON: 'TEAM/FETCH_TEAMICON',
 };
 
 const state = {
@@ -18,12 +19,14 @@ const state = {
         teamIntro: '',
         otherNames: '',
         players: [{}],
-        icon: window.localStorage.getItem('currentTeamIcon') || '',
+        icon: '',
     },
+    currentTeamIcon: '',
 };
 
 const getters = {
     teamInfo: state => state.teamInfo,
+    currentTeamIcon: state => state.currentTeamIcon || window.localStorage.getItem('currentTeamIcon') || '',
 };
 
 const actions = {
@@ -74,8 +77,8 @@ const actions = {
                 });
                 return batch.commit();
             }
-        }).then(() => {
-            dispatch('fetchTeamInfo', data.code);
+        // }).then(() => {
+        //     dispatch('fetchTeamInfo', data.code);
         }).catch(error => {
             console.log("Error getting document:", error);
         });
@@ -98,11 +101,38 @@ const actions = {
             commit(rootTypes.LOADING, false);
         });
     },
+    fetchTeamIcon({ commit }, teamCode) {
+        commit(rootTypes.LOADING, true);
+
+        const refTeamDoc = db.collection("teams").doc(teamCode);
+        let queryCount = 0;
+        const realtimeCount = 1;
+        refTeamDoc.onSnapshot(doc => {
+            queryCount += 1;
+            if (queryCount > realtimeCount) {
+                // realtime
+                commit(rootTypes.LOADING, { text: 'New data is coming' });
+                setTimeout(() => {
+                    if (doc.exists) {
+                        commit(types.FETCH_TEAMICON, doc.data().icon);
+                    }
+                    commit(rootTypes.LOADING, false);
+                }, 1000);
+            } else {
+                // first time
+                if (doc.exists) {
+                    commit(types.FETCH_TEAMICON, doc.data().icon);
+                }
+                if (queryCount === realtimeCount) {
+                    commit(rootTypes.LOADING, false);
+                }
+            }
+        });
+    },
 };
 
 const mutations = {
     [types.FETCH_TEAM](state, data) {
-        if (data.icon) window.localStorage.setItem('currentTeamIcon', data.icon);
         state.teamInfo = {
             teamCode: data.id,
             teamName: data.name,
@@ -111,6 +141,10 @@ const mutations = {
             players: data.players.sort((a, b) => a.number > b.number),
             icon: data.icon,
         };
+    },
+    [types.FETCH_TEAMICON](state, data) {
+        if (data) window.localStorage.setItem('currentTeamIcon', data);
+        state.currentTeamIcon = data;
     },
 };
 

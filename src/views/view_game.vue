@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<mobile-header :icon="teamInfo.icon"/>
+		<mobile-header :icon="currentTeamIcon"/>
 		<div class="gamebox-container">
 			<div class="box-summary" v-if="boxSummary.league && boxSummary.group">
 				{{ `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}` }}
@@ -333,7 +333,7 @@
 				box: 'box',
 				boxSummary: 'boxSummary',
 				loading: 'loading',
-				teamInfo: 'teamInfo',
+				currentTeamIcon: 'currentTeamIcon',
 			})
 		}
 	}

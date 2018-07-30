@@ -1,6 +1,6 @@
 <template>
 	<div class="gamelist-container">
-		<mobile-header :icon="teamInfo.icon"/>
+		<mobile-header :icon="currentTeamIcon"/>
 		<template v-for="item in gameList">
 			<div class="row" :data-date="item.date">
 				<template v-for="sub in item.games">
@@ -108,7 +108,7 @@
 			...mapGetters({
 				gameList: 'gameList',
 				currentTeam: 'currentTeam',
-				teamInfo: 'teamInfo',
+				currentTeamIcon: 'currentTeamIcon',
 			})
 		}
 	}

@@ -2,7 +2,7 @@
 	<div class="profile-container">
 		<mobile-header
 			:back="back_"
-			:icon="teamInfo.icon"
+			:icon="currentTeamIcon"
 			:save="edit_"
 		/>
 		<h1>{{ $t('edit_avatar') }}</h1>
@@ -268,7 +268,7 @@
 		computed: {
 			...mapGetters({
 				accountInfo: 'accountInfo',
-				teamInfo: 'teamInfo',
+				currentTeamIcon: 'currentTeamIcon',
 				userId: 'userId',
 			})
 		},
