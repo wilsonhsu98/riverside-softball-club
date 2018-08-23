@@ -78,6 +78,7 @@
 			display: inline-block;
 			position: relative;
 			cursor: pointer;
+			width: 73px;
 			&:not(.custom):before {
 				content: '';
 				display: inline-block;
@@ -127,7 +128,8 @@
 			}
 		}
 		img {
-			width: 80px;
+			// width: 80px;
+			width: 100%;
 			border-radius: 50%;
 			vertical-align: top;
 		}
@@ -203,8 +205,8 @@
 			}
 		}
 		.avatar-container {
-			img {
-				width: 64px;
+			span {
+				width: 17%;
 			}
 		}
 		.avatar-editor {

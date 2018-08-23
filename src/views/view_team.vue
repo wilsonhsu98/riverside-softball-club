@@ -2,7 +2,7 @@
 	<div>
 		<mobile-header
 			:back="back_"
-			:icon="teamInfo.icon"
+			:icon="currentTeamIcon"
 			:save="editTeam_"
 		/>
 		<div class="container">
@@ -32,6 +32,15 @@
 				:placeholder="$t('pla_split_names')"
 				v-model="otherNames"
 			/>
+			<!-- <vue-tags-input
+				class="field-wrapper"
+				v-model="otherName"
+				:allow-edit-tags="true"
+				:placeholder="$t('pla_split_names')"
+				:tags="otherNames"
+				:separators="[';', ',']"
+				@tags-changed="newTags => otherNames = newTags"
+			/> -->
 
 			<custom-input
 				class="field-wrapper"
@@ -377,6 +386,7 @@
 				teamName: '',
 				teamName_err: '',
 				teamIntro: '',
+				// otherName: '',
 				otherNames: '',
 				players: [{}],
 				players_err: '',
@@ -492,6 +502,7 @@
 			...mapGetters({
 				userId: 'userId',
 				teamInfo: 'teamInfo',
+				currentTeamIcon: 'currentTeamIcon',
 			}),
 		},
 		watch: {
@@ -508,6 +519,9 @@
 				this.teamName = this.teamInfo.teamName;
 				this.teamIntro = this.teamInfo.teamIntro;
 				this.otherNames = this.teamInfo.otherNames;
+				// this.otherNames = this.teamInfo.otherNames.split(',').map(item => ({
+				// 	text: item,
+				// }));
 				this.icon = this.teamInfo.icon;
 				this.players = JSON.parse(JSON.stringify(this.teamInfo.players));
 				const find = this.players.find(player => player.uid === this.userId)

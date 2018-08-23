@@ -17,7 +17,7 @@
 				</template>
 
 				<template v-else-if="type === 'splitting-wording'">
-					<div v-if="showPretty && value && value.split(',').length" class="split">
+					<!-- <div v-if="showPretty && value && value.split(',').length" class="split">
 						<span v-if="split !== ''" v-for="split in value.split(',')" class="split-span">
 							{{ split }}
 						</span>
@@ -28,6 +28,18 @@
 						:value="value"
 						:placeholder="focused ? placeholder : ''"
 						@blur="split($event.target.value)"
+					/> -->
+
+					<vue-tags-input
+						ref="splitInput"
+						v-model="tag"
+						:allow-edit-tags="true"
+						:placeholder="focused ? placeholder : ''"
+						:tags="value ? value.split(',').filter(item => item).map(item => ({ text: item })) : []"
+						:separators="[',']"
+						:disabled="disabled"
+						@blur="blur"
+						@tags-changed="newTags => this.$emit('input', newTags.filter(item => item.text).map(item => item.text).join(','))"
 					/>
 				</template>
 
@@ -189,10 +201,15 @@
 			return {
 				focused: false,
 				showPretty: false,
+				tag: '',
 			};
 		},
 		methods: {
-			focus() {
+			focus(e) {
+				// console.log(e.target);
+				// console.log(e.currentTarget);
+				if (e.target.tagName === 'SPAN') return;
+				// if (this.type === 'splitting-wording' && this.value) return;
 				if (this.disabled) return;
 
 				this.focused = true;
@@ -201,7 +218,7 @@
 					if (this.type === 'textarea') {
 						this.$refs.textarea.focus();
 					} else if (this.type === 'splitting-wording') {
-						this.$refs.splitInput.focus();
+						this.$refs.splitInput.$refs.newTagInput.focus();
 					} else {
 						this.$refs.input.focus();
 					}

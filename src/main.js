@@ -5,11 +5,13 @@ import i18n from './i18n';
 import './css/font-awesome.min.css';
 import './css/font.css';
 import './scss/_base.scss';
+import VueTagsInput from '@johmun/vue-tags-input';
 
 let componentsReq = require.context("./components/", false, /\.vue$/);
 componentsReq.keys().forEach(path => {
 	Vue.component(path.replace(/(\_|\b|\-)./g, function(a) { return a.toUpperCase(); }).replace(/(\_|\b|\-|\.\/|\.vue)*/ig, ""), componentsReq(path).default);
 });
+Vue.component('vue-tags-input', VueTagsInput);
 
 const app = new Vue({
 	el: '#app',

@@ -107,6 +107,32 @@ select::-ms-expand {
 	word-break: normal;
 }
 
+.field-wrapper-children {
+	.vue-tags-input[class] {
+		background-color: transparent;
+		.input[class] {
+			border: none;
+			min-height: 38px;
+		}
+		.tag-input[class] {
+			height: 100%;
+			font-size: .85rem;
+		}
+		.new-tag-input {
+			min-width: auto;
+			padding: 0;
+			width: 0;
+		}
+		.new-tag-input:not([placeholder='']) {
+			min-width: 170px;
+			font-size: 14px;
+		}
+		.tag-center[class] {
+			line-height: 19px;
+		}
+	}
+}
+
 
 @media only screen and (max-width: 760px) {
 	// html {
