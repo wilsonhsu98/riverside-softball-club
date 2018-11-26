@@ -70,6 +70,7 @@
 	export default {
 		data() {
 			return {
+				dots: undefined
 				// dots: [{x: 50, y: 50, color: 'blue'}, {x: 30, y: 30}]
 			};
 		},

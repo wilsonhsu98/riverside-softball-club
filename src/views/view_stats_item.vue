@@ -56,6 +56,7 @@
 		border-radius: 10px;
 		margin: 20px 0;
 		padding: 20px;
+		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 		> div, label {
 			display: inline-block;
 			line-height: 30px;
@@ -97,6 +98,9 @@
 			background-color: #fff;
 			display: flex;
 			flex-direction: column;
+			border-radius: 10px;
+			overflow: hidden;
+			box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 			.header {
 				background: $header_bgcolor;
 				color: $header_color;
@@ -261,6 +265,7 @@
 				margin: 10px 0;
 				flex: 0 1 48%;
 				flex: 0 1 calc(50vw - 10px);
+				border-radius: 0;
 			}
 		}
 	}

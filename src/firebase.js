@@ -1,8 +1,8 @@
 import firebase from 'firebase';
 import 'firebase/firestore';
-import config from'../functions/config.json';
+import config from'../config.json';
 
-firebase.initializeApp(config);
+firebase.initializeApp(config.firebase);
 
 const db = firebase.firestore();
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();

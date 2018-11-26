@@ -25,6 +25,12 @@ const router = new VueRouter({
             meta: { requiresAuth: false },
         },
         {
+            path: '/parse/:team',
+            name: 'parse',
+            component: require('./views/page_parse').default,
+            meta: { requiresAuth: false },
+        },
+        {
             path: '/main',
             name: 'main',
             component: require('./views/page_main').default,
@@ -39,6 +45,11 @@ const router = new VueRouter({
                     path: 'games/:team/:game',
                     name: 'game',
                     component: require('./views/view_game').default,
+                    meta: { requiresAuth: true },
+                }, {
+                    path: 'games/:team/:game/:order',
+                    name: 'pa',
+                    component: require('./views/view_edit_pa').default,
                     meta: { requiresAuth: true },
                 }, {
                     path: 'stats_pa/:team',
@@ -75,14 +86,14 @@ const router = new VueRouter({
         },
         {
             path: '*',
-            redirect: '/login',
+            redirect: '/main/user',
         }
     ]
 });
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(route => route.meta.requiresAuth) && store.getters.userId === '' && store.getters.token === '') {
-        next({ path: 'login' });
+        next({ path: '/login' });
     } else {
         next();
     }

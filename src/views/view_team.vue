@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<mobile-header
-			:back="back_"
+			:back="!$route.params.team ? back_ : undefined"
 			:icon="currentTeamIcon"
 			:save="editTeam_"
 		/>
@@ -136,7 +136,10 @@
 
 			<div v-if="players_err" class="error">{{ players_err }}</div>
 
-			<button class="save-btn" @click="editTeam_">{{ $route.params.team ? $t('btn_update') : $t('btn_insert') }}</button>
+			<div class="button-container">
+				<button v-if="!$route.params.team" class="save-btn" @click="back_">{{ $t('btn_cancel') }}</button>
+				<button class="save-btn" @click="editTeam_">{{ $route.params.team ? $t('btn_update') : $t('btn_insert') }}</button>
+			</div>
 		</div>
 	</div>
 </template>
@@ -149,7 +152,7 @@
 		background-color: #fff;
 		border-radius: 10px;
 		margin: 20px 0;
-		padding: 20px;
+		padding: 10px 20px;
 		box-sizing: border-box;
 		position: relative;
 		box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
@@ -228,12 +231,18 @@
 			box-sizing: border-box;
 			color: $active_bgcolor;
 		}
+		.button-container {
+			padding: 10px 0;
+			text-align: center;
+			width: 100%;
+			position: sticky;
+			bottom: 0;
+			background-color: rgba(255,255,255,0.8);
+		}
 		.save-btn {
 			background-color: $header_bgcolor;
 			padding: 10px 15px;
 			width: 100px;
-			margin: 10px auto;
-			display: block;
 		}
 	}
 	.icon-container {

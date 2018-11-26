@@ -1,93 +1,99 @@
 <template>
-	<div :class="`canvas ${disabled ? 'disabled' : ''}`" ref="canvas">
-		<div class="in-field">
-			<div class="warning-track">
-				<div class="out-field">
-					<div class="out-field-gress r-270">
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-					</div>
-					<div class="out-field-gress r-180">
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
+	<div class="container">
+		<div class="canvas">
+			<div class="in-field">
+				<div class="warning-track">
+					<div class="out-field">
+						<div class="out-field-gress r-270">
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+						</div>
+						<div class="out-field-gress r-180">
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+							<div class="gress-mask"></div>
+						</div>
 					</div>
 				</div>
-			</div>
-			<div class="in-field-track"></div>
-			<div class="in-field-gress">
-				<div class="first-base base"></div>
-				<div class="second-base base"></div>
-				<div class="third-base base"></div>
-				<div class="pitcher base"></div>
+				<div class="in-field-track"></div>
+				<div class="in-field-gress">
+					<div class="first-base base"></div>
+					<div class="second-base base"></div>
+					<div class="third-base base"></div>
+					<div class="pitcher base"></div>
 
-				<div class="gress r-270">
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-				</div>
-				<div class="gress r-180">
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
+					<div class="gress r-270">
+						<div class="gress-mask"></div>
+						<div class="gress-mask"></div>
+						<div class="gress-mask"></div>
+						<div class="gress-mask"></div>
+						<div class="gress-mask"></div>
+					</div>
+					<div class="gress r-180">
+						<div class="gress-mask"></div>
+						<div class="gress-mask"></div>
+						<div class="gress-mask"></div>
+						<div class="gress-mask"></div>
+						<div class="gress-mask"></div>
+					</div>
 				</div>
 			</div>
+			<div class="cover cover-left">
+				<div class="cover-ground"></div>
+			</div>
+			<div class="cover cover-right">
+				<div class="cover-ground"></div>
+			</div>
+			<div class="home">
+				<div class="home-batting-left home-batting"></div>
+				<div class="home-base"></div>
+				<div class="home-batting-right home-batting"></div>
+			</div>
 		</div>
-		<div class="cover cover-left">
-			<div class="cover-ground"></div>
-		</div>
-		<div class="cover cover-right">
-			<div class="cover-ground"></div>
-		</div>
-		<div class="home">
-			<div class="home-batting-left home-batting"></div>
-			<div class="home-base"></div>
-			<div class="home-batting-right home-batting"></div>
-		</div>
-		<div class="coordinate-area" @mousedown="trackXY">
-			<div class="dot" v-for="item in xy" :style="{ left: `${item.realX}px`, top: `${item.realY}px`, backgroundColor: item.color }"></div>
-		</div>
+		<slot></slot>
 	</div>
 </template>
 
 <style lang="scss" scoped>
 	$green: #6aa253;
 	$orange: #e3ab78;
+	.container {
+		width: 300px;
+		height: 180px;
+		position: relative;
+		overflow: hidden;
+		display: inline-block;
+	}
 	.canvas {
 		display: inline-block;
-		width: 500px;
-		height: 500px;
+		width: 300px;
+		height: 300px;
 		background-color: $green;
 		overflow: hidden;
-		position: relative;
-		&.disabled {
-			opacity: .5;
-		}
+		position: absolute;
+		top: -118px;
+		left: 0;
 		.in-field {
 			display: inline-block;
 			width: 25%;
@@ -335,127 +341,27 @@
 				}
 			}
 		}
-		.coordinate-area {
-			position: absolute;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			.dot {
-				display: inline-block;
-				width: 1%;
-				height: 1%;
-				background-color: yellow;
-				border-radius: 50%;
-				position: absolute;
-			}
-		}
 		.gress-mask {
-			height: 30px;
+			height: 20px;
 			opacity: .1;
 			background-color: white;
-			margin: 30px 0;
+			margin: 20px 0;
 		}
 	}
 	@media only screen and (max-width: 760px) {
-		.canvas {
-			// width: calc(100vw - 20px);
-			// height: calc(100vw - 20px);
-			width: 300px;
-			height: 300px;
-			.gress-mask {
-				height: 20px;
-				opacity: .1;
-				background-color: white;
-				margin: 20px 0;
-			}
-		}
+		// .canvas {
+		// 	width: calc(100vw - 20px);
+		// 	height: calc(100vw - 20px);
+		// 	.gress-mask {
+		// 		height: 20px;
+		// 		opacity: .1;
+		// 		background-color: white;
+		// 		margin: 20px 0;
+		// 	}
+		// }
 	}
 </style>
 
 <script>
-	export default {
-		props: ['values', 'disabled'],
-		data() {
-			return {
-				xy: this.values || [],
-			}
-		},
-		mounted() {
-			this.resetDot();
-			window.addEventListener('resize', this.resetDot);
-		},
-		beforeDestroy() {
-			window.removeEventListener('resize', this.resetDot);
-		},
-		methods: {
-			trackXY(event) {
-				if (this.disabled) return;
-				if (Array.isArray(this.values) && this.values.length > 1) return;
-				const { left, top, width, height } = this.$refs["canvas"].getBoundingClientRect();
-				const x = parseInt((event.pageX - left - window.scrollX) / width * 100, 10);
-				const y = parseInt((event.pageY - top - window.scrollY) / height * 100, 10);
-				let location = '';
-				// console.log(`(${x}, ${y})`);
-				if (y - x <= 38 && y + x <= 138) {
-					if (Math.pow(x - 50, 2) + Math.pow(y - 66, 2) <= Math.pow(21, 2)) {
-						if ((y - x * 4 / 7 >= 56 - 32 * 4 / 7) && (y + x * 7 /3 <= 64 + 46 * 7 / 3)) {
-							location = '3B';
-						} else if ((y + x * 4 / 7 >= 56 + 68 * 4 / 7) && (y - x * 7 /3 <= 64 - 54 * 7 / 3)) {
-							location = '1B';
-						} else if (x <= 50 && y <= 64) {
-							location = 'ss';
-						} else if (x > 50 && y <= 64) {
-							location = '2B';
-						} else {
-							location = 'P';
-						}
-					} else if (Math.pow(x - 50, 2) + Math.pow(y - 66, 2) < Math.pow(58.5, 2)) {
-						if (y - x * 7 / 2 >= -87) {
-							location = '左';
-						} else if (y + x * 7 / 2 >= 263) {
-							location = '右';
-						} else {
-							location = '中';
-						}
-					} else {
-						if (y - x * 7 / 2 >= -87) {
-							location = '左hr';
-						} else if (y + x * 7 / 2 >= 263) {
-							location = '右hr';
-						} else {
-							location = '中hr';
-						}
-					}
-				} else {
-					location = '界外';
-				}
-				this.xy = [{
-					x,
-					y,
-					realX: x / 100 * this.$refs["canvas"].offsetWidth,
-					realY: y / 100 * this.$refs["canvas"].offsetHeight,
-					location,
-				}];
-			},
-			resetDot() {
-				this.xy.forEach(item => {
-					item.realX = item.x / 100 * this.$refs["canvas"].offsetWidth;
-					item.realY = item.y / 100 * this.$refs["canvas"].offsetHeight;
-				});
-				this.xy = [].concat(this.xy);
-			},
-		},
-		watch: {
-			xy() {
-				this.$emit('change', this.xy[0]);
-			},
-			disabled() {
-				if (this.disabled) {
-					this.xy = [];
-					this.resetDot();
-				}
-			},
-		}
-	};
+
 </script>

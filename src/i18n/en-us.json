@@ -3,6 +3,7 @@
 	"login_line_btn": "Sign in with your LINE account",
 	"login_google_btn": "Sign in with your Google account",
 	"login_github_btn": "Sign in with your Github account",
+	"login_anonymous_btn": "Sign in anonymously",
 	"logout_btn": "Log out",
 	"fb_share": "Share",
 	"menu_games": "Games",
@@ -81,6 +82,7 @@
 	"join_team": "Join a team",
 
 	"btn_update": "Save",
+	"btn_cancel": "Cancel",
 	"btn_insert": "Create",
 	"required": "Required column"
 }

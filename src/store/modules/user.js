@@ -72,21 +72,24 @@ const actions = {
         });
     },
     fetchUser({ commit }) {
-        let queryCount = 0;
-        const realtimeCount = 1;
-        db.collection("accounts").doc(rootGetters.userId(rootState))
-            .onSnapshot(snapshot => {
-                const { accessToken, ...other } = snapshot.data();
-                queryCount += 1;
-                if (queryCount > realtimeCount) {
-                    // realtime
-                    commit(rootTypes.LOADING, { text: 'New data is coming' });
-                    setTimeout(() => {
-                        commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
-                        commit(rootTypes.LOADING, false);
-                    }, 1000);
-                }
-            });
+        const userId = rootGetters.userId(rootState);
+        if (userId) {
+            let queryCount = 0;
+            const realtimeCount = 1;
+            db.collection("accounts").doc(userId)
+                .onSnapshot(snapshot => {
+                    const { accessToken, ...other } = snapshot.data();
+                    queryCount += 1;
+                    if (queryCount > realtimeCount) {
+                        // realtime
+                        commit(rootTypes.LOADING, { text: 'New data is coming' });
+                        setTimeout(() => {
+                            commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
+                            commit(rootTypes.LOADING, false);
+                        }, 1000);
+                    }
+                });
+        }
     },
 };
 

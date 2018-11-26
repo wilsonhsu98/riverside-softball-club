@@ -13,6 +13,10 @@
 		<button class="signin-btn github" @click="githubLogin">
 			{{ $t('login_github_btn') }}
 		</button>
+		<button class="signin-btn anonymous" @click="anonymousLogin">
+			<i class="fa fa-user-secret"></i>
+			{{ $t('login_anonymous_btn') }}
+		</button>
 	</div>
 </template>
 
@@ -84,6 +88,21 @@
 				background-image: url(../images/github.svg);
 			}
 		}
+		&.anonymous {
+			background-color: $header_bgcolor;
+			&:before {
+				content: none;
+			}
+			.fa {
+				display: inline-block;
+				position: absolute;
+				left: 16px;
+				width: 20px;
+				height: 20px;
+				text-align: center;
+				font-size: 21px;
+			}
+		}
 		&:focus {
 			outline: none;
 		}
@@ -109,6 +128,7 @@
 		},
 		methods: {
 			...mapActions({
+				anonymousLogin: 'anonymousLogin',
 				googleLogin: 'googleLogin',
 				fbLogin: 'fbLogin',
 				githubLogin: 'githubLogin',

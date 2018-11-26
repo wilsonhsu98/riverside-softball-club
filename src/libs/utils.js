@@ -237,12 +237,16 @@ utils.displayGame = function(players, records, errors) {
         };
     records.map((item, i, self) => {
             const find = arr.find(sub => sub.name === item.name);
+            if (!item.order) {
+                item.order = i + 1;
+            }
             if (!find && order === 0) {
                 arr.push({
                     name: item.name,
                     data: (players.find(sub => sub.id === item.name) || {data: {}}).data,
                     order: item.order,
                     content: [],
+                    location: item.location,
                 });
             } else {
                 if (order === 0) {
@@ -257,6 +261,9 @@ utils.displayGame = function(players, records, errors) {
             if (item.inn !== innChange) {
                 innChange = item.inn;
                 item.innChange = item.inn;
+            }
+            if (!item.content) {
+                item.content = 'new';
             }
             item.color = contentColor(item.content);
 
@@ -316,6 +323,17 @@ utils.displayGame = function(players, records, errors) {
                 });
             }
         });
+
+    if (records.length && order) {
+        let insertAt = records[records.length - order];
+        if (insertAt.r && insertAt.name !== insertAt.r) {
+            insertAt = insertAt.r;
+        } else {
+            insertAt = insertAt.name;
+        }
+        arr.find(player => player.name === insertAt).content.push({ content: 'new', name: insertAt });
+    }
+
     let paMax = 0;
     arr.forEach(item => {
         if (item.content.length > paMax) paMax = item.content.length;

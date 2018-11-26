@@ -3,6 +3,7 @@
 	"login_line_btn": "使用LINE帳號登入",
 	"login_google_btn": "使用Google帳號登入",
 	"login_github_btn": "使用Github帳號登入",
+	"login_anonymous_btn": "匿名路過",
 	"logout_btn": "登出",
 	"fb_share": "分享",
 	"menu_games": "盒子",
@@ -59,6 +60,13 @@
 	"box_lose": "輸了",
 	"box_tie": "平手",
 
+	"desc_inn": "局",
+	"desc_order": "全隊第 %{n} 打席",
+	"desc_out": "目前 %{n} 出局",
+	"desc_batting": "輪到第 %{n} 棒",
+	"Out": "出局",
+	"RBI_count": "%{rbi}分",
+
 	"create_team": "新增球隊",
 	"manage_team": "管理球隊",
 	"ttl_team_code": "球隊代號",
@@ -85,6 +93,7 @@
 	"join_team": "加入球隊",
 
 	"btn_update": "儲存",
+	"btn_cancel": "取消",
 	"btn_insert": "新增",
 	"required": "必填欄位"
 }

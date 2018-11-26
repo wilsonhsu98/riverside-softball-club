@@ -33,10 +33,10 @@ const getters = {
 };
 
 const actions = {
-    fetchTwoOrigin({ commit }) {
+    fetchTwoOrigin({ commit }, team = 'OldStar') {
         commit(rootTypes.LOADING, true);
         Promise.all([
-                db.collection('teams').doc('OldStar').collection('games').get().then(snapshot => snapshot.docs.map(doc => doc.id)),
+                db.collection('teams').doc(team).collection('games').get().then(snapshot => snapshot.docs.map(doc => doc.id)),
                 axios.get(GET_URL({ fileId: TEDDY, action: 'sheets' })).then(res => res.data),
                 axios.get(GET_URL({ fileId: TEDDY, sheetname: '比賽結果' })).then(res => res.data)
             ])
@@ -55,7 +55,7 @@ const actions = {
     toggleTodo({ commit }, item) {
         commit(types.SET_TODO, item);
     },
-    importData({ commit }) {
+    importData({ commit }, team = 'OldStar') {
         commit(rootTypes.LOADING, true);
         axios.all([].concat(
                 axios.get(GET_URL({ fileId: TEDDY, sheetname: '比賽結果' })),
@@ -68,7 +68,7 @@ const actions = {
                 res.forEach(item => {
                     const teddySummary = teddySummarys.find(game => game['場次'] === item.table);
                     const parseResult = utils.parseGame(item.data);
-                    batch.set(db.collection('teams').doc('OldStar').collection('games').doc(item.table), {
+                    batch.set(db.collection('teams').doc(team).collection('games').doc(item.table), {
                         orders: parseResult.orders,
                         errors: parseResult.errors,
                         result: ['win', 'lose', 'tie', ''][
@@ -85,13 +85,13 @@ const actions = {
 
                 return batch.commit();
             }).then(() => {
-                this.dispatch('fetchTwoOrigin');
+                this.dispatch('fetchTwoOrigin', team);
             }).catch(err => {
                 alert(err);
                 commit(rootTypes.LOADING, false);
             });
     },
-    importOneGame({ commit }, game) {
+    importOneGame({ commit }, team = 'OldStar', game) {
         commit(rootTypes.LOADING, true);
         axios.all([
                 axios.get(GET_URL({ fileId: TEDDY, sheetname: '比賽結果' })),
@@ -100,7 +100,7 @@ const actions = {
             .then(res => {
                 const teddySummary = res[0].data.find(item => item['場次'] === game);
                 const parseResult = utils.parseGame(res[1].data);
-                return db.collection('teams').doc('OldStar').collection('games').doc(game).set({
+                return db.collection('teams').doc(team).collection('games').doc(game).set({
                     orders: parseResult.orders,
                     errors: parseResult.errors,
                     result: ['win', 'lose', 'tie', ''][

@@ -4,18 +4,18 @@
 		<template v-for="item in gameList">
 			<div class="row" :data-date="item.date">
 				<template v-for="sub in item.games">
-					<div class="item" v-if="sub.hasOrder">
+					<div class="item">
 						<router-link :to="{ name: 'game', params: { team: currentTeam, game: sub.game } }" :class="`result ${sub.result} ${sub.group}`" >
 							{{ (sub.result && sub.result.substr(0, 1)) || '?' }}
 						</router-link>
 						<div class="name">{{ sub.opponent || sub.game }}</div>
 					</div>
-					<div class="item" v-else>
+					<!-- <div class="item" v-else>
 						<div :class="`result ${sub.result} ${sub.group} ${sub.hasOrder ? '' : 'no-order'}`">
 							{{ (sub.result && sub.result.substr(0, 1)) || '?' }}
 						</div>
 						<div class="name">{{ sub.opponent || sub.game }}</div>
-					</div>
+					</div> -->
 				</template>
 			</div>
 		</template>
@@ -53,18 +53,23 @@
 					color: #CCC;
 					box-sizing: border-box;
 					border: 5px solid;
+					border-color: $row_odd_bgcolor;
+					box-shadow:
+						0 2px 2px 0 rgba(0, 0, 0, 0.14),
+						0 3px 1px -2px rgba(0, 0, 0, 0.2),
+						0 1px 5px 0 rgba(0, 0, 0, 0.12);
 					&.win, &.tie, &.lose {
 						color: #FFF;
 					}
 					&.win { background-color: #ef1010; }
 					&.tie { background-color: #efaf34; }
 					&.lose { background-color: #4d9de5; }
-					&.C { border-color: $header_bgcolor; }
-					&.G { border-color: $row_odd_bgcolor; }
-					&.no-order {
-						opacity: .5;
-						cursor: not-allowed;
-					}
+					// &.C { border-color: $header_bgcolor; }
+					// &.G { border-color: $row_odd_bgcolor; }
+					// &.no-order {
+					// 	opacity: .5;
+					// 	cursor: not-allowed;
+					// }
 				}
 			}
 			&:after {
@@ -86,6 +91,9 @@
 			padding: 10px 0 0;
 			background-color: transparent;
 			box-shadow: none;
+			.row .item .result {
+				color: #FFF;
+			}
 		}
 	}
 </style>

@@ -24,6 +24,7 @@ const types = {
     REFRESH_PLAYER: 'RECORD/REFRESH_PLAYER',
     SET_LASTUPDATE: 'RECORD/SET_LASTUPDATE',
     SET_GAME: 'RECORD/SET_GAME',
+    SET_ORDER: 'RECORD/SET_ORDER',
     GET_GAMELIST: 'RECORD/GET_GAMELIST',
 };
 
@@ -60,6 +61,7 @@ const state = {
         { name: 'OPS', visible: true }
     ],
     game: '',
+    order: 0,
     gameList: [],
 };
 
@@ -109,6 +111,9 @@ const getters = {
             .find(item => item.game === state.game);
         return utils.displayGame(state.players, state.records.filter(item => item._table === state.game), boxSummary.errors);
     },
+    pa: state => {
+        return state.records.find(item => item._table === state.game && `${item.order}` === `${state.order}`);
+    },
     boxSummary: state => {
         const boxSummary = state.gameList.length && state.game && state.gameList
             .find(item => item.games.find(sub => sub.game === state.game)).games
@@ -120,6 +125,7 @@ const getters = {
             h: game.filter(item => ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1).length,
             r: game.filter(item => item.r).length,
             e: boxSummary.errors.reduce((result, item) => result + item.count, 0),
+            contents: game,
         });
     },
     gameList: state => state.gameList,
@@ -165,10 +171,10 @@ const actions = {
             }).reduce((a, b) => a.concat(b), []);
             const period = changedData.map(item => {
                 if (item.data.orders && item.data.orders.length) {
-                    item.data.hasOrder = true;
+                    // item.data.hasOrder = true;
                     delete item.data.orders;
                 } else {
-                    item.data.hasOrder = false;
+                    // item.data.hasOrder = false;
                 }
                 return Object.assign({}, item.data, { game: item.id });
             });
@@ -261,6 +267,9 @@ const actions = {
     },
     setGame({ commit }, gemeDate) {
         commit(types.SET_GAME, gemeDate);
+    },
+    setOrder({ commit }, order) {
+        commit(types.SET_ORDER, order);
     },
 };
 
@@ -356,6 +365,9 @@ const mutations = {
     },
     [types.SET_GAME](state, data) {
         state.game = data;
+    },
+    [types.SET_ORDER](state, data) {
+        state.order = data;
     },
     [types.GET_GAMELIST](state, data) {
         state.gameList = utils.genGameList(data);

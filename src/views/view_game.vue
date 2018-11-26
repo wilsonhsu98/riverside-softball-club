@@ -1,6 +1,9 @@
 <template>
 	<div>
-		<mobile-header :icon="currentTeamIcon"/>
+		<mobile-header
+			:back="back_"
+			:icon="currentTeamIcon"
+		/>
 		<div class="gamebox-container">
 			<div class="box-summary" v-if="boxSummary.league && boxSummary.group">
 				{{ `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}` }}
@@ -32,8 +35,27 @@
 								<div class="record" v-if="record === undefined"></div>
 								<div class="record" v-else>
 									<span class="inn">{{ record.innChange }}</span>
-									<span :class="`content ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''}`" :data-rbi="record.rbi" :data-run="`${record.r === record.name ? 'R' : ''}`">
-										{{ $t(record.content) }}
+									<router-link
+										v-if="role === 'manager'"
+										tag="span"
+										:to="{ name: 'pa', params: {
+											team: $route.params.team,
+											game: $route.params.game,
+											order: record.order || 'new',
+										}}"
+										:class="`content editable ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''} ${record.content === 'new' ? 'new' : ''}`"
+										:data-rbi="record.rbi"
+										:data-run="`${record.r === record.name ? 'R' : ''}`"
+									>
+										{{ record.content === 'new' ? '＋' : $t(record.content) }}
+									</router-link>
+									<span
+										v-else
+										:class="`content ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''}`"
+										:data-rbi="record.rbi"
+										:data-run="`${record.r === record.name ? 'R' : ''}`"
+									>
+										{{ record.content !== 'new' ? $t(record.content) : '' }}
 									</span>
 								</div>
 							</template>
@@ -63,6 +85,7 @@
 			margin: 20px 0;
 			padding: 20px;
 			position: relative;
+			box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
 			.result {
 				position: absolute;
 				top: 20px;
@@ -73,6 +96,9 @@
 		.box-table {
 			display: table;
 			width: 100%;
+			border-radius: 10px;
+			overflow: hidden;
+			box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
 		}
 		span {
 			display: inline-block;
@@ -184,6 +210,13 @@
 							text-align: center;
 							background-color: #2497a2;
 						}
+						&.new { background-color: $current_user_bgcolor; }
+						&.editable {
+							cursor: pointer;
+							&:hover {
+								opacity: .8;
+							}
+						}
 					}
 				}
 			}
@@ -227,10 +260,14 @@
 				text-align: center;
 				color: $row_color;
 				font-size: 14px;
+				box-shadow: none;
 				.result {
 					position: initial;
 					font-size: 14px;
 				}
+			}
+			.box-table {
+				border-radius: 0;
 			}
 			.player-records {
 				.player {
@@ -280,7 +317,8 @@
 	import { mapGetters, mapActions } from 'vuex';
 	import html2canvas from 'html2canvas';
 	import axios from 'axios';
-	import config from'../../functions/config.json';
+	import config from'../../config.json';
+	import router from '../router';
 
 	export default {
 		data() {
@@ -327,13 +365,17 @@
 						this.toggleLoading(false);
 					});
 			},
+			back_() {
+				// router.back();
+				router.push(`/main/games/${this.$route.params.team}`);
+			},
 		},
 		computed: {
 			...mapGetters({
 				box: 'box',
 				boxSummary: 'boxSummary',
-				loading: 'loading',
 				currentTeamIcon: 'currentTeamIcon',
+				role: 'role',
 			})
 		}
 	}

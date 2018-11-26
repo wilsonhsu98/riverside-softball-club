@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { db, auth, providerMapping, credentialMapping } from "../firebase";
 import router from '../router';
-import config from'../../functions/config.json';
+import config from'../../config.json';
 
 const types = {
     LOADING: 'LOADING',
@@ -42,6 +42,19 @@ const getters = {
 const actions = {
     toggleLoading({ commit }, isLoading) {
         commit(types.LOADING, isLoading);
+    },
+    anonymousLogin({ commit }) {
+        commit(types.LOADING, { img: true });
+        auth.signInAnonymously();
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                commit(types.SET_TOKEN, user.refreshToken);
+                commit(types.SET_USERNAME, user.uid);
+                // go to main page
+                router.push('/main/stats_pa');
+                commit(types.LOADING, false);
+            }
+        });
     },
     googleLogin({ commit }) {
         auth.signInWithRedirect(providerMapping['google.com']);
@@ -258,10 +271,12 @@ const mutations = {
         state.accountInfo = accountInfo;
     },
     [types.CLEAN_TOKEN](state) {
+        const version = window.localStorage.getItem('version');
         window.localStorage.clear();
         state.token = '';
         state.userId = '';
         router.push('/login');
+        window.localStorage.setItem('version', version);
     },
     [types.SET_AUTH](state, auth) {
         const find = auth.find(item => item.team === window.localStorage.getItem('currentTeam'));

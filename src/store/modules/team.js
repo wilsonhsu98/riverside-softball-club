@@ -85,7 +85,6 @@ const actions = {
     },
     fetchTeamInfo({ commit }, teamCode) {
         commit(rootTypes.LOADING, true);
-
         const refTeamDoc = db.collection("teams").doc(teamCode);
         Promise.all([
             refTeamDoc.get(),
@@ -102,32 +101,34 @@ const actions = {
         });
     },
     fetchTeamIcon({ commit }, teamCode) {
-        commit(rootTypes.LOADING, true);
+        if (teamCode) {
+            commit(rootTypes.LOADING, true);
 
-        const refTeamDoc = db.collection("teams").doc(teamCode);
-        let queryCount = 0;
-        const realtimeCount = 1;
-        refTeamDoc.onSnapshot(doc => {
-            queryCount += 1;
-            if (queryCount > realtimeCount) {
-                // realtime
-                commit(rootTypes.LOADING, { text: 'New data is coming' });
-                setTimeout(() => {
+            const refTeamDoc = db.collection("teams").doc(teamCode);
+            let queryCount = 0;
+            const realtimeCount = 1;
+            refTeamDoc.onSnapshot(doc => {
+                queryCount += 1;
+                if (queryCount > realtimeCount) {
+                    // realtime
+                    commit(rootTypes.LOADING, { text: 'New data is coming' });
+                    setTimeout(() => {
+                        if (doc.exists) {
+                            commit(types.FETCH_TEAMICON, doc.data().icon);
+                        }
+                        commit(rootTypes.LOADING, false);
+                    }, 1000);
+                } else {
+                    // first time
                     if (doc.exists) {
                         commit(types.FETCH_TEAMICON, doc.data().icon);
                     }
-                    commit(rootTypes.LOADING, false);
-                }, 1000);
-            } else {
-                // first time
-                if (doc.exists) {
-                    commit(types.FETCH_TEAMICON, doc.data().icon);
+                    if (queryCount === realtimeCount) {
+                        commit(rootTypes.LOADING, false);
+                    }
                 }
-                if (queryCount === realtimeCount) {
-                    commit(rootTypes.LOADING, false);
-                }
-            }
-        });
+            });
+        }
     },
 };
 

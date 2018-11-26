@@ -62,8 +62,8 @@
 				</template>
 			</div>
 			<template v-for="(item, index) in list">
-				<input type="radio" name="expand" class="toggle-row non-input" :checked="toggleTarget ===  item.name" @click="toggleRadio(item.name)"/>
-				<div :class="`row-grid${item.name === userName ? ' current' : ''}`">
+				<input type="radio" name="expand" class="toggle-row non-input" :checked="toggleTarget ===  item.name" @click="toggleRadio(item.name)" :key="`chk_${encodeURI(item.name)}`"/>
+				<div :class="`row-grid${item.name === userName ? ' current' : ''}`" :key="`div_${encodeURI(item.name)}`">
 					<span class="cell delete"><i class="fa fa-trash" @click="deletePlayer_(item.name)"></i></span>
 					<template v-for="col in displayedCols">
 						<span v-if="col.name === 'Rank'" class="cell Rank" data-label="Rank">{{ index + 1 }}</span>
@@ -105,6 +105,7 @@
 		border-radius: 10px;
 		margin: 20px 0;
 		padding: 20px;
+		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
 		> div, label {
 			display: inline-block;
 			line-height: 30px;
@@ -150,17 +151,21 @@
 	#table {
 		display: table;
 		width: 100%;
-		background: #FFF;
+		// background: #FFF;
 		margin: 0;
 		box-sizing: border-box;
 		color: $row_color;
 		position: relative;
 		z-index: 0;
+		box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+		border-radius: 10px;
 		.header-row {
 			display: table-row;
-			background: $header_bgcolor;
 			color: $header_color;
 			.cell {
+				background: $header_bgcolor;
+				&:first-child { border-top-left-radius: 10px; }
+				&:last-child  { border-top-right-radius: 10px; }
 				&:not(.Rank):not(.name) {
 					cursor: pointer;
 				}
@@ -173,6 +178,12 @@
 					width: 100px;
 					padding-left: 0;
 					text-align: center;
+				}
+				&:nth-child(2n+4):not(.sort) {
+					opacity: 1;
+					> div {
+						opacity: 0.6;
+					}
 				}
 			}
 		}
@@ -187,6 +198,7 @@
 			opacity: 0;
 			cursor: pointer;
 			&:checked {
+				&+.row-grid .cell:nth-last-child(2) { display: block; border-bottom-right-radius: 0; }
 				&+.row-grid .cell.chart {
 					display: flex;
 				}
@@ -196,6 +208,12 @@
 			display: table-row;
 			&:nth-child(4n+3) { background-color: $row_even_bgcolor; }
 			&:nth-child(4n+1) { background-color: $row_odd_bgcolor; }
+			&:last-child {
+				.cell {
+					&:first-child { border-bottom-left-radius: 10px; }
+					&:nth-last-child(2) { border-bottom-right-radius: 10px; }
+				}
+			}
 			&.current {
 				background-color: $current_user_bgcolor;
 				color: $current_user_color;
@@ -231,6 +249,7 @@
 				padding-top: 5px;
 				border-top: 0;
 				box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+				border-radius: 0 0 10px 10px;
 				.chart-inner {
 					display: flex;
 					align-items: flex-end;
@@ -294,6 +313,9 @@
 			&.sort {
 				opacity: 1;
 				color: $active_bgcolor;
+				> div {
+					opacity: 1;
+				}
 			}
 		}
 	}
@@ -414,7 +436,7 @@
 			overflow: hidden;
 			position: relative;
 			z-index: 0;
-
+			border-radius: 0;
 			.row-grid {
 				position: relative;
 				display: flex;

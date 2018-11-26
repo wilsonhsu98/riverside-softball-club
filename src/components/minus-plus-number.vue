@@ -15,6 +15,7 @@
 		.input,
 		.button {
 			opacity: 0.5;
+			cursor: default;
 		}
 	}
 	.input {
@@ -114,7 +115,10 @@
 		watch: {
 			val() {
 				this.$emit('change', this.val);
-			}
+			},
+			value() {
+				this.val = this.value;
+			},
 		}
 	}
 </script>

@@ -36,7 +36,10 @@
 			:zoomText="$t('zoom')"
 			:finishText="$t('gen_img')"
 		/>
-		<button class="save-btn" @click="edit_">{{ $t('btn_update') }}</button>
+		<div class="button-container">
+			<button class="save-btn" @click="back_">{{ $t('btn_cancel') }}</button>
+			<button class="save-btn" @click="edit_">{{ $t('btn_update') }}</button>
+		</div>
 	</div>
 </template>
 
@@ -61,12 +64,18 @@
 			text-align: center;
 			text-decoration: underline;
 		}
+		.button-container {
+			padding: 10px 0;
+			text-align: center;
+			width: 100%;
+			position: sticky;
+			bottom: 0;
+			background-color: #fff;
+		}
 		.save-btn {
 			background-color: $header_bgcolor;
 			padding: 10px 15px;
 			width: 100px;
-			margin: 10px auto;
-			display: block;
 		}
 	}
 	.avatar-container {
