@@ -86,16 +86,18 @@ const actions = {
       db.collection("accounts")
         .doc(userId)
         .onSnapshot(snapshot => {
-          const { accessToken, ...other } = snapshot.data();
-          accessToken;
-          queryCount += 1;
-          if (queryCount > realtimeCount) {
-            // realtime
-            commit(rootTypes.LOADING, { text: "New data is coming" });
-            setTimeout(() => {
-              commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
-              commit(rootTypes.LOADING, false);
-            }, 1000);
+          const data = snapshot.data();
+          if (data) {
+            const { accessToken, ...other } = data;
+            queryCount += 1;
+            if (queryCount > realtimeCount) {
+              // realtime
+              commit(rootTypes.LOADING, { text: "New data is coming" });
+              setTimeout(() => {
+                commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
+                commit(rootTypes.LOADING, false);
+              }, 1000);
+            }
           }
         });
     }

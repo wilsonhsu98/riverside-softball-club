@@ -158,14 +158,14 @@ const getters = {
         item => ["1H", "2H", "3H", "HR"].indexOf(item.content) > -1
       ).length,
       r: game.filter(item => item.r).length,
-      e: boxSummary.errors.reduce((result, item) => result + item.count, 0),
+      e: (boxSummary.errors || []).reduce((result, item) => result + item.count, 0),
       contents: game
     });
   },
   gameList: state => state.gameList,
   periodGames: state => state.period.find(item => item.select).games,
   itemStats: state => {
-    const games = state.period.find(item => item.select).games;
+    const games = state.period.find(item => item.select).games || [];
     const minimunPA = games.length * 1.6;
     const records = utils.genStatistics(
       state.players,

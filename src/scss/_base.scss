@@ -111,24 +111,24 @@ select::-ms-expand {
 .field-wrapper-children {
 	.vue-tags-input[class] {
 		background-color: transparent;
-		.input[class] {
+		.ti-input[class] {
 			border: none;
 			min-height: 38px;
 		}
-		.tag-input[class] {
+		.ti-tag-input[class] {
 			height: 100%;
 			font-size: .85rem;
 		}
-		.new-tag-input {
+		.ti-new-tag-input {
 			min-width: auto;
 			padding: 0;
 			width: 0;
 		}
-		.new-tag-input:not([placeholder='']) {
+		.ti-new-tag-input:not([placeholder='']) {
 			min-width: 170px;
 			font-size: 14px;
 		}
-		.tag-center[class] {
+		.ti-tag-center[class] {
 			line-height: 19px;
 		}
 	}

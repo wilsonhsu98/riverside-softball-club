@@ -208,7 +208,7 @@ $max-width: 400px;
       // button
       flex: 1;
       background-color: $header_bgcolor;
-      padding: 10px;
+      padding: 10px 8px;
     }
   }
 }
