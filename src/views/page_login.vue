@@ -1,23 +1,23 @@
 <template>
-	<loading v-if="loading" :img="loading.img"></loading>
-	<div v-else class="login-container">
-		<button class="signin-btn google" @click="googleLogin">
-			{{ $t('login_google_btn') }}
-		</button>
-		<button class="signin-btn fb" @click="fbLogin">
-			{{ $t('login_fb_btn') }}
-		</button>
-		<button class="signin-btn line" @click="lineLogin">
-			{{ $t('login_line_btn') }}
-		</button>
-		<button class="signin-btn github" @click="githubLogin">
-			{{ $t('login_github_btn') }}
-		</button>
-		<button class="signin-btn anonymous" @click="anonymousLogin">
-			<i class="fa fa-user-secret"></i>
-			{{ $t('login_anonymous_btn') }}
-		</button>
-	</div>
+  <loading v-if="loading" :img="loading.img"></loading>
+  <div v-else class="login-container">
+    <button class="signin-btn google" @click="googleLogin">
+      {{ $t('login_google_btn') }}
+    </button>
+    <button class="signin-btn fb" @click="fbLogin">
+      {{ $t('login_fb_btn') }}
+    </button>
+    <button class="signin-btn line" @click="lineLogin">
+      {{ $t('login_line_btn') }}
+    </button>
+    <button class="signin-btn github" @click="githubLogin">
+      {{ $t('login_github_btn') }}
+    </button>
+    <button class="signin-btn anonymous" @click="anonymousLogin">
+      <i class="fa fa-user-secret"></i>
+      {{ $t('login_anonymous_btn') }}
+    </button>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -123,7 +123,7 @@ export default {
     if (this.$route.params.custom) {
       this.lineLoginRedirect(this.$route.params.custom);
     } else {
-      this.chkLoginStatus();
+      // this.chkLoginStatus();
     }
   },
   methods: {
@@ -133,8 +133,8 @@ export default {
       fbLogin: "fbLogin",
       githubLogin: "githubLogin",
       lineLogin: "lineLogin",
-      lineLoginRedirect: "lineLoginRedirect",
-      chkLoginStatus: "chkLoginStatus"
+      lineLoginRedirect: "lineLoginRedirect"
+      // chkLoginStatus: "chkLoginStatus"
     })
   },
   computed: {

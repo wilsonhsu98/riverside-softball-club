@@ -1,40 +1,43 @@
 <template>
-	<div class="main-container">
-		<header>
-			<div class="header-container">
-				<img class="icon" :src="currentTeamIcon || defaultIcon"/>
-				<ul class="tab">
-					<li v-if="currentTeam">
-						<router-link :to="{ name: 'games', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_games')">
-							<i class="fa fa-table"></i>
-						</router-link>
-					</li>
-					<li v-if="currentTeam">
-						<router-link :to="{ name: 'stats_pa', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_stats')">
-							<i class="fa fa-list-ol"></i>
-						</router-link>
-					</li>
-					<li v-if="currentTeam">
-						<router-link :to="{ name: 'stats_item', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_stats_item')">
-							<i class="fa fa-th-large"></i>
-						</router-link>
-					</li>
-					<li v-if="currentTeam && role === 'manager'">
-						<router-link :to="{ name: 'edit_team', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_manage')">
-							<i class="fa fa-cog"></i>
-						</router-link>
-					</li>
-					<li>
-						<router-link :to="{ name: 'user' }" active-class="active" :data-label="$t('menu_profile')">
-							<i class="fa fa-user"></i>
-						</router-link>
-					</li>
-				</ul>
-			</div>
-		</header>
-		<router-view class="content"></router-view>
-		<loading v-if="loading" :text="loading.text"></loading>
-	</div>
+  <div class="main-container">
+    <header>
+      <div class="header-container">
+        <img class="icon" :src="currentTeamIcon || defaultIcon"/>
+        <ul class="tab">
+          <li v-if="currentTeam">
+            <router-link :to="{ name: 'games', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_games')">
+              <i class="fa fa-table"></i>
+            </router-link>
+          </li>
+          <li v-if="currentTeam">
+            <router-link :to="{ name: 'stats_pa', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_stats')">
+              <i class="fa fa-list-ol"></i>
+            </router-link>
+          </li>
+          <li v-if="currentTeam">
+            <router-link :to="{ name: 'stats_item', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_stats_item')">
+              <i class="fa fa-th-large"></i>
+            </router-link>
+          </li>
+          <li v-if="currentTeam && role === 'manager'">
+            <router-link :to="{ name: 'edit_team', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_manage')" :data-requests="teamRequests.length === 0 ? undefined : teamRequests.length">
+              <i class="fa fa-cog"></i>
+            </router-link>
+          </li>
+          <li>
+            <router-link :to="{ name: 'user' }" active-class="active" :data-label="$t('menu_profile')">
+              <i class="fa fa-user"></i>
+            </router-link>
+          </li>
+          <li class="logout_link">
+            <a @click="logout">{{ $t('logout_btn') }}</a>
+          </li>
+        </ul>
+      </div>
+    </header>
+    <router-view class="content"></router-view>
+    <loading v-if="loading" :text="loading.text"></loading>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -65,7 +68,7 @@ header {
     vertical-align: middle;
   }
   .tab {
-    display: inline-block;
+    display: inline-flex;
     box-sizing: border-box;
     list-style-type: none;
     padding: 0;
@@ -73,8 +76,13 @@ header {
     background-size: contain;
     height: 100%;
     line-height: 70px;
+    width: calc(100% - 66px);
     > li {
       display: inline-block;
+    }
+    .logout_link {
+      margin-left: auto;
+      cursor: pointer;
     }
   }
   a {
@@ -83,9 +91,25 @@ header {
     padding: 8px 15px;
     margin: 0 2px;
     border-radius: 98px;
+    position: relative;
     &.active {
       background-color: $menu_active;
       color: $row_color;
+    }
+    &[data-requests]:before {
+      content: attr(data-requests);
+      position: absolute;
+      z-index: 1;
+      right: -3px;
+      top: -3px;
+      height: 18px;
+      width: 18px;
+      line-height: 18px;
+      font-size: 10px;
+      background-color: #ff2200;
+      border-radius: 50%;
+      text-align: center;
+      color: #fff;
     }
     &:after {
       content: attr(data-label);
@@ -134,6 +158,9 @@ header {
       background: none;
       margin: 0;
       width: 100%;
+      .logout_link {
+        display: none;
+      }
       a {
         display: inline-block;
         text-align: center;
@@ -171,8 +198,16 @@ header {
         }
       }
     }
-    a:hover:not(.active) {
-      background: none;
+    a {
+      &[data-requests]:before {
+        right: -8px;
+        top: initial;
+        bottom: 16px;
+        background-color: #ff2200;
+      }
+      &:hover:not(.active) {
+        background: none;
+      }
     }
   }
   .content {
@@ -198,14 +233,15 @@ export default {
     this.initFromLS();
     this.fetchGame();
     this.fetchUser();
-    this.fetchTeamIcon(this.currentTeam);
   },
   methods: {
     ...mapActions({
       initFromLS: "initFromLS",
       fetchTable: "fetchTable",
       fetchUser: "fetchUser",
-      fetchTeamIcon: "fetchTeamIcon"
+      fetchTeamIcon: "fetchTeamIcon",
+      fetchTeamRequests: "fetchTeamRequests",
+      logout: "logout"
     }),
     fetchGame() {
       if (!this.isFetchGame && this.$route.params.team) {
@@ -219,13 +255,18 @@ export default {
       loading: "loading",
       currentTeam: "currentTeam",
       role: "role",
-      currentTeamIcon: "currentTeamIcon"
+      currentTeamIcon: "currentTeamIcon",
+      teamRequests: "teamRequests"
     })
   },
   watch: {
     $route() {
       this.fetchGame();
       window.scrollTo(0, 0);
+    },
+    currentTeam() {
+      this.fetchTeamIcon(this.currentTeam);
+      this.fetchTeamRequests(this.currentTeam);
     }
   }
 };

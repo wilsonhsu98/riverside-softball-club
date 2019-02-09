@@ -158,12 +158,15 @@ const getters = {
         item => ["1H", "2H", "3H", "HR"].indexOf(item.content) > -1
       ).length,
       r: game.filter(item => item.r).length,
-      e: (boxSummary.errors || []).reduce((result, item) => result + item.count, 0),
+      e: (boxSummary.errors || []).reduce(
+        (result, item) => result + item.count,
+        0
+      ),
       contents: game
     });
   },
   gameList: state => state.gameList,
-  periodGames: state => state.period.find(item => item.select).games,
+  periodGames: state => state.period.find(item => item.select).games || [],
   itemStats: state => {
     const games = state.period.find(item => item.select).games || [];
     const minimunPA = games.length * 1.6;
@@ -264,8 +267,25 @@ const actions = {
       window.localStorage.setItem("records", JSON.stringify(records));
     };
     const operatePlayers = players => {
-      commit(types.GET_PLAYERS, players);
-      window.localStorage.setItem("players", JSON.stringify(players));
+      db.collection("accounts")
+        .where("teams", "array-contains", team)
+        .get()
+        .then(accountCollection => {
+          const accounts = players.map(player => {
+            const find = accountCollection.docs.find(
+              account => account.id === player.data.uid
+            );
+            return {
+              id: player.id,
+              data: {
+                ...player.data,
+                photo: find && find.data().photo
+              }
+            };
+          });
+          commit(types.GET_PLAYERS, accounts);
+          window.localStorage.setItem("players", JSON.stringify(accounts));
+        });
     };
 
     if (

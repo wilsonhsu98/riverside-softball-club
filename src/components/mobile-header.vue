@@ -4,6 +4,7 @@
 		<span v-else></span>
 		<img class="icon" :src="icon || defaultIcon"/>
 		<div v-if="save" class="save-btn" @click="save_">{{ $t('btn_update') }}</div>
+    <span v-else></span>
 	</header>
 </template>
 

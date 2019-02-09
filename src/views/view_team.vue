@@ -1,147 +1,182 @@
 <template>
-	<div>
-		<mobile-header
-			:back="!$route.params.team ? back_ : undefined"
-			:icon="currentTeamIcon"
-			:save="editTeam_"
-		/>
-		<div class="container">
-			<h1>{{ $route.params.team ? $t('manage_team') : $t('create_team') }}</h1>
+  <div>
+    <mobile-header
+      :back="!$route.params.team ? back_ : undefined"
+      :icon="$route.params.team ? currentTeamIcon : undefined"
+      :save="editTeam_"
+    />
+    <div class="container">
+      <h1>{{ $route.params.team ? $t('manage_team') : $t('create_team') }}</h1>
 
-			<custom-input
-				class="field-wrapper"
-				limit="en-only"
-				:name="$t('ttl_team_code')"
-				:placeholder="$t('pla_en_only')"
-				:error="teamCode_err"
-				:disabled="$route.params.team ? true : false"
-				v-model="teamCode"
-			/>
+      <div class="request" :key="`request_${request.teamCode}`" v-for="request in teamRequests">
+        <img :src="request.photo"/>
+        <p>{{ $t('msg_request_join', { team: request.teamName }) }}</p>
+        <p class="request-msg">{{ request.msg }}</p>
+        <p>{{ new Date(request.timestamp).toLocaleString() }}</p>
+        <div class="request-btn-container">
+          <button @click="acceptRequest_(request.id)">{{ $t('btn_accept') }}</button>
+          <button @click="deniedRequest_(request.id)">{{ $t('btn_denied') }}</button>
+        </div>
+      </div>
 
-			<custom-input
-				class="field-wrapper"
-				:name="$t('ttl_team_name')"
-				:error="teamName_err"
-				v-model="teamName"
-			/>
+      <custom-input
+        class="field-wrapper"
+        limit="en-only"
+        :name="$t('ttl_team_code')"
+        :placeholder="$t('pla_en_only')"
+        :error="teamCode_err"
+        :disabled="$route.params.team ? true : false"
+        v-model="teamCode"
+      />
 
-			<custom-input
-				class="field-wrapper"
-				type="splitting-wording"
-				:name="$t('ttl_other_names')"
-				:placeholder="$t('pla_split_names')"
-				v-model="otherNames"
-			/>
-			<!-- <vue-tags-input
-				class="field-wrapper"
-				v-model="otherName"
-				:allow-edit-tags="true"
-				:placeholder="$t('pla_split_names')"
-				:tags="otherNames"
-				:separators="[';', ',']"
-				@tags-changed="newTags => otherNames = newTags"
-			/> -->
+      <custom-input
+        class="field-wrapper"
+        :name="$t('ttl_team_name')"
+        :error="teamName_err"
+        v-model="teamName"
+      />
 
-			<custom-input
-				class="field-wrapper"
-				type="textarea"
-				rows="3"
-				:name="$t('ttl_team_intro')"
-				v-model="teamIntro"
-			/>
+      <custom-input
+        class="field-wrapper"
+        type="splitting-wording"
+        :name="$t('ttl_other_names')"
+        :placeholder="$t('pla_split_names')"
+        v-model="otherNames"
+      />
 
-			<div v-if="!iconEdit" class="icon-container" :style="{ background: `url(${transparentPng})` }">
-				<i class="fa fa-picture-o" @click="iconEdit = true"></i>
-				<img :src="icon"/>
-			</div>
-			<div v-else class="icon-editor-container">
-				<i class="fa fa-times" @click="iconEdit = false"></i>
-				<vue-avatar-editor
-					class="icon-editor"
-					:image="icon"
-					:hasRotation="true"
-					:width="400"
-					:height="400"
-					:zoomText="$t('zoom')"
-					:finishText="$t('gen_img')"
-					:canMoveOutOfBound="true"
-					@finished="genImage"
-				/>
-			</div>
+      <custom-input
+        class="field-wrapper"
+        type="textarea"
+        rows="3"
+        :name="$t('ttl_team_intro')"
+        v-model="teamIntro"
+      />
 
-			<h2 class="player-header">{{ $t('ttl_player') }}<i class="fa fa-plus-circle" @click="players = [].concat({}, players)"></i></h2>
-			<div class="player" v-for="(player, i) in players" :key="player.uid">
+      <div v-if="!iconEdit" class="icon-container" :style="{ background: `url(${transparentPng})` }">
+        <i class="fa fa-picture-o" @click="iconEdit = true"></i>
+        <img :src="icon"/>
+      </div>
+      <div v-else class="icon-editor-container">
+        <i class="fa fa-times" @click="iconEdit = false"></i>
+        <vue-avatar-editor
+          class="icon-editor"
+          :image="icon"
+          :hasRotation="true"
+          :width="400"
+          :height="400"
+          :zoomText="$t('zoom')"
+          :finishText="$t('gen_img')"
+          :canMoveOutOfBound="true"
+          @finished="genImage"
+        />
+      </div>
 
-				<!-- a little bit different between insert / edit mode -->
-				<template v-if="$route.params.team">
-					<input
-						type="text"
-						class="txt-player"
-						:placeholder="$t('name')"
-						v-model="player.name"
-					/>
-					<input
-						type="number"
-						min="0"
-						oninput="validity.valid||(value='');"
-						class="txt-number"
-						:placeholder="$t('number')"
-						v-model.number="player.number"
-					/>
-					<label v-if="player && player.uid" :for="`chk${i}`">
-						<input
-							type="checkbox"
-							:id="`chk${i}`"
-							:disabled="atLeastOneManager(player.manager)"
-							v-model="player.manager"
-							@change="releaseSelfManager($event, player)"
-						/>
-						{{ $t('manager') }}
-					</label>
-					<img v-if="player && player.uid && player.photo" :src="player.photo" class="binded"/>
-					<span v-if="player && player.uid">{{ $t('binded') }}</span>
-					<i v-if="player.uid !== userId" class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
-				</template>
+      <h2 class="player-header">
+        {{ $t('ttl_player_list') }}
+        <i class="fa fa-info-circle" v-if="$route.params.team" v-tooltip="{ content: $t('tip_player'), classes: ['info'] }"></i>
+        <i class="fa fa-plus-circle" @click="players = [].concat({}, players)"></i>
+      </h2>
 
-				<!-- insert mode -->
-				<template v-else>
-					<input
-						type="text"
-						class="txt-player"
-						:placeholder="$t('name')"
-						v-model="player.name"
-					/>
-					<input
-						type="number"
-						min="0"
-						oninput="validity.valid||(value='');"
-						class="txt-number"
-						:placeholder="$t('number')"
-						v-model.number="player.number"
-					/>
-					<label :for="`rdo${i}`">
-						<input
-							type="radio"
-							name="self"
-							:id="`rdo${i}`"
-							:checked="player.self"
-							@change="rdoBindSelf(i)"
-						/>
-						{{ $t('bind_self') }}
-					</label>
-					<i class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
-				</template>
+      <div class="player" v-for="(player, i) in players" :key="`row_${i}`">
+        <!-- a little bit different between insert / edit mode -->
+        <template v-if="$route.params.team">
+          <input
+            type="text"
+            class="txt-player"
+            :placeholder="$t('name')"
+            v-model="player.name"
+          />
+          <input
+            type="number"
+            min="0"
+            oninput="validity.valid||(value='');"
+            class="txt-number"
+            :placeholder="$t('number')"
+            v-model.number="player.number"
+          />
+          <label v-if="player && player.uid" :for="`chk${i}`">
+            <input
+              type="checkbox"
+              :id="`chk${i}`"
+              :disabled="atLeastOneManager(player.manager)"
+              v-model="player.manager"
+              @change="releaseSelfManager($event, player)"
+            />
+            {{ $t('manager') }}
+          </label>
+          <img v-if="player && player.uid && player.photo" :src="player.photo" class="binded"/>
+          <span v-if="player && player.uid">{{ $t('binded') }}</span>
+          <i v-if="player.uid !== userId" class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
+        </template>
 
-			</div>
+        <!-- insert mode -->
+        <template v-else>
+          <input
+            type="text"
+            class="txt-player"
+            :placeholder="$t('name')"
+            v-model="player.name"
+          />
+          <input
+            type="number"
+            min="0"
+            oninput="validity.valid||(value='');"
+            class="txt-number"
+            :placeholder="$t('number')"
+            v-model.number="player.number"
+          />
+          <label :for="`rdo${i}`">
+            <input
+              type="radio"
+              name="self"
+              :id="`rdo${i}`"
+              :checked="player.self"
+              @change="rdoBindSelf(i)"
+            />
+            {{ $t('bind_self') }}
+          </label>
+          <i class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
+        </template>
+      </div>
 
-			<div v-if="players_err" class="error">{{ players_err }}</div>
+      <h2 class="player-header" v-if="$route.params.team && benches.length">
+        {{ $t('ttl_bench_list') }}
+        <i class="fa fa-info-circle" v-tooltip="{ content: $t('tip_bench'), classes: ['info'] }"></i>
+      </h2>
 
-			<div class="button-container">
-				<button v-if="!$route.params.team" class="save-btn" @click="back_">{{ $t('btn_cancel') }}</button>
-				<button class="save-btn" @click="editTeam_">{{ $route.params.team ? $t('btn_update') : $t('btn_insert') }}</button>
-			</div>
-		</div>
-	</div>
+      <div class="player" v-for="(player, i) in benches" :key="`benches_row_${i}`">
+        <template v-if="$route.params.team">
+          <input
+            type="text"
+            class="txt-player"
+            :placeholder="$t('name')"
+            v-model="player.name"
+          />
+          <input
+            type="number"
+            min="0"
+            oninput="validity.valid||(value='');"
+            class="txt-number"
+            :placeholder="$t('number')"
+            v-model.number="player.number"
+          />
+          <label v-if="player && player.uid" style="width: 57px;">
+
+          </label>
+          <img v-if="player && player.uid && player.photo" :src="player.photo" class="binded"/>
+          <i class="fa fa-commenting-o" v-tooltip="{ content: player.msg, classes: ['info'] }"></i>
+          <i v-if="player.uid !== userId" class="fa fa-times-circle" @click="benches.splice(i, 1)"></i>
+        </template>
+      </div>
+
+      <div v-if="players_err" class="error" v-html="players_err"></div>
+
+      <div class="button-container">
+        <button v-if="!$route.params.team" class="save-btn" @click="back_">{{ $t('btn_cancel') }}</button>
+        <button class="save-btn" @click="editTeam_">{{ $route.params.team ? $t('btn_update') : $t('btn_insert') }}</button>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -164,11 +199,62 @@ $max-width: 400px;
     text-align: center;
     text-decoration: underline;
   }
+  .request {
+    color: #fff;
+    box-sizing: border-box;
+    max-width: $max-width;
+    width: 100%;
+    margin: 15px auto;
+    border-radius: 5px;
+    background-color: #b5b5b5;
+    padding: 5px 8px 10px 60px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    > img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      position: absolute;
+      left: 13px;
+      top: 7px;
+    }
+    > p {
+      margin: 0 0 10px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+    > p {
+      margin: 0;
+    }
+    &-msg {
+      position: relative;
+      padding-left: 16px;
+      &:before {
+        content: "-";
+        position: absolute;
+        top: 2px;
+        left: 3px;
+      }
+    }
+    &-btn-container {
+      margin-left: -50px;
+      display: flex;
+      > button {
+        background-color: $header_bgcolor;
+        flex: 1;
+        padding: 5px 8px;
+      }
+    }
+  }
   h2 {
     max-width: $max-width;
     width: 100%;
     margin: 0 auto;
-    padding: 15px 0 2px 10px;
+    padding: 15px 0 2px 8px;
     font-size: 12px;
     font-weight: normal;
     text-align: left;
@@ -186,18 +272,22 @@ $max-width: 400px;
     width: 100%;
     margin: 0 auto;
   }
-  .fa-minus-circle,
-  .fa-plus-circle {
-    position: absolute;
-    right: 5px;
+  .fa {
     font-size: 28px;
     cursor: pointer;
+    vertical-align: middle;
+  }
+  .fa-minus-circle,
+  .fa-plus-circle,
+  .fa-times-circle {
+    position: absolute;
+    right: 5px;
   }
   .binded {
     width: 28px;
     height: 28px;
     vertical-align: middle;
-    margin: 0 3px 0 15px;
+    margin: 0 3px 0 12px;
     border-radius: 50%;
   }
   .player {
@@ -242,7 +332,7 @@ $max-width: 400px;
     padding: 0 10px;
     font-size: 12px;
     box-sizing: border-box;
-    color: $active_bgcolor;
+    color: $error_color;
   }
   .button-container {
     padding: 10px 0;
@@ -265,7 +355,7 @@ $max-width: 400px;
   height: 300px;
   line-height: 300px;
   position: relative;
-  i {
+  .fa {
     color: white;
     background-color: $current_user_bgcolor;
     border-radius: 4px;
@@ -289,7 +379,7 @@ $max-width: 400px;
   margin: 10px auto 0;
   width: 300px;
   position: relative;
-  i {
+  .fa {
     color: white;
     background-color: $current_user_bgcolor;
     border-radius: 4px;
@@ -414,9 +504,9 @@ export default {
       teamName: "",
       teamName_err: "",
       teamIntro: "",
-      // otherName: '',
       otherNames: "",
       players: [{}],
+      benches: [],
       players_err: "",
       icon: "",
       iconEdit: false,
@@ -433,13 +523,9 @@ export default {
   methods: {
     ...mapActions({
       editTeam: "editTeam",
-      fetchTeamInfo: "fetchTeamInfo"
+      fetchTeamInfo: "fetchTeamInfo",
+      handleRequest: "handleRequest"
     }),
-    chkTeamCode() {
-      if (/[\W]/g.test(this.teamCode)) {
-        this.teamCode = this.teamCode.replace(/[\W]/g, "");
-      }
-    },
     validate() {
       let returnVal = true;
 
@@ -454,12 +540,7 @@ export default {
             photo: item.photo || ""
           };
         })
-        .filter((v, i, self) => {
-          return (
-            self.map(item => item.name.trim()).indexOf(v.name.trim()) === i &&
-            v.name.trim() !== ""
-          );
-        });
+        .filter(v => v.name.trim() !== "");
 
       this.teamCode_err = "";
       if (!this.teamCode) {
@@ -474,21 +555,56 @@ export default {
       }
 
       this.players_err = "";
+      const players_err = [];
+
       if (this.players.length === 0) {
         this.players = [{}];
-        this.players_err = this.$t("msg_atleastone");
-        returnVal = false;
-      } else if (
-        !this.players.find(item => item.self) &&
-        !this.$route.params.team
+        players_err.push(this.$t("msg_atleastone"));
+      }
+
+      if (!this.players.find(item => item.self) && !this.$route.params.team) {
+        players_err.push(this.$t("msg_bind_self"));
+      }
+
+      if (!this.players.find(item => item.manager) && this.$route.params.team) {
+        players_err.push(this.$t("msg_atleastone_manager"));
+      }
+
+      if (
+        this.players.filter(
+          (v, i, self) => self.map(item => item.name).indexOf(v.name) !== i
+        ).length
       ) {
-        this.players_err = this.$t("msg_bind_self");
-        returnVal = false;
-      } else if (
-        !this.players.find(item => item.manager) &&
-        this.$route.params.team
+        players_err.push(this.$t("msg_duplicate_name"));
+      }
+
+      if (
+        this.players.filter(
+          (v, i, self) =>
+            v.number && self.map(item => item.number).indexOf(v.number) !== i
+        ).length
       ) {
-        this.players_err = this.$t("msg_atleastone_manager");
+        players_err.push(this.$t("msg_duplicate_number"));
+      }
+
+      if (
+        this.benches.filter(
+          v => this.players.map(item => item.name).indexOf(v.name) > -1
+        ).length
+      ) {
+        players_err.push(this.$t("msg_duplicate_name"));
+      }
+
+      if (
+        this.benches.filter(
+          v => this.players.map(item => item.number).indexOf(v.number) > -1
+        ).length
+      ) {
+        players_err.push(this.$t("msg_duplicate_number"));
+      }
+
+      if (players_err.length) {
+        this.players_err = players_err.join("<br>");
         returnVal = false;
       }
 
@@ -505,6 +621,7 @@ export default {
           subNames: this.otherNames,
           intro: this.teamIntro,
           players: this.players,
+          benches: this.benches,
           icon: this.icon,
           isNew: !this.$route.params.team
         });
@@ -533,13 +650,26 @@ export default {
         this.icon = img.toDataURL();
       }
       this.iconEdit = false;
+    },
+    acceptRequest_(requestId) {
+      this.handleRequest({
+        requestId,
+        action: "accept"
+      });
+    },
+    deniedRequest_(requestId) {
+      this.handleRequest({
+        requestId,
+        action: "denied"
+      });
     }
   },
   computed: {
     ...mapGetters({
       userId: "userId",
       teamInfo: "teamInfo",
-      currentTeamIcon: "currentTeamIcon"
+      currentTeamIcon: "currentTeamIcon",
+      teamRequests: "teamRequests"
     })
   },
   watch: {
@@ -556,15 +686,14 @@ export default {
       this.teamName = this.teamInfo.teamName;
       this.teamIntro = this.teamInfo.teamIntro;
       this.otherNames = this.teamInfo.otherNames;
-      // this.otherNames = this.teamInfo.otherNames.split(',').map(item => ({
-      // 	text: item,
-      // }));
+
       this.icon = this.teamInfo.icon;
       this.players = JSON.parse(JSON.stringify(this.teamInfo.players));
       const find = this.players.find(player => player.uid === this.userId);
       if (find) {
         find.self = true;
       }
+      this.benches = JSON.parse(JSON.stringify(this.teamInfo.benches));
     }
   }
 };

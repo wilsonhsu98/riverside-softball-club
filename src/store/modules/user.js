@@ -5,25 +5,23 @@ import {
   promiseImage
 } from "../root";
 import router from "../../router";
-import { db } from "../../firebase";
+import { db, timestamp } from "../../firebase";
 
-// const types = {
-//   FETCH_TEAM: 'TEAM/FETCH_TEAM',
-// };
+let snapShotAccount;
+let snapShotTeams;
+const snapShotRequest = {};
+
+const types = {
+  FETCH_TEAMS: "TEAM/FETCH_TEAMS",
+  SET_TEAM_REQUEST: "TEAM/SET_TEAM_REQUEST"
+};
 
 const state = {
-  // teamInfo: {
-  //     teamCode: '',
-  //     teamName: '',
-  //     teamIntro: '',
-  //     otherNames: '',
-  //     players: [{}],
-  //     icon: window.localStorage.getItem('currentTeamIcon') || '',
-  // },
+  teams: null // tricky to set null for the default condition
 };
 
 const getters = {
-  // teamInfo: state => state.teamInfo,
+  teams: state => state.teams
 };
 
 const actions = {
@@ -48,25 +46,28 @@ const actions = {
           refPlayerDoc
             .collection("teams")
             .get()
-            .then(querySnapshot => {
-              querySnapshot.forEach(doc => {
-                db.collection("teams")
-                  .doc(doc.id)
-                  .collection("players")
-                  .where("uid", "==", data.userId)
-                  .get()
-                  .then(querySnapshot => {
-                    querySnapshot.forEach(doc => {
-                      batch.update(doc.ref, {
-                        photo
+            .then(querySnapshot => querySnapshot.docs.map(doc => doc.id))
+            .then(docIds => {
+              return Promise.all(
+                docIds.map(docId => {
+                  return db
+                    .collection("teams")
+                    .doc(docId)
+                    .collection("players")
+                    .where("uid", "==", data.userId)
+                    .get()
+                    .then(querySnapshot => {
+                      querySnapshot.forEach(doc => {
+                        batch.update(doc.ref, {
+                          timestamp
+                        });
                       });
                     });
-                    resolve(batch.commit());
-                  });
-              });
-              if (querySnapshot.size === 0) {
-                resolve(batch.commit());
-              }
+                })
+              );
+            })
+            .then(() => {
+              resolve(batch.commit());
             });
         });
       })
@@ -83,12 +84,15 @@ const actions = {
     if (userId) {
       let queryCount = 0;
       const realtimeCount = 1;
-      db.collection("accounts")
+      if (typeof snapShotAccount === "function") snapShotAccount();
+      snapShotAccount = db
+        .collection("accounts")
         .doc(userId)
         .onSnapshot(snapshot => {
           const data = snapshot.data();
           if (data) {
             const { accessToken, ...other } = data;
+            accessToken;
             queryCount += 1;
             if (queryCount > realtimeCount) {
               // realtime
@@ -97,27 +101,82 @@ const actions = {
                 commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
                 commit(rootTypes.LOADING, false);
               }, 1000);
+            } else {
+              // first time
+              commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
             }
           }
         });
+      if (typeof snapShotTeams === "function") snapShotTeams();
+      snapShotTeams = db
+        .collection("accounts")
+        .doc(userId)
+        .collection("teams")
+        .onSnapshot(snapshot => {
+          if (snapshot.docs.length) {
+            Promise.all(
+              snapshot.docs.map(doc => {
+                return new Promise(resolve => {
+                  db.collection("teams")
+                    .doc(doc.id)
+                    .get()
+                    .then(teamsDoc => {
+                      resolve({
+                        role: doc.data().role,
+                        teamCode: doc.id,
+                        ...teamsDoc.data()
+                      });
+                    });
+                });
+              })
+            ).then(teams => {
+              commit(
+                types.FETCH_TEAMS,
+                teams.sort((a, b) => b.name.localeCompare(a.name))
+              );
+              commit(rootTypes.SET_AUTH, teams);
+              teams.forEach(team => {
+                if (typeof snapShotRequest[team.teamCode] === "function")
+                  snapShotRequest[team.teamCode]();
+                snapShotRequest[team.teamCode] = db
+                  .collection("requests")
+                  .where("teamCode", "==", team.teamCode)
+                  .onSnapshot(requestsCollection => {
+                    commit(types.SET_TEAM_REQUEST, {
+                      teamCode: team.teamCode,
+                      requests: requestsCollection.docs
+                        .map(doc => doc.data())
+                        .filter(status => status !== "denied").length
+                    });
+                  });
+              });
+            });
+          } else {
+            commit(rootTypes.SET_AUTH);
+            commit(types.FETCH_TEAMS);
+          }
+        });
     }
+  },
+  switchTeam({ commit, state }, teamCode) {
+    window.localStorage.setItem("currentTeam", teamCode);
+    commit(rootTypes.SET_AUTH, state.teams);
   }
 };
 
 const mutations = {
-  // [types.FETCH_TEAM](state, data) {
-  //     if (data.icon) window.localStorage.setItem('currentTeamIcon', data.icon);
-  //     state.teamInfo = {
-  //         teamCode: data.id,
-  //         teamName: data.name,
-  //         teamIntro: data.intro,
-  //         otherNames: data.subNames,
-  //         players: data.players.sort((a, b) => a.number > b.number),
-  //         icon: data.icon,
-  //     };
-  // },
+  [types.FETCH_TEAMS](state, data = []) {
+    state.teams = data;
+  },
+  [types.SET_TEAM_REQUEST](state, data) {
+    const find = state.teams.find(team => team.teamCode === data.teamCode);
+    if (find) {
+      find.requests = data.requests;
+      state.teams = [...state.teams];
+    }
+  }
 };
-
+export { types };
 export default {
   state,
   getters,

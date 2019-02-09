@@ -1,48 +1,47 @@
 <template>
-	<div class="profile-container">
-		<mobile-header
-			:back="back_"
-			:icon="currentTeamIcon"
-			:save="edit_"
-		/>
-		<h1>{{ $t('edit_avatar') }}</h1>
-		<div class="avatar-container">
-			<template v-for="provider in ['google', 'facebook', 'line', 'github', 'custom']">
-				<span
+  <div class="profile-container">
+    <mobile-header
+      :back="back_"
+      :save="edit_"
+    />
+    <h1>{{ $t('edit_avatar') }}</h1>
+    <div class="avatar-container">
+      <template v-for="provider in ['google', 'facebook', 'line', 'github', 'custom']">
+        <span
           :key="`avatar_${provider}`"
-					v-if="provider !== 'custom' && accountInfo[`${provider}_photo`]"
-					:class="provider"
-					@click="setCurrent(provider)"
-				>
-					<i v-if="provider === current" class="fa fa-check"/>
-					<img :src="accountInfo[`${provider}_photo`]"/>
-				</span>
-				<span
+          v-if="provider !== 'custom' && accountInfo[`${provider}_photo`]"
+          :class="provider"
+          @click="setCurrent(provider)"
+        >
+          <i v-if="provider === current" class="fa fa-check"/>
+          <img :src="accountInfo[`${provider}_photo`]"/>
+        </span>
+        <span
           :key="`avatar_${provider}`"
-					v-if="provider === 'custom' && (img || accountInfo[`${provider}_photo`])"
-					:class="provider"
-					@click="setCurrent(provider)"
-				>
-					<i v-if="provider === current" class="fa fa-check"/>
-					<img :src="img || accountInfo.custom_photo"/>
-				</span>
-			</template>
-		</div>
-		<vue-avatar-editor
-			class="avatar-editor"
-			@finished="genImage"
-			:hasRadius="true"
-			:hasRotation="true"
-			:width="400"
-			:height="400"
-			:zoomText="$t('zoom')"
-			:finishText="$t('gen_img')"
-		/>
-		<div class="button-container">
-			<button class="save-btn" @click="back_">{{ $t('btn_cancel') }}</button>
-			<button class="save-btn" @click="edit_">{{ $t('btn_update') }}</button>
-		</div>
-	</div>
+          v-if="provider === 'custom' && (img || accountInfo[`${provider}_photo`])"
+          :class="provider"
+          @click="setCurrent(provider)"
+        >
+          <i v-if="provider === current" class="fa fa-check"/>
+          <img :src="img || accountInfo.custom_photo"/>
+        </span>
+      </template>
+    </div>
+    <vue-avatar-editor
+      class="avatar-editor"
+      @finished="genImage"
+      :hasRadius="true"
+      :hasRotation="true"
+      :width="400"
+      :height="400"
+      :zoomText="$t('zoom')"
+      :finishText="$t('gen_img')"
+    />
+    <div class="button-container">
+      <button class="save-btn" @click="back_">{{ $t('btn_cancel') }}</button>
+      <button class="save-btn" @click="edit_">{{ $t('btn_update') }}</button>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

@@ -1,51 +1,51 @@
 <template>
-	<div>
-		<div class="search-bar" ref="searchBar">
-			<div class="search-bar__container">
-				<img class="icon" :src="currentTeamIcon || defaultIcon"/>
-				<i class="fa fa-search"></i>
-			</div>
-			<input type="checkbox" class="toggle-search non-input" v-model="toggleSearch"/>
-			<div class="condition__container">
-				<div class="condition">
-					<div class="condition__label">{{ $t('col_period') }}</div>
-					<div class="condition__element">
-						<div class="selectdiv">
-							<select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
-								<option v-for="(item, i) in period" :value="item.period" :key="`period_${i}`">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
-							</select>
-						</div>
-					</div>
-					<template v-if="lastUpdate">
-						<br>
-						<div class="condition__label date">{{ $t('col_update') }}</div>
-						<div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
-					</template>
-				</div>
-			</div>
-		</div>
-		<div class="item-container">
-			<div class="item-container__table" v-for="key in ['AVG', 'H', 'HR', 'RBI']" :key="`block_${key}`">
-				<div class="header"><span @click="goStats(key)">{{ $t(key) }}</span></div>
-				<template v-for="(item, index) in itemStats[key].slice(0, 5)">
-					<div v-if="index === 0" class="row" :key="`row_${index}`">
-						<span class="rank">{{ index + 1 }}</span>
-						<img v-if="item.data.photo" class="img" :src="item.data.photo" onLoad="this.className='img'" onError="this.className='img-hidden'"/>
-						<span v-else class="img-hidden"></span>
-						<span class="name">{{ item.name }}</span>
-						<span class="dummy"></span>
-						<span class="value">{{ item[key] }}</span>
-					</div>
-					<div v-else class="row" :key="`row_${index}`">
-						<span class="rank">{{ index + 1 }}</span>
-						<span class="name">{{ item.name }}</span>
-						<span class="value">{{ item[key] }}</span>
-					</div>
-				</template>
-				<div class="note">{{ $t(`${key}_note`, { g: periodGames.length,pa: parseInt(periodGames.length * 1.6, 10) }) }}</div>
-			</div>
-		</div>
-	</div>
+  <div>
+    <div class="search-bar" ref="searchBar">
+      <div class="search-bar__container">
+        <img class="icon" :src="currentTeamIcon || defaultIcon"/>
+        <i class="fa fa-search"></i>
+      </div>
+      <input type="checkbox" class="toggle-search non-input" v-model="toggleSearch"/>
+      <div class="condition__container">
+        <div class="condition">
+          <div class="condition__label">{{ $t('col_period') }}</div>
+          <div class="condition__element">
+            <div class="selectdiv">
+              <select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
+                <option v-for="(item, i) in period" :value="item.period" :key="`period_${i}`">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
+              </select>
+            </div>
+          </div>
+          <template v-if="lastUpdate">
+            <br>
+            <div class="condition__label date">{{ $t('col_update') }}</div>
+            <div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
+          </template>
+        </div>
+      </div>
+    </div>
+    <div class="item-container">
+      <div class="item-container__table" v-for="key in ['AVG', 'H', 'HR', 'RBI']" :key="`block_${key}`">
+        <div class="header"><span @click="goStats(key)">{{ $t(key) }}</span></div>
+        <template v-for="(item, index) in itemStats[key].slice(0, 5)">
+          <div v-if="index === 0" class="row" :key="`row_${index}`">
+            <span class="rank">{{ index + 1 }}</span>
+            <img v-if="item.data.photo" class="img" :src="item.data.photo" onLoad="this.className='img'" onError="this.className='img-hidden'"/>
+            <span v-else class="img-hidden"></span>
+            <span class="name">{{ item.name }}</span>
+            <span class="dummy"></span>
+            <span class="value">{{ item[key] }}</span>
+          </div>
+          <div v-else class="row" :key="`row_${index}`">
+            <span class="rank">{{ index + 1 }}</span>
+            <span class="name">{{ item.name }}</span>
+            <span class="value">{{ item[key] }}</span>
+          </div>
+        </template>
+        <div class="note">{{ $t(`${key}_note`, { g: periodGames.length,pa: parseInt(periodGames.length * 1.6, 10) }) }}</div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -210,6 +210,7 @@ i.fa {
       width: 50px;
       margin: 0;
       opacity: 0;
+      cursor: pointer;
       &:checked {
         & ~ .condition__container {
           max-height: 200vh;

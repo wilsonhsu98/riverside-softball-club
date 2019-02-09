@@ -1,97 +1,97 @@
 <template>
-	<div>
-		<div class="search-bar" ref="searchBar">
-			<div class="search-bar__container">
-				<img class="icon" :src="currentTeamIcon || defaultIcon"/>
-				<i class="fa fa-search"></i>
-			</div>
-			<input type="checkbox" class="toggle-search non-input" v-model="toggleSearch"/>
-			<div class="condition__container">
-				<div class="condition">
-					<div class="condition__label">{{ $t('col_period') }}</div>
-					<div class="condition__element">
-						<div class="selectdiv">
-							<select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
-								<option v-for="item in period" :value="item.period" :key="`period_${item.period}`">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
-							</select>
-						</div>
-					</div>
-					<div class="condition__label">{{ $t('col_sort') }}</div>
-					<div class="condition__element">
-						<div class="selectdiv">
-							<select class="dropdown" :value="sortBy" @change="setSortBy_($event.target.value)">
-								<option v-for="col in conditionCols" :value="col.name" :key="`col_${col.name}`">{{ $t(col.name) }}</option>
-							</select>
-						</div>
-					</div>
-					<div class="condition__label">{{ $t('col_latest') }}</div>
-					<div class="condition__element pa">
-						<minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop_"/>
-						<label for="unlimited_pa">
+  <div>
+    <div class="search-bar" ref="searchBar">
+      <div class="search-bar__container">
+        <img class="icon" :src="currentTeamIcon || defaultIcon"/>
+        <i class="fa fa-search"></i>
+      </div>
+      <input type="checkbox" class="toggle-search non-input" v-model="toggleSearch"/>
+      <div class="condition__container">
+        <div class="condition">
+          <div class="condition__label">{{ $t('col_period') }}</div>
+          <div class="condition__element">
+            <div class="selectdiv">
+              <select class="dropdown" :value="periodSelect" @change="setPeriod_($event.target.value)">
+                <option v-for="item in period" :value="item.period" :key="`period_${item.period}`">{{ `${item.period === 'period_all' ? $t(item.period) : item.period}` }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="condition__label">{{ $t('col_sort') }}</div>
+          <div class="condition__element">
+            <div class="selectdiv">
+              <select class="dropdown" :value="sortBy" @change="setSortBy_($event.target.value)">
+                <option v-for="col in conditionCols" :value="col.name" :key="`col_${col.name}`">{{ $t(col.name) }}</option>
+              </select>
+            </div>
+          </div>
+          <div class="condition__label">{{ $t('col_latest') }}</div>
+          <div class="condition__element pa">
+            <minus-plus-number :value="top" :disabled="unlimitedPA" @change="setTop_"/>
+            <label for="unlimited_pa">
               <input id="unlimited_pa" type="checkbox" :checked="unlimitedPA" @change="setUnlimitedPA_($event.target.checked)"/>{{ $t('col_unlimited') }}
             </label>
-					</div>
-					<br>
-					<div class="condition__label col">{{ $t('col_display') }}</div>
-					<div class="condition__element col">
-						<label class="condition__col" for="check_all">
+          </div>
+          <br>
+          <div class="condition__label col">{{ $t('col_display') }}</div>
+          <div class="condition__element col">
+            <label class="condition__col" for="check_all">
               <input id="check_all" type="checkbox" :checked="checkAll" @change="setCheckAll_($event.target.checked)"/>{{ $t('All') }}
               </label>
               <label class="condition__col" :for="col.name" v-for="col in conditionCols" :key="`condition_${col.name}`">
                 <input :id="col.name" type="checkbox" :value="col.name" :checked="col.visible" :disabled="col.disabled" @change="toggleColumn_(col.name)"/>{{ $t(col.name) }}
               </label>
-					</div>
-					<template v-if="lastUpdate">
-						<div class="condition__label date">{{ $t('col_update') }}</div>
-						<div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
-					</template>
-					<i class="fa fa-refresh" @click="refreshPlayer_"></i>
-				</div>
-			</div>
-		</div>
-		<div id="table">
-			<div class="header-row">
-				<span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer_"></i></span>
-				<template v-for="col in displayedCols">
-					<span v-if="col.name === 'Rank'" :key="`header_${col.name}`" class="cell Rank" :title="$t(col.name)"><div>{{ $t(col.name) }}</div></span>
-					<span v-else-if="col.name === 'name'" :key="`header_${col.name}`" class="cell name" :title="$t(col.name)"><div>{{ $t(col.name) }}</div></span>
-					<span v-else :key="`header_${col.name}`" :class="`cell ${col.name}${col.name === sortBy ? ' sort' : ''}`" :title="$t(col.name)" @click="setSortBy_(col.name)"><div>{{ $t(col.name) }}</div></span>
-				</template>
-			</div>
-			<template v-for="(item, itemIndex) in list">
-				<input type="radio" name="expand" class="toggle-row non-input" :checked="toggleTarget === item.name" @click="toggleRadio(item.name)" :key="`chk_${encodeURI(item.name)}`"/>
-				<div :class="`row-grid${item.name === userName ? ' current' : ''}`" :key="`div_${encodeURI(item.name)}`">
-					<span class="cell delete"><i class="fa fa-trash" @click="deletePlayer_(item.name)"></i></span>
-					<template v-for="(col, colIndex) in displayedCols">
-						<span v-if="col.name === 'Rank'" class="cell Rank" data-label="Rank" :key="`row_${encodeURI(item.name)}_${colIndex}`">{{ itemIndex + 1 }}</span>
-						<span v-else-if="col.name === 'name'" class="cell name" data-label="name" :key="`row_${encodeURI(item.name)}_${colIndex}`">
-							<span>
-								<span class="img" style="border-width: 1px">
-									<i class="fa fa-user-o"></i>
-								</span>
-								<span v-if="item.data.photo" class="img" :style="`background-image: url(${item.data.photo})`">
-								</span>
-								{{ item.name }}
-							</span>
-						</span>
-						<span v-else :class="`cell${col.name === sortBy ? ' sort' : ''}`" :data-label="$t(col.name)" :key="`row_${encodeURI(item.name)}_${colIndex}`">
-							{{ formatValue(item[col.name], col.name) }}
-						</span>
-					</template>
-					<div v-if="item.listByGame.length" class="cell chart" :style="{ top: `${(itemIndex + 2) * 36}px` }" :id="`row_${item.name}`">
-						<div class="chart-inner">
-							<div class="bar" v-for="(cube, cubeIndex) in item.listByGame" :key="`bar_${encodeURI(item.name)}_${cubeIndex}`">
-								<template v-for="(cell, cellIndex) in cube">
-									<span v-if="cellIndex === cube.length - 1" class="game" :key="`bar_${encodeURI(item.name)}_${cubeIndex}_${cellIndex}`">{{ cell }}</span>
-									<span v-else :class="`item ${cell.color} ${cell.exclude ? 'exclude' : ''}`" :key="`bar_${encodeURI(item.name)}_${cubeIndex}_${cellIndex}`">{{ $t(cell.content) }}</span>
-								</template>
-							</div>
-						</div>
-					</div>
-				</div>
-			</template>
-		</div>
-	</div>
+          </div>
+          <template v-if="lastUpdate">
+            <div class="condition__label date">{{ $t('col_update') }}</div>
+            <div class="condition__element date" :data-long="`${$t('col_update')} `" :data-short="`${$t('col_update_short')} `">{{ new Date(lastUpdate).toLocaleString() }}</div>
+          </template>
+          <i class="fa fa-refresh" @click="refreshPlayer_"></i>
+        </div>
+      </div>
+    </div>
+    <div id="table">
+      <div class="header-row">
+        <span class="cell delete"><i class="fa fa-refresh" @click="refreshPlayer_"></i></span>
+        <template v-for="col in displayedCols">
+          <span v-if="col.name === 'Rank'" :key="`header_${col.name}`" class="cell Rank" :title="$t(col.name)"><div>{{ $t(col.name) }}</div></span>
+          <span v-else-if="col.name === 'name'" :key="`header_${col.name}`" class="cell name" :title="$t(col.name)"><div>{{ $t(col.name) }}</div></span>
+          <span v-else :key="`header_${col.name}`" :class="`cell ${col.name}${col.name === sortBy ? ' sort' : ''}`" :title="$t(col.name)" @click="setSortBy_(col.name)"><div>{{ $t(col.name) }}</div></span>
+        </template>
+      </div>
+      <template v-for="(item, itemIndex) in list">
+        <input type="radio" name="expand" class="toggle-row non-input" :checked="toggleTarget === item.name" @click="toggleRadio(item.name)" :key="`chk_${encodeURI(item.name)}`"/>
+        <div :class="`row-grid${item.name === userName ? ' current' : ''}`" :key="`div_${encodeURI(item.name)}`">
+          <span class="cell delete"><i class="fa fa-trash" @click="deletePlayer_(item.name)"></i></span>
+          <template v-for="(col, colIndex) in displayedCols">
+            <span v-if="col.name === 'Rank'" class="cell Rank" data-label="Rank" :key="`row_${encodeURI(item.name)}_${colIndex}`">{{ itemIndex + 1 }}</span>
+            <span v-else-if="col.name === 'name'" class="cell name" data-label="name" :key="`row_${encodeURI(item.name)}_${colIndex}`">
+              <span>
+                <span class="img" style="border-width: 1px">
+                  <i class="fa fa-user-o"></i>
+                </span>
+                <span v-if="item.data.photo" class="img" :style="`background-image: url(${item.data.photo})`">
+                </span>
+                {{ item.name }}
+              </span>
+            </span>
+            <span v-else :class="`cell${col.name === sortBy ? ' sort' : ''}`" :data-label="$t(col.name)" :key="`row_${encodeURI(item.name)}_${colIndex}`">
+              {{ formatValue(item[col.name], col.name) }}
+            </span>
+          </template>
+          <div v-if="item.listByGame.length" class="cell chart" :style="{ top: `${(itemIndex + 2) * 36}px` }" :id="`row_${item.name}`">
+            <div class="chart-inner">
+              <div class="bar" v-for="(cube, cubeIndex) in item.listByGame" :key="`bar_${encodeURI(item.name)}_${cubeIndex}`">
+                <template v-for="(cell, cellIndex) in cube">
+                  <span v-if="cellIndex === cube.length - 1" class="game" :key="`bar_${encodeURI(item.name)}_${cubeIndex}_${cellIndex}`">{{ cell }}</span>
+                  <span v-else :class="`item ${cell.color} ${cell.exclude ? 'exclude' : ''}`" :key="`bar_${encodeURI(item.name)}_${cubeIndex}_${cellIndex}`">{{ $t(cell.content) }}</span>
+                </template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -396,6 +396,7 @@ i.fa {
       width: 50px;
       margin: 0;
       opacity: 0;
+      cursor: pointer;
       &:checked {
         & ~ .condition__container {
           max-height: 200vh;

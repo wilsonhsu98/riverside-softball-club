@@ -89,6 +89,12 @@ const router = new VueRouter({
           name: "edit_team",
           component: require("./views/view_team").default,
           meta: { requiresAuth: true }
+        },
+        {
+          path: "join_team",
+          name: "join_team",
+          component: require("./views/view_join").default,
+          meta: { requiresAuth: true }
         }
       ]
     },
@@ -106,6 +112,8 @@ router.beforeEach((to, from, next) => {
     store.getters.token === ""
   ) {
     next({ path: "/login" });
+  } else if (to.path === "/login" && store.getters.token) {
+    next({ path: from.path });
   } else {
     next();
   }

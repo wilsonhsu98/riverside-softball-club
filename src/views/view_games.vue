@@ -1,25 +1,25 @@
 <template>
-	<div class="gamelist-container">
-		<mobile-header :icon="currentTeamIcon"/>
-		<template v-for="item in gameList">
-			<div class="row" :data-date="item.date" :key="`date_${item.date}`">
-				<template v-for="sub in item.games">
-					<div class="item" :key="`game_${sub.game}`">
-						<router-link :to="{ name: 'game', params: { team: currentTeam, game: sub.game } }" :class="`result ${sub.result} ${sub.group}`" >
-							{{ (sub.result && sub.result.substr(0, 1)) || '?' }}
-						</router-link>
-						<div class="name">{{ sub.opponent || sub.game }}</div>
-					</div>
-					<!-- <div class="item" v-else>
-						<div :class="`result ${sub.result} ${sub.group} ${sub.hasOrder ? '' : 'no-order'}`">
-							{{ (sub.result && sub.result.substr(0, 1)) || '?' }}
-						</div>
-						<div class="name">{{ sub.opponent || sub.game }}</div>
-					</div> -->
-				</template>
-			</div>
-		</template>
-	</div>
+  <div class="gamelist-container">
+    <mobile-header :icon="currentTeamIcon"/>
+    <template v-for="item in gameList">
+      <div class="row" :data-date="item.date" :key="`date_${item.date}`">
+        <template v-for="sub in item.games">
+          <div class="item" :key="`game_${sub.game}`">
+            <router-link :to="{ name: 'game', params: { team: $route.params.team, game: sub.game } }" :class="`result ${sub.result} ${sub.group}`" >
+              {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+            </router-link>
+            <div class="name">{{ sub.opponent || sub.game }}</div>
+          </div>
+          <!-- <div class="item" v-else>
+            <div :class="`result ${sub.result} ${sub.group} ${sub.hasOrder ? '' : 'no-order'}`">
+              {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+            </div>
+            <div class="name">{{ sub.opponent || sub.game }}</div>
+          </div> -->
+        </template>
+      </div>
+    </template>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -74,8 +74,8 @@
         // &.C { border-color: $header_bgcolor; }
         // &.G { border-color: $row_odd_bgcolor; }
         // &.no-order {
-        // 	opacity: .5;
-        // 	cursor: not-allowed;
+        //  opacity: .5;
+        //  cursor: not-allowed;
         // }
       }
     }
@@ -119,7 +119,6 @@ export default {
   computed: {
     ...mapGetters({
       gameList: "gameList",
-      currentTeam: "currentTeam",
       currentTeamIcon: "currentTeamIcon"
     })
   }

@@ -7,6 +7,7 @@ firebase.initializeApp(config.firebase);
 
 const db = firebase.firestore();
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+const fieldValue = firebase.firestore.FieldValue;
 const settings = {
   timestampsInSnapshots: true
 };
@@ -29,4 +30,4 @@ const credentialMapping = {
   "github.com": token => firebase.auth.GithubAuthProvider.credential(token)
 };
 
-export { db, timestamp, auth, providerMapping, credentialMapping };
+export { db, timestamp, fieldValue, auth, providerMapping, credentialMapping };

@@ -56,6 +56,8 @@
 					/>
 				</template>
 
+        <slot></slot>
+
 			</div>
 		</div>
 		<div v-if="error" class="field-wrapper-message">{{ error }}</div>
@@ -70,6 +72,9 @@ $error-color: #ff695e;
   position: relative;
   &-item {
     margin-top: 15px;
+  }
+  &-children {
+    display: flex;
   }
   label {
     position: absolute;

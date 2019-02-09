@@ -6,6 +6,8 @@ import "./css/font-awesome.min.css";
 import "./css/font.css";
 import "./scss/_base.scss";
 import VueTagsInput from "@johmun/vue-tags-input";
+import VTooltip from "v-tooltip";
+import "./scss/v-tooltip.scss";
 
 let componentsReq = require.context("./components/", false, /\.vue$/);
 componentsReq.keys().forEach(path => {
@@ -19,15 +21,23 @@ componentsReq.keys().forEach(path => {
   );
 });
 Vue.component("vue-tags-input", VueTagsInput);
+Vue.use(VTooltip, {
+  defaultTrigger: "hover focus click"
+});
 Vue.config.productionTip = false;
 
-const app = new Vue({
-  el: "#app",
-  store,
-  router,
-  i18n
+new Promise(resolve => {
+  resolve(
+    new Vue({
+      el: "#app",
+      store,
+      router,
+      i18n
+    })
+  );
+}).then(() => {
+  store.dispatch("chkLoginStatus");
 });
-app;
 
 const version = 4;
 if (window.localStorage.getItem("version") !== version.toString()) {
@@ -35,7 +45,7 @@ if (window.localStorage.getItem("version") !== version.toString()) {
   window.localStorage.setItem("version", version.toString());
 }
 
-document.title = "TrendStar";
+document.title = "Riverside Softball Club";
 let link = document.createElement("link");
 link.type = "image/png";
 link.rel = "shortcut icon";
