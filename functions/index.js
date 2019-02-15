@@ -13,7 +13,9 @@ exports.import_game = functions.https.onRequest((req, res) => {
 	const game = body.game;
 	const teddySummary = body.summary.find(item => item['場次'] === game);
 	const parseResult = parseGame(body.rawdata);
-	db.collection('games')
+	db.collection('teams')
+		.doc('OldStar')
+		.collection('games')
 		.doc(game)
 		.set({
 			orders: parseResult.orders,

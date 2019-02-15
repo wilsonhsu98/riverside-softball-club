@@ -1,5 +1,11 @@
 import axios from "axios";
-import { db, auth, providerMapping, credentialMapping } from "../firebase";
+import {
+  db,
+  auth,
+  providerMapping,
+  credentialMapping,
+  messaging
+} from "../firebase";
 import router from "../router";
 import config from "../../config.json";
 import user from "./modules/user";
@@ -208,21 +214,40 @@ const actions = {
         }
       });
     auth.onAuthStateChanged(user => {
-      if (user && user.isAnonymous) {
-        commit(types.SET_TOKEN, user.refreshToken);
-        commit(types.SET_USERNAME, user.uid);
-        commit(types.SET_ANONYMOUS, true);
-        // go to main page
-        router.push("/main/stats_pa");
-        commit(types.LOADING, false);
-        return;
-      }
-      if (user && user.uid.match(/LINE: /)) {
-        commit(types.SET_ANONYMOUS, false);
-        commit(types.LOADING, false);
-        return;
-      }
       if (user) {
+        if (user.isAnonymous) {
+          commit(types.SET_TOKEN, user.refreshToken);
+          commit(types.SET_USERNAME, user.uid);
+          commit(types.SET_ANONYMOUS, true);
+          // go to main page
+          router.push("/main/stats_pa");
+          commit(types.LOADING, false);
+          return;
+        }
+        if (user.uid.match(/LINE: /)) {
+          commit(types.SET_ANONYMOUS, false);
+          commit(types.LOADING, false);
+          return;
+        }
+        if (!state.providerId) {
+          commit(types.CLEAN_TOKEN);
+          commit(types.LOADING, false);
+          return;
+        }
+        if (messaging) {
+          messaging
+            .requestPermission()
+            .then(() => {
+              console.log("Notification permission granted.");
+              return messaging.getToken();
+            })
+            .then(token => {
+              console.log(token);
+            })
+            .catch(err => {
+              console.log("Unable to get permission to notify.", err);
+            });
+        }
         let promise = new Promise(resolve => {
           resolve();
         });

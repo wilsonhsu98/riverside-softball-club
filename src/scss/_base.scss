@@ -39,6 +39,7 @@ button {
 	cursor: pointer;
 	&:disabled {
 		opacity: 0.5;
+		cursor: not-allowed;
 	}
 }
 
@@ -137,9 +138,12 @@ select::-ms-expand {
 	}
 }
 
+.container {
+
+}
 
 @media only screen and (max-width: 760px) {
-	// html {
-	// 	background-color: #fff;
-	// }
+	.container {
+
+	}
 }

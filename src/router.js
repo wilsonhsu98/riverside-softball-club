@@ -43,6 +43,12 @@ const router = new VueRouter({
           meta: { requiresAuth: true }
         },
         {
+          path: "games/:team/new",
+          name: "new_game",
+          component: require("./views/view_new_game").default,
+          meta: { requiresAuth: true }
+        },
+        {
           path: "games/:team/:game",
           name: "game",
           component: require("./views/view_game").default,

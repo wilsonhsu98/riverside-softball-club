@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import "firebase/messaging";
 import config from "../config.json";
 
 firebase.initializeApp(config.firebase);
@@ -30,4 +31,20 @@ const credentialMapping = {
   "github.com": token => firebase.auth.GithubAuthProvider.credential(token)
 };
 
-export { db, timestamp, fieldValue, auth, providerMapping, credentialMapping };
+let messaging = null;
+if (firebase.messaging.isSupported() && messaging) {
+  messaging = firebase.messaging();
+  messaging.usePublicVapidKey(
+    "BFeaTTT1Dh8RoYytjYuMk3BktHvFDYrkZfDiRUlNtQyT8YbKpX5DnQU7rHq0x4YdP-xACIttBDFl6Tngy-v0BKw"
+  );
+}
+
+export {
+  db,
+  timestamp,
+  fieldValue,
+  auth,
+  providerMapping,
+  credentialMapping,
+  messaging
+};

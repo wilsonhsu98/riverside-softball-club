@@ -7,7 +7,7 @@
     <button class="signin-btn fb" @click="fbLogin">
       {{ $t('login_fb_btn') }}
     </button>
-    <button class="signin-btn line" @click="lineLogin">
+    <button class="signin-btn line" @click="lineLogin" :disabled="isProduction ? true : false">
       {{ $t('login_line_btn') }}
     </button>
     <button class="signin-btn github" @click="githubLogin">
@@ -46,7 +46,6 @@
   font-family: Roboto, Helvetica, Arial, sans-serif;
   font-size: 14px;
   position: relative;
-  cursor: pointer;
   margin-bottom: 15px;
   &:before {
     content: "";
@@ -119,11 +118,14 @@
 import { mapGetters, mapActions } from "vuex";
 
 export default {
+  data() {
+    return {
+      isProduction: process.env.NODE_ENV === "production"
+    };
+  },
   created() {
     if (this.$route.params.custom) {
       this.lineLoginRedirect(this.$route.params.custom);
-    } else {
-      // this.chkLoginStatus();
     }
   },
   methods: {
@@ -134,7 +136,6 @@ export default {
       githubLogin: "githubLogin",
       lineLogin: "lineLogin",
       lineLoginRedirect: "lineLoginRedirect"
-      // chkLoginStatus: "chkLoginStatus"
     })
   },
   computed: {

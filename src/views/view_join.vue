@@ -39,7 +39,7 @@
           </span>
         </div>
         <template v-if="teamCode">
-          <div class="team-info" :style="{ backgroundImage: `url(${icon})`}">
+          <div class="team-info" :style="{ backgroundImage: `url(${icon || defaultIcon})`}">
             <label class="section-header">{{ $t('ttl_team_intro') }}</label>
             <p>{{ teamName }}</p>
             <p>{{ otherNames }}</p>

@@ -19,6 +19,9 @@
         </template>
       </div>
     </template>
+    <div class="button-container" v-if="role === 'manager'">
+      <router-link :to="{ name: 'new_game', params: { team: $route.params.team } }" tag="button">＋</router-link>
+    </div>
   </div>
 </template>
 
@@ -90,6 +93,23 @@
       transform: translateX(-50%);
     }
   }
+  .button-container {
+    margin-top: -50px;
+    text-align: right;
+    width: 100%;
+    position: sticky;
+    bottom: 20px;
+    button {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: $current_user_bgcolor;
+      margin: 0;
+      font-size: 25px;
+      outline: none;
+    }
+  }
 }
 @media only screen and (max-width: 760px) {
   .gamelist-container {
@@ -98,8 +118,16 @@
     padding: 10px 0 0;
     background-color: transparent;
     box-shadow: none;
-    .row .item .result {
+    .row .item .result,
+    .row:after {
       color: #fff;
+    }
+    .button-container {
+      margin-top: -15px;
+      bottom: 50px;
+      button {
+        margin: 0 10px 10px 0;
+      }
     }
   }
 }
@@ -119,7 +147,8 @@ export default {
   computed: {
     ...mapGetters({
       gameList: "gameList",
-      currentTeamIcon: "currentTeamIcon"
+      currentTeamIcon: "currentTeamIcon",
+      role: "role"
     })
   }
 };
