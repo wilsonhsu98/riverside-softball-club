@@ -1,61 +1,99 @@
 <template>
   <div>
-    <mobile-header
-      :back="back_"
-      :icon="currentTeamIcon"
-    />
+    <mobile-header :back="back_" :icon="currentTeamIcon" />
     <div class="gamebox-container">
       <div class="box-summary" v-if="boxSummary.league && boxSummary.group">
-        {{ `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}` }}
+        {{ `${boxSummary.league} ${$t("box_group", { g: boxSummary.group })}` }}
         <template v-if="boxSummary.year && boxSummary.season">
           {{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
         </template>
-        <div>{{ boxSummary.opponent ? $t('box_opponent', { opponent: boxSummary.opponent }) : $t('box_forgot_opponent') }}
+        <div>
+          {{
+            boxSummary.opponent
+              ? $t("box_opponent", { opponent: boxSummary.opponent })
+              : $t("box_forgot_opponent")
+          }}
         </div>
-        <div class="result" v-if="boxSummary.result">{{ $t('box_summary', { h: boxSummary.h, r: boxSummary.r, result: $t(`box_${boxSummary.result}`)}) }}
+        <div class="result" v-if="boxSummary.result">
+          {{
+            $t("box_summary", {
+              h: boxSummary.h,
+              r: boxSummary.r,
+              result: $t(`box_${boxSummary.result}`)
+            })
+          }}
         </div>
       </div>
       <div class="box-table">
-        <div class="player-records" v-for="(item, i) in box" :key="`record_${i}`">
+        <div
+          class="player-records"
+          v-for="(item, i) in box"
+          :key="`record_${i}`"
+        >
           <div class="player">
-            <span class="order">{{ item.altOrder ? $t('PH'): item.order }}</span>
+            <span class="order">{{
+              item.altOrder ? $t("PH") : item.order
+            }}</span>
             <span class="name">
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span v-if="item.data.photo" class="img" :style="`background-image: url(${item.data.photo})`">
+              <span
+                v-if="item.data.photo"
+                class="img"
+                :style="`background-image: url(${item.data.photo})`"
+              >
               </span>
               {{ item.name }}
             </span>
           </div>
-          <div v-if="boxSummary.e" class="error">{{ item.error > 0 ? `${item.error}E` : '' }}</div>
+          <div v-if="boxSummary.e" class="error">
+            {{ item.error > 0 ? `${item.error}E` : "" }}
+          </div>
           <div class="records">
             <div class="records-flex">
               <template v-for="(record, recordIndex) in item.content">
-                <div class="record" v-if="record === undefined" :key="`content_${recordIndex}`"></div>
+                <div
+                  class="record"
+                  v-if="record === undefined"
+                  :key="`content_${recordIndex}`"
+                ></div>
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <span class="inn">{{ record.innChange }}</span>
                   <router-link
                     v-if="role === 'manager'"
                     tag="span"
-                    :to="{ name: 'pa', params: {
-                      team: $route.params.team,
-                      game: $route.params.game,
-                      order: record.order || 'new',
-                    }}"
-                    :class="`content editable ${record.color} ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''} ${record.content === 'new' ? 'new' : ''}`"
+                    :to="{
+                      name: 'pa',
+                      params: {
+                        team: $route.params.team,
+                        game: $route.params.game,
+                        order: record.order || 'new'
+                      }
+                    }"
+                    :class="
+                      `content editable ${record.color} ${
+                        record.rbi ? 'rbi' : ''
+                      } ${record.r === record.name ? 'run' : ''} ${
+                        record.content === 'new' ? 'new' : ''
+                      }`
+                    "
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                   >
-                    {{ record.content === 'new' ? '＋' : $t(record.content) }}
+                    {{ record.content === "new" ? "＋" : $t(record.content) }}
                   </router-link>
                   <span
                     v-else
-                    :class="`content ${record.rbi ? 'rbi' : ''} ${record.r === record.name ? 'run' : ''} ${record.content === 'new' ? '' : record.color}`"
+                    :class="
+                      `content ${record.rbi ? 'rbi' : ''} ${
+                        record.r === record.name ? 'run' : ''
+                      } ${record.content === 'new' ? '' : record.color}`
+                    "
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                   >
-                    {{ record.content !== 'new' ? $t(record.content) : '' }}
+                    {{ record.content !== "new" ? $t(record.content) : "" }}
                   </span>
                 </div>
               </template>
@@ -68,7 +106,7 @@
     <div style="text-align: center; margin: 10px;">
       <button class="share-btn" @click="screenshot">
         <i class="fa fa-facebook-square"></i>
-        {{ $t('fb_share') }}
+        {{ $t("fb_share") }}
       </button>
     </div>
   </div>

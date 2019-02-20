@@ -1,12 +1,18 @@
 <template>
   <div class="gamelist-container">
-    <mobile-header :icon="currentTeamIcon"/>
+    <mobile-header :icon="currentTeamIcon" />
     <template v-for="item in gameList">
       <div class="row" :data-date="item.date" :key="`date_${item.date}`">
         <template v-for="sub in item.games">
           <div class="item" :key="`game_${sub.game}`">
-            <router-link :to="{ name: 'game', params: { team: $route.params.team, game: sub.game } }" :class="`result ${sub.result} ${sub.group}`" >
-              {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+            <router-link
+              :to="{
+                name: 'game',
+                params: { team: $route.params.team, game: sub.game }
+              }"
+              :class="`result ${sub.result} ${sub.group}`"
+            >
+              {{ (sub.result && sub.result.substr(0, 1)) || "?" }}
             </router-link>
             <div class="name">{{ sub.opponent || sub.game }}</div>
           </div>
@@ -20,7 +26,11 @@
       </div>
     </template>
     <div class="button-container" v-if="role === 'manager'">
-      <router-link :to="{ name: 'new_game', params: { team: $route.params.team } }" tag="button">＋</router-link>
+      <router-link
+        :to="{ name: 'new_game', params: { team: $route.params.team } }"
+        tag="button"
+        >＋</router-link
+      >
     </div>
   </div>
 </template>

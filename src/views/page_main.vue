@@ -2,35 +2,58 @@
   <div class="main-container">
     <header>
       <div class="header-container">
-        <img class="icon" :src="currentTeamIcon || defaultIcon"/>
+        <img class="icon" :src="currentTeamIcon || defaultIcon" />
         <ul class="tab">
           <li v-if="currentTeam">
-            <router-link :to="{ name: 'games', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_games')">
+            <router-link
+              :to="{ name: 'games', params: { team: currentTeam } }"
+              active-class="active"
+              :data-label="$t('menu_games')"
+            >
               <i class="fa fa-table"></i>
             </router-link>
           </li>
           <li v-if="currentTeam">
-            <router-link :to="{ name: 'stats_pa', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_stats')">
+            <router-link
+              :to="{ name: 'stats_pa', params: { team: currentTeam } }"
+              active-class="active"
+              :data-label="$t('menu_stats')"
+            >
               <i class="fa fa-list-ol"></i>
             </router-link>
           </li>
           <li v-if="currentTeam">
-            <router-link :to="{ name: 'stats_item', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_stats_item')">
+            <router-link
+              :to="{ name: 'stats_item', params: { team: currentTeam } }"
+              active-class="active"
+              :data-label="$t('menu_stats_item')"
+            >
               <i class="fa fa-th-large"></i>
             </router-link>
           </li>
           <li v-if="currentTeam && role === 'manager'">
-            <router-link :to="{ name: 'edit_team', params: { team: currentTeam } }" active-class="active" :data-label="$t('menu_manage')" :data-requests="teamRequests.length === 0 ? undefined : teamRequests.length">
+            <router-link
+              :to="{ name: 'edit_team', params: { team: currentTeam } }"
+              active-class="active"
+              :data-label="$t('menu_manage')"
+              :data-requests="
+                teamRequests.length === 0 ? undefined : teamRequests.length
+              "
+            >
               <i class="fa fa-cog"></i>
             </router-link>
           </li>
           <li>
-            <router-link :to="{ name: 'user' }" active-class="active" :data-label="$t('menu_profile')">
+            <router-link
+              :to="{ name: 'user' }"
+              active-class="active"
+              :data-label="$t('menu_profile')"
+            >
               <i class="fa fa-user"></i>
             </router-link>
           </li>
           <li class="logout_link">
-            <a @click="logout">{{ $t('logout_btn') }}</a>
+            <a @click="logout">{{ $t("logout_btn") }}</a>
           </li>
         </ul>
       </div>
@@ -152,7 +175,7 @@ header {
     .tab {
       display: flex;
       justify-content: space-around;
-      align-items: start;
+      align-items: flex-start;
       font-size: 25px;
       padding: 0;
       background: none;

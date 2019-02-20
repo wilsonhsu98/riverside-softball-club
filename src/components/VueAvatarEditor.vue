@@ -1,28 +1,29 @@
 <template>
   <div>
     <vue-avatar
-      :image='image'
-      :width='width'
-      :height='height'
+      :image="image"
+      :width="width"
+      :height="height"
       :rotation="rotation"
       :borderRadius="hasRadius ? borderRadius : 0"
-      :border='border'
-      :color='color'
+      :border="border"
+      :color="color"
       :scale="scale"
       :canMoveOutOfBound="canMoveOutOfBound"
       ref="vueavatar"
-      @vue-avatar-editor:image-ready="onImageReady">
+      @vue-avatar-editor:image-ready="onImageReady"
+    >
     </vue-avatar>
     <div>
       <label>
-        {{ zoomText }} : {{scale}}x
-        <br>
+        {{ zoomText }} : {{ scale }}x
+        <br />
         <input
           type="range"
-          min=0.5
-          max=2
-          step=0.02
-          v-model.number='scale'
+          min="0.5"
+          max="2"
+          step="0.02"
+          v-model.number="scale"
         />
         <!-- <input
           type="range"

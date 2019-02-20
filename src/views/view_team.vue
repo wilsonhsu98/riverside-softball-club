@@ -6,16 +6,24 @@
       :save="editTeam_"
     />
     <div class="container">
-      <h1>{{ $route.params.team ? $t('manage_team') : $t('create_team') }}</h1>
+      <h1>{{ $route.params.team ? $t("manage_team") : $t("create_team") }}</h1>
 
-      <div class="request" :key="`request_${request.teamCode}`" v-for="request in teamRequests">
-        <img :src="request.photo"/>
-        <p>{{ $t('msg_request_join', { team: request.teamName }) }}</p>
+      <div
+        class="request"
+        :key="`request_${request.teamCode}`"
+        v-for="request in teamRequests"
+      >
+        <img :src="request.photo" />
+        <p>{{ $t("msg_request_join", { team: request.teamName }) }}</p>
         <p class="request-msg">{{ request.msg }}</p>
         <p>{{ new Date(request.timestamp).toLocaleString() }}</p>
         <div class="request-btn-container">
-          <button @click="acceptRequest_(request.id)">{{ $t('btn_accept') }}</button>
-          <button @click="deniedRequest_(request.id)">{{ $t('btn_denied') }}</button>
+          <button @click="acceptRequest_(request.id)">
+            {{ $t("btn_accept") }}
+          </button>
+          <button @click="deniedRequest_(request.id)">
+            {{ $t("btn_denied") }}
+          </button>
         </div>
       </div>
 
@@ -52,9 +60,13 @@
         v-model="teamIntro"
       />
 
-      <div v-if="!iconEdit" class="icon-container" :style="{ background: `url(${transparentPng})` }">
+      <div
+        v-if="!iconEdit"
+        class="icon-container"
+        :style="{ background: `url(${transparentPng})` }"
+      >
         <i class="fa fa-picture-o" @click="iconEdit = true"></i>
-        <img :src="icon"/>
+        <img :src="icon" />
       </div>
       <div v-else class="icon-editor-container">
         <i class="fa fa-times" @click="iconEdit = false"></i>
@@ -72,9 +84,16 @@
       </div>
 
       <h2 class="player-header">
-        {{ $t('ttl_player_list') }}
-        <i class="fa fa-info-circle" v-if="$route.params.team" v-tooltip="{ content: $t('tip_player'), classes: ['info'] }"></i>
-        <i class="fa fa-plus-circle" @click="players = [].concat({}, players)"></i>
+        {{ $t("ttl_player_list") }}
+        <i
+          class="fa fa-info-circle"
+          v-if="$route.params.team"
+          v-tooltip="{ content: $t('tip_player'), classes: ['info'] }"
+        ></i>
+        <i
+          class="fa fa-plus-circle"
+          @click="players = [].concat({}, players)"
+        ></i>
       </h2>
 
       <div class="player" v-for="(player, i) in players" :key="`row_${i}`">
@@ -102,11 +121,19 @@
               v-model="player.manager"
               @change="releaseSelfManager($event, player)"
             />
-            {{ $t('manager') }}
+            {{ $t("manager") }}
           </label>
-          <img v-if="player && player.uid && player.photo" :src="player.photo" class="binded"/>
-          <span v-if="player && player.uid">{{ $t('binded') }}</span>
-          <i v-if="player.uid !== userId" class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
+          <img
+            v-if="player && player.uid && player.photo"
+            :src="player.photo"
+            class="binded"
+          />
+          <span v-if="player && player.uid">{{ $t("binded") }}</span>
+          <i
+            v-if="player.uid !== userId"
+            class="fa fa-minus-circle"
+            @click="players.splice(i, 1)"
+          ></i>
         </template>
 
         <!-- insert mode -->
@@ -133,18 +160,25 @@
               :checked="player.self"
               @change="rdoBindSelf(i)"
             />
-            {{ $t('bind_self') }}
+            {{ $t("bind_self") }}
           </label>
           <i class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
         </template>
       </div>
 
       <h2 class="player-header" v-if="$route.params.team && benches.length">
-        {{ $t('ttl_bench_list') }}
-        <i class="fa fa-info-circle" v-tooltip="{ content: $t('tip_bench'), classes: ['info'] }"></i>
+        {{ $t("ttl_bench_list") }}
+        <i
+          class="fa fa-info-circle"
+          v-tooltip="{ content: $t('tip_bench'), classes: ['info'] }"
+        ></i>
       </h2>
 
-      <div class="player" v-for="(player, i) in benches" :key="`benches_row_${i}`">
+      <div
+        class="player"
+        v-for="(player, i) in benches"
+        :key="`benches_row_${i}`"
+      >
         <template v-if="$route.params.team">
           <input
             type="text"
@@ -160,20 +194,33 @@
             :placeholder="$t('number')"
             v-model.number="player.number"
           />
-          <label v-if="player && player.uid" style="width: 57px;">
-
-          </label>
-          <img v-if="player && player.uid && player.photo" :src="player.photo" class="binded"/>
-          <i class="fa fa-commenting-o" v-tooltip="{ content: player.msg, classes: ['info'] }"></i>
-          <i v-if="player.uid !== userId" class="fa fa-times-circle" @click="benches.splice(i, 1)"></i>
+          <label v-if="player && player.uid" style="width: 57px;"> </label>
+          <img
+            v-if="player && player.uid && player.photo"
+            :src="player.photo"
+            class="binded"
+          />
+          <i
+            class="fa fa-commenting-o"
+            v-tooltip="{ content: player.msg, classes: ['info'] }"
+          ></i>
+          <i
+            v-if="player.uid !== userId"
+            class="fa fa-times-circle"
+            @click="benches.splice(i, 1)"
+          ></i>
         </template>
       </div>
 
       <div v-if="players_err" class="error" v-html="players_err"></div>
 
       <div class="button-container">
-        <button v-if="!$route.params.team" class="save-btn" @click="back_">{{ $t('btn_cancel') }}</button>
-        <button class="save-btn" @click="editTeam_">{{ $route.params.team ? $t('btn_update') : $t('btn_insert') }}</button>
+        <button v-if="!$route.params.team" class="save-btn" @click="back_">
+          {{ $t("btn_cancel") }}
+        </button>
+        <button class="save-btn" @click="editTeam_">
+          {{ $route.params.team ? $t("btn_update") : $t("btn_insert") }}
+        </button>
       </div>
     </div>
   </div>

@@ -9,10 +9,7 @@ firebase.initializeApp(config.firebase);
 const db = firebase.firestore();
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 const fieldValue = firebase.firestore.FieldValue;
-const settings = {
-  timestampsInSnapshots: true
-};
-db.settings(settings);
+db.settings({});
 
 // provider.addScope('public_profile');
 // provider.addScope('user_birthday');

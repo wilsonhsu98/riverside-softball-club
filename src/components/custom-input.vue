@@ -1,23 +1,27 @@
 <template>
-	<div :class="['field-wrapper', { focused, disabled, 'has-value': value, 'has-error': error }]">
-		<div class="field-wrapper-item" @click="focus">
-			<label>{{ name }}</label>
-			<div class="field-wrapper-children">
+  <div
+    :class="[
+      'field-wrapper',
+      { focused, disabled, 'has-value': value, 'has-error': error }
+    ]"
+  >
+    <div class="field-wrapper-item" @click="focus">
+      <label>{{ name }}</label>
+      <div class="field-wrapper-children">
+        <template v-if="type === 'textarea'">
+          <textarea
+            ref="textarea"
+            :placeholder="focused ? placeholder : ''"
+            :rows="rows"
+            :value="value"
+            :disabled="disabled"
+            @blur="blur"
+            @input="input($event.target.value)"
+          ></textarea>
+        </template>
 
-				<template v-if="type === 'textarea'">
-					<textarea
-						ref="textarea"
-						:placeholder="focused ? placeholder : ''"
-						:rows="rows"
-						:value="value"
-						:disabled="disabled"
-						@blur="blur"
-						@input="input($event.target.value)"
-					></textarea>
-				</template>
-
-				<template v-else-if="type === 'splitting-wording'">
-					<!-- <div v-if="showPretty && value && value.split(',').length" class="split">
+        <template v-else-if="type === 'splitting-wording'">
+          <!-- <div v-if="showPretty && value && value.split(',').length" class="split">
 						<span v-if="split !== ''" v-for="split in value.split(',')" class="split-span">
 							{{ split }}
 						</span>
@@ -30,38 +34,53 @@
 						@blur="split($event.target.value)"
 					/> -->
 
-					<vue-tags-input
-						ref="splitInput"
-						v-model="tag"
-						:allow-edit-tags="true"
-						:placeholder="focused ? placeholder : ''"
-						:tags="value ? value.split(',').filter(item => item).map(item => ({ text: item })) : []"
-						:separators="[',']"
-						:disabled="disabled"
-						@blur="blur"
-						@tags-changed="newTags => this.$emit('input', newTags.filter(item => item.text).map(item => item.text).join(','))"
-					/>
-				</template>
+          <vue-tags-input
+            ref="splitInput"
+            v-model="tag"
+            :allow-edit-tags="true"
+            :placeholder="focused ? placeholder : ''"
+            :tags="
+              value
+                ? value
+                    .split(',')
+                    .filter(item => item)
+                    .map(item => ({ text: item }))
+                : []
+            "
+            :separators="[',']"
+            :disabled="disabled"
+            @blur="blur"
+            @tags-changed="
+              newTags =>
+                this.$emit(
+                  'input',
+                  newTags
+                    .filter(item => item.text)
+                    .map(item => item.text)
+                    .join(',')
+                )
+            "
+          />
+        </template>
 
-				<template v-else>
-					<input
-						ref="input"
-						type="text"
-						:placeholder="focused ? placeholder : ''"
-						:value="value"
-						:disabled="disabled"
-						@blur="blur"
-						@keyup="keyup($event.target.value)"
-						@input="input($event.target.value)"
-					/>
-				</template>
+        <template v-else>
+          <input
+            ref="input"
+            type="text"
+            :placeholder="focused ? placeholder : ''"
+            :value="value"
+            :disabled="disabled"
+            @blur="blur"
+            @keyup="keyup($event.target.value)"
+            @input="input($event.target.value)"
+          />
+        </template>
 
         <slot></slot>
-
-			</div>
-		</div>
-		<div v-if="error" class="field-wrapper-message">{{ error }}</div>
-	</div>
+      </div>
+    </div>
+    <div v-if="error" class="field-wrapper-message">{{ error }}</div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

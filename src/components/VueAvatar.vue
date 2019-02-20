@@ -10,14 +10,15 @@
       @drop="onDrop"
       @mousedown="onDragStart"
       @touchstart="onDragStart"
-      @click="clicked">
+      @click="clicked"
+    >
     </canvas>
     <input
       type="file"
       ref="input"
       @change="fileSelected"
       style="display:none;"
-      />
+    />
   </div>
 </template>
 

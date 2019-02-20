@@ -1,78 +1,87 @@
 <template>
-	<div :class="`canvas ${disabled ? 'disabled' : ''}`" ref="canvas">
-		<div class="in-field">
-			<div class="warning-track">
-				<div class="out-field">
-					<div class="out-field-gress r-270">
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-					</div>
-					<div class="out-field-gress r-180">
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-						<div class="gress-mask"></div>
-					</div>
-				</div>
-			</div>
-			<div class="in-field-track"></div>
-			<div class="in-field-gress">
-				<div class="first-base base"></div>
-				<div class="second-base base"></div>
-				<div class="third-base base"></div>
-				<div class="pitcher base"></div>
+  <div :class="`canvas ${disabled ? 'disabled' : ''}`" ref="canvas">
+    <div class="in-field">
+      <div class="warning-track">
+        <div class="out-field">
+          <div class="out-field-gress r-270">
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+          </div>
+          <div class="out-field-gress r-180">
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+            <div class="gress-mask"></div>
+          </div>
+        </div>
+      </div>
+      <div class="in-field-track"></div>
+      <div class="in-field-gress">
+        <div class="first-base base"></div>
+        <div class="second-base base"></div>
+        <div class="third-base base"></div>
+        <div class="pitcher base"></div>
 
-				<div class="gress r-270">
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-				</div>
-				<div class="gress r-180">
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-					<div class="gress-mask"></div>
-				</div>
-			</div>
-		</div>
-		<div class="cover cover-left">
-			<div class="cover-ground"></div>
-		</div>
-		<div class="cover cover-right">
-			<div class="cover-ground"></div>
-		</div>
-		<div class="home">
-			<div class="home-batting-left home-batting"></div>
-			<div class="home-base"></div>
-			<div class="home-batting-right home-batting"></div>
-		</div>
-		<div class="coordinate-area" @mousedown="trackXY">
-			<div class="dot" v-for="(item, i) in xy" :style="{ left: `${item.realX}px`, top: `${item.realY}px`, backgroundColor: item.color }" :key="`dot_${i}`"></div>
-		</div>
-	</div>
+        <div class="gress r-270">
+          <div class="gress-mask"></div>
+          <div class="gress-mask"></div>
+          <div class="gress-mask"></div>
+          <div class="gress-mask"></div>
+          <div class="gress-mask"></div>
+        </div>
+        <div class="gress r-180">
+          <div class="gress-mask"></div>
+          <div class="gress-mask"></div>
+          <div class="gress-mask"></div>
+          <div class="gress-mask"></div>
+          <div class="gress-mask"></div>
+        </div>
+      </div>
+    </div>
+    <div class="cover cover-left">
+      <div class="cover-ground"></div>
+    </div>
+    <div class="cover cover-right">
+      <div class="cover-ground"></div>
+    </div>
+    <div class="home">
+      <div class="home-batting-left home-batting"></div>
+      <div class="home-base"></div>
+      <div class="home-batting-right home-batting"></div>
+    </div>
+    <div class="coordinate-area" @mousedown="trackXY">
+      <div
+        class="dot"
+        v-for="(item, i) in xy"
+        :style="{
+          left: `${item.realX}px`,
+          top: `${item.realY}px`,
+          backgroundColor: item.color
+        }"
+        :key="`dot_${i}`"
+      ></div>
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

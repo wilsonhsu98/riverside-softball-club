@@ -131,28 +131,30 @@ const actions = {
               }
             }
           });
-          data.benches.filter(item => item.name).forEach(item => {
-            batch.set(
-              db
-                .collection("accounts")
-                .doc(item.uid)
-                .collection("teams")
-                .doc(data.code),
-              { role: "player" },
-              { merge: true }
-            );
-            batch.set(
-              db.collection("accounts").doc(item.uid),
-              { teams: fieldValue.arrayUnion(data.code) },
-              { merge: true }
-            );
-            batch.set(
-              refTeamDoc.collection("players").doc(item.name),
-              { manager: false, number: item.number || "", uid: item.uid },
-              { merge: true }
-            );
-            batch.delete(refTeamDoc.collection("benches").doc(item.uid));
-          });
+          data.benches
+            .filter(item => item.name)
+            .forEach(item => {
+              batch.set(
+                db
+                  .collection("accounts")
+                  .doc(item.uid)
+                  .collection("teams")
+                  .doc(data.code),
+                { role: "player" },
+                { merge: true }
+              );
+              batch.set(
+                db.collection("accounts").doc(item.uid),
+                { teams: fieldValue.arrayUnion(data.code) },
+                { merge: true }
+              );
+              batch.set(
+                refTeamDoc.collection("players").doc(item.name),
+                { manager: false, number: item.number || "", uid: item.uid },
+                { merge: true }
+              );
+              batch.delete(refTeamDoc.collection("benches").doc(item.uid));
+            });
           teamBenchesCollection.docs.forEach(doc => {
             if (!data.benches.map(player => player.uid).includes(doc.id)) {
               batch.delete(refTeamDoc.collection("benches").doc(doc.id));

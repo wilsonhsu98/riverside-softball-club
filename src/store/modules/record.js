@@ -179,9 +179,8 @@ const getters = {
     return {
       AVG: records
         .filter(item => item.PA !== "-" && item.AVG > 0 && item.PA >= minimunPA)
-        .sort(
-          (a, b) =>
-            b["AVG"] === a["AVG"] ? b["PA"] - a["PA"] : b["AVG"] - a["AVG"]
+        .sort((a, b) =>
+          b["AVG"] === a["AVG"] ? b["PA"] - a["PA"] : b["AVG"] - a["AVG"]
         )
         .map(item => ({
           name: item.name,
@@ -191,8 +190,8 @@ const getters = {
         })),
       H: records
         .filter(item => item.PA !== "-" && item.H > 0)
-        .sort(
-          (a, b) => (b["H"] === a["H"] ? a["PA"] - b["PA"] : b["H"] - a["H"])
+        .sort((a, b) =>
+          b["H"] === a["H"] ? a["PA"] - b["PA"] : b["H"] - a["H"]
         )
         .map(item => ({
           name: item.name,
@@ -202,9 +201,8 @@ const getters = {
         })),
       HR: records
         .filter(item => item.PA !== "-" && item.HR > 0)
-        .sort(
-          (a, b) =>
-            b["HR"] === a["HR"] ? a["PA"] - b["PA"] : b["HR"] - a["HR"]
+        .sort((a, b) =>
+          b["HR"] === a["HR"] ? a["PA"] - b["PA"] : b["HR"] - a["HR"]
         )
         .map(item => ({
           name: item.name,
@@ -214,9 +212,8 @@ const getters = {
         })),
       RBI: records
         .filter(item => item.PA !== "-" && item.RBI > 0)
-        .sort(
-          (a, b) =>
-            b["RBI"] === a["RBI"] ? a["PA"] - b["PA"] : b["RBI"] - a["RBI"]
+        .sort((a, b) =>
+          b["RBI"] === a["RBI"] ? a["PA"] - b["PA"] : b["RBI"] - a["RBI"]
         )
         .map(item => ({
           name: item.name,

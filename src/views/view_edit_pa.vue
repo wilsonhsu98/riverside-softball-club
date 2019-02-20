@@ -1,40 +1,52 @@
 <template>
   <div class="gamelist-container">
-    <mobile-header
-      :back="back_"
-      :icon="currentTeamIcon"
-      :save="edit_"
-    />
+    <mobile-header :back="back_" :icon="currentTeamIcon" :save="edit_" />
     <!-- {{ pa }}
     <div>{{ pa.name }}</div>
     <div>{{ pa.inn }}</div>
     <div>{{ pa.content }}</div> -->
     <div class="left">
       <div class="desc">
-        <div><minus-plus-number :value="inn"/> {{ $t('desc_inn') }}</div>
-        <div>{{ $t('desc_order', { n: order }) }}</div>
-        <div>{{ $t('desc_out', { n: 3 }) }}</div>
-        <div>{{ $t('desc_batting', { n: order % box[box.length - 1].order || box[box.length - 1].order }) }}</div>
+        <div><minus-plus-number :value="inn" /> {{ $t("desc_inn") }}</div>
+        <div>{{ $t("desc_order", { n: order }) }}</div>
+        <div>{{ $t("desc_out", { n: 3 }) }}</div>
+        <div>
+          {{
+            $t("desc_batting", {
+              n: order % box[box.length - 1].order || box[box.length - 1].order
+            })
+          }}
+        </div>
       </div>
       <infield class="infield">
         <div class="player-container">
-          <div :class="`on-base-player ${b}`" v-for="(b, bi) in ['first', 'second', 'third', 'home']" :key="`onbase_${bi}`">
+          <div
+            :class="`on-base-player ${b}`"
+            v-for="(b, bi) in ['first', 'second', 'third', 'home']"
+            :key="`onbase_${bi}`"
+          >
             <span
-              :class="`run${base[b].run ? ' select' : ''}${base[b].disabled ? ' disabled' : ''}`"
+              :class="
+                `run${base[b].run ? ' select' : ''}${
+                  base[b].disabled ? ' disabled' : ''
+                }`
+              "
               @click="base[b].disabled || toggle(`base.${b}.run`)"
             >
-              {{ $t('R') }}
+              {{ $t("R") }}
             </span>
-            <span
-              class="name"
-            >
+            <span class="name">
               {{ base[b].name }}
             </span>
             <span
-              :class="`out${base[b].out ? ' select' : ''}${base[b].disabled ? ' disabled' : ''}`"
+              :class="
+                `out${base[b].out ? ' select' : ''}${
+                  base[b].disabled ? ' disabled' : ''
+                }`
+              "
               @click="base[b].disabled || toggle(`base.${b}.out`)"
             >
-              {{ $t('Out') }}
+              {{ $t("Out") }}
             </span>
           </div>
         </div>
@@ -50,10 +62,14 @@
             {{ $t(item) }}
           </span>
           <span
-            :class="`rbi${rbi.value === 1 ? ' select' : ''}${rbi.one.disabled ? ' disabled' : ''}`"
+            :class="
+              `rbi${rbi.value === 1 ? ' select' : ''}${
+                rbi.one.disabled ? ' disabled' : ''
+              }`
+            "
             @click="rbi.one.disabled || toggle('rbi.value', 1)"
           >
-            {{ $t('RBI_count', { rbi: 1 }) }}
+            {{ $t("RBI_count", { rbi: 1 }) }}
           </span>
         </div>
         <div>
@@ -66,10 +82,14 @@
             {{ $t(item) }}
           </span>
           <span
-            :class="`rbi${rbi.value === 2 ? ' select' : ''}${rbi.two.disabled ? ' disabled' : ''}`"
+            :class="
+              `rbi${rbi.value === 2 ? ' select' : ''}${
+                rbi.two.disabled ? ' disabled' : ''
+              }`
+            "
             @click="rbi.two.disabled || toggle('rbi.value', 2)"
           >
-            {{ $t('RBI_count', { rbi: 2 }) }}
+            {{ $t("RBI_count", { rbi: 2 }) }}
           </span>
         </div>
         <div>
@@ -83,10 +103,14 @@
           </span>
           <span></span>
           <span
-            :class="`rbi${rbi.value === 3 ? ' select' : ''}${rbi.three.disabled ? ' disabled' : ''}`"
+            :class="
+              `rbi${rbi.value === 3 ? ' select' : ''}${
+                rbi.three.disabled ? ' disabled' : ''
+              }`
+            "
             @click="rbi.three.disabled || toggle('rbi.value', 3)"
           >
-            {{ $t('RBI_count', { rbi: 3 }) }}
+            {{ $t("RBI_count", { rbi: 3 }) }}
           </span>
         </div>
         <div>
@@ -100,22 +124,29 @@
           </span>
           <span></span><span></span>
           <span
-            :class="`rbi${rbi.value === 4 ? ' select' : ''}${rbi.four.disabled ? ' disabled' : ''}`"
+            :class="
+              `rbi${rbi.value === 4 ? ' select' : ''}${
+                rbi.four.disabled ? ' disabled' : ''
+              }`
+            "
             @click="rbi.four.disabled || toggle('rbi.value', 4)"
           >
-            {{ $t('RBI_count', { rbi: 4 }) }}
+            {{ $t("RBI_count", { rbi: 4 }) }}
           </span>
         </div>
       </div>
     </div>
     <div class="right">
       <div class="coordination">
-        <coordination :values="location" :disabled="['BB', 'K'].includes(content)"/>
+        <coordination
+          :values="location"
+          :disabled="['BB', 'K'].includes(content)"
+        />
       </div>
     </div>
     <div class="button-container">
-      <button class="save-btn" @click="back_">{{ $t('btn_cancel') }}</button>
-      <button class="save-btn" @click="edit_">{{ $t('btn_update') }}</button>
+      <button class="save-btn" @click="back_">{{ $t("btn_cancel") }}</button>
+      <button class="save-btn" @click="edit_">{{ $t("btn_update") }}</button>
     </div>
   </div>
 </template>

@@ -5,9 +5,8 @@
       :icon="$route.params.team ? currentTeamIcon : undefined"
       :save="edit_"
     />
-    <div class="container">
-    </div>
-	</div>
+    <div class="container"></div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

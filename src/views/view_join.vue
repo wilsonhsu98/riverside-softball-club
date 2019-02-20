@@ -1,18 +1,21 @@
 <template>
   <div>
-    <mobile-header
-      :back="back_"
-    />
+    <mobile-header :back="back_" />
     <div class="container">
+      <h1>{{ $t("join_team") }}</h1>
 
-      <h1>{{ $t('join_team') }}</h1>
-
-      <div class="request" :key="`request_${request.teamCode}`" v-for="request in requests">
+      <div
+        class="request"
+        :key="`request_${request.teamCode}`"
+        v-for="request in requests"
+      >
         <i class="fa fa-times" @click="deleteRequest_(request.id)"></i>
-        <p>{{ $t('msg_request_join', { team: request.teamName }) }}</p>
+        <p>{{ $t("msg_request_join", { team: request.teamName }) }}</p>
         <p class="request-msg">{{ request.msg }}</p>
         <p>{{ new Date(request.timestamp).toLocaleString() }}</p>
-        <p v-if="request.status === 'denied'" class="request-denied">{{ $t('msg_denied') }}</p>
+        <p v-if="request.status === 'denied'" class="request-denied">
+          {{ $t("msg_denied") }}
+        </p>
       </div>
 
       <custom-input
@@ -20,33 +23,46 @@
         :name="$t('ttl_search_team')"
         v-model="keyWord"
       >
-        <i class="fa fa-search" @click="searchTeams({ keyword: keyWord, type: 'join'})"></i>
+        <i
+          class="fa fa-search"
+          @click="searchTeams({ keyword: keyWord, type: 'join' })"
+        ></i>
       </custom-input>
 
       <div class="search-result">
-        <div v-if="Array.isArray(teamList) && teamList.length" class="team-wrapper">
+        <div
+          v-if="Array.isArray(teamList) && teamList.length"
+          class="team-wrapper"
+        >
           <span
             v-for="team in teamList"
             class="team"
             @click="searchTeam_(team.teamCode)"
             :key="`team_${team.teamCode}`"
           >
-            <img :src="team.icon || defaultIcon" style="height: 50px;"/>
+            <img :src="team.icon || defaultIcon" style="height: 50px;" />
             <p class="team__name">{{ team.name }}</p>
-            <p class="team__name" v-for="(subName, i) in team.subNames.split(',')" :key="`${team.teamCode}_subname_${i}`">
+            <p
+              class="team__name"
+              v-for="(subName, i) in team.subNames.split(',')"
+              :key="`${team.teamCode}_subname_${i}`"
+            >
               {{ subName }}
             </p>
           </span>
         </div>
         <template v-if="teamCode">
-          <div class="team-info" :style="{ backgroundImage: `url(${icon || defaultIcon})`}">
-            <label class="section-header">{{ $t('ttl_team_intro') }}</label>
+          <div
+            class="team-info"
+            :style="{ backgroundImage: `url(${icon || defaultIcon})` }"
+          >
+            <label class="section-header">{{ $t("ttl_team_intro") }}</label>
             <p>{{ teamName }}</p>
             <p>{{ otherNames }}</p>
           </div>
           <p class="team-intro">{{ teamIntro }}</p>
           <div class="team-player" v-if="joined">
-            <label class="section-header">{{ $t('ttl_player_list') }}</label>
+            <label class="section-header">{{ $t("ttl_player_list") }}</label>
             <div
               class="team-player-item"
               style="cursor: auto;"
@@ -57,14 +73,20 @@
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span v-if="player.photo" class="img" :style="`background-image: url(${player.photo})`">
+              <span
+                v-if="player.photo"
+                class="img"
+                :style="`background-image: url(${player.photo})`"
+              >
               </span>
-              <span v-if="player.number" class="team-player-item__number">{{ player.number }}</span>
+              <span v-if="player.number" class="team-player-item__number">{{
+                player.number
+              }}</span>
               <span v-if="player.name">{{ player.name }}</span>
             </div>
           </div>
           <div class="team-player" v-else>
-            <label class="section-header">{{ $t('bind_self') }}</label>
+            <label class="section-header">{{ $t("bind_self") }}</label>
             <div
               class="team-player-item"
               :class="{
@@ -78,20 +100,26 @@
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span v-if="player.photo" class="img" :style="`background-image: url(${player.photo})`">
+              <span
+                v-if="player.photo"
+                class="img"
+                :style="`background-image: url(${player.photo})`"
+              >
               </span>
-              <span v-if="player.number" class="team-player-item__number">{{ player.number }}</span>
+              <span v-if="player.number" class="team-player-item__number">{{
+                player.number
+              }}</span>
               <span>{{ player.name }}</span>
             </div>
             <div v-if="bindPlayer" style="margin-top: 5px;">
               <label>
-                <input type="radio" v-model="choice" value="bind"/>
-                {{ $t('msg_join_bind', { name: bindPlayer.name }) }}
+                <input type="radio" v-model="choice" value="bind" />
+                {{ $t("msg_join_bind", { name: bindPlayer.name }) }}
               </label>
             </div>
           </div>
           <div class="team-player" v-if="joined && benches.length">
-            <label class="section-header">{{ $t('ttl_bench_list') }}</label>
+            <label class="section-header">{{ $t("ttl_bench_list") }}</label>
             <div
               class="team-player-item"
               style="cursor: auto;"
@@ -102,19 +130,29 @@
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span v-if="player.photo" class="img" :style="`background-image: url(${player.photo})`">
+              <span
+                v-if="player.photo"
+                class="img"
+                :style="`background-image: url(${player.photo})`"
+              >
               </span>
-              <span v-if="player.number" class="team-player-item__number">{{ player.number }}</span>
+              <span v-if="player.number" class="team-player-item__number">{{
+                player.number
+              }}</span>
               <span v-if="player.name">{{ player.name }}</span>
             </div>
           </div>
           <div class="team-other" v-if="!joined">
-            <label class="section-header">{{ $t('ttl_or') }}</label>
+            <label class="section-header">{{ $t("ttl_or") }}</label>
             <div>
               <label>
-                <input type="radio" v-model="choice" value="join"/>
-                {{ $t('msg_just_join') }}
-                <input type="text" v-model="otherPlayer" @focus="() => this.choice = 'join'"/>
+                <input type="radio" v-model="choice" value="join" />
+                {{ $t("msg_just_join") }}
+                <input
+                  type="text"
+                  v-model="otherPlayer"
+                  @focus="() => (this.choice = 'join')"
+                />
               </label>
             </div>
           </div>
@@ -122,10 +160,17 @@
       </div>
 
       <div class="button-container">
-        <button class="btn cancel" @click="back_">{{ $t('btn_cancel') }}</button>
-        <button v-if="(choice === 'join' && otherPlayer) || choice === 'bind'" class="btn" @click="joinTeam_">{{ $t('btn_join') }}</button>
+        <button class="btn cancel" @click="back_">
+          {{ $t("btn_cancel") }}
+        </button>
+        <button
+          v-if="(choice === 'join' && otherPlayer) || choice === 'bind'"
+          class="btn"
+          @click="joinTeam_"
+        >
+          {{ $t("btn_join") }}
+        </button>
       </div>
-
     </div>
   </div>
 </template>

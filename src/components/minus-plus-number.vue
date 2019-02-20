@@ -1,9 +1,19 @@
 <template>
-	<div style="display: inline-block;" :class="`container ${disabled ? 'disabled' : ''}`">
-		<div class="dec button" @click="minus"></div>
-    <input type="number" oninput="validity.valid||(value='');" class="input" v-model.number="num" min="1" :disabled="disabled">
+  <div
+    style="display: inline-block;"
+    :class="`container ${disabled ? 'disabled' : ''}`"
+  >
+    <div class="dec button" @click="minus"></div>
+    <input
+      type="number"
+      oninput="validity.valid||(value='');"
+      class="input"
+      v-model.number="num"
+      min="1"
+      :disabled="disabled"
+    />
     <div class="inc button" @click="plus"></div>
-	</div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
