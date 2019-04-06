@@ -481,7 +481,7 @@ i.fa {
     }
     &.sort {
       opacity: 1;
-      color: $active_bgcolor;
+      color: $error_color;
       > div {
         opacity: 1;
       }

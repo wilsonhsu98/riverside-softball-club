@@ -1,5 +1,5 @@
 <template>
-  <div class="gamelist-container">
+  <div class="gamelist-container" :class="{ 'empty': role === 'manager' && gameList.length === 0 }">
     <mobile-header :icon="currentTeamIcon" />
     <template v-for="item in gameList">
       <div class="row" :data-date="item.date" :key="`date_${item.date}`">
@@ -28,7 +28,7 @@
     <div class="button-container" v-if="role === 'manager'">
       <router-link
         :to="{ name: 'new_game', params: { team: $route.params.team } }"
-        tag="button"
+        tag="span"
         >＋</router-link
       >
     </div>
@@ -109,16 +109,25 @@
     width: 100%;
     position: sticky;
     bottom: 20px;
-    button {
+    span {
       display: inline-block;
       width: 50px;
       height: 50px;
+      line-height: 50px;
+      color: #fff;
       border-radius: 50%;
       background-color: $current_user_bgcolor;
       margin: 0;
-      font-size: 25px;
+      font-size: 30px;
+      font-weight: bold;
       outline: none;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
     }
+  }
+  &.empty {
+    padding-top: 70px;
   }
 }
 @media only screen and (max-width: 760px) {
@@ -135,8 +144,18 @@
     .button-container {
       margin-top: -15px;
       bottom: 50px;
-      button {
+      span {
         margin: 0 10px 10px 0;
+      }
+    }
+    &.empty {
+      height: calc(100vh - 50px);
+      margin: 0;
+      padding: 0;
+      position: relative;
+      .button-container {
+        position: absolute;
+        bottom: 0;
       }
     }
   }

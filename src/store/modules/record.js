@@ -439,6 +439,17 @@ const mutations = {
           .filter(sub => sub.year + sub.season === item)
           .map(sub => sub.game)
       }))
+      .concat(
+        data
+          .map(item => item.year)
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .map(item => ({
+            period: `${item}`,
+            games: data
+              .filter(sub => sub.year === item)
+              .map(sub => sub.game)
+          }))
+      )
       .forEach(item => {
         const find = state.period.find(sub => sub.period === item.period);
         if (!find) {
@@ -448,7 +459,7 @@ const mutations = {
         }
       });
 
-    state.period = state.period.sort((a, b) => a.period < b.period);
+    state.period = state.period.sort((a, b) => b.period.localeCompare(a.period));
     if (!state.period.find(item => item.select)) {
       state.period.find(item => item.period === "period_all").select = true;
     }
