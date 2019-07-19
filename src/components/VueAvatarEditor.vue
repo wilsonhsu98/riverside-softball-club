@@ -41,18 +41,18 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
-input[type="range"] {
+input[type='range'] {
   height: 24px;
   -webkit-appearance: none;
   // margin: 10px 0;
   width: 100%;
 }
-input[type="range"]:focus {
+input[type='range']:focus {
   outline: none;
 }
-input[type="range"]::-webkit-slider-runnable-track {
+input[type='range']::-webkit-slider-runnable-track {
   width: 100%;
   height: 5px;
   cursor: pointer;
@@ -62,7 +62,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   border-radius: 1px;
   border: 0px solid #000000;
 }
-input[type="range"]::-webkit-slider-thumb {
+input[type='range']::-webkit-slider-thumb {
   box-shadow: 0px 0px 0px #000000;
   border: 0px solid #edf7f8;
   height: 18px;
@@ -73,10 +73,10 @@ input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   margin-top: -6.5px;
 }
-input[type="range"]:focus::-webkit-slider-runnable-track {
+input[type='range']:focus::-webkit-slider-runnable-track {
   background: $row_color;
 }
-input[type="range"]::-moz-range-track {
+input[type='range']::-moz-range-track {
   width: 100%;
   height: 5px;
   cursor: pointer;
@@ -86,7 +86,7 @@ input[type="range"]::-moz-range-track {
   border-radius: 1px;
   border: 0px solid #000000;
 }
-input[type="range"]::-moz-range-thumb {
+input[type='range']::-moz-range-thumb {
   box-shadow: 0px 0px 0px #000000;
   border: 0px solid #edf7f8;
   height: 18px;
@@ -95,7 +95,7 @@ input[type="range"]::-moz-range-thumb {
   background: $current_user_bgcolor;
   cursor: pointer;
 }
-input[type="range"]::-ms-track {
+input[type='range']::-ms-track {
   width: 100%;
   height: 5px;
   cursor: pointer;
@@ -104,19 +104,19 @@ input[type="range"]::-ms-track {
   border-color: transparent;
   color: transparent;
 }
-input[type="range"]::-ms-fill-lower {
+input[type='range']::-ms-fill-lower {
   background: $row_color;
   border: 0px solid #000000;
   border-radius: 2px;
   box-shadow: 0px 0px 0px #000000;
 }
-input[type="range"]::-ms-fill-upper {
+input[type='range']::-ms-fill-upper {
   background: $row_color;
   border: 0px solid #000000;
   border-radius: 2px;
   box-shadow: 0px 0px 0px #000000;
 }
-input[type="range"]::-ms-thumb {
+input[type='range']::-ms-thumb {
   margin-top: 1px;
   box-shadow: 0px 0px 0px #000000;
   border: 0px solid #edf7f8;
@@ -126,10 +126,10 @@ input[type="range"]::-ms-thumb {
   background: $current_user_bgcolor;
   cursor: pointer;
 }
-input[type="range"]:focus::-ms-fill-lower {
+input[type='range']:focus::-ms-fill-lower {
   background: $row_color;
 }
-input[type="range"]:focus::-ms-fill-upper {
+input[type='range']:focus::-ms-fill-upper {
   background: $row_color;
 }
 </style>
@@ -141,57 +141,57 @@ export default {
   props: {
     zoomText: {
       type: String,
-      default: "Zoom"
+      default: 'Zoom',
     },
     finishText: {
       type: String,
-      default: "Save"
+      default: 'Save',
     },
     hasRotation: {
       type: Boolean,
-      default: true
+      default: true,
     },
     hasScale: {
       type: Boolean,
-      default: true
+      default: true,
     },
     hasRadius: {
       type: Boolean,
-      default: false
+      default: false,
     },
     image: {
       type: String,
-      default: ""
+      default: '',
     },
     border: {
       type: Number,
-      default: 25
+      default: 25,
     },
     borderRadius: {
       type: Number,
-      default: 200
+      default: 200,
     },
     width: {
       type: Number,
-      default: 200
+      default: 200,
     },
     height: {
       type: Number,
-      default: 200
+      default: 200,
     },
     color: {
       type: Array,
-      default: () => [0, 0, 0, 0.5]
+      default: () => [0, 0, 0, 0.5],
     },
     canMoveOutOfBound: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
       rotation: 0,
-      scale: 1
+      scale: 1,
     };
   },
   methods: {
@@ -203,8 +203,8 @@ export default {
       this.rotation += value;
     },
     finished() {
-      return this.$emit("finished", this.$refs.vueavatar.getImageScaled());
-    }
-  }
+      return this.$emit('finished', this.$refs.vueavatar.getImageScaled());
+    },
+  },
 };
 </script>

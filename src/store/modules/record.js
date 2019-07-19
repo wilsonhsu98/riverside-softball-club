@@ -1,68 +1,68 @@
 import {
-  types as rootTypes
+  types as rootTypes,
   // getters as rootGetters,
   // state as rootState
-} from "../root";
-import utils from "../../libs/utils";
-import { db } from "../../firebase";
+} from '../root';
+import utils from '../../libs/utils';
+import { db } from '../../firebase';
 
 let snapShotGames;
 let snapShotplayers;
 
 const types = {
-  INIT_FROM_LS: "RECORD/INIT_FROM_LS",
-  GET_PERIOD: "RECORD/GET_PERIOD",
-  GET_PLAYERS: "RECORD/GET_PLAYERS",
-  GET_RECORDS: "RECORD/GET_RECORDS",
-  SET_PERIOD: "RECORD/SET_PERIOD",
-  SET_TOP: "RECORD/SET_TOP",
-  SET_UNLIMITED_PA: "RECORD/SET_UNLIMITED_PA",
-  SET_SORTBY: "RECORD/SET_SORTBY",
-  SET_CHECKALL: "RECORD/SET_CHECKALL",
-  SET_COLS: "RECORD/SET_COLS",
-  DEL_PLAYER: "RECORD/DEL_PLAYER",
-  REFRESH_PLAYER: "RECORD/REFRESH_PLAYER",
-  SET_LASTUPDATE: "RECORD/SET_LASTUPDATE",
-  SET_GAME: "RECORD/SET_GAME",
-  SET_ORDER: "RECORD/SET_ORDER",
-  GET_GAMELIST: "RECORD/GET_GAMELIST"
+  INIT_FROM_LS: 'RECORD/INIT_FROM_LS',
+  GET_PERIOD: 'RECORD/GET_PERIOD',
+  GET_PLAYERS: 'RECORD/GET_PLAYERS',
+  GET_RECORDS: 'RECORD/GET_RECORDS',
+  SET_PERIOD: 'RECORD/SET_PERIOD',
+  SET_TOP: 'RECORD/SET_TOP',
+  SET_UNLIMITED_PA: 'RECORD/SET_UNLIMITED_PA',
+  SET_SORTBY: 'RECORD/SET_SORTBY',
+  SET_CHECKALL: 'RECORD/SET_CHECKALL',
+  SET_COLS: 'RECORD/SET_COLS',
+  DEL_PLAYER: 'RECORD/DEL_PLAYER',
+  REFRESH_PLAYER: 'RECORD/REFRESH_PLAYER',
+  SET_LASTUPDATE: 'RECORD/SET_LASTUPDATE',
+  SET_GAME: 'RECORD/SET_GAME',
+  SET_ORDER: 'RECORD/SET_ORDER',
+  GET_GAMELIST: 'RECORD/GET_GAMELIST',
 };
 
 const state = {
   players: [],
   records: [],
-  period: [{ period: "period_all", select: true }],
+  period: [{ period: 'period_all', select: true }],
   top: 10,
   unlimitedPA: false,
   hiddenPlayer: [],
-  sortBy: "OPS",
-  lastUpdate: "",
+  sortBy: 'OPS',
+  lastUpdate: '',
   cols: [
-    { name: "Rank", visible: true },
-    { name: "name", visible: true },
-    { name: "PA", visible: true },
-    { name: "AB", visible: true },
-    { name: "H", visible: true },
-    { name: "TB", visible: true },
-    { name: "TOB", visible: true },
-    { name: "R", visible: true },
-    { name: "RBI", visible: true },
-    { name: "1H", visible: true },
-    { name: "2H", visible: true },
-    { name: "3H", visible: true },
-    { name: "HR", visible: true },
-    { name: "K", visible: true },
-    { name: "DP", visible: true },
-    { name: "BB", visible: true },
-    { name: "SF", visible: true },
-    { name: "AVG", visible: true },
-    { name: "OBP", visible: true },
-    { name: "SLG", visible: true },
-    { name: "OPS", visible: true }
+    { name: 'Rank', visible: true },
+    { name: 'name', visible: true },
+    { name: 'PA', visible: true },
+    { name: 'AB', visible: true },
+    { name: 'H', visible: true },
+    { name: 'TB', visible: true },
+    { name: 'TOB', visible: true },
+    { name: 'R', visible: true },
+    { name: 'RBI', visible: true },
+    { name: '1H', visible: true },
+    { name: '2H', visible: true },
+    { name: '3H', visible: true },
+    { name: 'HR', visible: true },
+    { name: 'K', visible: true },
+    { name: 'DP', visible: true },
+    { name: 'BB', visible: true },
+    { name: 'SF', visible: true },
+    { name: 'AVG', visible: true },
+    { name: 'OBP', visible: true },
+    { name: 'SLG', visible: true },
+    { name: 'OPS', visible: true },
   ],
-  game: "",
+  game: '',
   order: 0,
-  gameList: []
+  gameList: [],
 };
 
 const getters = {
@@ -76,19 +76,19 @@ const getters = {
   checkAll: state => {
     return (
       state.cols.filter(
-        item => item.name !== "Rank" && item.name !== "name" && item.visible
+        item => item.name !== 'Rank' && item.name !== 'name' && item.visible,
       ).length ===
-      state.cols.filter(item => item.name !== "Rank" && item.name !== "name")
+      state.cols.filter(item => item.name !== 'Rank' && item.name !== 'name')
         .length
     );
   },
   conditionCols: state => {
     return state.cols
-      .filter(item => item.name !== "Rank" && item.name !== "name")
+      .filter(item => item.name !== 'Rank' && item.name !== 'name')
       .map(item => ({
         name: item.name,
         visible: item.visible,
-        disabled: item.name === state.sortBy
+        disabled: item.name === state.sortBy,
       }));
   },
   genStatistics: state => {
@@ -97,25 +97,25 @@ const getters = {
         state.players,
         state.records,
         state.unlimitedPA ? undefined : state.top,
-        state.period.find(item => item.select).games
+        state.period.find(item => item.select).games,
       )
       .filter(
         item =>
-          item.PA !== "-" &&
+          item.PA !== '-' &&
           (state.unlimitedPA || item.PA === state.top) &&
-          state.hiddenPlayer.indexOf(item.name) === -1
+          state.hiddenPlayer.indexOf(item.name) === -1,
       )
       .sort((a, b) => {
-        if (["AVG", "OBP", "SLG", "OPS"].indexOf(state.sortBy) > -1) {
+        if (['AVG', 'OBP', 'SLG', 'OPS'].indexOf(state.sortBy) > -1) {
           return b[state.sortBy] === a[state.sortBy]
-            ? b["PA"] - a["PA"]
+            ? b['PA'] - a['PA']
             : b[state.sortBy] - a[state.sortBy];
         } else {
           if (b[state.sortBy] === 0 && a[state.sortBy] === 0) {
-            return b["PA"] - a["PA"];
+            return b['PA'] - a['PA'];
           } else {
             return b[state.sortBy] === a[state.sortBy]
-              ? a["PA"] - b["PA"]
+              ? a['PA'] - b['PA']
               : b[state.sortBy] - a[state.sortBy];
           }
         }
@@ -135,12 +135,13 @@ const getters = {
     return utils.displayGame(
       state.players,
       state.records.filter(item => item._table === state.game),
-      boxSummary.errors
+      boxSummary.errors,
     );
   },
   pa: state => {
     return state.records.find(
-      item => item._table === state.game && `${item.order}` === `${state.order}`
+      item =>
+        item._table === state.game && `${item.order}` === `${state.order}`,
     );
   },
   boxSummary: state => {
@@ -155,14 +156,14 @@ const getters = {
     return Object.assign({}, boxSummary, {
       result: boxSummary.result,
       h: game.filter(
-        item => ["1H", "2H", "3H", "HR"].indexOf(item.content) > -1
+        item => ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1,
       ).length,
       r: game.filter(item => item.r).length,
       e: (boxSummary.errors || []).reduce(
         (result, item) => result + item.count,
-        0
+        0,
       ),
-      contents: game
+      contents: game,
     });
   },
   gameList: state => state.gameList,
@@ -174,55 +175,55 @@ const getters = {
       state.players,
       state.records,
       undefined,
-      games
+      games,
     );
     return {
       AVG: records
-        .filter(item => item.PA !== "-" && item.AVG > 0 && item.PA >= minimunPA)
+        .filter(item => item.PA !== '-' && item.AVG > 0 && item.PA >= minimunPA)
         .sort((a, b) =>
-          b["AVG"] === a["AVG"] ? b["PA"] - a["PA"] : b["AVG"] - a["AVG"]
+          b['AVG'] === a['AVG'] ? b['PA'] - a['PA'] : b['AVG'] - a['AVG'],
         )
         .map(item => ({
           name: item.name,
           PA: item.PA,
           AVG: item.AVG.toFixed(3),
-          data: item.data
+          data: item.data,
         })),
       H: records
-        .filter(item => item.PA !== "-" && item.H > 0)
+        .filter(item => item.PA !== '-' && item.H > 0)
         .sort((a, b) =>
-          b["H"] === a["H"] ? a["PA"] - b["PA"] : b["H"] - a["H"]
+          b['H'] === a['H'] ? a['PA'] - b['PA'] : b['H'] - a['H'],
         )
         .map(item => ({
           name: item.name,
           PA: item.PA,
           H: item.H,
-          data: item.data
+          data: item.data,
         })),
       HR: records
-        .filter(item => item.PA !== "-" && item.HR > 0)
+        .filter(item => item.PA !== '-' && item.HR > 0)
         .sort((a, b) =>
-          b["HR"] === a["HR"] ? a["PA"] - b["PA"] : b["HR"] - a["HR"]
+          b['HR'] === a['HR'] ? a['PA'] - b['PA'] : b['HR'] - a['HR'],
         )
         .map(item => ({
           name: item.name,
           PA: item.PA,
           HR: item.HR,
-          data: item.data
+          data: item.data,
         })),
       RBI: records
-        .filter(item => item.PA !== "-" && item.RBI > 0)
+        .filter(item => item.PA !== '-' && item.RBI > 0)
         .sort((a, b) =>
-          b["RBI"] === a["RBI"] ? a["PA"] - b["PA"] : b["RBI"] - a["RBI"]
+          b['RBI'] === a['RBI'] ? a['PA'] - b['PA'] : b['RBI'] - a['RBI'],
         )
         .map(item => ({
           name: item.name,
           PA: item.PA,
           RBI: item.RBI,
-          data: item.data
-        }))
+          data: item.data,
+        })),
     };
-  }
+  },
 };
 
 const actions = {
@@ -237,7 +238,7 @@ const actions = {
       if (dates.length) {
         const lastDate = new Date(Math.max.apply(null, dates));
         commit(types.SET_LASTUPDATE, lastDate);
-        window.localStorage.setItem("lastUpdate", lastDate);
+        window.localStorage.setItem('lastUpdate', lastDate);
       }
       const records = changedData
         .filter(item => item.data.orders)
@@ -260,105 +261,105 @@ const actions = {
       commit(types.GET_PERIOD, period);
       commit(types.GET_RECORDS, records);
       commit(types.GET_GAMELIST, period);
-      window.localStorage.setItem("period", JSON.stringify(period));
-      window.localStorage.setItem("records", JSON.stringify(records));
+      window.localStorage.setItem('period', JSON.stringify(period));
+      window.localStorage.setItem('records', JSON.stringify(records));
     };
     const operatePlayers = players => {
-      db.collection("accounts")
-        .where("teams", "array-contains", team)
+      db.collection('accounts')
+        .where('teams', 'array-contains', team)
         .get()
         .then(accountCollection => {
           const accounts = players.map(player => {
             const find = accountCollection.docs.find(
-              account => account.id === player.data.uid
+              account => account.id === player.data.uid,
             );
             return {
               id: player.id,
               data: {
                 ...player.data,
-                photo: find && find.data().photo
-              }
+                photo: find && find.data().photo,
+              },
             };
           });
           commit(types.GET_PLAYERS, accounts);
-          window.localStorage.setItem("players", JSON.stringify(accounts));
+          window.localStorage.setItem('players', JSON.stringify(accounts));
         });
     };
 
     if (
-      window.localStorage.getItem("players") &&
-      window.localStorage.getItem("period") &&
-      window.localStorage.getItem("records")
+      window.localStorage.getItem('players') &&
+      window.localStorage.getItem('period') &&
+      window.localStorage.getItem('records')
     ) {
       commit(
         types.GET_PLAYERS,
-        JSON.parse(window.localStorage.getItem("players"))
+        JSON.parse(window.localStorage.getItem('players')),
       );
       commit(
         types.GET_PERIOD,
-        JSON.parse(window.localStorage.getItem("period"))
+        JSON.parse(window.localStorage.getItem('period')),
       );
       commit(
         types.GET_RECORDS,
-        JSON.parse(window.localStorage.getItem("records"))
+        JSON.parse(window.localStorage.getItem('records')),
       );
       commit(
         types.GET_GAMELIST,
-        JSON.parse(window.localStorage.getItem("period"))
+        JSON.parse(window.localStorage.getItem('period')),
       );
-      if (window.localStorage.getItem("lastUpdate")) {
-        commit(types.SET_LASTUPDATE, window.localStorage.getItem("lastUpdate"));
+      if (window.localStorage.getItem('lastUpdate')) {
+        commit(types.SET_LASTUPDATE, window.localStorage.getItem('lastUpdate'));
       }
     }
     commit(rootTypes.LOADING, true);
     let queryCount = 0;
     const realtimeCount = 2;
-    if (typeof snapShotGames === "function") snapShotGames();
+    if (typeof snapShotGames === 'function') snapShotGames();
     snapShotGames = db
-      .collection("teams")
+      .collection('teams')
       .doc(team)
-      .collection("games")
+      .collection('games')
       .onSnapshot(snapshot => {
         queryCount += 1;
         if (queryCount > realtimeCount) {
           // realtime
-          commit(rootTypes.LOADING, { text: "New data is coming" });
+          commit(rootTypes.LOADING, { text: 'New data is coming' });
           setTimeout(() => {
             operateGames(
-              snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))
+              snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })),
             );
             commit(rootTypes.LOADING, false);
           }, 1000);
         } else {
           // first time
           operateGames(
-            snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))
+            snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })),
           );
           if (queryCount === realtimeCount) {
             commit(rootTypes.LOADING, false);
           }
         }
       });
-    if (typeof snapShotplayers === "function") snapShotplayers();
+    if (typeof snapShotplayers === 'function') snapShotplayers();
     snapShotplayers = db
-      .collection("teams")
+      .collection('teams')
       .doc(team)
-      .collection("players")
+      .collection('players')
       .onSnapshot(snapshot => {
         queryCount += 1;
         if (queryCount > realtimeCount) {
           // realtime
-          commit(rootTypes.LOADING, { text: "New data is coming" });
+          commit(rootTypes.LOADING, { text: 'New data is coming' });
           setTimeout(() => {
             operatePlayers(
-              snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))
+              snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })),
             );
             commit(rootTypes.LOADING, false);
           }, 1000);
         } else {
           // first time
           operatePlayers(
-            snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() }))
+            snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })),
           );
           if (queryCount === realtimeCount) {
             commit(rootTypes.LOADING, false);
@@ -396,38 +397,38 @@ const actions = {
   },
   setOrder({ commit }, order) {
     commit(types.SET_ORDER, order);
-  }
+  },
 };
 
 const mutations = {
   [types.INIT_FROM_LS](state) {
     state.top =
-      parseInt(window.localStorage.getItem("pref_top"), 10) || state.top;
+      parseInt(window.localStorage.getItem('pref_top'), 10) || state.top;
     state.unlimitedPA =
-      window.localStorage.getItem("pref_unlimited_pa") === "true" ||
+      window.localStorage.getItem('pref_unlimited_pa') === 'true' ||
       state.unlimitedPA;
-    state.sortBy = window.localStorage.getItem("pref_sortby") || state.sortBy;
+    state.sortBy = window.localStorage.getItem('pref_sortby') || state.sortBy;
 
-    const pref_period = window.localStorage.getItem("pref_period");
+    const pref_period = window.localStorage.getItem('pref_period');
     if (pref_period) state.period = JSON.parse(pref_period);
-    const pref_cols = window.localStorage.getItem("pref_cols");
+    const pref_cols = window.localStorage.getItem('pref_cols');
     if (pref_cols) state.cols = JSON.parse(pref_cols);
-    const pref_hiddenplayer = window.localStorage.getItem("pref_hiddenplayer");
+    const pref_hiddenplayer = window.localStorage.getItem('pref_hiddenplayer');
     if (pref_hiddenplayer) state.hiddenPlayer = JSON.parse(pref_hiddenplayer);
   },
   [types.GET_PERIOD](state, data) {
-    state.period.find(item => item.period === "period_all").games = data
+    state.period.find(item => item.period === 'period_all').games = data
       .map(item => item.game)
       .sort((a, b) => {
         return (
-          parseInt(b.match(/\d/g).join(""), 10) -
-          parseInt(a.match(/\d/g).join(""), 10)
+          parseInt(b.match(/\d/g).join(''), 10) -
+          parseInt(a.match(/\d/g).join(''), 10)
         );
       });
 
     state.period = state.period.filter(
       (value, index, self) =>
-        self.map(item => item.period).indexOf(value.period) === index
+        self.map(item => item.period).indexOf(value.period) === index,
     );
 
     data
@@ -437,7 +438,7 @@ const mutations = {
         period: item,
         games: data
           .filter(sub => sub.year + sub.season === item)
-          .map(sub => sub.game)
+          .map(sub => sub.game),
       }))
       .concat(
         data
@@ -445,10 +446,8 @@ const mutations = {
           .filter((value, index, self) => self.indexOf(value) === index)
           .map(item => ({
             period: `${item}`,
-            games: data
-              .filter(sub => sub.year === item)
-              .map(sub => sub.game)
-          }))
+            games: data.filter(sub => sub.year === item).map(sub => sub.game),
+          })),
       )
       .forEach(item => {
         const find = state.period.find(sub => sub.period === item.period);
@@ -459,9 +458,11 @@ const mutations = {
         }
       });
 
-    state.period = state.period.sort((a, b) => b.period.localeCompare(a.period));
+    state.period = state.period.sort((a, b) =>
+      b.period.localeCompare(a.period),
+    );
     if (!state.period.find(item => item.select)) {
-      state.period.find(item => item.period === "period_all").select = true;
+      state.period.find(item => item.period === 'period_all').select = true;
     }
   },
   [types.GET_PLAYERS](state, data) {
@@ -479,50 +480,50 @@ const mutations = {
     });
     const temp = JSON.stringify(state.period);
     state.period = JSON.parse(temp);
-    window.localStorage.setItem("pref_period", temp);
+    window.localStorage.setItem('pref_period', temp);
   },
   [types.SET_TOP](state, value) {
     state.top = value;
-    window.localStorage.setItem("pref_top", state.top);
+    window.localStorage.setItem('pref_top', state.top);
   },
   [types.SET_UNLIMITED_PA](state, value) {
     state.unlimitedPA = value;
-    window.localStorage.setItem("pref_unlimited_pa", state.unlimitedPA);
+    window.localStorage.setItem('pref_unlimited_pa', state.unlimitedPA);
   },
   [types.SET_SORTBY](state, value) {
     state.sortBy = value;
-    window.localStorage.setItem("pref_sortby", state.sortBy);
+    window.localStorage.setItem('pref_sortby', state.sortBy);
   },
   [types.SET_CHECKALL](state, isCheckAll) {
     state.cols
       .filter(
         col =>
-          col.name !== "Rank" &&
-          col.name !== "name" &&
-          col.name !== state.sortBy
+          col.name !== 'Rank' &&
+          col.name !== 'name' &&
+          col.name !== state.sortBy,
       )
       .forEach(col => {
         col.visible = isCheckAll;
       });
-    window.localStorage.setItem("pref_cols", JSON.stringify(state.cols));
+    window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
   [types.SET_COLS](state, { col, visible }) {
     const item = state.cols.find(i => i.name === col);
     item.visible = visible || !item.visible;
-    window.localStorage.setItem("pref_cols", JSON.stringify(state.cols));
+    window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
   [types.DEL_PLAYER](state, player) {
     state.hiddenPlayer.push(player);
     window.localStorage.setItem(
-      "pref_hiddenplayer",
-      JSON.stringify(state.hiddenPlayer)
+      'pref_hiddenplayer',
+      JSON.stringify(state.hiddenPlayer),
     );
   },
   [types.REFRESH_PLAYER](state) {
     state.hiddenPlayer = [];
     window.localStorage.setItem(
-      "pref_hiddenplayer",
-      JSON.stringify(state.hiddenPlayer)
+      'pref_hiddenplayer',
+      JSON.stringify(state.hiddenPlayer),
     );
   },
   [types.SET_LASTUPDATE](state, date) {
@@ -536,12 +537,12 @@ const mutations = {
   },
   [types.GET_GAMELIST](state, data) {
     state.gameList = utils.genGameList(data);
-  }
+  },
 };
 
 export default {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

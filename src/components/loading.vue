@@ -21,11 +21,12 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
 .text {
   text-align: center;
   line-height: calc(100vh + 73px);
+  line-height: calc(var(--vh, 1vh) * 100 + 73px);
   color: #fff;
   font-size: 24px;
   display: block;
@@ -35,6 +36,7 @@
   background: 50% 50% no-repeat;
   background-size: 320px auto;
   height: 100vh;
+  height: -webkit-fill-available;
 }
 
 .loading-mask {
@@ -131,13 +133,13 @@
 </style>
 
 <script>
-import defaultIcon from "../images/icon.png";
+import defaultIcon from '../images/icon.png';
 export default {
-  props: ["text", "img"],
+  props: ['text', 'img'],
   data() {
     return {
-      defaultIcon
+      defaultIcon,
     };
-  }
+  },
 };
 </script>

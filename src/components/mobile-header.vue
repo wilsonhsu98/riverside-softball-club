@@ -4,14 +4,14 @@
     <span v-else></span>
     <img class="icon" :src="icon || defaultIcon" />
     <div v-if="save" class="save-btn" @click="save_">
-      {{ $t("btn_update") }}
+      {{ $t('btn_update') }}
     </div>
     <span v-else></span>
   </header>
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
 header {
   display: none;
@@ -62,26 +62,26 @@ header {
 </style>
 
 <script>
-import defaultIcon from "../images/icon.png";
+import defaultIcon from '../images/icon.png';
 
 export default {
-  props: ["back", "icon", "save"],
+  props: ['back', 'icon', 'save'],
   data() {
     return {
-      defaultIcon
+      defaultIcon,
     };
   },
   methods: {
     back_() {
-      if (typeof this.back === "function") {
+      if (typeof this.back === 'function') {
         this.back();
       }
     },
     save_() {
-      if (typeof this.save === "function") {
+      if (typeof this.save === 'function') {
         this.save();
       }
-    }
-  }
+    },
+  },
 };
 </script>

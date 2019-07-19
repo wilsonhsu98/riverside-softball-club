@@ -12,7 +12,7 @@
       />
       <div class="condition__container">
         <div class="condition">
-          <div class="condition__label">{{ $t("col_period") }}</div>
+          <div class="condition__label">{{ $t('col_period') }}</div>
           <div class="condition__element">
             <div class="selectdiv">
               <select
@@ -26,7 +26,7 @@
                   :key="`period_${item.period}`"
                   >{{
                     `${
-                      item.period === "period_all"
+                      item.period === 'period_all'
                         ? $t(item.period)
                         : item.period
                     }`
@@ -35,7 +35,7 @@
               </select>
             </div>
           </div>
-          <div class="condition__label">{{ $t("col_sort") }}</div>
+          <div class="condition__label">{{ $t('col_sort') }}</div>
           <div class="condition__element">
             <div class="selectdiv">
               <select
@@ -52,7 +52,7 @@
               </select>
             </div>
           </div>
-          <div class="condition__label">{{ $t("col_latest") }}</div>
+          <div class="condition__label">{{ $t('col_latest') }}</div>
           <div class="condition__element pa">
             <minus-plus-number
               :value="top"
@@ -65,11 +65,11 @@
                 type="checkbox"
                 :checked="unlimitedPA"
                 @change="setUnlimitedPA_($event.target.checked)"
-              />{{ $t("col_unlimited") }}
+              />{{ $t('col_unlimited') }}
             </label>
           </div>
           <br />
-          <div class="condition__label col">{{ $t("col_display") }}</div>
+          <div class="condition__label col">{{ $t('col_display') }}</div>
           <div class="condition__element col">
             <label class="condition__col" for="check_all">
               <input
@@ -77,7 +77,7 @@
                 type="checkbox"
                 :checked="checkAll"
                 @change="setCheckAll_($event.target.checked)"
-              />{{ $t("All") }}
+              />{{ $t('All') }}
             </label>
             <label
               class="condition__col"
@@ -96,7 +96,7 @@
             </label>
           </div>
           <template v-if="lastUpdate">
-            <div class="condition__label date">{{ $t("col_update") }}</div>
+            <div class="condition__label date">{{ $t('col_update') }}</div>
             <div
               class="condition__element date"
               :data-long="`${$t('col_update')} `"
@@ -233,7 +233,7 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
 .condition {
   background-color: #fff;
@@ -248,7 +248,7 @@
     line-height: 30px;
     height: 30px;
     vertical-align: middle;
-    &[for="unlimited_pa"] {
+    &[for='unlimited_pa'] {
       margin-left: 5px;
     }
   }
@@ -623,17 +623,32 @@ i.fa {
         background-color: $row_even_bgcolor;
       }
       &.current {
-        background-color: $current_user_bgcolor;
-        color: $current_user_color;
-        .cell .img {
-          border-color: $current_user_color;
-        }
-        .cell.chart .game {
-          color: $current_user_color;
+        .cell {
+          color: $current_user_bgcolor;
+          &.name,
+          &.Rank,
+          &.sort,
+          &.delete {
+            background-color: $current_user_bgcolor;
+            color: $current_user_color;
+          }
+          &.chart .game {
+            color: $current_user_bgcolor;
+          }
         }
       }
       .cell:nth-child(2n + 4) {
         opacity: 1;
+      }
+      &:last-child {
+        .cell {
+          &:first-child {
+            border-bottom-left-radius: 0;
+          }
+          &:nth-last-child(2) {
+            border-bottom-right-radius: 0;
+          }
+        }
       }
     }
     .header-row {
@@ -648,7 +663,7 @@ i.fa {
       }
       &:not(.Rank):not(.name):not(.delete):not(.chart) {
         &:before {
-          content: attr(data-label) ":";
+          content: attr(data-label) ':';
           display: inline-block;
           width: 58px;
           text-align: right;
@@ -746,7 +761,7 @@ i.fa {
       }
     }
   }
-  [lang="zh-TW"] {
+  [lang='zh-TW'] {
     .search-bar .condition__element.col {
       font-size: 14px;
     }
@@ -804,7 +819,7 @@ i.fa {
       }
     }
   }
-  [lang="zh-TW"] {
+  [lang='zh-TW'] {
     .search-bar .condition__element.col {
       font-size: 12px;
     }
@@ -813,11 +828,11 @@ i.fa {
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import defaultIcon from "../images/icon.png";
+import { mapGetters, mapActions } from 'vuex';
+import defaultIcon from '../images/icon.png';
 const clickEvent = (() => {
-  if ("ontouchstart" in document.documentElement === true) return "touchstart";
-  else return "click";
+  if ('ontouchstart' in document.documentElement === true) return 'touchstart';
+  else return 'click';
 })();
 
 export default {
@@ -825,7 +840,7 @@ export default {
     return {
       toggleSearch: false,
       toggleTarget: null,
-      defaultIcon
+      defaultIcon,
     };
   },
   created() {},
@@ -837,17 +852,17 @@ export default {
   },
   methods: {
     ...mapActions([
-      "setPeriod",
-      "setTop",
-      "setUnlimitedPA",
-      "setSortBy",
-      "setCheckAll",
-      "toggleColumn",
-      "deletePlayer",
-      "refreshPlayer"
+      'setPeriod',
+      'setTop',
+      'setUnlimitedPA',
+      'setSortBy',
+      'setCheckAll',
+      'toggleColumn',
+      'deletePlayer',
+      'refreshPlayer',
     ]),
     formatValue(value, col) {
-      return ["AVG", "OBP", "SLG", "OPS"].indexOf(col) > -1 && value !== "-"
+      return ['AVG', 'OBP', 'SLG', 'OPS'].indexOf(col) > -1 && value !== '-'
         ? value.toFixed(3)
         : value;
     },
@@ -861,11 +876,11 @@ export default {
     collapseSearch(event) {
       if (
         this.toggleSearch &&
-        !this.$refs["searchBar"].contains(event.target)
+        !this.$refs['searchBar'].contains(event.target)
       ) {
         this.toggleSearch = false;
         event.preventDefault();
-        if (event.target.classList.contains("fa-trash")) {
+        if (event.target.classList.contains('fa-trash')) {
           event.stopPropagation();
         }
       }
@@ -901,23 +916,23 @@ export default {
     refreshPlayer_() {
       this.toggleTarget = null;
       this.refreshPlayer();
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      period: "period",
-      periodSelect: "periodSelect",
-      top: "top",
-      unlimitedPA: "unlimitedPA",
-      sortBy: "sortBy",
-      checkAll: "checkAll",
-      conditionCols: "conditionCols",
-      list: "genStatistics",
-      displayedCols: "displayedCols",
-      lastUpdate: "lastUpdate",
-      userName: "userName",
-      currentTeamIcon: "currentTeamIcon"
-    })
-  }
+      period: 'period',
+      periodSelect: 'periodSelect',
+      top: 'top',
+      unlimitedPA: 'unlimitedPA',
+      sortBy: 'sortBy',
+      checkAll: 'checkAll',
+      conditionCols: 'conditionCols',
+      list: 'genStatistics',
+      displayedCols: 'displayedCols',
+      lastUpdate: 'lastUpdate',
+      userName: 'userName',
+      currentTeamIcon: 'currentTeamIcon',
+    }),
+  },
 };
 </script>

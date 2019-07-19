@@ -2,7 +2,7 @@
   <div
     :class="[
       'field-wrapper',
-      { focused, disabled, 'has-value': value, 'has-error': error }
+      { focused, disabled, 'has-value': value, 'has-error': error },
     ]"
   >
     <div class="field-wrapper-item" @click="focus">
@@ -57,7 +57,7 @@
                   newTags
                     .filter(item => item.text)
                     .map(item => item.text)
-                    .join(',')
+                    .join(','),
                 )
             "
           />
@@ -152,7 +152,8 @@ $error-color: #ff695e;
     width: 100%;
   }
   input {
-    line-height: 38px;
+    height: 38px;
+    line-height: $font-size + 2;
     padding: 0 10px;
   }
   textarea {
@@ -217,41 +218,41 @@ $error-color: #ff695e;
 </style>
 
 <script>
-import Vue from "vue";
+import Vue from 'vue';
 
 export default {
   props: [
-    "type",
-    "rows",
-    "name",
-    "placeholder",
-    "value",
-    "isrequired",
-    "limit",
-    "disabled",
-    "error"
+    'type',
+    'rows',
+    'name',
+    'placeholder',
+    'value',
+    'isrequired',
+    'limit',
+    'disabled',
+    'error',
   ],
   data() {
     return {
       focused: false,
       showPretty: false,
-      tag: ""
+      tag: '',
     };
   },
   methods: {
     focus(e) {
       // console.log(e.target);
       // console.log(e.currentTarget);
-      if (e.target.tagName === "SPAN") return;
+      if (e.target.tagName === 'SPAN') return;
       // if (this.type === 'splitting-wording' && this.value) return;
       if (this.disabled) return;
 
       this.focused = true;
       this.showPretty = false;
       Vue.nextTick().then(() => {
-        if (this.type === "textarea") {
+        if (this.type === 'textarea') {
           this.$refs.textarea.focus();
-        } else if (this.type === "splitting-wording") {
+        } else if (this.type === 'splitting-wording') {
           this.$refs.splitInput.$refs.newTagInput.focus();
         } else {
           this.$refs.input.focus();
@@ -263,36 +264,36 @@ export default {
     },
     split(val) {
       const newVal = val
-        .split(",")
+        .split(',')
         .map(item => item.trim())
-        .filter((v, i, self) => self.indexOf(v) === i && v !== "")
-        .join(",");
+        .filter((v, i, self) => self.indexOf(v) === i && v !== '')
+        .join(',');
 
       if (newVal) {
         this.showPretty = true;
       }
       this.focused = false;
-      this.$emit("input", newVal);
+      this.$emit('input', newVal);
     },
     keyup(val) {
       let newVal = val;
 
-      if (this.limit === "en-only") {
-        newVal = val.replace(/[^a-zA-Z]/g, "");
+      if (this.limit === 'en-only') {
+        newVal = val.replace(/[^a-zA-Z]/g, '');
       }
 
-      this.$emit("input", newVal);
+      this.$emit('input', newVal);
     },
     input(val) {
-      this.$emit("input", val);
-    }
+      this.$emit('input', val);
+    },
   },
   watch: {
     value() {
       if (this.value) {
         this.showPretty = true;
       }
-    }
-  }
+    },
+  },
 };
 </script>

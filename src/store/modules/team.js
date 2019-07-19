@@ -1,56 +1,56 @@
-import i18n from "../../i18n";
+import i18n from '../../i18n';
 import {
   types as rootTypes,
   // getters as rootGetters,
   // state as rootState,
-  promiseImage
-} from "../root";
-import { types as userTypes } from "./user";
-import { db, auth, timestamp, fieldValue } from "../../firebase";
+  promiseImage,
+} from '../root';
+import { types as userTypes } from './user';
+import { db, auth, timestamp, fieldValue } from '../../firebase';
 
 let snapShotTeam;
 let snapShotRequest;
 let snapShotTeamRequest;
 
 const types = {
-  FETCH_TEAM: "TEAM/FETCH_TEAM",
-  SEARCH_TEAM: "TEAM/SEARCH_TEAM",
-  FETCH_REQUESTS: "TEAM/FETCH_REQUESTS",
-  FETCH_TEAM_REQUESTS: "TEAM/FETCH_TEAM_REQUESTS"
+  FETCH_TEAM: 'TEAM/FETCH_TEAM',
+  SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
+  FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
+  FETCH_TEAM_REQUESTS: 'TEAM/FETCH_TEAM_REQUESTS',
 };
 
 const state = {
   teamInfo: {
-    teamCode: "",
-    teamName: "",
-    teamIntro: "",
-    otherNames: "",
+    teamCode: '',
+    teamName: '',
+    teamIntro: '',
+    otherNames: '',
     players: [{}],
-    icon: ""
+    icon: '',
   },
   teamList: [],
   requests: [],
-  teamRequests: []
+  teamRequests: [],
 };
 
 const getters = {
   teamInfo: state => state.teamInfo,
   teamList: state => state.teamList,
   requests: state => state.requests,
-  teamRequests: state => state.teamRequests
+  teamRequests: state => state.teamRequests,
 };
 
 const actions = {
   editTeam({ commit, dispatch }, data) {
     commit(rootTypes.LOADING, true);
-    const refTeamDoc = db.collection("teams").doc(data.code);
-    const refPlayerDoc = db.collection("accounts").doc(auth.currentUser.uid);
+    const refTeamDoc = db.collection('teams').doc(data.code);
+    const refPlayerDoc = db.collection('accounts').doc(auth.currentUser.uid);
     Promise.all([
-      promiseImage(data.icon, "icon"),
+      promiseImage(data.icon, 'icon'),
       refTeamDoc.get(),
-      refTeamDoc.collection("players").get(),
-      refTeamDoc.collection("benches").get(),
-      refPlayerDoc.get()
+      refTeamDoc.collection('players').get(),
+      refTeamDoc.collection('benches').get(),
+      refPlayerDoc.get(),
     ])
       .then(res => {
         const [
@@ -58,10 +58,10 @@ const actions = {
           teamDoc,
           teamPlayerCollection,
           teamBenchesCollection,
-          playerDoc
+          playerDoc,
         ] = res;
         if (teamDoc.exists && data.isNew) {
-          alert(i18n.t("msg_duplicate_team"));
+          alert(i18n.t('msg_duplicate_team'));
           return true;
         } else {
           const batch = db.batch();
@@ -72,61 +72,61 @@ const actions = {
               subNames: data.subNames,
               intro: data.intro,
               icon: url,
-              timestamp
+              timestamp,
             },
-            { merge: true }
+            { merge: true },
           );
           data.players.forEach(item => {
             let obj = {
               number: item.number,
-              manager: item.manager
+              manager: item.manager,
             };
             if (item.uid) {
               obj = { ...obj, uid: item.uid };
               batch.set(
                 db
-                  .collection("accounts")
+                  .collection('accounts')
                   .doc(item.uid)
-                  .collection("teams")
+                  .collection('teams')
                   .doc(data.code),
-                { role: item.manager ? "manager" : "player" },
-                { merge: true }
+                { role: item.manager ? 'manager' : 'player' },
+                { merge: true },
               );
             } else if (item.self) {
               batch.set(
-                refPlayerDoc.collection("teams").doc(data.code),
-                { role: "manager" },
-                { merge: true }
+                refPlayerDoc.collection('teams').doc(data.code),
+                { role: 'manager' },
+                { merge: true },
               );
               batch.set(
                 refPlayerDoc,
                 { teams: fieldValue.arrayUnion(data.code) },
-                { merge: true }
+                { merge: true },
               );
               obj = { ...obj, uid: playerDoc.id };
             }
-            batch.set(refTeamDoc.collection("players").doc(item.name), obj, {
-              merge: true
+            batch.set(refTeamDoc.collection('players').doc(item.name), obj, {
+              merge: true,
             });
           });
           teamPlayerCollection.docs.forEach(doc => {
             if (!data.players.map(player => player.name).includes(doc.id)) {
-              batch.delete(refTeamDoc.collection("players").doc(doc.id));
+              batch.delete(refTeamDoc.collection('players').doc(doc.id));
               const { uid } = doc.data();
               if (uid) {
                 batch.set(
                   db
-                    .collection("accounts")
+                    .collection('accounts')
                     .doc(uid)
-                    .collection("teams")
+                    .collection('teams')
                     .doc(data.code),
-                  { role: "bench" },
-                  { merge: true }
+                  { role: 'bench' },
+                  { merge: true },
                 );
                 batch.set(
-                  refTeamDoc.collection("benches").doc(uid),
+                  refTeamDoc.collection('benches').doc(uid),
                   { uid, msg: doc.id },
-                  { merge: true }
+                  { merge: true },
                 );
               }
             }
@@ -136,39 +136,39 @@ const actions = {
             .forEach(item => {
               batch.set(
                 db
-                  .collection("accounts")
+                  .collection('accounts')
                   .doc(item.uid)
-                  .collection("teams")
+                  .collection('teams')
                   .doc(data.code),
-                { role: "player" },
-                { merge: true }
+                { role: 'player' },
+                { merge: true },
               );
               batch.set(
-                db.collection("accounts").doc(item.uid),
+                db.collection('accounts').doc(item.uid),
                 { teams: fieldValue.arrayUnion(data.code) },
-                { merge: true }
+                { merge: true },
               );
               batch.set(
-                refTeamDoc.collection("players").doc(item.name),
-                { manager: false, number: item.number || "", uid: item.uid },
-                { merge: true }
+                refTeamDoc.collection('players').doc(item.name),
+                { manager: false, number: item.number || '', uid: item.uid },
+                { merge: true },
               );
-              batch.delete(refTeamDoc.collection("benches").doc(item.uid));
+              batch.delete(refTeamDoc.collection('benches').doc(item.uid));
             });
           teamBenchesCollection.docs.forEach(doc => {
             if (!data.benches.map(player => player.uid).includes(doc.id)) {
-              batch.delete(refTeamDoc.collection("benches").doc(doc.id));
+              batch.delete(refTeamDoc.collection('benches').doc(doc.id));
               batch.delete(
                 db
-                  .collection("accounts")
+                  .collection('accounts')
                   .doc(doc.id)
-                  .collection("teams")
-                  .doc(data.code)
+                  .collection('teams')
+                  .doc(data.code),
               );
               batch.set(
-                db.collection("accounts").doc(doc.id),
+                db.collection('accounts').doc(doc.id),
                 { teams: fieldValue.arrayRemove(data.code) },
-                { merge: true }
+                { merge: true },
               );
             }
           });
@@ -177,57 +177,57 @@ const actions = {
       })
       .then(() => {
         commit(rootTypes.LOADING, false);
-        dispatch("fetchTeamInfo", data.code);
+        dispatch('fetchTeamInfo', data.code);
       })
       .catch(error => {
-        console.log("Error getting document:", error);
+        console.log('Error getting document:', error);
       });
   },
   fetchTeamInfo({ commit }, teamCode) {
     commit(rootTypes.LOADING, true);
-    const refTeamDoc = db.collection("teams").doc(teamCode);
+    const refTeamDoc = db.collection('teams').doc(teamCode);
     Promise.all([
       refTeamDoc.get(),
-      refTeamDoc.collection("players").get(),
-      refTeamDoc.collection("benches").get(),
+      refTeamDoc.collection('players').get(),
+      refTeamDoc.collection('benches').get(),
       db
-        .collection("accounts")
-        .where("teams", "array-contains", teamCode)
-        .get()
+        .collection('accounts')
+        .where('teams', 'array-contains', teamCode)
+        .get(),
     ]).then(res => {
       const [
         teamDoc,
         playerCollection,
         benchCollection,
-        accountCollection
+        accountCollection,
       ] = res;
       if (teamDoc.exists) {
         const players = playerCollection.docs.map(doc => {
           const data = doc.data();
           const find = accountCollection.docs.find(
-            account => account.id === data.uid
+            account => account.id === data.uid,
           );
           return {
             name: doc.id,
             photo: find && find.data().photo,
-            ...data
+            ...data,
           };
         });
         const benches = benchCollection.docs.map(doc => {
           const data = doc.data();
           const find = accountCollection.docs.find(
-            account => account.id === data.uid
+            account => account.id === data.uid,
           );
           return {
             photo: find && find.data().photo,
-            ...data
+            ...data,
           };
         });
         commit(types.FETCH_TEAM, {
           id: teamDoc.id,
           ...teamDoc.data(),
           players,
-          benches
+          benches,
         });
       }
       commit(rootTypes.LOADING, false);
@@ -237,15 +237,15 @@ const actions = {
     if (teamCode) {
       commit(rootTypes.LOADING, true);
 
-      const refTeamDoc = db.collection("teams").doc(teamCode);
+      const refTeamDoc = db.collection('teams').doc(teamCode);
       let queryCount = 0;
       const realtimeCount = 1;
-      if (typeof snapShotTeam === "function") snapShotTeam();
+      if (typeof snapShotTeam === 'function') snapShotTeam();
       snapShotTeam = refTeamDoc.onSnapshot(doc => {
         queryCount += 1;
         if (queryCount > realtimeCount) {
           // realtime
-          commit(rootTypes.LOADING, { text: "New data is coming" });
+          commit(rootTypes.LOADING, { text: 'New data is coming' });
           setTimeout(() => {
             if (doc.exists) {
               commit(rootTypes.SET_TEAMICON, doc.data().icon);
@@ -263,23 +263,23 @@ const actions = {
         }
       });
     } else {
-      commit(rootTypes.SET_TEAMICON, "");
+      commit(rootTypes.SET_TEAMICON, '');
     }
   },
-  searchTeams({ commit }, { keyword = "", type }) {
+  searchTeams({ commit }, { keyword = '', type }) {
     if (!keyword) {
       switch (type) {
-        case "join":
+        case 'join':
           commit(types.SEARCH_TEAM, []);
           break;
-        case "anonymous":
+        case 'anonymous':
           commit(userTypes.FETCH_TEAMS, []);
           break;
       }
       return;
     }
     commit(rootTypes.LOADING, true);
-    db.collection("teams")
+    db.collection('teams')
       .get()
       .then(teamCollection => {
         const filterTeams = teamCollection.docs
@@ -291,28 +291,28 @@ const actions = {
               name: data.name,
               subNames: data.subNames,
               keyword: `${data.name}${
-                data.subNames ? `${data.subNames.replace(/,/g, "")}` : ""
-              }`
+                data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
+              }`,
             };
           })
           .filter(team => {
-            if (keyword === "*") return true;
+            if (keyword === '*') return true;
             return keyword
               ? team.keyword.match(
                   new RegExp(
-                    keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
-                    "ig"
-                  )
+                    keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+                    'ig',
+                  ),
                 )
               : false;
           })
           .sort((a, b) => b.name.localeCompare(a.name));
 
         switch (type) {
-          case "join":
+          case 'join':
             commit(types.SEARCH_TEAM, filterTeams);
             break;
-          case "anonymous":
+          case 'anonymous':
             commit(userTypes.FETCH_TEAMS, filterTeams);
             break;
         }
@@ -323,9 +323,9 @@ const actions = {
     commit(rootTypes.LOADING, true);
     const batch = db.batch();
     batch.set(
-      db.collection("requests").doc(`${data.teamCode}-${data.uid}`),
-      { ...data, status: "", timestamp },
-      { merge: true }
+      db.collection('requests').doc(`${data.teamCode}-${data.uid}`),
+      { ...data, status: '', timestamp },
+      { merge: true },
     );
     batch
       .commit()
@@ -334,15 +334,15 @@ const actions = {
         // dispatch("fetchRequests", data.uid);
       })
       .catch(error => {
-        console.log("Error getting document:", error);
+        console.log('Error getting document:', error);
       });
   },
   fetchRequests({ commit }, uid) {
     commit(rootTypes.LOADING, true);
-    if (typeof snapShotRequest === "function") snapShotRequest();
+    if (typeof snapShotRequest === 'function') snapShotRequest();
     snapShotRequest = db
-      .collection("requests")
-      .where("uid", "==", uid)
+      .collection('requests')
+      .where('uid', '==', uid)
       .onSnapshot(querySnapshot => {
         if (!querySnapshot.metadata.hasPendingWrites) {
           const requests = querySnapshot.docs
@@ -351,7 +351,7 @@ const actions = {
               return {
                 timestamp: timestamp.toDate(),
                 ...data,
-                id: doc.id
+                id: doc.id,
               };
             })
             .sort((a, b) => b.timestamp - a.timestamp);
@@ -361,7 +361,7 @@ const actions = {
       });
   },
   disconnectRequests() {
-    if (typeof snapShotRequest === "function") snapShotRequest();
+    if (typeof snapShotRequest === 'function') snapShotRequest();
   },
   fetchTeamRequests({ commit }, teamCode) {
     if (teamCode) {
@@ -369,28 +369,28 @@ const actions = {
       const operateRequests = requests => {
         Promise.all(
           requests
-            .filter(request => request.status !== "denied")
+            .filter(request => request.status !== 'denied')
             .map(request => {
               return db
-                .collection("accounts")
+                .collection('accounts')
                 .doc(request.uid)
                 .get()
                 .then(doc => {
                   return {
                     ...request,
-                    photo: doc.data().photo
+                    photo: doc.data().photo,
                   };
                 });
-            })
+            }),
         ).then(res => {
           commit(types.FETCH_TEAM_REQUESTS, res);
         });
       };
 
-      if (typeof snapShotTeamRequest === "function") snapShotTeamRequest();
+      if (typeof snapShotTeamRequest === 'function') snapShotTeamRequest();
       snapShotTeamRequest = db
-        .collection("requests")
-        .where("teamCode", "==", teamCode)
+        .collection('requests')
+        .where('teamCode', '==', teamCode)
         .onSnapshot(querySnapshot => {
           if (!querySnapshot.metadata.hasPendingWrites) {
             const requests = querySnapshot.docs
@@ -399,7 +399,7 @@ const actions = {
                 return {
                   timestamp: timestamp.toDate(),
                   ...data,
-                  id: doc.id
+                  id: doc.id,
                 };
               })
               .sort((a, b) => b.timestamp - a.timestamp);
@@ -411,75 +411,75 @@ const actions = {
     }
   },
   handleRequest({ dispatch }, { requestId, action }) {
-    const refRequestDoc = db.collection("requests").doc(requestId);
+    const refRequestDoc = db.collection('requests').doc(requestId);
     switch (action) {
-      case "denied":
-        refRequestDoc.set({ status: "denied", timestamp }, { merge: true });
+      case 'denied':
+        refRequestDoc.set({ status: 'denied', timestamp }, { merge: true });
         break;
-      case "delete":
+      case 'delete':
         refRequestDoc.delete();
         break;
-      case "accept":
+      case 'accept':
         refRequestDoc.get().then(request => {
           const data = request.data();
           const batch = db.batch();
           if (data.name) {
             batch.set(
               db
-                .collection("accounts")
+                .collection('accounts')
                 .doc(data.uid)
-                .collection("teams")
+                .collection('teams')
                 .doc(data.teamCode),
-              { role: "player" },
-              { merge: true }
+              { role: 'player' },
+              { merge: true },
             );
             batch.set(
-              db.collection("accounts").doc(data.uid),
+              db.collection('accounts').doc(data.uid),
               { teams: fieldValue.arrayUnion(data.teamCode) },
-              { merge: true }
+              { merge: true },
             );
             batch.set(
               db
-                .collection("teams")
+                .collection('teams')
                 .doc(data.teamCode)
-                .collection("players")
+                .collection('players')
                 .doc(data.name),
               { uid: data.uid },
-              { merge: true }
+              { merge: true },
             );
           } else {
             batch.set(
               db
-                .collection("accounts")
+                .collection('accounts')
                 .doc(data.uid)
-                .collection("teams")
+                .collection('teams')
                 .doc(data.teamCode),
-              { role: "bench" },
-              { merge: true }
+              { role: 'bench' },
+              { merge: true },
             );
             batch.set(
-              db.collection("accounts").doc(data.uid),
+              db.collection('accounts').doc(data.uid),
               { teams: fieldValue.arrayUnion(data.teamCode) },
-              { merge: true }
+              { merge: true },
             );
             batch.set(
               db
-                .collection("teams")
+                .collection('teams')
                 .doc(data.teamCode)
-                .collection("benches")
+                .collection('benches')
                 .doc(data.uid),
               { uid: data.uid, msg: data.msg },
-              { merge: true }
+              { merge: true },
             );
           }
           batch.delete(refRequestDoc);
           batch.commit().then(() => {
-            dispatch("fetchTeamInfo", data.teamCode);
+            dispatch('fetchTeamInfo', data.teamCode);
           });
         });
         break;
     }
-  }
+  },
 };
 
 const mutations = {
@@ -491,7 +491,7 @@ const mutations = {
       otherNames: data.subNames,
       players: data.players.sort((a, b) => a.number - b.number),
       benches: data.benches,
-      icon: data.icon
+      icon: data.icon,
     };
   },
   [types.SEARCH_TEAM](state, data) {
@@ -502,12 +502,12 @@ const mutations = {
   },
   [types.FETCH_TEAM_REQUESTS](state, data) {
     state.teamRequests = data;
-  }
+  },
 };
 
 export default {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

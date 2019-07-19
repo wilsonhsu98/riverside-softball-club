@@ -76,7 +76,7 @@
         :style="{
           left: `${item.realX}px`,
           top: `${item.realY}px`,
-          backgroundColor: item.color
+          backgroundColor: item.color,
         }"
         :key="`dot_${i}`"
       ></div>
@@ -174,7 +174,7 @@ $orange: #e3ab78;
         position: absolute;
         z-index: 1;
         &:before {
-          content: "";
+          content: '';
           display: inline-block;
           width: 40%;
           height: 40%;
@@ -257,7 +257,7 @@ $orange: #e3ab78;
       }
     }
     &:before {
-      content: "";
+      content: '';
       display: inline-block;
       width: 2%;
       height: 100%;
@@ -266,7 +266,7 @@ $orange: #e3ab78;
       z-index: 1;
     }
     &:after {
-      content: "";
+      content: '';
       display: inline-block;
       width: 95%;
       height: 100%;
@@ -300,7 +300,7 @@ $orange: #e3ab78;
       left: 50%;
       transform: translateX(-50%);
       &:before {
-        content: "";
+        content: '';
         display: inline-block;
         width: 100%;
         height: 70%;
@@ -310,7 +310,7 @@ $orange: #e3ab78;
         left: 0;
       }
       &:after {
-        content: "";
+        content: '';
         display: inline-block;
         width: 70%;
         height: 70%;
@@ -330,7 +330,7 @@ $orange: #e3ab78;
       position: absolute;
       top: 12%;
       &:before {
-        content: "";
+        content: '';
         display: inline-block;
         width: 78%;
         height: 77%;
@@ -392,35 +392,35 @@ $orange: #e3ab78;
 
 <script>
 export default {
-  props: ["values", "disabled"],
+  props: ['values', 'disabled'],
   data() {
     return {
-      xy: this.values || []
+      xy: this.values || [],
     };
   },
   mounted() {
     this.resetDot();
-    window.addEventListener("resize", this.resetDot);
+    window.addEventListener('resize', this.resetDot);
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.resetDot);
+    window.removeEventListener('resize', this.resetDot);
   },
   methods: {
     trackXY(event) {
       if (this.disabled) return;
       if (Array.isArray(this.values) && this.values.length > 1) return;
       const { left, top, width, height } = this.$refs[
-        "canvas"
+        'canvas'
       ].getBoundingClientRect();
       const x = parseInt(
         ((event.pageX - left - window.scrollX) / width) * 100,
-        10
+        10,
       );
       const y = parseInt(
         ((event.pageY - top - window.scrollY) / height) * 100,
-        10
+        10,
       );
-      let location = "";
+      let location = '';
       // console.log(`(${x}, ${y})`);
       if (y - x <= 38 && y + x <= 138) {
         if (Math.pow(x - 50, 2) + Math.pow(y - 66, 2) <= Math.pow(21, 2)) {
@@ -428,70 +428,70 @@ export default {
             y - (x * 4) / 7 >= 56 - (32 * 4) / 7 &&
             y + (x * 7) / 3 <= 64 + (46 * 7) / 3
           ) {
-            location = "3B";
+            location = '3B';
           } else if (
             y + (x * 4) / 7 >= 56 + (68 * 4) / 7 &&
             y - (x * 7) / 3 <= 64 - (54 * 7) / 3
           ) {
-            location = "1B";
+            location = '1B';
           } else if (x <= 50 && y <= 64) {
-            location = "ss";
+            location = 'ss';
           } else if (x > 50 && y <= 64) {
-            location = "2B";
+            location = '2B';
           } else {
-            location = "P";
+            location = 'P';
           }
         } else if (
           Math.pow(x - 50, 2) + Math.pow(y - 66, 2) <
           Math.pow(58.5, 2)
         ) {
           if (y - (x * 7) / 2 >= -87) {
-            location = "左";
+            location = '左';
           } else if (y + (x * 7) / 2 >= 263) {
-            location = "右";
+            location = '右';
           } else {
-            location = "中";
+            location = '中';
           }
         } else {
           if (y - (x * 7) / 2 >= -87) {
-            location = "左hr";
+            location = '左hr';
           } else if (y + (x * 7) / 2 >= 263) {
-            location = "右hr";
+            location = '右hr';
           } else {
-            location = "中hr";
+            location = '中hr';
           }
         }
       } else {
-        location = "界外";
+        location = '界外';
       }
       this.xy = [
         {
           x,
           y,
-          realX: (x / 100) * this.$refs["canvas"].offsetWidth,
-          realY: (y / 100) * this.$refs["canvas"].offsetHeight,
-          location
-        }
+          realX: (x / 100) * this.$refs['canvas'].offsetWidth,
+          realY: (y / 100) * this.$refs['canvas'].offsetHeight,
+          location,
+        },
       ];
     },
     resetDot() {
       this.xy.forEach(item => {
-        item.realX = (item.x / 100) * this.$refs["canvas"].offsetWidth;
-        item.realY = (item.y / 100) * this.$refs["canvas"].offsetHeight;
+        item.realX = (item.x / 100) * this.$refs['canvas'].offsetWidth;
+        item.realY = (item.y / 100) * this.$refs['canvas'].offsetHeight;
       });
       this.xy = [].concat(this.xy);
-    }
+    },
   },
   watch: {
     xy() {
-      this.$emit("change", this.xy[0]);
+      this.$emit('change', this.xy[0]);
     },
     disabled() {
       if (this.disabled) {
         this.xy = [];
         this.resetDot();
       }
-    }
-  }
+    },
+  },
 };
 </script>

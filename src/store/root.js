@@ -1,59 +1,59 @@
-import axios from "axios";
+import axios from 'axios';
 import {
   db,
   auth,
   providerMapping,
   credentialMapping,
-  messaging
-} from "../firebase";
-import router from "../router";
-import config from "../../config.json";
-import user from "./modules/user";
+  messaging,
+} from '../firebase';
+import router from '../router';
+import config from '../../config.json';
+import user from './modules/user';
 const lineLoginUrl =
-  process.env.NODE_ENV === "production"
+  process.env.NODE_ENV === 'production'
     ? config.line.loginUrl
-    : "http://localhost:5000/riversidesoftballclub/us-central1/api/line_oauth";
+    : 'http://localhost:5000/riversidesoftballclub/us-central1/api/line_oauth';
 let isFirst = true;
 let chkLoginStatusDone = false;
 let isLogout = false;
 
 const types = {
-  INIT_FROM_LS: "INIT_FROM_LS",
-  LOADING: "LOADING",
-  SET_TOKEN: "SET_TOKEN",
-  CLEAN_TOKEN: "CLEAN_TOKEN",
-  SET_USERID: "SET_USERID",
-  SET_USERNAME: "SET_USERNAME",
-  SET_ACCOUNT_INFO: "SET_ACCOUNT_INFO",
-  SET_AUTH: "SET_AUTH",
-  SET_TEAMICON: "SET_TEAMICON",
-  SET_PROVIDERID: "SET_PROVIDERID",
-  SET_ANONYMOUS: "SET_ANONYMOUS"
+  INIT_FROM_LS: 'INIT_FROM_LS',
+  LOADING: 'LOADING',
+  SET_TOKEN: 'SET_TOKEN',
+  CLEAN_TOKEN: 'CLEAN_TOKEN',
+  SET_USERID: 'SET_USERID',
+  SET_USERNAME: 'SET_USERNAME',
+  SET_ACCOUNT_INFO: 'SET_ACCOUNT_INFO',
+  SET_AUTH: 'SET_AUTH',
+  SET_TEAMICON: 'SET_TEAMICON',
+  SET_PROVIDERID: 'SET_PROVIDERID',
+  SET_ANONYMOUS: 'SET_ANONYMOUS',
 };
 
 const state = {
   loading: false,
   isAnonymous: undefined,
-  token: "",
-  userId: "",
-  userName: "",
+  token: '',
+  userId: '',
+  userName: '',
   accountInfo: undefined,
-  currentTeam: "",
-  role: "",
+  currentTeam: '',
+  role: '',
 
-  providerId: "",
-  accessToken: "",
-  currentTeamIcon: ""
+  providerId: '',
+  accessToken: '',
+  currentTeamIcon: '',
 };
 
 const getters = {
   loading: state => state.loading,
-  token: state => state.token || window.localStorage.getItem("token") || "",
-  userId: state => state.userId || window.localStorage.getItem("user") || "",
+  token: state => state.token || window.localStorage.getItem('token') || '',
+  userId: state => state.userId || window.localStorage.getItem('user') || '',
   userName: state =>
-    state.userName || window.localStorage.getItem("userName") || "",
+    state.userName || window.localStorage.getItem('userName') || '',
   accountInfo: state => {
-    let info = window.localStorage.getItem("accountInfo");
+    let info = window.localStorage.getItem('accountInfo');
     if (info) {
       info = JSON.parse(info);
     }
@@ -62,7 +62,7 @@ const getters = {
   currentTeam: state => state.currentTeam,
   currentTeamIcon: state => state.currentTeamIcon,
   role: state => state.role,
-  isAnonymous: state => state.isAnonymous
+  isAnonymous: state => state.isAnonymous,
 };
 
 const actions = {
@@ -70,22 +70,22 @@ const actions = {
     commit(types.LOADING, isLoading);
   },
   anonymousLogin({ commit }) {
-    window.localStorage.removeItem("currentTeam");
+    window.localStorage.removeItem('currentTeam');
     commit(types.LOADING, { img: true });
     auth.signInAnonymously();
   },
   googleLogin() {
-    auth.signInWithRedirect(providerMapping["google.com"]);
+    auth.signInWithRedirect(providerMapping['google.com']);
   },
   fbLogin() {
-    auth.signInWithRedirect(providerMapping["facebook.com"]);
+    auth.signInWithRedirect(providerMapping['facebook.com']);
   },
   githubLogin() {
-    auth.signInWithRedirect(providerMapping["github.com"]);
+    auth.signInWithRedirect(providerMapping['github.com']);
   },
   lineLogin() {
     window.location = `${lineLoginUrl}?from=${encodeURIComponent(
-      window.location.href
+      window.location.href,
     )}`;
   },
   lineLoginRedirect({ commit }, token) {
@@ -97,7 +97,7 @@ const actions = {
         commit(types.SET_USERID, user.uid);
         commit(types.SET_ANONYMOUS, false);
 
-        const refPlayerDoc = db.collection("accounts").doc(user.uid);
+        const refPlayerDoc = db.collection('accounts').doc(user.uid);
         refPlayerDoc
           .get()
           .then(doc => {
@@ -109,7 +109,7 @@ const actions = {
               ...data,
               accessToken: state.token,
               name: data.name || user.displayName,
-              photo: data.photo || user.photoURL
+              photo: data.photo || user.photoURL,
             };
           })
           .then(res => {
@@ -120,14 +120,14 @@ const actions = {
                   accessToken,
                   name: res.name,
                   photo: res.photo,
-                  line_photo: user.photoURL
+                  line_photo: user.photoURL,
                 },
                 {
-                  merge: true
-                }
+                  merge: true,
+                },
               ),
-              refPlayerDoc.collection("teams").get(),
-              other
+              refPlayerDoc.collection('teams').get(),
+              other,
             ]);
           })
           .then(res => {
@@ -136,18 +136,18 @@ const actions = {
               Promise.all(
                 snapshot.docs.map(doc => {
                   return new Promise(resolve => {
-                    db.collection("teams")
+                    db.collection('teams')
                       .doc(doc.id)
                       .get()
                       .then(teamDoc => {
                         resolve({
                           teamCode: doc.id,
                           role: doc.data().role,
-                          ...teamDoc.data()
+                          ...teamDoc.data(),
                         });
                       });
                   });
-                })
+                }),
               ).then(teams => {
                 commit(types.SET_AUTH, teams);
               });
@@ -156,7 +156,7 @@ const actions = {
             }
             commit(types.SET_ACCOUNT_INFO, { ...other });
             // commit(types.SET_USERNAME, snapshot.docs[0].id);
-            router.push("/main/user");
+            router.push('/main/user');
             commit(types.LOADING, false);
           });
       }
@@ -180,24 +180,24 @@ const actions = {
       .catch(error => {
         if (!isFirst) return; // prevent logout event trigger auth.getRedirectResult()
         isFirst = false;
-        if (error.code === "auth/account-exists-with-different-credential") {
+        if (error.code === 'auth/account-exists-with-different-credential') {
           window.localStorage.setItem(
-            "pendingCred",
-            JSON.stringify(error.credential)
+            'pendingCred',
+            JSON.stringify(error.credential),
           );
           auth.fetchSignInMethodsForEmail(error.email).then(providers => {
-            if (providers[0] === "password") {
-              db.collection("accounts")
-                .where("email", "==", error.email)
+            if (providers[0] === 'password') {
+              db.collection('accounts')
+                .where('email', '==', error.email)
                 .get()
                 .then(querySnapshot => {
                   querySnapshot.forEach(doc => {
                     commit(types.LOADING, { img: true });
                     auth.signInWithEmailAndPassword(
                       error.email,
-                      doc.data().lineUserID
+                      doc.data().lineUserID,
                     );
-                    commit(types.SET_PROVIDERID, "password");
+                    commit(types.SET_PROVIDERID, 'password');
                     commit(types.SET_TOKEN, doc.data().accessToken);
                     commit(types.SET_ANONYMOUS, false);
                   });
@@ -207,7 +207,7 @@ const actions = {
             }
           });
         } else {
-          console.log("getRedirectResult error");
+          console.log('getRedirectResult error');
           console.log(error);
           commit(types.CLEAN_TOKEN);
           commit(types.LOADING, false);
@@ -220,7 +220,7 @@ const actions = {
           commit(types.SET_USERNAME, user.uid);
           commit(types.SET_ANONYMOUS, true);
           // go to main page
-          router.push("/main/stats_pa");
+          router.push('/main/stats_pa');
           commit(types.LOADING, false);
           return;
         }
@@ -238,44 +238,44 @@ const actions = {
           messaging
             .requestPermission()
             .then(() => {
-              console.log("Notification permission granted.");
+              console.log('Notification permission granted.');
               return messaging.getToken();
             })
             .then(token => {
               console.log(token);
             })
             .catch(err => {
-              console.log("Unable to get permission to notify.", err);
+              console.log('Unable to get permission to notify.', err);
             });
         }
         let promise = new Promise(resolve => {
           resolve();
         });
         let providerData = user.providerData.find(
-          item => item.providerId === state.providerId
+          item => item.providerId === state.providerId,
         );
 
         // Link account if duplicated
-        let pendingCred = window.localStorage.getItem("pendingCred");
+        let pendingCred = window.localStorage.getItem('pendingCred');
         if (pendingCred) {
           pendingCred = JSON.parse(pendingCred);
           const token = credentialMapping[pendingCred.providerId](
-            pendingCred.accessToken
+            pendingCred.accessToken,
           );
           promise = user.linkAndRetrieveDataWithCredential(token).then(res => {
-            window.localStorage.removeItem("pendingCred");
+            window.localStorage.removeItem('pendingCred');
             providerData = res.user.providerData.find(
-              item => item.providerId === pendingCred.providerId
+              item => item.providerId === pendingCred.providerId,
             );
             return res;
           });
         }
 
-        const refPlayerDoc = db.collection("accounts").doc(user.uid);
+        const refPlayerDoc = db.collection('accounts').doc(user.uid);
         promise
           .then(() => {
             const photo =
-              providerData.providerId === "facebook.com"
+              providerData.providerId === 'facebook.com'
                 ? `${providerData.photoURL}?type=large`
                 : providerData.photoURL;
 
@@ -290,10 +290,10 @@ const actions = {
                 name:
                   data.name ||
                   providerData.displayName ||
-                  providerData.email.split("@")[0],
+                  providerData.email.split('@')[0],
                 email: data.email || providerData.email,
                 photo: data.photo || photo,
-                providerPhoto: photo
+                providerPhoto: photo,
               };
             });
           })
@@ -305,12 +305,13 @@ const actions = {
               name: res.name,
               email: res.email,
               photo: res.photo,
-              [`${providerData.providerId.split(".")[0]}_photo`]: providerPhoto
+              [`${providerData.providerId.split('.')[0]}_photo`]: providerPhoto,
             };
+            commit(types.SET_USERNAME, res.name);
             return Promise.all([
               refPlayerDoc.set(data, { merge: true }),
-              refPlayerDoc.collection("teams").get(),
-              data
+              refPlayerDoc.collection('teams').get(),
+              data,
             ]);
           })
           .then(res => {
@@ -321,18 +322,18 @@ const actions = {
               Promise.all(
                 snapshot.docs.map(doc => {
                   return new Promise(resolve => {
-                    db.collection("teams")
+                    db.collection('teams')
                       .doc(doc.id)
                       .get()
                       .then(teamDoc => {
                         resolve({
                           teamCode: doc.id,
                           role: doc.data().role,
-                          ...teamDoc.data()
+                          ...teamDoc.data(),
                         });
                       });
                   });
-                })
+                }),
               ).then(teams => {
                 commit(types.SET_AUTH, teams);
               });
@@ -342,9 +343,8 @@ const actions = {
             commit(types.SET_USERID, user.uid);
             commit(types.SET_ACCOUNT_INFO, { ...other });
             commit(types.SET_ANONYMOUS, false);
-            // commit(types.SET_USERNAME, snapshot.docs[0].id);
-            if (router.history.current.path === "/login") {
-              router.push("/main/user");
+            if (router.history.current.path === '/login') {
+              router.push('/main/user');
             }
             commit(types.LOADING, false);
           });
@@ -373,23 +373,19 @@ const actions = {
           promise = promise
             .then(() => {
               return axios.post(
-                `https://securetoken.googleapis.com/v1/token?key=${
-                  config.firebase.apiKey
-                }`,
+                `https://securetoken.googleapis.com/v1/token?key=${config.firebase.apiKey}`,
                 {
-                  grant_type: "refresh_token",
-                  refresh_token: getters.token
-                }
+                  grant_type: 'refresh_token',
+                  refresh_token: getters.token,
+                },
               );
             })
             .then(res => {
               return axios.post(
-                `https://www.googleapis.com/identitytoolkit/v3/relyingparty/deleteAccount?key=${
-                  config.firebase.apiKey
-                }`,
+                `https://www.googleapis.com/identitytoolkit/v3/relyingparty/deleteAccount?key=${config.firebase.apiKey}`,
                 {
-                  idToken: res.data.id_token
-                }
+                  idToken: res.data.id_token,
+                },
               );
             });
         }
@@ -399,56 +395,56 @@ const actions = {
         });
       })
       .catch(error => {
-        console.log("logout error");
+        console.log('logout error');
         console.log(error);
         commit(types.LOADING, false);
       });
-  }
+  },
 };
 
 const mutations = {
   [types.INIT_FROM_LS](state) {
     state.providerId =
-      window.localStorage.getItem("providerId") || state.providerId;
-    state.token = window.localStorage.getItem("token") || state.token;
+      window.localStorage.getItem('providerId') || state.providerId;
+    state.token = window.localStorage.getItem('token') || state.token;
   },
   [types.LOADING](state, isLoading) {
     state.loading = isLoading;
   },
   [types.SET_TOKEN](state, token) {
-    window.localStorage.setItem("token", token);
+    window.localStorage.setItem('token', token);
     state.token = token;
   },
   [types.SET_USERID](state, userId) {
-    window.localStorage.setItem("user", userId);
+    window.localStorage.setItem('user', userId);
     state.userId = userId;
   },
   [types.SET_USERNAME](state, userName) {
-    window.localStorage.setItem("userName", userName);
+    window.localStorage.setItem('userName', userName);
     state.userName = userName;
   },
   [types.SET_ACCOUNT_INFO](state, accountInfo) {
-    window.localStorage.setItem("accountInfo", JSON.stringify(accountInfo));
+    window.localStorage.setItem('accountInfo', JSON.stringify(accountInfo));
     state.accountInfo = accountInfo;
   },
   [types.CLEAN_TOKEN](state) {
-    const version = window.localStorage.getItem("version");
-    const currentTeam = window.localStorage.getItem("currentTeam");
+    const version = window.localStorage.getItem('version');
+    const currentTeam = window.localStorage.getItem('currentTeam');
     window.localStorage.clear();
-    state.token = "";
-    state.userId = "";
-    state.accountInfo = "";
-    state.currentTeam = "";
-    state.currentTeamIcon = "";
+    state.token = '';
+    state.userId = '';
+    state.accountInfo = '';
+    state.currentTeam = '';
+    state.currentTeamIcon = '';
     state.isAnonymous = undefined;
     user.state.teams = null;
-    window.localStorage.setItem("version", version);
-    if (currentTeam) window.localStorage.setItem("currentTeam", currentTeam);
-    router.push("/login");
+    window.localStorage.setItem('version', version);
+    if (currentTeam) window.localStorage.setItem('currentTeam', currentTeam);
+    router.push('/login');
   },
   [types.SET_AUTH](state, auth = []) {
     const find = auth.find(
-      item => item.teamCode === window.localStorage.getItem("currentTeam")
+      item => item.teamCode === window.localStorage.getItem('currentTeam'),
     );
     if (find) {
       state.currentTeam = find.teamCode;
@@ -459,40 +455,40 @@ const mutations = {
       state.currentTeamIcon = auth[0].icon;
       state.role = auth[0].role;
     } else {
-      state.currentTeam = "";
-      state.currentTeamIcon = "";
-      state.role = "";
+      state.currentTeam = '';
+      state.currentTeamIcon = '';
+      state.role = '';
     }
-    window.localStorage.setItem("currentTeam", state.currentTeam);
+    window.localStorage.setItem('currentTeam', state.currentTeam);
   },
   [types.SET_TEAMICON](state, data) {
     state.currentTeamIcon = data;
   },
   [types.SET_PROVIDERID](state, providerId) {
-    window.localStorage.setItem("providerId", providerId);
+    window.localStorage.setItem('providerId', providerId);
     state.providerId = providerId;
   },
   [types.SET_ANONYMOUS](state, isAnonymous) {
     state.isAnonymous = isAnonymous;
-    state.currentTeam = window.localStorage.getItem("currentTeam");
-  }
+    state.currentTeam = window.localStorage.getItem('currentTeam');
+  },
 };
 
 const promiseImage = (img, type) => {
   const mapping = {
-    avatar: "albumAvatar",
-    icon: "albumIcon"
+    avatar: 'albumAvatar',
+    icon: 'albumIcon',
   };
   return new Promise((resolve, reject) => {
-    if (img.indexOf("data:image/png;base64") > -1) {
+    if (img.indexOf('data:image/png;base64') > -1) {
       const formData = new FormData();
-      formData.append("image", img.split(",")[1]);
-      formData.append("album", config.imgur[mapping[type.toLowerCase()]]);
+      formData.append('image', img.split(',')[1]);
+      formData.append('album', config.imgur[mapping[type.toLowerCase()]]);
       return axios
         .post(config.imgur.postUrl, formData, {
           headers: {
-            Authorization: `Client-ID ${config.imgur.clientId}`
-          }
+            Authorization: `Client-ID ${config.imgur.clientId}`,
+          },
         })
         .then(res => {
           resolve(res.data.data.link);

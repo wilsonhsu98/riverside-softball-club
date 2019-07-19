@@ -1,106 +1,101 @@
 <template>
-  <div class="profile-container">
+  <div>
     <mobile-header />
-    <template v-if="isAnonymous === false">
-      <img class="avatar" :src="accountInfo.photo" />
-      <div class="info-wrapper">
-        <div class="info">{{ accountInfo.name }}</div>
-        <div class="info" v-if="accountInfo.email">{{ accountInfo.email }}</div>
-        <div
-          class="btn-container"
-          v-if="
-            (teams === null || (Array.isArray(teams) && teams.length)) &&
-              collapse
-          "
-        >
-          <router-link :to="{ path: 'user/avatar' }" tag="button">
-            {{ $t("edit_avatar") }}
-          </router-link>
-          <button class="fa fa-ellipsis-h" @click="collapse = false"></button>
+    <div class="container">
+      <template v-if="isAnonymous === false">
+        <img class="avatar" :src="accountInfo.photo" />
+        <div class="info-wrapper">
+          <div class="info">{{ accountInfo.name }}</div>
+          <div class="info" v-if="accountInfo.email">
+            {{ accountInfo.email }}
+          </div>
+          <div
+            class="btn-container"
+            v-if="
+              (teams === null || (Array.isArray(teams) && teams.length)) &&
+                collapse
+            "
+          >
+            <router-link :to="{ path: 'user/avatar' }" tag="button">
+              {{ $t('edit_avatar') }}
+            </router-link>
+            <button class="fa fa-ellipsis-h" @click="collapse = false"></button>
+          </div>
+          <div class="btn-container" v-else>
+            <router-link :to="{ path: 'user/avatar' }" tag="button">
+              {{ $t('edit_avatar') }}
+            </router-link>
+            <router-link :to="{ path: 'join_team' }" tag="button">
+              {{ $t('join_team') }}
+            </router-link>
+            <router-link :to="{ path: 'create_team' }" tag="button">
+              {{ $t('create_team') }}
+            </router-link>
+            <button class="logout-btn" @click="logout">
+              {{ $t('logout_btn') }}
+            </button>
+          </div>
         </div>
-        <div class="btn-container" v-else>
-          <router-link :to="{ path: 'user/avatar' }" tag="button">
-            {{ $t("edit_avatar") }}
-          </router-link>
-          <router-link :to="{ path: 'join_team' }" tag="button">
-            {{ $t("join_team") }}
-          </router-link>
-          <router-link :to="{ path: 'create_team' }" tag="button">
-            {{ $t("create_team") }}
-          </router-link>
-          <button class="logout-btn" @click="logout">
-            {{ $t("logout_btn") }}
-          </button>
-        </div>
-      </div>
-    </template>
-    <template v-if="isAnonymous === true">
-      <button class="logout-btn" @click="logout">
-        {{ $t("logout_btn") }}
-      </button>
-      <div class="search-wrapper">
-        <h1>{{ $t("anonymous_join") }}</h1>
-        <custom-input
-          class="field-wrapper"
-          :name="$t('ttl_search_team')"
-          v-model="keyWord"
-        >
-          <i
-            class="fa fa-search"
-            @click="searchTeams({ keyword: keyWord, type: 'anonymous' })"
-          ></i>
-        </custom-input>
-      </div>
-    </template>
-    <div v-if="Array.isArray(teams) && teams.length" class="team-wrapper">
-      <label v-if="isAnonymous === true">{{
-        $t("ttl_anonymous_search")
-      }}</label>
-      <template v-else>
-        <label v-if="teams.length === 1">{{ $t("ttl_current_team") }}</label>
-        <label v-else>{{ $t("ttl_switch_team") }}</label>
       </template>
-      <span
-        v-for="team in teams"
-        class="team"
-        @click="switchTeam_(team.teamCode)"
-        :data-requests="team.requests === 0 ? undefined : team.requests"
-        :key="`team_${team.teamCode}`"
-      >
-        <i v-if="team.teamCode === currentTeam" class="fa fa-check" />
-        <img :src="team.icon || defaultIcon" style="height: 50px;" />
-        <p class="team__name">{{ team.name }}</p>
-        <p
-          class="team__name"
-          v-for="(subName, i) in team.subNames.split(',')"
-          :key="`${team.teamCode}_subname_${i}`"
+      <template v-if="isAnonymous === true">
+        <button class="logout-btn" @click="logout">
+          {{ $t('logout_btn') }}
+        </button>
+        <div class="search-wrapper">
+          <h1>{{ $t('anonymous_join') }}</h1>
+          <custom-input
+            class="field-wrapper"
+            :name="$t('ttl_search_team')"
+            v-model="keyWord"
+          >
+            <i
+              class="fa fa-search"
+              @click="searchTeams({ keyword: keyWord, type: 'anonymous' })"
+            ></i>
+          </custom-input>
+        </div>
+      </template>
+      <div v-if="Array.isArray(teams) && teams.length" class="team-wrapper">
+        <label v-if="isAnonymous === true">{{
+          $t('ttl_anonymous_search')
+        }}</label>
+        <template v-else>
+          <label v-if="teams.length === 1">{{ $t('ttl_current_team') }}</label>
+          <label v-else>{{ $t('ttl_switch_team') }}</label>
+        </template>
+        <span
+          v-for="team in teams"
+          class="team"
+          @click="switchTeam_(team.teamCode)"
+          :data-requests="team.requests === 0 ? undefined : team.requests"
+          :key="`team_${team.teamCode}`"
         >
-          {{ subName }}
-        </p>
-      </span>
+          <i v-if="team.teamCode === currentTeam" class="fa fa-check" />
+          <img :src="team.icon || defaultIcon" style="height: 50px;" />
+          <p class="team__name">{{ team.name }}</p>
+          <p
+            class="team__name"
+            v-for="(subName, i) in team.subNames.split(',')"
+            :key="`${team.teamCode}_subname_${i}`"
+          >
+            {{ subName }}
+          </p>
+        </span>
+      </div>
+      <!-- <coordination :values="dots"/> -->
     </div>
-    <!-- <coordination :values="dots"/> -->
   </div>
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 $max-width: 400px;
 
-.profile-container {
-  text-align: left;
-  background-color: #fff;
-  border-radius: 10px;
-  margin: 20px auto;
-  padding: 20px;
-  box-sizing: border-box;
-  position: relative;
-  min-height: 140px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+.container {
   display: flex;
   flex-wrap: wrap;
   align-content: flex-start;
+  justify-content: center;
   .avatar {
     border-radius: 50%;
     height: 100px;
@@ -186,7 +181,6 @@ $max-width: 400px;
       word-break: keep-all;
     }
   }
-
   button {
     background-color: $header_bgcolor;
     padding: 10px 15px;
@@ -233,14 +227,7 @@ $max-width: 400px;
 }
 
 @media only screen and (max-width: 760px) {
-  .profile-container {
-    margin: 50px 0 0;
-    background-color: #fff;
-    border-radius: 0;
-    box-shadow: none;
-    min-height: calc(100vh - 100px);
-    justify-content: center;
-    // padding: 10px 0 0;
+  .container {
     .info-wrapper {
       flex: none;
       width: calc(100% - 20px);
@@ -257,27 +244,27 @@ $max-width: 400px;
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import defaultIcon from "../images/icon.png";
+import { mapGetters, mapActions } from 'vuex';
+import defaultIcon from '../images/icon.png';
 
 export default {
   data() {
     return {
       collapse: true,
       dots: undefined,
-      keyWord: "",
-      defaultIcon
+      keyWord: '',
+      defaultIcon,
       // dots: [{x: 50, y: 50, color: 'blue'}, {x: 30, y: 30}]
     };
   },
   created() {},
   methods: {
     ...mapActions({
-      logout: "logout",
-      switchTeam: "switchTeam",
-      fetchTable: "fetchTable",
-      fetchTeamRequests: "fetchTeamRequests",
-      searchTeams: "searchTeams"
+      logout: 'logout',
+      switchTeam: 'switchTeam',
+      fetchTable: 'fetchTable',
+      fetchTeamRequests: 'fetchTeamRequests',
+      searchTeams: 'searchTeams',
     }),
     switchTeam_(teamCode) {
       if (this.currentTeam !== teamCode) {
@@ -285,17 +272,17 @@ export default {
         this.fetchTable(teamCode);
         this.fetchTeamRequests(teamCode);
       }
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      userId: "userId",
-      accountInfo: "accountInfo",
-      currentTeamIcon: "currentTeamIcon",
-      currentTeam: "currentTeam",
-      teams: "teams",
-      isAnonymous: "isAnonymous"
-    })
-  }
+      userId: 'userId',
+      accountInfo: 'accountInfo',
+      currentTeamIcon: 'currentTeamIcon',
+      currentTeam: 'currentTeam',
+      teams: 'teams',
+      isAnonymous: 'isAnonymous',
+    }),
+  },
 };
 </script>

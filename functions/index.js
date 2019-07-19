@@ -2,139 +2,141 @@ const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const config = require('./config.json');
 admin.initializeApp({
-	...functions.config().firebase,
-	credential: admin.credential.cert(config.serviceAccount),
+  ...functions.config().firebase,
+  credential: admin.credential.cert(config.serviceAccount),
 });
 const db = admin.firestore();
 const timestamp = admin.firestore.FieldValue.serverTimestamp();
 
 exports.import_game = functions.https.onRequest((req, res) => {
-	const body = req.body;
-	const game = body.game;
-	const teddySummary = body.summary.find(item => item['場次'] === game);
-	const parseResult = parseGame(body.rawdata);
-	db.collection('teams')
-		.doc('OldStar')
-		.collection('games')
-		.doc(game)
-		.set({
-			orders: parseResult.orders,
-			errors: parseResult.errors,
-			result: ['win', 'lose', 'tie', ''][
-						['勝', '敗', '和', ''].indexOf(teddySummary ? teddySummary['結果'] : 3)
-					],
-			year: teddySummary ? teddySummary['年度'] : '',
-			season: teddySummary ? teddySummary['季度'] : '',
-			opponent: teddySummary ? teddySummary['對手'] : '',
-			league: teddySummary ? teddySummary['聯盟'] : '',
-			coach: teddySummary ? teddySummary['教練'] : '',
-			place: teddySummary ? teddySummary['休息區'] : '',
-			group: teddySummary ? teddySummary['組別'] : '',
-			timestamp,
-		})
-		.then(writeResult => {
-			res.json(writeResult);
-		});
+  const body = req.body;
+  const game = body.game;
+  const teddySummary = body.summary.find(item => item['場次'] === game);
+  const parseResult = parseGame(body.rawdata);
+  db.collection('teams')
+    .doc('OldStar')
+    .collection('games')
+    .doc(game)
+    .set({
+      orders: parseResult.orders,
+      errors: parseResult.errors,
+      result: ['win', 'lose', 'tie', ''][
+        ['勝', '敗', '和', ''].indexOf(teddySummary ? teddySummary['結果'] : 3)
+      ],
+      year: teddySummary ? teddySummary['年度'] : '',
+      season: teddySummary ? teddySummary['季度'] : '',
+      opponent: teddySummary ? teddySummary['對手'] : '',
+      league: teddySummary ? teddySummary['聯盟'] : '',
+      coach: teddySummary ? teddySummary['教練'] : '',
+      place: teddySummary ? teddySummary['休息區'] : '',
+      group: teddySummary ? teddySummary['組別'] : '',
+      timestamp,
+    })
+    .then(writeResult => {
+      res.json(writeResult);
+    });
 });
 
 const contentMapping = {
-	'1H': '1H',
-	'2H': '2H',
-	'3H': '3H',
-	'HR': 'HR',
-	'飛球': 'FO',
-	'滾地': 'GO',
-	'BB': 'BB',
-	'K': 'K',
-	'E': 'E',
-	'野選': 'FC',
-	'犧飛': 'SF',
-	'雙殺': 'DP',
-	'三殺': 'TP',
+  '1H': '1H',
+  '2H': '2H',
+  '3H': '3H',
+  HR: 'HR',
+  飛球: 'FO',
+  滾地: 'GO',
+  BB: 'BB',
+  K: 'K',
+  E: 'E',
+  野選: 'FC',
+  犧飛: 'SF',
+  雙殺: 'DP',
+  三殺: 'TP',
 };
-const parseGame = (arr) => {
-	var nameCol = arr[0].indexOf('名單'),
-		errCol = arr[0].indexOf('失誤'),
-		startCol = arr[0].indexOf('一'),
-		row = 1,
-		col = startCol,
-		order = 1,
-		result = [],
-		scan = [],
-		innArray = ['', '一', '二', '三', '四', '五', '六', '七'],
-		errorArr = [];
+const parseGame = arr => {
+  var nameCol = arr[0].indexOf('名單'),
+    errCol = arr[0].indexOf('失誤'),
+    startCol = arr[0].indexOf('一'),
+    row = 1,
+    col = startCol,
+    order = 1,
+    result = [],
+    scan = [],
+    innArray = ['', '一', '二', '三', '四', '五', '六', '七'],
+    errorArr = [];
 
-	while (col < arr[0].length && row < arr.length) {
-		if (scan.indexOf(row + '' + col) === -1) {
-			scan.push(row + '' + col);
-			if (arr[row][col]) {
-				var run = '';
-				if (arr[row][col + 2] === 'R') {
-					run = arr[row][nameCol];
-				} else if (row + 1 < arr.length && arr[row + 1][col] === '' && arr[row + 1][col + 2] === 'R') {
-					run = arr[row + 1][nameCol];
-				}
-				result.push({
-					order: order++,
-					inn: innArray.indexOf(arr[0][col]),
-					name: arr[row][nameCol],
-					content: contentMapping[arr[row][col]],
-					r: run,
-					rbi: arr[row][col + 1],
-					_row: row
-				});
-			}
-		}
-		if (arr[row][errCol] && col === startCol) {
-			errorArr.push({
-				name: arr[row][nameCol],
-				count: arr[row][errCol],
-			});
-		}
-		row++;
-		if (row === arr.length) {
-			if (scan.indexOf('1' + col) === -1) {
-				row = 1;
-			} else {
-				col += 3;
-				if (result[result.length - 1]) {
-					if (result[result.length - 1]._row === arr.length - 1) {
-						row = 1;
-					} else {
-						row = result[result.length - 1]._row + 1
-					}
-				} else {
-					row = 1;
-				}
-			}
-		}
-	}
-	return {
-		orders: result.map(item => {
-			const { _row, ...others } = item;
-			_row;
-			return { ...others };
-		}),
-		errors: errorArr,
-	};
+  while (col < arr[0].length && row < arr.length) {
+    if (scan.indexOf(row + '' + col) === -1) {
+      scan.push(row + '' + col);
+      if (arr[row][col]) {
+        var run = '';
+        if (arr[row][col + 2] === 'R') {
+          run = arr[row][nameCol];
+        } else if (
+          row + 1 < arr.length &&
+          arr[row + 1][col] === '' &&
+          arr[row + 1][col + 2] === 'R'
+        ) {
+          run = arr[row + 1][nameCol];
+        }
+        result.push({
+          order: order++,
+          inn: innArray.indexOf(arr[0][col]),
+          name: arr[row][nameCol],
+          content: contentMapping[arr[row][col]],
+          r: run,
+          rbi: arr[row][col + 1],
+          _row: row,
+        });
+      }
+    }
+    if (arr[row][errCol] && col === startCol) {
+      errorArr.push({
+        name: arr[row][nameCol],
+        count: arr[row][errCol],
+      });
+    }
+    row++;
+    if (row === arr.length) {
+      if (scan.indexOf('1' + col) === -1) {
+        row = 1;
+      } else {
+        col += 3;
+        if (result[result.length - 1]) {
+          if (result[result.length - 1]._row === arr.length - 1) {
+            row = 1;
+          } else {
+            row = result[result.length - 1]._row + 1;
+          }
+        } else {
+          row = 1;
+        }
+      }
+    }
+  }
+  return {
+    orders: result.map(item => {
+      const { _row, ...others } = item;
+      _row;
+      return { ...others };
+    }),
+    errors: errorArr,
+  };
 };
-
-
 
 // Line OAuth 2 setup
 const credentials = {
-	client: {
-		id: config.line.clientId,
-		secret: config.line.clientSecret
-	},
-	auth: {
-		tokenHost: 'https://api.line.me',
-		tokenPath: '/oauth2/v2.1/token',
-		authorizeHost: 'https://access.line.me',
-		authorizePath: '/oauth2/v2.1/authorize'
-	}
+  client: {
+    id: config.line.clientId,
+    secret: config.line.clientSecret,
+  },
+  auth: {
+    tokenHost: 'https://api.line.me',
+    tokenPath: '/oauth2/v2.1/token',
+    authorizeHost: 'https://access.line.me',
+    authorizePath: '/oauth2/v2.1/authorize',
+  },
 };
-const restUrl = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty'
+const restUrl = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty';
 const oauth2 = require('simple-oauth2').create(credentials);
 const rp = require('request-promise');
 const express = require('express');
@@ -158,23 +160,40 @@ app.use(cookieParser());
  * Redirects the User to the Instagram authentication consent screen. Also the 'state' cookie is set for later state verification.
  */
 app.get(OAUTH_REDIRECT_PATH, (req, res) => {
-	const state = (req.cookies && req.cookies.state) || crypto.randomBytes(20).toString('hex');
-	// console.log('Setting state cookie for verification:', state);
-	const secureCookie = req.get('host').indexOf('localhost:') !== 0;
-	// console.log('Need a secure cookie (i.e. not on localhost)?', secureCookie);
-	res.cookie('state', state, {maxAge: 3600000, secure: secureCookie, httpOnly: true});
-	res.cookie('from', req.query.from, {maxAge: 3600000, secure: secureCookie, httpOnly: true});
+  const state =
+    (req.cookies && req.cookies.state) ||
+    crypto.randomBytes(20).toString('hex');
+  // console.log('Setting state cookie for verification:', state);
+  const secureCookie = req.get('host').indexOf('localhost:') !== 0;
+  // console.log('Need a secure cookie (i.e. not on localhost)?', secureCookie);
+  res.cookie('state', state, {
+    maxAge: 3600000,
+    secure: secureCookie,
+    httpOnly: true,
+  });
+  res.cookie('from', req.query.from, {
+    maxAge: 3600000,
+    secure: secureCookie,
+    httpOnly: true,
+  });
 
-	const { projectId, cloudResourceLocation } = JSON.parse(process.env.FIREBASE_CONFIG);
-	const middle_dir = req.get('host').indexOf('localhost:') === 0 ? `/${projectId}/${cloudResourceLocation}1` : '';
+  const { projectId, cloudResourceLocation } = JSON.parse(
+    process.env.FIREBASE_CONFIG,
+  );
+  const middle_dir =
+    req.get('host').indexOf('localhost:') === 0
+      ? `/${projectId}/${cloudResourceLocation}1`
+      : '';
 
-	const redirectUri = oauth2.authorizationCode.authorizeURL({
-		redirect_uri: `${req.protocol}://${req.get('host')}${middle_dir}/api${OAUTH_CALLBACK_PATH}`,
-		scope: OAUTH_SCOPES,
-		state: state
-	});
-	// console.log('Redirecting to:', redirectUri);
-	res.redirect(redirectUri);
+  const redirectUri = oauth2.authorizationCode.authorizeURL({
+    redirect_uri: `${req.protocol}://${req.get(
+      'host',
+    )}${middle_dir}/api${OAUTH_CALLBACK_PATH}`,
+    scope: OAUTH_SCOPES,
+    state: state,
+  });
+  // console.log('Redirecting to:', redirectUri);
+  res.redirect(redirectUri);
 });
 
 /**
@@ -183,164 +202,180 @@ app.get(OAUTH_REDIRECT_PATH, (req, res) => {
  * This is meant to be used by Web Clients.
  */
 app.get(OAUTH_CALLBACK_PATH, (req, res) => {
-	const { projectId, cloudResourceLocation } = JSON.parse(process.env.FIREBASE_CONFIG);
-	const middle_dir = req.get('host').indexOf('localhost:') === 0 ? `/${projectId}/${cloudResourceLocation}1` : '';
+  const { projectId, cloudResourceLocation } = JSON.parse(
+    process.env.FIREBASE_CONFIG,
+  );
+  const middle_dir =
+    req.get('host').indexOf('localhost:') === 0
+      ? `/${projectId}/${cloudResourceLocation}1`
+      : '';
 
-	// console.log('Received state cookie:', req.cookies && req.cookies.state);
-	// console.log('Received state query parameter:', req.query.state);
-	if (req.cookies && !req.cookies.state) {
-		res.status(400).send('State cookie not set or expired. Maybe you took too long to authorize. Please try again.');
-	} else if (req.cookies && req.cookies.state !== req.query.state) {
-		res.status(400).send('State validation failed');
-	}
-	// console.log('Received auth code:', req.query.code);
-	oauth2.authorizationCode
-		.getToken({
-			code: req.query.code,
-			redirect_uri: `${req.protocol}://${req.get('host')}${middle_dir}/api${OAUTH_CALLBACK_PATH}`,
-		})
-		.then(results => {
-			const payload = jwt.decode(results.id_token);
-			return {
-				lineUserID: payload.sub,
-				profilePic: payload.picture,
-				userName: payload.name,
-				email: payload.email,
-				accessToken: results.access_token,
-			};
-		})
-		.then(results => {
-			// The UID we'll assign to the user.
-			const uid = `LINE: ${results.lineUserID}`;
-			if (results.email) {
-				return rp({
-						method: 'POST',
-						uri: `${restUrl}/verifyPassword?key=${config.apiKey}`,
-						headers: { 'Content-Type': 'application/json' },
-						body: {
-							email: results.email,
-							password: results.lineUserID,
-							returnSecureToken: true,
-						},
-						json: true,
-					})
-					.then(result => ({
-						uid: result.localId,
-						...results,
-					}))
-					.catch(err => {
-						switch (err.error.error.message) {
-						case 'INVALID_PASSWORD':
-							// duplicate
-							return admin.auth()
-								.getUserByEmail(results.email)
-								.then(res => ({
-									uid: res.uid,
-									...results,
-								}));
-							break;
-						case 'EMAIL_NOT_FOUND':
-							// create new user
-							return rp({
-									method: 'POST',
-									uri: `${restUrl}/signupNewUser?key=${config.apiKey}`,
-									headers: { 'Content-Type': 'application/json' },
-									body: {
-										email: results.email,
-										password: results.lineUserID,
-										returnSecureToken: true,
-									},
-									json: true,
-								})
-								.then(result => ({
-									uid: result.localId,
-									...results,
-								}));
-						}
-						throw err.error.error;
-					})
-					.then(result => {
-						const deleteDocTask = db.collection('accounts')
-							.doc(uid)
-							.delete();
-						const deleteUserTask = admin.auth()
-							.deleteUser(uid)
-							.catch(error => {
-								if (error.code === 'auth/user-not-found') {
-									return;
-								}
-								throw error;
-							});
+  // console.log('Received state cookie:', req.cookies && req.cookies.state);
+  // console.log('Received state query parameter:', req.query.state);
+  if (req.cookies && !req.cookies.state) {
+    res
+      .status(400)
+      .send(
+        'State cookie not set or expired. Maybe you took too long to authorize. Please try again.',
+      );
+  } else if (req.cookies && req.cookies.state !== req.query.state) {
+    res.status(400).send('State validation failed');
+  }
+  // console.log('Received auth code:', req.query.code);
+  oauth2.authorizationCode
+    .getToken({
+      code: req.query.code,
+      redirect_uri: `${req.protocol}://${req.get(
+        'host',
+      )}${middle_dir}/api${OAUTH_CALLBACK_PATH}`,
+    })
+    .then(results => {
+      const payload = jwt.decode(results.id_token);
+      return {
+        lineUserID: payload.sub,
+        profilePic: payload.picture,
+        userName: payload.name,
+        email: payload.email,
+        accessToken: results.access_token,
+      };
+    })
+    .then(results => {
+      // The UID we'll assign to the user.
+      const uid = `LINE: ${results.lineUserID}`;
+      if (results.email) {
+        return rp({
+          method: 'POST',
+          uri: `${restUrl}/verifyPassword?key=${config.apiKey}`,
+          headers: { 'Content-Type': 'application/json' },
+          body: {
+            email: results.email,
+            password: results.lineUserID,
+            returnSecureToken: true,
+          },
+          json: true,
+        })
+          .then(result => ({
+            uid: result.localId,
+            ...results,
+          }))
+          .catch(err => {
+            switch (err.error.error.message) {
+              case 'INVALID_PASSWORD':
+                // duplicate
+                return admin
+                  .auth()
+                  .getUserByEmail(results.email)
+                  .then(res => ({
+                    uid: res.uid,
+                    ...results,
+                  }));
+              case 'EMAIL_NOT_FOUND':
+                // create new user
+                return rp({
+                  method: 'POST',
+                  uri: `${restUrl}/signupNewUser?key=${config.apiKey}`,
+                  headers: { 'Content-Type': 'application/json' },
+                  body: {
+                    email: results.email,
+                    password: results.lineUserID,
+                    returnSecureToken: true,
+                  },
+                  json: true,
+                }).then(result => ({
+                  uid: result.localId,
+                  ...results,
+                }));
+            }
+            throw err.error.error;
+          })
+          .then(result => {
+            const deleteDocTask = db
+              .collection('accounts')
+              .doc(uid)
+              .delete();
+            const deleteUserTask = admin
+              .auth()
+              .deleteUser(uid)
+              .catch(error => {
+                if (error.code === 'auth/user-not-found') {
+                  return;
+                }
+                throw error;
+              });
 
-						return Promise.all([deleteUserTask, deleteDocTask])
-							.then(() => ({
-								uid: result.uid,
-								...results,
-							}));
-					});
-			} else {
-				return {
-					uid,
-					...results,
-				};
-			}
-		})
-		.then(results => {
-			// Save the access token to the Firebase Realtime Database.
-			const email = results.email ? { email: results.email } : {};
-			const updateDocTask = db.collection('accounts')
-				.doc(results.uid)
-				.set({
-					...email,
-					accessToken: results.accessToken,
-					lineUserID: results.lineUserID,
-					line_photo: results.profilePic,
-				}, { merge: true });
+            return Promise.all([deleteUserTask, deleteDocTask]).then(() => ({
+              uid: result.uid,
+              ...results,
+            }));
+          });
+      } else {
+        return {
+          uid,
+          ...results,
+        };
+      }
+    })
+    .then(results => {
+      // Save the access token to the Firebase Realtime Database.
+      const email = results.email ? { email: results.email } : {};
+      const updateDocTask = db
+        .collection('accounts')
+        .doc(results.uid)
+        .set(
+          {
+            ...email,
+            accessToken: results.accessToken,
+            lineUserID: results.lineUserID,
+            line_photo: results.profilePic,
+          },
+          { merge: true },
+        );
 
-			// Create or update the user account.
-			const updateUserTask = admin.auth()
-				.updateUser(results.uid, {
-					displayName: results.userName,
-					photoURL: results.profilePic,
-					password: results.lineUserID,
-				})
-				.catch(error => {
-					// If user does not exists we create it.
-					if (error.code === 'auth/user-not-found') {
-						return admin.auth()
-							.createUser({
-								uid: results.uid,
-								displayName: results.userName,
-								photoURL: results.profilePic,
-							});
-					}
-					throw error;
-				});
+      // Create or update the user account.
+      const updateUserTask = admin
+        .auth()
+        .updateUser(results.uid, {
+          displayName: results.userName,
+          photoURL: results.profilePic,
+          password: results.lineUserID,
+        })
+        .catch(error => {
+          // If user does not exists we create it.
+          if (error.code === 'auth/user-not-found') {
+            return admin.auth().createUser({
+              uid: results.uid,
+              displayName: results.userName,
+              photoURL: results.profilePic,
+            });
+          }
+          throw error;
+        });
 
-			// Wait for all async task to complete then generate and return a custom auth token.
-			// Then create a Firebase custom auth token
-			return Promise.all([updateUserTask, updateDocTask])
-				.then(() => admin.auth().createCustomToken(results.uid));
-		})
-		.then(firebaseToken => {
-			// Serve an HTML page that signs the user in and updates the user profile.
-			if (req.cookies.from !== 'undefined') {
-				res.redirect(`${req.cookies.from}/${firebaseToken}`);
-			} else {
-				res.send(signInFirebaseTemplate(firebaseToken));
-			}
-		})
-		.catch(err => {
-			console.log(err)
-			res.status(500).send(err.message);
-		});
+      // Wait for all async task to complete then generate and return a custom auth token.
+      // Then create a Firebase custom auth token
+      return Promise.all([updateUserTask, updateDocTask]).then(() =>
+        admin.auth().createCustomToken(results.uid),
+      );
+    })
+    .then(firebaseToken => {
+      // Serve an HTML page that signs the user in and updates the user profile.
+      if (req.cookies.from !== 'undefined') {
+        res.redirect(`${req.cookies.from}/${firebaseToken}`);
+      } else {
+        res.send(signInFirebaseTemplate(firebaseToken));
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).send(err.message);
+    });
 });
 
 /**
  * Generates the HTML template that signs the user in Firebase using the given token and closes the popup.
  */
 function signInFirebaseTemplate(token) {
-	return `
+  return `
 		<script src="https://www.gstatic.com/firebasejs/4.8.1/firebase.js"></script>
 		<script>
 			var token = '${token}';

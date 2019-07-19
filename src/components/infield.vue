@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="outer-container">
     <div class="canvas">
       <div class="in-field">
         <div class="warning-track">
@@ -78,7 +78,7 @@
 <style lang="scss" scoped>
 $green: #6aa253;
 $orange: #e3ab78;
-.container {
+.outer-container {
   width: 300px;
   height: 180px;
   position: relative;
@@ -171,7 +171,7 @@ $orange: #e3ab78;
         position: absolute;
         z-index: 1;
         &:before {
-          content: "";
+          content: '';
           display: inline-block;
           width: 40%;
           height: 40%;
@@ -254,7 +254,7 @@ $orange: #e3ab78;
       }
     }
     &:before {
-      content: "";
+      content: '';
       display: inline-block;
       width: 2%;
       height: 100%;
@@ -263,7 +263,7 @@ $orange: #e3ab78;
       z-index: 1;
     }
     &:after {
-      content: "";
+      content: '';
       display: inline-block;
       width: 95%;
       height: 100%;
@@ -297,7 +297,7 @@ $orange: #e3ab78;
       left: 50%;
       transform: translateX(-50%);
       &:before {
-        content: "";
+        content: '';
         display: inline-block;
         width: 100%;
         height: 70%;
@@ -307,7 +307,7 @@ $orange: #e3ab78;
         left: 0;
       }
       &:after {
-        content: "";
+        content: '';
         display: inline-block;
         width: 70%;
         height: 70%;
@@ -327,7 +327,7 @@ $orange: #e3ab78;
       position: absolute;
       top: 12%;
       &:before {
-        content: "";
+        content: '';
         display: inline-block;
         width: 78%;
         height: 77%;

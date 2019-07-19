@@ -10,7 +10,7 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 .container {
 }
 
@@ -21,8 +21,8 @@
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import router from "../router";
+import { mapGetters, mapActions } from 'vuex';
+import router from '../router';
 
 export default {
   data() {
@@ -34,13 +34,13 @@ export default {
     back_() {
       router.back();
     },
-    edit_() {}
+    edit_() {},
   },
   computed: {
     ...mapGetters({
-      currentTeamIcon: "currentTeamIcon",
-      currentTeam: "currentTeam"
-    })
-  }
+      currentTeamIcon: 'currentTeamIcon',
+      currentTeam: 'currentTeam',
+    }),
+  },
 };
 </script>

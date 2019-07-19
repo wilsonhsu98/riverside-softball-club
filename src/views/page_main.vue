@@ -53,7 +53,7 @@
             </router-link>
           </li>
           <li class="logout_link">
-            <a @click="logout">{{ $t("logout_btn") }}</a>
+            <a @click="logout">{{ $t('logout_btn') }}</a>
           </li>
         </ul>
       </div>
@@ -64,7 +64,7 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
 $header_menu_height: 70px;
 $footer_menu_height: 50px;
@@ -242,14 +242,14 @@ header {
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import defaultIcon from "../images/icon.png";
+import { mapGetters, mapActions } from 'vuex';
+import defaultIcon from '../images/icon.png';
 
 export default {
   data() {
     return {
       isFetchGame: false,
-      defaultIcon
+      defaultIcon,
     };
   },
   created() {
@@ -259,28 +259,28 @@ export default {
   },
   methods: {
     ...mapActions({
-      initFromLS: "initFromLS",
-      fetchTable: "fetchTable",
-      fetchUser: "fetchUser",
-      fetchTeamIcon: "fetchTeamIcon",
-      fetchTeamRequests: "fetchTeamRequests",
-      logout: "logout"
+      initFromLS: 'initFromLS',
+      fetchTable: 'fetchTable',
+      fetchUser: 'fetchUser',
+      fetchTeamIcon: 'fetchTeamIcon',
+      fetchTeamRequests: 'fetchTeamRequests',
+      logout: 'logout',
     }),
     fetchGame() {
       if (!this.isFetchGame && this.$route.params.team) {
         this.fetchTable(this.$route.params.team);
         this.isFetchGame = true;
       }
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      loading: "loading",
-      currentTeam: "currentTeam",
-      role: "role",
-      currentTeamIcon: "currentTeamIcon",
-      teamRequests: "teamRequests"
-    })
+      loading: 'loading',
+      currentTeam: 'currentTeam',
+      role: 'role',
+      currentTeamIcon: 'currentTeamIcon',
+      teamRequests: 'teamRequests',
+    }),
   },
   watch: {
     $route() {
@@ -290,7 +290,7 @@ export default {
     currentTeam() {
       this.fetchTeamIcon(this.currentTeam);
       this.fetchTeamRequests(this.currentTeam);
-    }
-  }
+    },
+  },
 };
 </script>

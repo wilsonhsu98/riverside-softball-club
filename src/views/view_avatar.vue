@@ -1,86 +1,56 @@
 <template>
-  <div class="profile-container">
+  <div>
     <mobile-header :back="back_" :save="edit_" />
-    <h1>{{ $t("edit_avatar") }}</h1>
-    <div class="avatar-container">
-      <template
-        v-for="provider in ['google', 'facebook', 'line', 'github', 'custom']"
-      >
-        <span
-          :key="`avatar_${provider}`"
-          v-if="provider !== 'custom' && accountInfo[`${provider}_photo`]"
-          :class="provider"
-          @click="setCurrent(provider)"
+    <div class="container">
+      <h1>{{ $t('edit_avatar') }}</h1>
+      <div class="avatar-container">
+        <template
+          v-for="provider in ['google', 'facebook', 'line', 'github', 'custom']"
         >
-          <i v-if="provider === current" class="fa fa-check" />
-          <img :src="accountInfo[`${provider}_photo`]" />
-        </span>
-        <span
-          :key="`avatar_${provider}`"
-          v-if="
-            provider === 'custom' && (img || accountInfo[`${provider}_photo`])
-          "
-          :class="provider"
-          @click="setCurrent(provider)"
-        >
-          <i v-if="provider === current" class="fa fa-check" />
-          <img :src="img || accountInfo.custom_photo" />
-        </span>
-      </template>
-    </div>
-    <vue-avatar-editor
-      class="avatar-editor"
-      @finished="genImage"
-      :hasRadius="true"
-      :hasRotation="true"
-      :width="400"
-      :height="400"
-      :zoomText="$t('zoom')"
-      :finishText="$t('gen_img')"
-    />
-    <div class="button-container">
-      <button class="save-btn" @click="back_">{{ $t("btn_cancel") }}</button>
-      <button class="save-btn" @click="edit_">{{ $t("btn_update") }}</button>
+          <span
+            :key="`avatar_${provider}`"
+            v-if="provider !== 'custom' && accountInfo[`${provider}_photo`]"
+            :class="provider"
+            @click="setCurrent(provider)"
+          >
+            <i v-if="provider === current" class="fa fa-check" />
+            <img :src="accountInfo[`${provider}_photo`]" />
+          </span>
+          <span
+            :key="`avatar_${provider}`"
+            v-if="
+              provider === 'custom' && (img || accountInfo[`${provider}_photo`])
+            "
+            :class="provider"
+            @click="setCurrent(provider)"
+          >
+            <i v-if="provider === current" class="fa fa-check" />
+            <img :src="img || accountInfo.custom_photo" />
+          </span>
+        </template>
+      </div>
+      <vue-avatar-editor
+        class="avatar-editor"
+        @finished="genImage"
+        :hasRadius="true"
+        :hasRotation="true"
+        :width="400"
+        :height="400"
+        :zoomText="$t('zoom')"
+        :finishText="$t('gen_img')"
+      />
+      <div class="btn-container">
+        <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
+        <button class="btn" @click="edit_">{{ $t('btn_update') }}</button>
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 $max-width: 400px;
 
-.profile-container {
-  text-align: left;
-  background-color: #fff;
-  border-radius: 10px;
-  margin: 20px auto;
-  padding: 20px;
-  box-sizing: border-box;
-  position: relative;
-  min-height: 140px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  h1 {
-    font-size: 18px;
-    font-weight: normal;
-    margin: 0;
-    text-align: center;
-    text-decoration: underline;
-  }
-  .button-container {
-    padding: 10px 0;
-    text-align: center;
-    width: 100%;
-    position: sticky;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-  }
-  .save-btn {
-    background-color: $header_bgcolor;
-    padding: 10px 15px;
-    width: 100px;
-  }
-}
 .avatar-container {
   max-width: $max-width;
   width: 100%;
@@ -95,7 +65,7 @@ $max-width: 400px;
       margin-left: 3px;
     }
     &:not(.custom):before {
-      content: "";
+      content: '';
       display: inline-block;
       width: 20px;
       height: 20px;
@@ -214,17 +184,6 @@ $max-width: 400px;
 }
 
 @media only screen and (max-width: 760px) {
-  .profile-container {
-    margin: 50px 0 0;
-    background-color: #fff;
-    border-radius: 0;
-    box-shadow: none;
-    min-height: calc(100vh - 100px);
-    padding: 10px;
-    .save-btn {
-      display: none;
-    }
-  }
   .avatar-container {
     span {
       width: 17%;
@@ -248,18 +207,18 @@ $max-width: 400px;
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import router from "../router";
+import { mapGetters, mapActions } from 'vuex';
+import router from '../router';
 
 export default {
   data() {
     return {
       img: undefined,
-      current: undefined
+      current: undefined,
     };
   },
   created() {
-    ["google", "facebook", "line", "github", "custom"].some(provider => {
+    ['google', 'facebook', 'line', 'github', 'custom'].some(provider => {
       if (this.accountInfo[`${provider}_photo`] === this.accountInfo.photo) {
         this.current = provider;
         return true;
@@ -268,7 +227,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      editAvatar: "editAvatar"
+      editAvatar: 'editAvatar',
     }),
     setCurrent(provider) {
       this.current = provider;
@@ -285,17 +244,17 @@ export default {
       this.editAvatar({
         userId: this.userId,
         current: this.current,
-        custom: this.img || this.accountInfo.custom_photo || "",
-        accountInfo: this.accountInfo
+        custom: this.img || this.accountInfo.custom_photo || '',
+        accountInfo: this.accountInfo,
       });
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      accountInfo: "accountInfo",
-      currentTeamIcon: "currentTeamIcon",
-      userId: "userId"
-    })
-  }
+      accountInfo: 'accountInfo',
+      currentTeamIcon: 'currentTeamIcon',
+      userId: 'userId',
+    }),
+  },
 };
 </script>

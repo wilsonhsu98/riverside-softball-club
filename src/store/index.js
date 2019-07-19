@@ -1,13 +1,13 @@
-import Vue from "vue";
-import Vuex from "vuex";
+import Vue from 'vue';
+import Vuex from 'vuex';
 
 // root
-import { state, actions, mutations, getters } from "./root";
+import { state, actions, mutations, getters } from './root';
 // modules
-import importGame from "./modules/import";
-import record from "./modules/record";
-import team from "./modules/team";
-import user from "./modules/user";
+import importGame from './modules/import';
+import record from './modules/record';
+import team from './modules/team';
+import user from './modules/user';
 
 Vue.use(Vuex);
 
@@ -20,7 +20,7 @@ export default new Vuex.Store({
     import: importGame,
     record,
     team,
-    user
+    user,
   },
-  strict: true
+  strict: true,
 });

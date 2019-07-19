@@ -34,7 +34,7 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
 .parse-container {
   padding: 10px;
@@ -57,7 +57,7 @@
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   created() {
@@ -65,17 +65,17 @@ export default {
   },
   methods: {
     ...mapActions([
-      "fetchTwoOrigin",
-      "importData",
-      "importOneGame",
-      "toggleTodo"
-    ])
+      'fetchTwoOrigin',
+      'importData',
+      'importOneGame',
+      'toggleTodo',
+    ]),
   },
   computed: {
     ...mapGetters({
-      list: "getSourceList",
-      loading: "loading"
-    })
-  }
+      list: 'getSourceList',
+      loading: 'loading',
+    }),
+  },
 };
 </script>

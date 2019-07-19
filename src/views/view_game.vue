@@ -3,23 +3,23 @@
     <mobile-header :back="back_" :icon="currentTeamIcon" />
     <div class="gamebox-container">
       <div class="box-summary" v-if="boxSummary.league && boxSummary.group">
-        {{ `${boxSummary.league} ${$t("box_group", { g: boxSummary.group })}` }}
+        {{ `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}` }}
         <template v-if="boxSummary.year && boxSummary.season">
           {{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
         </template>
         <div>
           {{
             boxSummary.opponent
-              ? $t("box_opponent", { opponent: boxSummary.opponent })
-              : $t("box_forgot_opponent")
+              ? $t('box_opponent', { opponent: boxSummary.opponent })
+              : $t('box_forgot_opponent')
           }}
         </div>
         <div class="result" v-if="boxSummary.result">
           {{
-            $t("box_summary", {
+            $t('box_summary', {
               h: boxSummary.h,
               r: boxSummary.r,
-              result: $t(`box_${boxSummary.result}`)
+              result: $t(`box_${boxSummary.result}`),
             })
           }}
         </div>
@@ -32,7 +32,7 @@
         >
           <div class="player">
             <span class="order">{{
-              item.altOrder ? $t("PH") : item.order
+              item.altOrder ? $t('PH') : item.order
             }}</span>
             <span class="name">
               <span class="img" style="border-width: 1px">
@@ -48,7 +48,7 @@
             </span>
           </div>
           <div v-if="boxSummary.e" class="error">
-            {{ item.error > 0 ? `${item.error}E` : "" }}
+            {{ item.error > 0 ? `${item.error}E` : '' }}
           </div>
           <div class="records">
             <div class="records-flex">
@@ -68,8 +68,8 @@
                       params: {
                         team: $route.params.team,
                         game: $route.params.game,
-                        order: record.order || 'new'
-                      }
+                        order: record.order || 'new',
+                      },
                     }"
                     :class="
                       `content editable ${record.color} ${
@@ -81,7 +81,7 @@
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                   >
-                    {{ record.content === "new" ? "＋" : $t(record.content) }}
+                    {{ record.content === 'new' ? '＋' : $t(record.content) }}
                   </router-link>
                   <span
                     v-else
@@ -93,7 +93,7 @@
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                   >
-                    {{ record.content !== "new" ? $t(record.content) : "" }}
+                    {{ record.content !== 'new' ? $t(record.content) : '' }}
                   </span>
                 </div>
               </template>
@@ -106,14 +106,14 @@
     <div style="text-align: center; margin: 10px;">
       <button class="share-btn" @click="screenshot">
         <i class="fa fa-facebook-square"></i>
-        {{ $t("fb_share") }}
+        {{ $t('fb_share') }}
       </button>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
 .gamebox-container {
   text-align: left;
@@ -366,11 +366,11 @@
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import html2canvas from "html2canvas";
-import axios from "axios";
-import config from "../../config.json";
-import router from "../router";
+import { mapGetters, mapActions } from 'vuex';
+import html2canvas from 'html2canvas';
+import axios from 'axios';
+import config from '../../config.json';
+import router from '../router';
 
 export default {
   data() {
@@ -383,34 +383,34 @@ export default {
   beforeDestroy() {},
   methods: {
     ...mapActions({
-      setGame: "setGame",
-      toggleLoading: "toggleLoading"
+      setGame: 'setGame',
+      toggleLoading: 'toggleLoading',
     }),
     screenshot() {
       this.toggleLoading(true);
-      html2canvas(document.querySelector(".gamebox-container"), {
+      html2canvas(document.querySelector('.gamebox-container'), {
         useCORS: true,
-        logging: false
+        logging: false,
       })
         .then(canvas => {
           const formData = new FormData();
           formData.append(
-            "image",
-            canvas.toDataURL("image/jpeg", 1.0).split(",")[1]
+            'image',
+            canvas.toDataURL('image/jpeg', 1.0).split(',')[1],
           );
-          formData.append("album", config.imgur.albumShare);
+          formData.append('album', config.imgur.albumShare);
           return axios.post(config.imgur.postUrl, formData, {
             headers: {
-              Authorization: `Client-ID ${config.imgur.clientId}`
-            }
+              Authorization: `Client-ID ${config.imgur.clientId}`,
+            },
           });
         })
         .then(res => {
           this.toggleLoading(false);
           window.FB.ui({
-            method: "share",
+            method: 'share',
             href: res.data.data.link,
-            display: "popup"
+            display: 'popup',
           });
         })
         .catch(() => {
@@ -420,15 +420,15 @@ export default {
     back_() {
       // router.back();
       router.push(`/main/games/${this.$route.params.team}`);
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      box: "box",
-      boxSummary: "boxSummary",
-      currentTeamIcon: "currentTeamIcon",
-      role: "role"
-    })
-  }
+      box: 'box',
+      boxSummary: 'boxSummary',
+      currentTeamIcon: 'currentTeamIcon',
+      role: 'role',
+    }),
+  },
 };
 </script>

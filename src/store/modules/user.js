@@ -2,37 +2,37 @@ import {
   types as rootTypes,
   getters as rootGetters,
   state as rootState,
-  promiseImage
-} from "../root";
-import router from "../../router";
-import { db, timestamp } from "../../firebase";
+  promiseImage,
+} from '../root';
+import router from '../../router';
+import { db, timestamp } from '../../firebase';
 
 let snapShotAccount;
 let snapShotTeams;
 const snapShotRequest = {};
 
 const types = {
-  FETCH_TEAMS: "TEAM/FETCH_TEAMS",
-  SET_TEAM_REQUEST: "TEAM/SET_TEAM_REQUEST"
+  FETCH_TEAMS: 'TEAM/FETCH_TEAMS',
+  SET_TEAM_REQUEST: 'TEAM/SET_TEAM_REQUEST',
 };
 
 const state = {
-  teams: null // tricky to set null for the default condition
+  teams: null, // tricky to set null for the default condition
 };
 
 const getters = {
-  teams: state => state.teams
+  teams: state => state.teams,
 };
 
 const actions = {
   editAvatar({ commit }, data) {
     commit(rootTypes.LOADING, true);
-    const refPlayerDoc = db.collection("accounts").doc(data.userId);
+    const refPlayerDoc = db.collection('accounts').doc(data.userId);
 
-    promiseImage(data.custom, "avatar")
+    promiseImage(data.custom, 'avatar')
       .then(url => {
         let photo = undefined;
-        if (data.current === "custom") {
+        if (data.current === 'custom') {
           photo = url;
         } else {
           photo = data.accountInfo[`${data.current}_photo`];
@@ -41,29 +41,29 @@ const actions = {
           const batch = db.batch();
           batch.update(refPlayerDoc, {
             photo,
-            custom_photo: url
+            custom_photo: url,
           });
           refPlayerDoc
-            .collection("teams")
+            .collection('teams')
             .get()
             .then(querySnapshot => querySnapshot.docs.map(doc => doc.id))
             .then(docIds => {
               return Promise.all(
                 docIds.map(docId => {
                   return db
-                    .collection("teams")
+                    .collection('teams')
                     .doc(docId)
-                    .collection("players")
-                    .where("uid", "==", data.userId)
+                    .collection('players')
+                    .where('uid', '==', data.userId)
                     .get()
                     .then(querySnapshot => {
                       querySnapshot.forEach(doc => {
                         batch.update(doc.ref, {
-                          timestamp
+                          timestamp,
                         });
                       });
                     });
-                })
+                }),
               );
             })
             .then(() => {
@@ -73,7 +73,7 @@ const actions = {
       })
       .then(() => {
         commit(rootTypes.LOADING, false);
-        router.push("/main/user");
+        router.push('/main/user');
       })
       .catch(e => {
         console.log(e);
@@ -84,9 +84,9 @@ const actions = {
     if (userId) {
       let queryCount = 0;
       const realtimeCount = 1;
-      if (typeof snapShotAccount === "function") snapShotAccount();
+      if (typeof snapShotAccount === 'function') snapShotAccount();
       snapShotAccount = db
-        .collection("accounts")
+        .collection('accounts')
         .doc(userId)
         .onSnapshot(snapshot => {
           const data = snapshot.data();
@@ -96,7 +96,7 @@ const actions = {
             queryCount += 1;
             if (queryCount > realtimeCount) {
               // realtime
-              commit(rootTypes.LOADING, { text: "New data is coming" });
+              commit(rootTypes.LOADING, { text: 'New data is coming' });
               setTimeout(() => {
                 commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
                 commit(rootTypes.LOADING, false);
@@ -107,46 +107,46 @@ const actions = {
             }
           }
         });
-      if (typeof snapShotTeams === "function") snapShotTeams();
+      if (typeof snapShotTeams === 'function') snapShotTeams();
       snapShotTeams = db
-        .collection("accounts")
+        .collection('accounts')
         .doc(userId)
-        .collection("teams")
+        .collection('teams')
         .onSnapshot(snapshot => {
           if (snapshot.docs.length) {
             Promise.all(
               snapshot.docs.map(doc => {
                 return new Promise(resolve => {
-                  db.collection("teams")
+                  db.collection('teams')
                     .doc(doc.id)
                     .get()
                     .then(teamsDoc => {
                       resolve({
                         role: doc.data().role,
                         teamCode: doc.id,
-                        ...teamsDoc.data()
+                        ...teamsDoc.data(),
                       });
                     });
                 });
-              })
+              }),
             ).then(teams => {
               commit(
                 types.FETCH_TEAMS,
-                teams.sort((a, b) => b.name.localeCompare(a.name))
+                teams.sort((a, b) => b.name.localeCompare(a.name)),
               );
               commit(rootTypes.SET_AUTH, teams);
               teams.forEach(team => {
-                if (typeof snapShotRequest[team.teamCode] === "function")
+                if (typeof snapShotRequest[team.teamCode] === 'function')
                   snapShotRequest[team.teamCode]();
                 snapShotRequest[team.teamCode] = db
-                  .collection("requests")
-                  .where("teamCode", "==", team.teamCode)
+                  .collection('requests')
+                  .where('teamCode', '==', team.teamCode)
                   .onSnapshot(requestsCollection => {
                     commit(types.SET_TEAM_REQUEST, {
                       teamCode: team.teamCode,
                       requests: requestsCollection.docs
                         .map(doc => doc.data())
-                        .filter(status => status !== "denied").length
+                        .filter(status => status !== 'denied').length,
                     });
                   });
               });
@@ -159,9 +159,9 @@ const actions = {
     }
   },
   switchTeam({ commit, state }, teamCode) {
-    window.localStorage.setItem("currentTeam", teamCode);
+    window.localStorage.setItem('currentTeam', teamCode);
     commit(rootTypes.SET_AUTH, state.teams);
-  }
+  },
 };
 
 const mutations = {
@@ -174,12 +174,12 @@ const mutations = {
       find.requests = data.requests;
       state.teams = [...state.teams];
     }
-  }
+  },
 };
 export { types };
 export default {
   state,
   getters,
   actions,
-  mutations
+  mutations,
 };

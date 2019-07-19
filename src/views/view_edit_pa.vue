@@ -1,5 +1,5 @@
 <template>
-  <div class="gamelist-container">
+  <div class="container">
     <mobile-header :back="back_" :icon="currentTeamIcon" :save="edit_" />
     <!-- {{ pa }}
     <div>{{ pa.name }}</div>
@@ -7,13 +7,13 @@
     <div>{{ pa.content }}</div> -->
     <div class="left">
       <div class="desc">
-        <div><minus-plus-number :value="inn" /> {{ $t("desc_inn") }}</div>
-        <div>{{ $t("desc_order", { n: order }) }}</div>
-        <div>{{ $t("desc_out", { n: 3 }) }}</div>
+        <div><minus-plus-number :value="inn" /> {{ $t('desc_inn') }}</div>
+        <div>{{ $t('desc_order', { n: order }) }}</div>
+        <div>{{ $t('desc_out', { n: 3 }) }}</div>
         <div>
           {{
-            $t("desc_batting", {
-              n: order % box[box.length - 1].order || box[box.length - 1].order
+            $t('desc_batting', {
+              n: order % box[box.length - 1].order || box[box.length - 1].order,
             })
           }}
         </div>
@@ -33,7 +33,7 @@
               "
               @click="base[b].disabled || toggle(`base.${b}.run`)"
             >
-              {{ $t("R") }}
+              {{ $t('R') }}
             </span>
             <span class="name">
               {{ base[b].name }}
@@ -46,7 +46,7 @@
               "
               @click="base[b].disabled || toggle(`base.${b}.out`)"
             >
-              {{ $t("Out") }}
+              {{ $t('Out') }}
             </span>
           </div>
         </div>
@@ -69,7 +69,7 @@
             "
             @click="rbi.one.disabled || toggle('rbi.value', 1)"
           >
-            {{ $t("RBI_count", { rbi: 1 }) }}
+            {{ $t('RBI_count', { rbi: 1 }) }}
           </span>
         </div>
         <div>
@@ -89,7 +89,7 @@
             "
             @click="rbi.two.disabled || toggle('rbi.value', 2)"
           >
-            {{ $t("RBI_count", { rbi: 2 }) }}
+            {{ $t('RBI_count', { rbi: 2 }) }}
           </span>
         </div>
         <div>
@@ -110,7 +110,7 @@
             "
             @click="rbi.three.disabled || toggle('rbi.value', 3)"
           >
-            {{ $t("RBI_count", { rbi: 3 }) }}
+            {{ $t('RBI_count', { rbi: 3 }) }}
           </span>
         </div>
         <div>
@@ -131,7 +131,7 @@
             "
             @click="rbi.four.disabled || toggle('rbi.value', 4)"
           >
-            {{ $t("RBI_count", { rbi: 4 }) }}
+            {{ $t('RBI_count', { rbi: 4 }) }}
           </span>
         </div>
       </div>
@@ -144,24 +144,17 @@
         />
       </div>
     </div>
-    <div class="button-container">
-      <button class="save-btn" @click="back_">{{ $t("btn_cancel") }}</button>
-      <button class="save-btn" @click="edit_">{{ $t("btn_update") }}</button>
+    <div class="btn-container">
+      <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
+      <button class="btn" @click="edit_">{{ $t('btn_update') }}</button>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
-.gamelist-container {
-  background-color: #fff;
-  border-radius: 10px;
-  margin: 20px auto;
-  padding: 20px;
-  box-sizing: border-box;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+.container {
   text-align: center;
   display: flex;
   flex-wrap: wrap;
@@ -187,7 +180,6 @@
     }
   }
   .infield {
-    vertical-align: middle;
     display: block;
     margin-bottom: 20px;
     .player-container {
@@ -273,7 +265,6 @@
   .content {
     margin: 20px 0;
     display: block;
-    vertical-align: middle;
     width: 300px;
     div {
       display: flex;
@@ -336,30 +327,15 @@
     margin: 0;
     text-align: center;
   }
-  .button-container {
-    padding: 10px 0;
-    text-align: center;
-    width: 100%;
-    position: sticky;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-  }
-  .save-btn {
-    background-color: $header_bgcolor;
-    padding: 10px 15px;
-    width: 100px;
-  }
 }
 .left {
   margin-right: 20px;
 }
 @media only screen and (max-width: 760px) {
-  .gamelist-container {
-    border-radius: 0;
+  .container {
     margin: 50px 0 0;
     padding: 10px 0;
     background-color: transparent;
-    box-shadow: none;
     .content {
       span {
         font-size: 10px;
@@ -374,7 +350,7 @@
         }
       }
     }
-    .button-container {
+    .btn-container {
       display: none;
     }
   }
@@ -385,49 +361,49 @@
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import router from "../router";
+import { mapGetters, mapActions } from 'vuex';
+import router from '../router';
 
 export default {
   data() {
     return {
-      inn: "",
-      order: "",
+      inn: '',
+      order: '',
       base: {
         home: {
-          name: "",
+          name: '',
           run: false,
           out: false,
-          disabled: true
+          disabled: true,
         },
         first: {
-          name: "",
+          name: '',
           run: false,
           out: false,
-          disabled: true
+          disabled: true,
         },
         second: {
-          name: "",
+          name: '',
           run: false,
           out: false,
-          disabled: true
+          disabled: true,
         },
         third: {
-          name: "",
+          name: '',
           run: false,
           out: false,
-          disabled: true
-        }
+          disabled: true,
+        },
       },
-      content: "",
+      content: '',
       rbi: {
-        value: "",
+        value: '',
         one: { disabled: true },
         two: { disabled: true },
         three: { disabled: true },
-        four: { disabled: true }
+        four: { disabled: true },
       },
-      location: []
+      location: [],
     };
   },
   created() {
@@ -437,26 +413,26 @@ export default {
   },
   methods: {
     ...mapActions({
-      setGame: "setGame",
-      setOrder: "setOrder"
+      setGame: 'setGame',
+      setOrder: 'setOrder',
     }),
     toggle(path, value) {
       const setPath = (path, value) =>
         path
-          .split(".")
+          .split('.')
           .reduce(
-            (o, p) => (o[p] = path.split(".").pop() === p ? value : o[p] || {}),
-            this
+            (o, p) => (o[p] = path.split('.').pop() === p ? value : o[p] || {}),
+            this,
           );
       const tempValue = path
-        .split(".")
+        .split('.')
         .reduce((o, p) => (o ? o[p] : value), this);
 
-      if (typeof tempValue === "boolean") {
+      if (typeof tempValue === 'boolean') {
         setPath(path, !tempValue);
       } else {
         if (tempValue === value) {
-          setPath(path, "");
+          setPath(path, '');
         } else {
           setPath(path, value);
         }
@@ -465,7 +441,7 @@ export default {
     back_() {
       // router.back();
       router.push(
-        `/main/games/${this.$route.params.team}/${this.$route.params.game}`
+        `/main/games/${this.$route.params.team}/${this.$route.params.game}`,
       );
     },
     edit_() {
@@ -481,9 +457,9 @@ export default {
         this.inn = this.pa.inn || 1;
         this.order = this.pa.order;
         this.base.home.name = this.pa.name;
-        this.content = this.pa.content === "new" ? "" : this.pa.content;
+        this.content = this.pa.content === 'new' ? '' : this.pa.content;
         this.rbi.value = this.pa.rbi;
-        if (typeof this.pa.location === "object")
+        if (typeof this.pa.location === 'object')
           this.location = [].concat(this.pa.location);
       } else {
         const last = this.boxSummary.contents[
@@ -505,7 +481,7 @@ export default {
           this.base.home.name = estimate.name;
         }
       }
-    }
+    },
   },
   watch: {
     $route() {
@@ -528,15 +504,15 @@ export default {
         this.base.second.disabled = true;
         this.base.third.disabled = true;
       }
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      box: "box",
-      boxSummary: "boxSummary",
-      currentTeamIcon: "currentTeamIcon",
-      pa: "pa"
-    })
-  }
+      box: 'box',
+      boxSummary: 'boxSummary',
+      currentTeamIcon: 'currentTeamIcon',
+      pa: 'pa',
+    }),
+  },
 };
 </script>

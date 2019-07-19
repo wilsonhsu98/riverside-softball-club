@@ -46,49 +46,49 @@ canvas {
 </style>
 
 <script>
-import svgToImage from "svg-to-image";
+import svgToImage from 'svg-to-image';
 export default {
   props: {
     image: {
       type: String,
-      default: ""
+      default: '',
     },
     border: {
       type: Number,
-      default: 25
+      default: 25,
     },
     borderRadius: {
       type: Number,
-      default: 0
+      default: 0,
     },
     width: {
       type: Number,
-      default: 200
+      default: 200,
     },
     height: {
       type: Number,
-      default: 200
+      default: 200,
     },
     color: {
       type: Array,
-      default: () => [0, 0, 0, 0.5]
+      default: () => [0, 0, 0, 0.5],
     },
     scale: {
       type: Number,
-      default: 1
+      default: 1,
     },
     rotation: {
       type: Number,
-      default: 0
+      default: 0,
     },
     canMoveOutOfBound: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   data() {
     return {
-      cursor: "cursorPointer",
+      cursor: 'cursorPointer',
       canvas: null,
       context: null,
       dragged: false,
@@ -98,13 +98,13 @@ export default {
         drag: false,
         my: null,
         mx: null,
-        xxx: "ab",
+        xxx: 'ab',
         image: {
           x: 0,
           y: 0,
-          resource: null
-        }
-      }
+          resource: null,
+        },
+      },
     };
   },
   computed: {
@@ -116,12 +116,12 @@ export default {
     },
     rotationRadian() {
       return ((this.rotation % 360) * Math.PI) / 180;
-    }
+    },
   },
   mounted() {
     let self = this;
     this.canvas = this.$refs.avatarEditorCanvas;
-    this.context = this.canvas.getContext("2d");
+    this.context = this.canvas.getContext('2d');
     this.paint();
 
     if (!this.image) {
@@ -135,9 +135,9 @@ export default {
             x,
             y,
             self.canvasWidth / 3,
-            self.canvasHeight / 3
+            self.canvasHeight / 3,
           );
-        }
+        },
       );
     } else {
       this.loadImage(this.image);
@@ -156,7 +156,7 @@ export default {
           borderRadius,
           borderRadius,
           Math.PI,
-          Math.PI * 1.5
+          Math.PI * 1.5,
         );
         context.lineTo(widthMinusRad, 0);
         context.arc(
@@ -164,7 +164,7 @@ export default {
           borderRadius,
           borderRadius,
           Math.PI * 1.5,
-          Math.PI * 2
+          Math.PI * 2,
         );
         context.lineTo(width, heightMinusRad);
         context.arc(
@@ -172,7 +172,7 @@ export default {
           heightMinusRad,
           borderRadius,
           Math.PI * 2,
-          Math.PI * 0.5
+          Math.PI * 0.5,
         );
         context.lineTo(borderRadius, height);
         context.arc(
@@ -180,7 +180,7 @@ export default {
           heightMinusRad,
           borderRadius,
           Math.PI * 0.5,
-          Math.PI
+          Math.PI,
         );
         context.translate(-x, -y);
       }
@@ -190,12 +190,12 @@ export default {
       var max = Math.floor(10000);
 
       this.state = state1;
-      this.state.cnt = "HELLO" + Math.floor(Math.random() * (max - min)) + min;
+      this.state.cnt = 'HELLO' + Math.floor(Math.random() * (max - min)) + min;
     },
     paint() {
       this.context.save();
       this.context.translate(0, 0);
-      this.context.fillStyle = "rgba(" + this.color.slice(0, 4).join(",") + ")";
+      this.context.fillStyle = 'rgba(' + this.color.slice(0, 4).join(',') + ')';
 
       let borderRadius = this.borderRadius;
       const dimensions = this.getDimensions();
@@ -208,7 +208,7 @@ export default {
       borderRadius = Math.min(
         borderRadius,
         width / 2 - borderSize,
-        height / 2 - borderSize
+        height / 2 - borderSize,
       );
 
       this.context.beginPath();
@@ -220,11 +220,11 @@ export default {
         borderSize,
         width - borderSize * 2,
         height - borderSize * 2,
-        borderRadius
+        borderRadius,
       );
 
       this.context.rect(width, 0, -width, height); // outer rect, drawn "counterclockwise"
-      this.context.fill("evenodd");
+      this.context.fill('evenodd');
       this.context.restore();
     },
     getDimensions() {
@@ -234,8 +234,8 @@ export default {
         border: this.border,
         canvas: {
           width: this.width + this.border * 2,
-          height: this.height + this.border * 2
-        }
+          height: this.height + this.border * 2,
+        },
       };
     },
     onDrop(e) {
@@ -258,7 +258,7 @@ export default {
       this.state.drag = true;
       this.state.mx = null;
       this.state.my = null;
-      this.cursor = "cursorGrabbing";
+      this.cursor = 'cursorGrabbing';
       let eventSubject = document;
       let hasMoved = false;
       let handleMouseUp = event => {
@@ -266,24 +266,24 @@ export default {
         if (!hasMoved && event.targetTouches) {
           e.target.click();
         }
-        eventSubject.removeEventListener("mouseup", handleMouseUp);
-        eventSubject.removeEventListener("mousemove", handleMouseMove);
-        eventSubject.removeEventListener("touchend", handleMouseUp);
-        eventSubject.removeEventListener("touchmove", handleMouseMove);
+        eventSubject.removeEventListener('mouseup', handleMouseUp);
+        eventSubject.removeEventListener('mousemove', handleMouseMove);
+        eventSubject.removeEventListener('touchend', handleMouseUp);
+        eventSubject.removeEventListener('touchmove', handleMouseMove);
       };
       let handleMouseMove = event => {
         hasMoved = true;
         this.onMouseMove(event);
       };
-      eventSubject.addEventListener("mouseup", handleMouseUp);
-      eventSubject.addEventListener("mousemove", handleMouseMove);
-      eventSubject.addEventListener("touchend", handleMouseUp);
-      eventSubject.addEventListener("touchmove", handleMouseMove);
+      eventSubject.addEventListener('mouseup', handleMouseUp);
+      eventSubject.addEventListener('mousemove', handleMouseMove);
+      eventSubject.addEventListener('touchend', handleMouseUp);
+      eventSubject.addEventListener('touchmove', handleMouseMove);
     },
     onDragEnd() {
       if (this.state.drag) {
         this.state.drag = false;
-        this.cursor = "cursorPointer";
+        this.cursor = 'cursorPointer';
       }
     },
     onMouseMove(e) {
@@ -309,7 +309,7 @@ export default {
       const newState = {
         mx: mousePositionX,
         my: mousePositionY,
-        image: imageState
+        image: imageState,
       };
 
       if (this.state.mx && this.state.my) {
@@ -343,15 +343,15 @@ export default {
         self.state.image.width = imageState.width;
         self.state.image.height = imageState.height;
         self.state.drag = false;
-        self.$emit("vue-avatar-editor:image-ready", self.scale);
+        self.$emit('vue-avatar-editor:image-ready', self.scale);
         self.imageLoaded = true;
-        self.cursor = "cursorGrab";
+        self.cursor = 'cursorGrab';
       };
-      imageObj.onerror = err => console.log("error loading image: ", err);
+      imageObj.onerror = err => console.log('error loading image: ', err);
 
       // imageObj.onerror = this.props.onLoadFailure
       if (!this.isDataURL(imageURL)) {
-        imageObj.crossOrigin = "anonymous";
+        imageObj.crossOrigin = 'anonymous';
       }
 
       imageObj.src = imageURL;
@@ -374,7 +374,7 @@ export default {
 
       return {
         height: newHeight,
-        width: newWidth
+        width: newWidth,
       };
     },
     isDataURL(str) {
@@ -383,7 +383,7 @@ export default {
       }
       return !!str.match(
         // eslint-disable-next-line
-        /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+=[a-z\-]+)?)?(;base64)?,[a-z0-9!$&',()*+;=\-._~:@\/?%\s]*\s*$/i
+        /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+=[a-z\-]+)?)?(;base64)?,[a-z0-9!$&',()*+;=\-._~:@\/?%\s]*\s*$/i,
       );
     },
     getBoundedX(x, scale) {
@@ -412,7 +412,7 @@ export default {
       if (image.resource) {
         var position = this.calculatePosition(image, border);
         context.save();
-        context.globalCompositeOperation = "destination-over";
+        context.globalCompositeOperation = 'destination-over';
         let dimensions = this.getDimensions();
         if (border === 0) {
           context.translate(dimensions.width / 2, dimensions.height / 2);
@@ -421,12 +421,12 @@ export default {
         } else {
           context.translate(
             dimensions.canvas.width / 2,
-            dimensions.canvas.height / 2
+            dimensions.canvas.height / 2,
           );
           context.rotate(this.rotationRadian);
           context.translate(
             -dimensions.canvas.width / 2,
-            -dimensions.canvas.height / 2
+            -dimensions.canvas.height / 2,
           );
         }
         context.drawImage(
@@ -434,7 +434,7 @@ export default {
           position.x,
           position.y,
           position.width,
-          position.height
+          position.height,
         );
         context.restore();
       }
@@ -461,7 +461,7 @@ export default {
         x,
         y,
         height,
-        width
+        width,
       };
     },
     redraw() {
@@ -469,7 +469,7 @@ export default {
         0,
         0,
         this.getDimensions().canvas.width,
-        this.getDimensions().canvas.height
+        this.getDimensions().canvas.height,
       );
       this.paint();
       this.paintImage(this.context, this.state.image, this.border);
@@ -486,14 +486,14 @@ export default {
         cropRect.height *= image.resource.height;
 
         // create a canvas with the correct dimensions
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement('canvas');
         canvas.width = cropRect.width;
         canvas.height = cropRect.height;
 
         // draw the full-size image at the correct position,
         // the image gets truncated to the size of the canvas.
         canvas
-          .getContext("2d")
+          .getContext('2d')
           .drawImage(image.resource, -cropRect.x, -cropRect.y);
 
         return canvas;
@@ -503,12 +503,12 @@ export default {
       if (this.state.image.resource) {
         const { width, height } = this.getDimensions();
 
-        const canvas = document.createElement("canvas");
+        const canvas = document.createElement('canvas');
         canvas.width = width;
         canvas.height = height;
 
         // don't paint a border here, as it is the resulting image
-        this.paintImage(canvas.getContext("2d"), this.state.image, 0);
+        this.paintImage(canvas.getContext('2d'), this.state.image, 0);
 
         return canvas;
       }
@@ -522,7 +522,7 @@ export default {
         x: dim.border,
         y: dim.border,
         width: dim.width,
-        height: dim.height
+        height: dim.height,
       };
       const imageRect = this.calculatePosition(this.state.image, dim.border);
 
@@ -530,7 +530,7 @@ export default {
         x: (frameRect.x - imageRect.x) / imageRect.width,
         y: (frameRect.y - imageRect.y) / imageRect.height,
         width: frameRect.width / imageRect.width,
-        height: frameRect.height / imageRect.height
+        height: frameRect.height / imageRect.height,
       };
     },
     clicked() {
@@ -553,7 +553,7 @@ export default {
       this.changed = true;
       reader.onload = e => this.loadImage(e.target.result);
       reader.readAsDataURL(files[0]);
-    }
+    },
   },
   watch: {
     state: {
@@ -562,7 +562,7 @@ export default {
           this.redraw();
         }
       },
-      deep: true
+      deep: true,
     },
     scale() {
       if (this.imageLoaded) {
@@ -578,7 +578,7 @@ export default {
     },
     borderRadius() {
       this.redraw();
-    }
-  }
+    },
+  },
 };
 </script>

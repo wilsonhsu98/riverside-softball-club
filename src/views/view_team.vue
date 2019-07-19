@@ -6,7 +6,7 @@
       :save="editTeam_"
     />
     <div class="container">
-      <h1>{{ $route.params.team ? $t("manage_team") : $t("create_team") }}</h1>
+      <h1>{{ $route.params.team ? $t('manage_team') : $t('create_team') }}</h1>
 
       <div
         class="request"
@@ -14,15 +14,15 @@
         v-for="request in teamRequests"
       >
         <img :src="request.photo" />
-        <p>{{ $t("msg_request_join", { team: request.teamName }) }}</p>
+        <p>{{ $t('msg_request_join', { team: request.teamName }) }}</p>
         <p class="request-msg">{{ request.msg }}</p>
         <p>{{ new Date(request.timestamp).toLocaleString() }}</p>
         <div class="request-btn-container">
           <button @click="acceptRequest_(request.id)">
-            {{ $t("btn_accept") }}
+            {{ $t('btn_accept') }}
           </button>
           <button @click="deniedRequest_(request.id)">
-            {{ $t("btn_denied") }}
+            {{ $t('btn_denied') }}
           </button>
         </div>
       </div>
@@ -84,7 +84,7 @@
       </div>
 
       <h2 class="player-header">
-        {{ $t("ttl_player_list") }}
+        {{ $t('ttl_player_list') }}
         <i
           class="fa fa-info-circle"
           v-if="$route.params.team"
@@ -121,14 +121,14 @@
               v-model="player.manager"
               @change="releaseSelfManager($event, player)"
             />
-            {{ $t("manager") }}
+            {{ $t('manager') }}
           </label>
           <img
             v-if="player && player.uid && player.photo"
             :src="player.photo"
             class="binded"
           />
-          <span v-if="player && player.uid">{{ $t("binded") }}</span>
+          <span v-if="player && player.uid">{{ $t('binded') }}</span>
           <i
             v-if="player.uid !== userId"
             class="fa fa-minus-circle"
@@ -160,14 +160,14 @@
               :checked="player.self"
               @change="rdoBindSelf(i)"
             />
-            {{ $t("bind_self") }}
+            {{ $t('bind_self') }}
           </label>
           <i class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
         </template>
       </div>
 
       <h2 class="player-header" v-if="$route.params.team && benches.length">
-        {{ $t("ttl_bench_list") }}
+        {{ $t('ttl_bench_list') }}
         <i
           class="fa fa-info-circle"
           v-tooltip="{ content: $t('tip_bench'), classes: ['info'] }"
@@ -214,12 +214,12 @@
 
       <div v-if="players_err" class="error" v-html="players_err"></div>
 
-      <div class="button-container">
-        <button v-if="!$route.params.team" class="save-btn" @click="back_">
-          {{ $t("btn_cancel") }}
+      <div class="btn-container">
+        <button v-if="!$route.params.team" class="btn" @click="back_">
+          {{ $t('btn_cancel') }}
         </button>
-        <button class="save-btn" @click="editTeam_">
-          {{ $route.params.team ? $t("btn_update") : $t("btn_insert") }}
+        <button class="btn" @click="editTeam_">
+          {{ $route.params.team ? $t('btn_update') : $t('btn_insert') }}
         </button>
       </div>
     </div>
@@ -227,25 +227,10 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 $max-width: 400px;
 
 .container {
-  background-color: #fff;
-  border-radius: 10px;
-  margin: 20px 0;
-  padding: 10px 20px;
-  box-sizing: border-box;
-  position: relative;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  h1 {
-    font-size: 18px;
-    font-weight: normal;
-    margin: 0;
-    text-align: center;
-    text-decoration: underline;
-  }
   .request {
     color: #fff;
     box-sizing: border-box;
@@ -281,7 +266,7 @@ $max-width: 400px;
       position: relative;
       padding-left: 16px;
       &:before {
-        content: "-";
+        content: '-';
         position: absolute;
         top: 2px;
         left: 3px;
@@ -350,7 +335,8 @@ $max-width: 400px;
       border-radius: 4px;
       box-sizing: border-box;
       font-size: 12px;
-      line-height: 32px;
+      line-height: 14px;
+      height: 32px;
       display: inline-block;
       margin: 0;
       padding: 0 8px;
@@ -380,19 +366,6 @@ $max-width: 400px;
     font-size: 12px;
     box-sizing: border-box;
     color: $error_color;
-  }
-  .button-container {
-    padding: 10px 0;
-    text-align: center;
-    width: 100%;
-    position: sticky;
-    bottom: 0;
-    background-color: rgba(255, 255, 255, 0.8);
-  }
-  .save-btn {
-    background-color: $header_bgcolor;
-    padding: 10px 15px;
-    width: 100px;
   }
 }
 .icon-container {
@@ -501,16 +474,6 @@ $max-width: 400px;
 }
 
 @media only screen and (max-width: 760px) {
-  .container {
-    margin: 0;
-    background-color: #fff;
-    border-radius: 0;
-    box-shadow: none;
-    min-height: calc(100vh - 100px);
-    .save-btn {
-      display: none;
-    }
-  }
   .icon-container {
     width: 200px;
     height: 200px;
@@ -539,25 +502,25 @@ $max-width: 400px;
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import router from "../router";
-import transparentPng from "../images/transparent.png";
+import { mapGetters, mapActions } from 'vuex';
+import router from '../router';
+import transparentPng from '../images/transparent.png';
 
 export default {
   data() {
     return {
-      teamCode: "",
-      teamCode_err: "",
-      teamName: "",
-      teamName_err: "",
-      teamIntro: "",
-      otherNames: "",
+      teamCode: '',
+      teamCode_err: '',
+      teamName: '',
+      teamName_err: '',
+      teamIntro: '',
+      otherNames: '',
       players: [{}],
       benches: [],
-      players_err: "",
-      icon: "",
+      players_err: '',
+      icon: '',
       iconEdit: false,
-      transparentPng
+      transparentPng,
     };
   },
   created() {
@@ -569,9 +532,9 @@ export default {
   beforeDestroy() {},
   methods: {
     ...mapActions({
-      editTeam: "editTeam",
-      fetchTeamInfo: "fetchTeamInfo",
-      handleRequest: "handleRequest"
+      editTeam: 'editTeam',
+      fetchTeamInfo: 'fetchTeamInfo',
+      handleRequest: 'handleRequest',
     }),
     validate() {
       let returnVal = true;
@@ -579,79 +542,79 @@ export default {
       this.players = this.players
         .map(item => {
           return {
-            name: item.name || "",
+            name: item.name || '',
             number: item.number,
             manager: item.manager || false,
             self: item.self || false,
-            uid: item.uid || "",
-            photo: item.photo || ""
+            uid: item.uid || '',
+            photo: item.photo || '',
           };
         })
-        .filter(v => v.name.trim() !== "");
+        .filter(v => v.name.trim() !== '');
 
-      this.teamCode_err = "";
+      this.teamCode_err = '';
       if (!this.teamCode) {
-        this.teamCode_err = this.$t("required");
+        this.teamCode_err = this.$t('required');
         returnVal = false;
       }
 
-      this.teamName_err = "";
+      this.teamName_err = '';
       if (!this.teamName) {
-        this.teamName_err = this.$t("required");
+        this.teamName_err = this.$t('required');
         returnVal = false;
       }
 
-      this.players_err = "";
+      this.players_err = '';
       const players_err = [];
 
       if (this.players.length === 0) {
         this.players = [{}];
-        players_err.push(this.$t("msg_atleastone"));
+        players_err.push(this.$t('msg_atleastone'));
       }
 
       if (!this.players.find(item => item.self) && !this.$route.params.team) {
-        players_err.push(this.$t("msg_bind_self"));
+        players_err.push(this.$t('msg_bind_self'));
       }
 
       if (!this.players.find(item => item.manager) && this.$route.params.team) {
-        players_err.push(this.$t("msg_atleastone_manager"));
+        players_err.push(this.$t('msg_atleastone_manager'));
       }
 
       if (
         this.players.filter(
-          (v, i, self) => self.map(item => item.name).indexOf(v.name) !== i
+          (v, i, self) => self.map(item => item.name).indexOf(v.name) !== i,
         ).length
       ) {
-        players_err.push(this.$t("msg_duplicate_name"));
+        players_err.push(this.$t('msg_duplicate_name'));
       }
 
       if (
         this.players.filter(
           (v, i, self) =>
-            v.number && self.map(item => item.number).indexOf(v.number) !== i
+            v.number && self.map(item => item.number).indexOf(v.number) !== i,
         ).length
       ) {
-        players_err.push(this.$t("msg_duplicate_number"));
+        players_err.push(this.$t('msg_duplicate_number'));
       }
 
       if (
         this.benches.filter(
-          v => this.players.map(item => item.name).indexOf(v.name) > -1
+          v => this.players.map(item => item.name).indexOf(v.name) > -1,
         ).length
       ) {
-        players_err.push(this.$t("msg_duplicate_name"));
+        players_err.push(this.$t('msg_duplicate_name'));
       }
 
       if (
         this.benches.filter(
-          v => this.players.map(item => item.number).indexOf(v.number) > -1
+          v => this.players.map(item => item.number).indexOf(v.number) > -1,
         ).length
       ) {
-        players_err.push(this.$t("msg_duplicate_number"));
+        players_err.push(this.$t('msg_duplicate_number'));
       }
 
       if (players_err.length) {
-        this.players_err = players_err.join("<br>");
+        this.players_err = players_err.join('<br>');
         returnVal = false;
       }
 
@@ -670,7 +633,7 @@ export default {
           players: this.players,
           benches: this.benches,
           icon: this.icon,
-          isNew: !this.$route.params.team
+          isNew: !this.$route.params.team,
         });
       }
     },
@@ -689,7 +652,7 @@ export default {
     },
     releaseSelfManager($event, player) {
       if ($event.target.checked === false && player.uid === this.userId) {
-        alert(this.$t("msg_self_release"));
+        alert(this.$t('msg_self_release'));
       }
     },
     genImage(img) {
@@ -701,30 +664,30 @@ export default {
     acceptRequest_(requestId) {
       this.handleRequest({
         requestId,
-        action: "accept"
+        action: 'accept',
       });
     },
     deniedRequest_(requestId) {
       this.handleRequest({
         requestId,
-        action: "denied"
+        action: 'denied',
       });
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      userId: "userId",
-      teamInfo: "teamInfo",
-      currentTeamIcon: "currentTeamIcon",
-      teamRequests: "teamRequests"
-    })
+      userId: 'userId',
+      teamInfo: 'teamInfo',
+      currentTeamIcon: 'currentTeamIcon',
+      teamRequests: 'teamRequests',
+    }),
   },
   watch: {
     $route() {
       if (this.$route.params.team) {
-        this.teamCode_err = "";
-        this.teamName_err = "";
-        this.players_err = "";
+        this.teamCode_err = '';
+        this.teamName_err = '';
+        this.players_err = '';
         this.fetchTeamInfo(this.$route.params.team);
       }
     },
@@ -741,7 +704,7 @@ export default {
         find.self = true;
       }
       this.benches = JSON.parse(JSON.stringify(this.teamInfo.benches));
-    }
-  }
+    },
+  },
 };
 </script>

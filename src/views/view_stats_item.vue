@@ -12,7 +12,7 @@
       />
       <div class="condition__container">
         <div class="condition">
-          <div class="condition__label">{{ $t("col_period") }}</div>
+          <div class="condition__label">{{ $t('col_period') }}</div>
           <div class="condition__element">
             <div class="selectdiv">
               <select
@@ -26,7 +26,7 @@
                   :key="`period_${i}`"
                   >{{
                     `${
-                      item.period === "period_all"
+                      item.period === 'period_all'
                         ? $t(item.period)
                         : item.period
                     }`
@@ -37,7 +37,7 @@
           </div>
           <template v-if="lastUpdate">
             <br />
-            <div class="condition__label date">{{ $t("col_update") }}</div>
+            <div class="condition__label date">{{ $t('col_update') }}</div>
             <div
               class="condition__element date"
               :data-long="`${$t('col_update')} `"
@@ -83,7 +83,7 @@
           {{
             $t(`${key}_note`, {
               g: periodGames.length,
-              pa: parseInt(periodGames.length * 1.6, 10)
+              pa: parseInt(periodGames.length * 1.6, 10),
             })
           }}
         </div>
@@ -93,7 +93,7 @@
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
 .condition {
   background-color: #fff;
@@ -140,6 +140,7 @@ i.fa {
   margin: 0 -10px;
   .item-container__table {
     flex: 1;
+    min-height: 200px;
     margin: 0 10px;
     background-color: #fff;
     display: flex;
@@ -320,6 +321,7 @@ i.fa {
       margin: 10px 0;
       flex: 0 1 48%;
       flex: 0 1 calc(50vw - 10px);
+      min-height: calc(var(--vh, 1vh) * 50 - 80px);
       border-radius: 0;
     }
   }
@@ -355,19 +357,19 @@ i.fa {
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
-import router from "../router";
-import defaultIcon from "../images/icon.png";
+import { mapGetters, mapActions } from 'vuex';
+import router from '../router';
+import defaultIcon from '../images/icon.png';
 const clickEvent = (() => {
-  if ("ontouchstart" in document.documentElement === true) return "touchstart";
-  else return "click";
+  if ('ontouchstart' in document.documentElement === true) return 'touchstart';
+  else return 'click';
 })();
 
 export default {
   data() {
     return {
       toggleSearch: false,
-      defaultIcon
+      defaultIcon,
     };
   },
   created() {},
@@ -378,11 +380,11 @@ export default {
     document.removeEventListener(clickEvent, this.collapseSearch);
   },
   methods: {
-    ...mapActions(["setPeriod", "setSortBy", "setUnlimitedPA"]),
+    ...mapActions(['setPeriod', 'setSortBy', 'setUnlimitedPA']),
     collapseSearch(event) {
       if (
         this.toggleSearch &&
-        !this.$refs["searchBar"].contains(event.target)
+        !this.$refs['searchBar'].contains(event.target)
       ) {
         this.toggleSearch = false;
         event.preventDefault();
@@ -396,17 +398,17 @@ export default {
       this.setSortBy(key);
       this.setUnlimitedPA(true);
       router.push(`/main/stats_pa/${this.$route.params.team}`);
-    }
+    },
   },
   computed: {
     ...mapGetters({
-      period: "period",
-      periodSelect: "periodSelect",
-      periodGames: "periodGames",
-      lastUpdate: "lastUpdate",
-      itemStats: "itemStats",
-      currentTeamIcon: "currentTeamIcon"
-    })
-  }
+      period: 'period',
+      periodSelect: 'periodSelect',
+      periodGames: 'periodGames',
+      lastUpdate: 'lastUpdate',
+      itemStats: 'itemStats',
+      currentTeamIcon: 'currentTeamIcon',
+    }),
+  },
 };
 </script>

@@ -1,8 +1,5 @@
 <template>
-  <div
-    style="display: inline-block;"
-    :class="`container ${disabled ? 'disabled' : ''}`"
-  >
+  <div class="wrapper" :class="disabled && 'disabled'">
     <div class="dec button" @click="minus"></div>
     <input
       type="number"
@@ -17,9 +14,10 @@
 </template>
 
 <style lang="scss" scoped>
-.container {
+.wrapper {
   position: relative;
   z-index: 0;
+  display: inline-block;
 }
 .disabled {
   .input,
@@ -52,7 +50,7 @@
   vertical-align: top;
   &:before,
   &:after {
-    content: "";
+    content: '';
     position: absolute;
     background-color: rgb(166, 166, 166);
   }
@@ -94,10 +92,10 @@
 
 <script>
 export default {
-  props: ["value", "disabled"],
+  props: ['value', 'disabled'],
   data() {
     return {
-      val: this.value
+      val: this.value,
     };
   },
   methods: {
@@ -110,7 +108,7 @@ export default {
       if (!this.disabled) {
         this.val -= this.val > 1 ? 1 : 0;
       }
-    }
+    },
   },
   computed: {
     num: {
@@ -119,16 +117,16 @@ export default {
       },
       set: function(newValue) {
         this.val = newValue || 1;
-      }
-    }
+      },
+    },
   },
   watch: {
     val() {
-      this.$emit("change", this.val);
+      this.$emit('change', this.val);
     },
     value() {
       this.val = this.value;
-    }
-  }
+    },
+  },
 };
 </script>

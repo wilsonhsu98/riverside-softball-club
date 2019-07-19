@@ -1,51 +1,49 @@
 <template>
-  <div class="gamelist-container" :class="{ 'empty': role === 'manager' && gameList.length === 0 }">
+  <div>
     <mobile-header :icon="currentTeamIcon" />
-    <template v-for="item in gameList">
-      <div class="row" :data-date="item.date" :key="`date_${item.date}`">
-        <template v-for="sub in item.games">
-          <div class="item" :key="`game_${sub.game}`">
-            <router-link
-              :to="{
-                name: 'game',
-                params: { team: $route.params.team, game: sub.game }
-              }"
-              :class="`result ${sub.result} ${sub.group}`"
-            >
-              {{ (sub.result && sub.result.substr(0, 1)) || "?" }}
-            </router-link>
-            <div class="name">{{ sub.opponent || sub.game }}</div>
-          </div>
-          <!-- <div class="item" v-else>
-            <div :class="`result ${sub.result} ${sub.group} ${sub.hasOrder ? '' : 'no-order'}`">
-              {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+    <div
+      class="container"
+      :class="{ empty: role === 'manager' && gameList.length === 0 }"
+    >
+      <template v-for="item in gameList">
+        <div class="row" :data-date="item.date" :key="`date_${item.date}`">
+          <template v-for="sub in item.games">
+            <div class="item" :key="`game_${sub.game}`">
+              <router-link
+                :to="{
+                  name: 'game',
+                  params: { team: $route.params.team, game: sub.game },
+                }"
+                :class="`result ${sub.result} ${sub.group}`"
+              >
+                {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+              </router-link>
+              <div class="name">{{ sub.opponent || sub.game }}</div>
             </div>
-            <div class="name">{{ sub.opponent || sub.game }}</div>
-          </div> -->
-        </template>
+            <!-- <div class="item" v-else>
+              <div :class="`result ${sub.result} ${sub.group} ${sub.hasOrder ? '' : 'no-order'}`">
+                {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+              </div>
+              <div class="name">{{ sub.opponent || sub.game }}</div>
+            </div> -->
+          </template>
+        </div>
+      </template>
+      <div class="button-container" v-if="role === 'manager'">
+        <router-link
+          :to="{ name: 'new_game', params: { team: $route.params.team } }"
+          tag="span"
+          >＋</router-link
+        >
       </div>
-    </template>
-    <div class="button-container" v-if="role === 'manager'">
-      <router-link
-        :to="{ name: 'new_game', params: { team: $route.params.team } }"
-        tag="span"
-        >＋</router-link
-      >
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-@import "../scss/variable";
+@import '../scss/variable';
 
-.gamelist-container {
-  background-color: #fff;
-  border-radius: 10px;
-  margin: 20px auto;
-  padding: 20px;
-  box-sizing: border-box;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+.container {
   .row {
     padding-bottom: 20px;
     display: flex;
@@ -105,10 +103,12 @@
   }
   .button-container {
     margin-top: -50px;
+    padding: 0;
     text-align: right;
     width: 100%;
     position: sticky;
     bottom: 20px;
+    background: none;
     span {
       display: inline-block;
       width: 50px;
@@ -123,7 +123,8 @@
       outline: none;
       text-align: center;
       cursor: pointer;
-      box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+        0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
     }
   }
   &.empty {
@@ -131,12 +132,9 @@
   }
 }
 @media only screen and (max-width: 760px) {
-  .gamelist-container {
-    border-radius: 0;
-    margin: 50px 0 0;
+  .container {
     padding: 10px 0 0;
     background-color: transparent;
-    box-shadow: none;
     .row .item .result,
     .row:after {
       color: #fff;
@@ -149,7 +147,8 @@
       }
     }
     &.empty {
-      height: calc(100vh - 50px);
+      height: calc(100vh - 100px);
+      height: calc(var(--vh, 1vh) * 100 - 100px);
       margin: 0;
       padding: 0;
       position: relative;
@@ -163,7 +162,7 @@
 </style>
 
 <script>
-import { mapGetters, mapActions } from "vuex";
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
   data() {
@@ -171,14 +170,14 @@ export default {
   },
   created() {},
   methods: {
-    ...mapActions({})
+    ...mapActions({}),
   },
   computed: {
     ...mapGetters({
-      gameList: "gameList",
-      currentTeamIcon: "currentTeamIcon",
-      role: "role"
-    })
-  }
+      gameList: 'gameList',
+      currentTeamIcon: 'currentTeamIcon',
+      role: 'role',
+    }),
+  },
 };
 </script>
