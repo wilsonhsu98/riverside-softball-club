@@ -31,12 +31,11 @@ const actions = {
 
     promiseImage(data.custom, 'avatar')
       .then(url => {
-        let photo = undefined;
-        if (data.current === 'custom') {
-          photo = url;
-        } else {
-          photo = data.accountInfo[`${data.current}_photo`];
-        }
+        const photo =
+          data.current === 'custom'
+            ? url
+            : data.accountInfo[`${data.current}_photo`];
+
         return new Promise(resolve => {
           const batch = db.batch();
           batch.update(refPlayerDoc, {

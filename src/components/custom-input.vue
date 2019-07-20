@@ -276,12 +276,8 @@ export default {
       this.$emit('input', newVal);
     },
     keyup(val) {
-      let newVal = val;
-
-      if (this.limit === 'en-only') {
-        newVal = val.replace(/[^a-zA-Z]/g, '');
-      }
-
+      const newVal =
+        this.limit === 'en-only' ? val.replace(/[^a-zA-Z]/g, '') : val;
       this.$emit('input', newVal);
     },
     input(val) {

@@ -537,8 +537,6 @@ export default {
       handleRequest: 'handleRequest',
     }),
     validate() {
-      let returnVal = true;
-
       this.players = this.players
         .map(item => {
           return {
@@ -555,13 +553,11 @@ export default {
       this.teamCode_err = '';
       if (!this.teamCode) {
         this.teamCode_err = this.$t('required');
-        returnVal = false;
       }
 
       this.teamName_err = '';
       if (!this.teamName) {
         this.teamName_err = this.$t('required');
-        returnVal = false;
       }
 
       this.players_err = '';
@@ -615,10 +611,11 @@ export default {
 
       if (players_err.length) {
         this.players_err = players_err.join('<br>');
-        returnVal = false;
       }
 
-      return returnVal;
+      return ![this.teamCode_err, this.teamName_err, this.players_err].some(
+        str => !!str,
+      );
     },
     back_() {
       router.back();

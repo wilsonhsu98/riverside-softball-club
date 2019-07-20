@@ -420,50 +420,51 @@ export default {
         ((event.pageY - top - window.scrollY) / height) * 100,
         10,
       );
-      let location = '';
-      // console.log(`(${x}, ${y})`);
-      if (y - x <= 38 && y + x <= 138) {
-        if (Math.pow(x - 50, 2) + Math.pow(y - 66, 2) <= Math.pow(21, 2)) {
-          if (
-            y - (x * 4) / 7 >= 56 - (32 * 4) / 7 &&
-            y + (x * 7) / 3 <= 64 + (46 * 7) / 3
-          ) {
-            location = '3B';
+      const location = ((x, y) => {
+        // console.log(`(${x}, ${y})`);
+        if (y - x <= 38 && y + x <= 138) {
+          if (Math.pow(x - 50, 2) + Math.pow(y - 66, 2) <= Math.pow(21, 2)) {
+            if (
+              y - (x * 4) / 7 >= 56 - (32 * 4) / 7 &&
+              y + (x * 7) / 3 <= 64 + (46 * 7) / 3
+            ) {
+              return '3B';
+            } else if (
+              y + (x * 4) / 7 >= 56 + (68 * 4) / 7 &&
+              y - (x * 7) / 3 <= 64 - (54 * 7) / 3
+            ) {
+              return '1B';
+            } else if (x <= 50 && y <= 64) {
+              return 'ss';
+            } else if (x > 50 && y <= 64) {
+              return '2B';
+            } else {
+              return 'P';
+            }
           } else if (
-            y + (x * 4) / 7 >= 56 + (68 * 4) / 7 &&
-            y - (x * 7) / 3 <= 64 - (54 * 7) / 3
+            Math.pow(x - 50, 2) + Math.pow(y - 66, 2) <
+            Math.pow(58.5, 2)
           ) {
-            location = '1B';
-          } else if (x <= 50 && y <= 64) {
-            location = 'ss';
-          } else if (x > 50 && y <= 64) {
-            location = '2B';
+            if (y - (x * 7) / 2 >= -87) {
+              return '左';
+            } else if (y + (x * 7) / 2 >= 263) {
+              return '右';
+            } else {
+              return '中';
+            }
           } else {
-            location = 'P';
-          }
-        } else if (
-          Math.pow(x - 50, 2) + Math.pow(y - 66, 2) <
-          Math.pow(58.5, 2)
-        ) {
-          if (y - (x * 7) / 2 >= -87) {
-            location = '左';
-          } else if (y + (x * 7) / 2 >= 263) {
-            location = '右';
-          } else {
-            location = '中';
+            if (y - (x * 7) / 2 >= -87) {
+              return '左hr';
+            } else if (y + (x * 7) / 2 >= 263) {
+              return '右hr';
+            } else {
+              return '中hr';
+            }
           }
         } else {
-          if (y - (x * 7) / 2 >= -87) {
-            location = '左hr';
-          } else if (y + (x * 7) / 2 >= 263) {
-            location = '右hr';
-          } else {
-            location = '中hr';
-          }
+          return '界外';
         }
-      } else {
-        location = '界外';
-      }
+      })(x, y);
       this.xy = [
         {
           x,

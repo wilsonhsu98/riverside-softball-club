@@ -77,12 +77,7 @@ const actions = {
             { merge: true },
           );
           data.players.forEach(item => {
-            let obj = {
-              number: item.number,
-              manager: item.manager,
-            };
             if (item.uid) {
-              obj = { ...obj, uid: item.uid };
               batch.set(
                 db
                   .collection('accounts')
@@ -103,11 +98,22 @@ const actions = {
                 { teams: fieldValue.arrayUnion(data.code) },
                 { merge: true },
               );
-              obj = { ...obj, uid: playerDoc.id };
             }
-            batch.set(refTeamDoc.collection('players').doc(item.name), obj, {
-              merge: true,
-            });
+            batch.set(
+              refTeamDoc.collection('players').doc(item.name),
+              {
+                number: item.number,
+                manager: item.manager,
+                ...(item.uid
+                  ? { uid: item.uid }
+                  : item.self
+                  ? { uid: playerDoc.id }
+                  : {}),
+              },
+              {
+                merge: true,
+              },
+            );
           });
           teamPlayerCollection.docs.forEach(doc => {
             if (!data.players.map(player => player.name).includes(doc.id)) {

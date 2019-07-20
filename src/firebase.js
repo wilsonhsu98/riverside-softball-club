@@ -28,13 +28,16 @@ const credentialMapping = {
   'github.com': token => firebase.auth.GithubAuthProvider.credential(token),
 };
 
-let messaging = null;
-if (firebase.messaging.isSupported() && messaging) {
-  messaging = firebase.messaging();
-  messaging.usePublicVapidKey(
-    'BFeaTTT1Dh8RoYytjYuMk3BktHvFDYrkZfDiRUlNtQyT8YbKpX5DnQU7rHq0x4YdP-xACIttBDFl6Tngy-v0BKw',
-  );
-}
+const messaging = (() => {
+  if (firebase.messaging.isSupported()) {
+    const fmsg = firebase.messaging();
+    fmsg.usePublicVapidKey(
+      'BFeaTTT1Dh8RoYytjYuMk3BktHvFDYrkZfDiRUlNtQyT8YbKpX5DnQU7rHq0x4YdP-xACIttBDFl6Tngy-v0BKw',
+    );
+    return fmsg;
+  }
+  return null;
+})();
 
 export {
   db,

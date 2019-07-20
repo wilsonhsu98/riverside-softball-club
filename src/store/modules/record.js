@@ -153,7 +153,8 @@ const getters = {
         .games.find(item => item.game === state.game);
     const game = state.records.filter(item => item._table === state.game);
 
-    return Object.assign({}, boxSummary, {
+    return {
+      ...boxSummary,
       result: boxSummary.result,
       h: game.filter(
         item => ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1,
@@ -164,7 +165,7 @@ const getters = {
         0,
       ),
       contents: game,
-    });
+    };
   },
   gameList: state => state.gameList,
   periodGames: state => state.period.find(item => item.select).games || [],
@@ -256,7 +257,7 @@ const actions = {
         } else {
           // item.data.hasOrder = false;
         }
-        return Object.assign({}, item.data, { game: item.id });
+        return { ...item.data, game: item.id };
       });
       commit(types.GET_PERIOD, period);
       commit(types.GET_RECORDS, records);

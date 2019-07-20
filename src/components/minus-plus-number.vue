@@ -112,10 +112,10 @@ export default {
   },
   computed: {
     num: {
-      get: function() {
+      get() {
         return this.val;
       },
-      set: function(newValue) {
+      set(newValue) {
         this.val = newValue || 1;
       },
     },

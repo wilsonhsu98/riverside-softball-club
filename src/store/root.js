@@ -101,10 +101,8 @@ const actions = {
         refPlayerDoc
           .get()
           .then(doc => {
-            let data = {};
-            if (doc.exists) {
-              data = doc.data();
-            }
+            const data = doc.exists ? doc.data() : {};
+
             return {
               ...data,
               accessToken: state.token,
@@ -280,10 +278,8 @@ const actions = {
                 : providerData.photoURL;
 
             return refPlayerDoc.get().then(doc => {
-              let data = {};
-              if (doc.exists) {
-                data = doc.data();
-              }
+              const data = doc.exists ? doc.data() : {};
+
               return {
                 ...data,
                 accessToken: state.token,
