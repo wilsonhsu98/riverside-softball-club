@@ -495,7 +495,7 @@ const mutations = {
       teamName: data.name,
       teamIntro: data.intro,
       otherNames: data.subNames,
-      players: data.players.sort((a, b) => a.number - b.number),
+      players: [...data.players].sort((a, b) => a.number - b.number),
       benches: data.benches,
       icon: data.icon,
     };

@@ -81,10 +81,10 @@ const actions = {
         ),
       )
       .then(res => {
-        const teddySummarys = res.shift().data;
+        const teddySummarys = res[0].data;
         const batch = db.batch();
 
-        res.forEach(item => {
+        res.slice(1).forEach(item => {
           const teddySummary = teddySummarys.find(
             game => game['場次'] === item.table,
           );
@@ -123,7 +123,7 @@ const actions = {
         commit(rootTypes.LOADING, false);
       });
   },
-  importOneGame({ commit }, team = 'OldStar', game) {
+  importOneGame({ commit }, { team = 'OldStar', game }) {
     commit(rootTypes.LOADING, true);
     axios
       .all([
@@ -186,9 +186,12 @@ const mutations = {
   [types.SET_TODO](state, item) {
     if (item) {
       if (state.todo.indexOf(item) === -1) {
-        state.todo.push(item);
+        state.todo = [...state.todo, item];
       } else {
-        state.todo.splice(state.todo.indexOf(item), 1);
+        state.todo = [
+          ...state.todo.slice(0, state.todo.indexOf(item)),
+          ...state.todo.slice(state.todo.indexOf(item) + 1),
+        ];
       }
     } else {
       state.todo = [];

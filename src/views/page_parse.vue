@@ -21,7 +21,7 @@
         :disabled="!item.disabled"
         class="parse-btn"
         style="padding: 4px 6px;"
-        @click="importOneGame($route.params.team, item.game)"
+        @click="importOneGame({ team: $route.params.team, game: item.game })"
       >
         Re-upload&nbsp;<i
           class="fa fa-cloud-upload"

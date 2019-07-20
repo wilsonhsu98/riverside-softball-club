@@ -560,58 +560,55 @@ export default {
         this.teamName_err = this.$t('required');
       }
 
-      this.players_err = '';
-      const players_err = [];
-
       if (this.players.length === 0) {
         this.players = [{}];
-        players_err.push(this.$t('msg_atleastone'));
       }
 
-      if (!this.players.find(item => item.self) && !this.$route.params.team) {
-        players_err.push(this.$t('msg_bind_self'));
-      }
-
-      if (!this.players.find(item => item.manager) && this.$route.params.team) {
-        players_err.push(this.$t('msg_atleastone_manager'));
-      }
-
-      if (
-        this.players.filter(
-          (v, i, self) => self.map(item => item.name).indexOf(v.name) !== i,
-        ).length
-      ) {
-        players_err.push(this.$t('msg_duplicate_name'));
-      }
-
-      if (
-        this.players.filter(
-          (v, i, self) =>
-            v.number && self.map(item => item.number).indexOf(v.number) !== i,
-        ).length
-      ) {
-        players_err.push(this.$t('msg_duplicate_number'));
-      }
-
-      if (
-        this.benches.filter(
-          v => this.players.map(item => item.name).indexOf(v.name) > -1,
-        ).length
-      ) {
-        players_err.push(this.$t('msg_duplicate_name'));
-      }
-
-      if (
-        this.benches.filter(
-          v => this.players.map(item => item.number).indexOf(v.number) > -1,
-        ).length
-      ) {
-        players_err.push(this.$t('msg_duplicate_number'));
-      }
-
-      if (players_err.length) {
-        this.players_err = players_err.join('<br>');
-      }
+      this.players_err = [
+        {
+          condition: this.players.length === 0,
+          err: this.$t('msg_atleastone'),
+        },
+        {
+          condition:
+            !this.players.find(item => item.self) && !this.$route.params.team,
+          err: this.$t('msg_bind_self'),
+        },
+        {
+          condition:
+            !this.players.find(item => item.manager) && this.$route.params.team,
+          err: this.$t('msg_atleastone_manager'),
+        },
+        {
+          condition: this.players.filter(
+            (v, i, self) => self.map(item => item.name).indexOf(v.name) !== i,
+          ).length,
+          err: this.$t('msg_duplicate_name'),
+        },
+        {
+          condition: this.players.filter(
+            (v, i, self) =>
+              v.number && self.map(item => item.number).indexOf(v.number) !== i,
+          ).length,
+          err: this.$t('msg_duplicate_number'),
+        },
+        {
+          condition: this.benches.filter(
+            v => this.players.map(item => item.name).indexOf(v.name) > -1,
+          ).length,
+          err: this.$t('msg_duplicate_name'),
+        },
+        {
+          condition: this.benches.filter(
+            v => this.players.map(item => item.number).indexOf(v.number) > -1,
+          ).length,
+          err: this.$t('msg_duplicate_number'),
+        },
+      ]
+        .reduce((acc, check) => {
+          return check.condition ? acc.concat(check.err) : acc;
+        }, [])
+        .join('<br>');
 
       return ![this.teamCode_err, this.teamName_err, this.players_err].some(
         str => !!str,

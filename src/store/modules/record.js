@@ -453,13 +453,13 @@ const mutations = {
       .forEach(item => {
         const find = state.period.find(sub => sub.period === item.period);
         if (!find) {
-          state.period.push(item);
+          state.period = [...state.period, item];
         } else {
           find.games = item.games;
         }
       });
 
-    state.period = state.period.sort((a, b) =>
+    state.period = [...state.period].sort((a, b) =>
       b.period.localeCompare(a.period),
     );
     if (!state.period.find(item => item.select)) {
@@ -514,7 +514,7 @@ const mutations = {
     window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
   [types.DEL_PLAYER](state, player) {
-    state.hiddenPlayer.push(player);
+    state.hiddenPlayer = [...state.hiddenPlayer, player];
     window.localStorage.setItem(
       'pref_hiddenplayer',
       JSON.stringify(state.hiddenPlayer),
