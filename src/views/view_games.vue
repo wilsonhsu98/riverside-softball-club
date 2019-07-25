@@ -129,6 +129,9 @@
   }
   &.empty {
     padding-top: 70px;
+    .button-container {
+      margin-top: 0;
+    }
   }
 }
 @media only screen and (max-width: 760px) {

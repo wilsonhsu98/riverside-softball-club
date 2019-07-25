@@ -180,7 +180,7 @@ select::-ms-expand {
 		box-shadow: none;
 		min-height: calc(100vh - 100px);
 		min-height: calc(var(--vh, 1vh) * 100 - 100px);
-		overflow-x: hidden;
+		// overflow-x: hidden;
 		.btn-container {
 			padding: 0;
 		}

@@ -4,7 +4,7 @@ import {
   auth,
   providerMapping,
   credentialMapping,
-  messaging,
+  // messaging,
 } from '../firebase';
 import router from '../router';
 import config from '../../config.json';
@@ -232,20 +232,20 @@ const actions = {
           commit(types.LOADING, false);
           return;
         }
-        if (messaging) {
-          messaging
-            .requestPermission()
-            .then(() => {
-              console.log('Notification permission granted.');
-              return messaging.getToken();
-            })
-            .then(token => {
-              console.log(token);
-            })
-            .catch(err => {
-              console.log('Unable to get permission to notify.', err);
-            });
-        }
+        // if (messaging) {
+        //   messaging
+        //     .requestPermission()
+        //     .then(() => {
+        //       console.log('Notification permission granted.');
+        //       return messaging.getToken();
+        //     })
+        //     .then(token => {
+        //       console.log(token);
+        //     })
+        //     .catch(err => {
+        //       console.log('Unable to get permission to notify.', err);
+        //     });
+        // }
         let promise = new Promise(resolve => {
           resolve();
         });

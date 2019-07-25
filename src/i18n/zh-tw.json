@@ -59,6 +59,7 @@
 	"box_win": "贏了",
 	"box_lose": "輸了",
 	"box_tie": "平手",
+	"box_header_player": "球員",
 
 	"desc_inn": "局",
 	"desc_order": "全隊第 %{n} 打席",

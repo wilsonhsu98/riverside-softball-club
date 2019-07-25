@@ -24,10 +24,10 @@
           }}
         </div>
       </div>
-      <div class="box-table">
+      <div class="box-table simple">
         <div
           class="player-records"
-          v-for="(item, i) in box"
+          v-for="(item, i) in box.slice(1)"
           :key="`record_${i}`"
         >
           <div class="player">
@@ -102,6 +102,104 @@
           <span class="summary">{{ item.summary }}</span>
         </div>
       </div>
+      <div class="box-table normal">
+        <div class="player-records header">
+          <div class="player">
+            <span class="order">#</span>
+            <span class="name">{{ $t('box_header_player') }}</span>
+          </div>
+          <div v-if="boxSummary.e" class="error">E</div>
+          <div class="records">
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${innIndex}`"
+                v-for="(inn, innIndex) in box[0]"
+              >
+                <span class="content">{{
+                  box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
+                }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="summary"></div>
+        </div>
+        <div
+          class="player-records"
+          v-for="(item, i) in box.slice(1)"
+          :key="`record_${i}`"
+        >
+          <div class="player">
+            <span class="order">{{
+              item.altOrder ? $t('PH') : item.order
+            }}</span>
+            <span class="name">
+              <span class="img" style="border-width: 1px">
+                <i class="fa fa-user-o"></i>
+              </span>
+              <span
+                v-if="item.data.photo"
+                class="img"
+                :style="`background-image: url(${item.data.photo})`"
+              >
+              </span>
+              {{ item.name }}
+            </span>
+          </div>
+          <div v-if="boxSummary.e" class="error">
+            {{ item.error > 0 ? `${item.error}E` : '' }}
+          </div>
+          <div class="records">
+            <div class="records-flex">
+              <template v-for="(record, recordIndex) in item.contentNormal">
+                <div
+                  class="record"
+                  v-if="record === undefined"
+                  :key="`content_${recordIndex}`"
+                ></div>
+                <div class="record" v-else :key="`content_${recordIndex}`">
+                  <router-link
+                    v-if="role === 'manager'"
+                    tag="span"
+                    :to="{
+                      name: 'pa',
+                      params: {
+                        team: $route.params.team,
+                        game: $route.params.game,
+                        order: record.order || 'new',
+                      },
+                    }"
+                    :class="
+                      `content editable ${record.color} ${
+                        record.rbi ? 'rbi' : ''
+                      } ${record.r === record.name ? 'run' : ''} ${
+                        record.content === 'new' ? 'new' : ''
+                      }`
+                    "
+                    :data-rbi="record.rbi"
+                    :data-run="`${record.r === record.name ? 'R' : ''}`"
+                  >
+                    {{ record.content === 'new' ? '＋' : $t(record.content) }}
+                  </router-link>
+                  <span
+                    v-else
+                    :class="
+                      `content ${record.rbi ? 'rbi' : ''} ${
+                        record.r === record.name ? 'run' : ''
+                      } ${record.content === 'new' ? '' : record.color}`
+                    "
+                    :data-rbi="record.rbi"
+                    :data-run="`${record.r === record.name ? 'R' : ''}`"
+                  >
+                    {{ record.content !== 'new' ? $t(record.content) : '' }}
+                  </span>
+                </div>
+              </template>
+            </div>
+          </div>
+          <span class="summary">{{ item.summary }}</span>
+        </div>
+      </div>
     </div>
     <div style="text-align: center; margin: 10px;">
       <button class="share-btn" @click="screenshot">
@@ -133,7 +231,32 @@
     }
   }
   .box-table {
-    display: table;
+    &.simple {
+      display: none;
+    }
+    &.normal {
+      display: table;
+      overflow-x: auto;
+      .player-records {
+        &.header > div {
+          background-color: rgba(50, 122, 129, 0.9);
+          color: #fff;
+          position: sticky;
+          top: 70px;
+          z-index: 1;
+        }
+        .records .record {
+          max-width: 75px;
+          width: auto;
+          flex: 1;
+          justify-content: center;
+          padding: 0 1px;
+          .inn {
+            width: 10px;
+          }
+        }
+      }
+    }
     width: 100%;
     border-radius: 10px;
     overflow: hidden;
@@ -321,6 +444,9 @@
     }
     .box-table {
       border-radius: 0;
+      &.normal .player-records.header > div {
+        top: 50px;
+      }
     }
     .player-records {
       .player {
@@ -359,6 +485,18 @@
       .summary {
         width: 26px;
         padding: 0 5px;
+      }
+    }
+  }
+}
+@media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
+  .gamebox-container {
+    .box-table {
+      &.simple {
+        display: table;
+      }
+      &.normal {
+        display: none;
       }
     }
   }

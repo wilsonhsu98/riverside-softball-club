@@ -1,7 +1,7 @@
 import {
   types as rootTypes,
   // getters as rootGetters,
-  // state as rootState
+  state as rootState,
 } from '../root';
 import utils from '../../libs/utils';
 import { db } from '../../firebase';
@@ -136,6 +136,7 @@ const getters = {
       state.players,
       state.records.filter(item => item._table === state.game),
       boxSummary.errors,
+      rootState.role,
     );
   },
   pa: state => {

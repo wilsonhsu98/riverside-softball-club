@@ -285,7 +285,6 @@ export default {
   watch: {
     $route() {
       this.fetchGame();
-      window.scrollTo(0, 0);
     },
     currentTeam() {
       this.fetchTeamIcon(this.currentTeam);

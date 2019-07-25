@@ -22,12 +22,12 @@ const contentColor = content => {
   }
   return 'blue';
 };
+const innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
 
 const parseGame = arr => {
   const nameCol = arr[0].indexOf('名單');
   const errCol = arr[0].indexOf('失誤');
   const startCol = arr[0].indexOf('一');
-  const innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
   let row = 1;
   let col = startCol;
   let order = 1;
@@ -290,9 +290,9 @@ const genGameList = games => {
   return temp;
 };
 
-const displayGame = (players, records, errors) => {
+const displayGame = (players, records, errors, role) => {
   let arr = [];
-  let order = 0;
+  let startOrder = 0;
   let innChange = 0;
 
   records
@@ -301,7 +301,7 @@ const displayGame = (players, records, errors) => {
       if (!item.order) {
         item.order = i + 1;
       }
-      if (!find && order === 0) {
+      if (!find && startOrder === 0) {
         arr.push({
           name: item.name,
           data: (players.find(sub => sub.id === item.name) || { data: {} })
@@ -311,8 +311,8 @@ const displayGame = (players, records, errors) => {
           location: item.location,
         });
       } else {
-        if (order === 0) {
-          order = item.order - find.order;
+        if (startOrder === 0) {
+          startOrder = item.order - find.order;
         }
       }
       return item;
@@ -332,27 +332,29 @@ const displayGame = (players, records, errors) => {
       if (find) {
         let middleArr = [];
         middleArr.length =
-          Math.ceil(item.order / (order || 10) - 1) - find.content.length;
+          Math.ceil(item.order / (startOrder || 10) - 1) - find.content.length;
         find.content = find.content.concat(middleArr, item);
       } else {
         // Handle 代打
         index = -1;
         arr.forEach((sub, i) => {
-          if (sub.altOrder && sub.altOrder === (item.order % order || order)) {
-            index = i;
-          } else if (sub.order === (item.order % order || order)) {
+          if (
+            (sub.altOrder &&
+              sub.altOrder === (item.order % startOrder || startOrder)) ||
+            sub.order === (item.order % startOrder || startOrder)
+          ) {
             index = i;
           }
         });
         if (index > -1) {
           let middleArr = [];
-          middleArr.length = Math.ceil(item.order / (order || 10) - 1);
+          middleArr.length = Math.ceil(item.order / (startOrder || 10) - 1);
           arr.splice(index + 1, 0, {
             name: item.name,
             data: (players.find(sub => sub.id === item.name) || { data: {} })
               .data,
             order: item.order,
-            altOrder: item.order % order || order,
+            altOrder: item.order % startOrder || startOrder,
             content: [].concat(middleArr, item),
           });
         }
@@ -360,20 +362,22 @@ const displayGame = (players, records, errors) => {
       // Handle 代跑
       index = -1;
       arr.forEach((sub, i) => {
-        if (sub.altOrder && sub.altOrder === (item.order % order || order)) {
-          index = i;
-        } else if (sub.order === (item.order % order || order)) {
+        if (
+          (sub.altOrder &&
+            sub.altOrder === (item.order % startOrder || startOrder)) ||
+          sub.order === (item.order % startOrder || startOrder)
+        ) {
           index = i;
         }
       });
       if (item.r && item.r !== item.name && index > -1) {
         let middleArr = [];
-        middleArr.length = Math.ceil(item.order / (order || 10) - 1);
+        middleArr.length = Math.ceil(item.order / (startOrder || 10) - 1);
         arr.splice(index + 1, 0, {
           name: item.r,
           data: (players.find(sub => sub.id === item.r) || { data: {} }).data,
           order: item.order,
-          altOrder: item.order % order || order,
+          altOrder: item.order % startOrder || startOrder,
           content: [].concat(middleArr, {
             inn: item.inn,
             name: item.r,
@@ -386,8 +390,8 @@ const displayGame = (players, records, errors) => {
       }
     });
 
-  if (records.length && order) {
-    let insertAt = records[records.length - order];
+  if (records.length && startOrder) {
+    let insertAt = records[records.length - startOrder];
     if (insertAt.r && insertAt.name !== insertAt.r) {
       insertAt = insertAt.r;
     } else {
@@ -395,8 +399,36 @@ const displayGame = (players, records, errors) => {
     }
     arr
       .find(player => player.name === insertAt)
-      .content.push({ content: 'new', name: insertAt });
+      .content.push({
+        content: 'new',
+        name: insertAt,
+        inn: role === 'manager' && records[records.length - 1].inn,
+      });
   }
+
+  const header = innArray.reduce((acc, item, i) => {
+    if (startOrder === 0) {
+      return [1];
+    }
+    if (i) {
+      return [
+        ...acc,
+        ...Array(
+          Math.ceil(
+            (records.filter(record => record.inn === i).length +
+              (i === (records[records.length - 1] || {}).inn &&
+              role === 'manager'
+                ? 1
+                : 0)) /
+              startOrder,
+          ),
+        )
+          .fill(undefined)
+          .map(() => i),
+      ];
+    }
+    return acc;
+  }, []);
 
   let paMax = 0;
   arr.forEach(item => {
@@ -426,10 +458,31 @@ const displayGame = (players, records, errors) => {
       h += ['1H', '2H', '3H', 'HR'].indexOf(sub.content) > -1 ? 1 : 0;
     });
     item.content.length = paMax;
+    item.contentNormal = header.reduce((acc, inn, i, self) => {
+      const filter = item.content.filter(sub => sub.inn === inn);
+      const arr = [];
+      arr.length = 1;
+      if (i && self[i - 1] === inn) {
+        if (filter.length > 1) {
+          return acc;
+        } else {
+          return acc.concat(arr);
+        }
+      } else if (filter.length) {
+        return acc.concat(filter);
+      } else {
+        if (role === 'manager' && startOrder === 0) {
+          return acc.concat(item.content);
+        } else {
+          return acc.concat(arr);
+        }
+      }
+    }, []);
     item.summary = `${ab}-${h}`;
     item.error = error && error.count;
   });
-  return arr;
+
+  return [header].concat(arr);
 };
 
 export default {

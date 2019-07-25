@@ -59,6 +59,7 @@
 	"box_win": "WIN",
 	"box_lose": "LOSE",
 	"box_tie": "TIE",
+	"box_header_player": "Player",
 
 	"create_team": "Create a team",
 	"manage_team": "Manage your team",
