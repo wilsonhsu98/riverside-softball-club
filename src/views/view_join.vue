@@ -165,7 +165,7 @@
         </button>
         <button
           v-if="(choice === 'join' && otherPlayer) || choice === 'bind'"
-          class="btn"
+          class="btn join"
           @click="joinTeam_"
         >
           {{ $t('btn_join') }}
@@ -305,7 +305,9 @@ $max-width: 400px;
       border-radius: 4px;
       width: 65px;
       border: 1px solid #ced4da;
-      line-height: 38px;
+      font-size: 12px;
+      line-height: 14px;
+      height: 32px;
       padding: 0 10px;
       &:focus {
         border-color: #3b5998;
@@ -367,6 +369,12 @@ $max-width: 400px;
 }
 
 @media only screen and (max-width: 760px) {
+  .btn-container {
+    position: static;
+    .join {
+      display: inline-block;
+    }
+  }
 }
 </style>
 
@@ -468,8 +476,8 @@ export default {
       this.teamIntro = this.teamInfo.teamIntro;
       this.otherNames = this.teamInfo.otherNames;
       this.icon = this.teamInfo.icon;
-      this.players = JSON.parse(JSON.stringify(this.teamInfo.players));
-      this.benches = JSON.parse(JSON.stringify(this.teamInfo.benches));
+      this.players = [...this.teamInfo.players];
+      this.benches = [...this.teamInfo.benches];
 
       this.joined =
         this.players.some(player => player.uid === this.userId) ||

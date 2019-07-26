@@ -692,12 +692,12 @@ export default {
       this.otherNames = this.teamInfo.otherNames;
 
       this.icon = this.teamInfo.icon;
-      this.players = JSON.parse(JSON.stringify(this.teamInfo.players));
+      this.players = [...this.teamInfo.players];
       const find = this.players.find(player => player.uid === this.userId);
       if (find) {
         find.self = true;
       }
-      this.benches = JSON.parse(JSON.stringify(this.teamInfo.benches));
+      this.benches = [...this.teamInfo.benches];
     },
   },
 };
