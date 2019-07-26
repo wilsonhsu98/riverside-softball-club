@@ -217,7 +217,7 @@ $max-width: 400px;
       }
     }
     &-denied {
-      color: $active_bgcolor;
+      color: $error_color;
     }
   }
   .field-wrapper {

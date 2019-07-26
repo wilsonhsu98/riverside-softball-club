@@ -288,7 +288,11 @@ export default {
     },
     currentTeam() {
       this.fetchTeamIcon(this.currentTeam);
-      this.fetchTeamRequests(this.currentTeam);
+    },
+    role() {
+      if (this.role === 'manager') {
+        this.fetchTeamRequests(this.currentTeam);
+      }
     },
   },
 };

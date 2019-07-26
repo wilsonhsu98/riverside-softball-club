@@ -145,7 +145,7 @@ const actions = {
                       teamCode: team.teamCode,
                       requests: requestsCollection.docs
                         .map(doc => doc.data())
-                        .filter(status => status !== 'denied').length,
+                        .filter(request => request.status !== 'denied').length,
                     });
                   });
               });
@@ -168,11 +168,13 @@ const mutations = {
     state.teams = data;
   },
   [types.SET_TEAM_REQUEST](state, data) {
-    const find = state.teams.find(team => team.teamCode === data.teamCode);
-    if (find) {
-      find.requests = data.requests;
-      state.teams = [...state.teams];
-    }
+    state.teams = state.teams.map(team => {
+      if (team.teamCode === data.teamCode) {
+        return { ...team, requests: data.requests };
+      } else {
+        return team;
+      }
+    });
   },
 };
 export { types };
