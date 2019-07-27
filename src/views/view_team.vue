@@ -691,12 +691,14 @@ export default {
       this.otherNames = this.teamInfo.otherNames;
 
       this.icon = this.teamInfo.icon;
-      this.players = Array.from(this.teamInfo.players.map(player => {
-        return {
-          ...player,
-          self: player.uid === this.userId,
-        };
-      }));
+      this.players = Array.from(
+        this.teamInfo.players.map(player => {
+          return {
+            ...player,
+            self: player.uid === this.userId,
+          };
+        }),
+      );
       this.benches = Array.from(this.teamInfo.benches);
     },
   },

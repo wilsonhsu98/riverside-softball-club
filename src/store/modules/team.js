@@ -119,7 +119,10 @@ const actions = {
             if (!data.players.map(player => player.name).includes(doc.id)) {
               batch.delete(refTeamDoc.collection('players').doc(doc.id));
               const { uid } = doc.data();
-              if (uid&& !data.players.map(player => player.uid).includes(uid)) {
+              if (
+                uid &&
+                !data.players.map(player => player.uid).includes(uid)
+              ) {
                 batch.set(
                   db
                     .collection('accounts')
