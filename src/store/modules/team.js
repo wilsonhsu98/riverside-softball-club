@@ -119,7 +119,7 @@ const actions = {
             if (!data.players.map(player => player.name).includes(doc.id)) {
               batch.delete(refTeamDoc.collection('players').doc(doc.id));
               const { uid } = doc.data();
-              if (uid) {
+              if (uid&& !data.players.map(player => player.uid).includes(uid)) {
                 batch.set(
                   db
                     .collection('accounts')
@@ -495,7 +495,7 @@ const mutations = {
       teamName: data.name,
       teamIntro: data.intro,
       otherNames: data.subNames,
-      players: [...data.players].sort((a, b) => a.number - b.number),
+      players: Array.from(data.players).sort((a, b) => a.number - b.number),
       benches: data.benches,
       icon: data.icon,
     };

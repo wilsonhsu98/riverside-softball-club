@@ -186,7 +186,7 @@ const mutations = {
   [types.SET_TODO](state, item) {
     if (item) {
       if (state.todo.indexOf(item) === -1) {
-        state.todo = [...state.todo, item];
+        state.todo = Array.from(state.todo).concat([item]);
       } else {
         state.todo = [
           ...state.todo.slice(0, state.todo.indexOf(item)),

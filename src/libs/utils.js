@@ -95,7 +95,7 @@ const parseGame = arr => {
 
 const genStatistics = (players, records, filterPA, filterGames) => {
   // filterPA = filterPA || 10;
-  const sortRecords = [...records].sort((a, b) => {
+  const sortRecords = Array.from(records).sort((a, b) => {
     return (
       parseInt(b._table.match(/\d/g).join('') + (b.order + 10), 10) -
       parseInt(a._table.match(/\d/g).join('') + (a.order + 10), 10)

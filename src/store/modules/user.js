@@ -131,7 +131,7 @@ const actions = {
             ).then(teams => {
               commit(
                 types.FETCH_TEAMS,
-                [...teams].sort((a, b) => b.name.localeCompare(a.name)),
+                Array.from(teams).sort((a, b) => b.name.localeCompare(a.name)),
               );
               commit(rootTypes.SET_AUTH, teams);
               teams.forEach(team => {

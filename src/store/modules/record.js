@@ -454,13 +454,13 @@ const mutations = {
       .forEach(item => {
         const find = state.period.find(sub => sub.period === item.period);
         if (!find) {
-          state.period = [...state.period, item];
+          state.period = Array.from(state.period).concat([item]);
         } else {
           find.games = item.games;
         }
       });
 
-    state.period = [...state.period].sort((a, b) =>
+    state.period = Array.from(state.period).sort((a, b) =>
       b.period.localeCompare(a.period),
     );
     if (!state.period.find(item => item.select)) {
@@ -474,15 +474,13 @@ const mutations = {
     state.records = data;
   },
   [types.SET_PERIOD](state, data) {
-    state.period.forEach(item => {
-      item.select = false;
-      if (item.period === data) {
-        item.select = true;
-      }
+    state.period = state.period.map(item => {
+      return {
+        ...item,
+        select: item.period === data,
+      };
     });
-    const temp = JSON.stringify(state.period);
-    state.period = JSON.parse(temp);
-    window.localStorage.setItem('pref_period', temp);
+    window.localStorage.setItem('pref_period', JSON.stringify(state.period));
   },
   [types.SET_TOP](state, value) {
     state.top = value;
@@ -515,7 +513,7 @@ const mutations = {
     window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
   [types.DEL_PLAYER](state, player) {
-    state.hiddenPlayer = [...state.hiddenPlayer, player];
+    state.hiddenPlayer = Array.from(state.hiddenPlayer).concat([player]);
     window.localStorage.setItem(
       'pref_hiddenplayer',
       JSON.stringify(state.hiddenPlayer),
