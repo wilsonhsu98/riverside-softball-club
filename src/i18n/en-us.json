@@ -61,6 +61,10 @@
 	"box_tie": "TIE",
 	"box_header_player": "Player",
 
+	"ttl_toggle_avatar": "Display avatar",
+	"ttl_all_players": "All players",
+	"ttl_starting_players": "Starting players",
+
 	"create_team": "Create a team",
 	"manage_team": "Manage your team",
 	"ttl_team_code": "Team code",

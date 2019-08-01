@@ -61,6 +61,10 @@
 	"box_tie": "平手",
 	"box_header_player": "球員",
 
+	"ttl_toggle_avatar": "顯示頭像",
+	"ttl_all_players": "所有球員",
+	"ttl_starting_players": "先發名單",
+
 	"desc_inn": "局",
 	"desc_order": "全隊第 %{n} 打席",
 	"desc_out": "目前 %{n} 出局",

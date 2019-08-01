@@ -255,6 +255,14 @@
             width: 10px;
           }
         }
+        &:last-child {
+          > :first-child {
+            border-radius: 0 0 0 10px;
+          }
+          > :last-child {
+            border-radius: 0 0 10px 0;
+          }
+        }
       }
     }
     width: 100%;
@@ -444,8 +452,18 @@
     }
     .box-table {
       border-radius: 0;
-      &.normal .player-records.header > div {
-        top: 50px;
+      &.normal {
+        .player-records {
+          &.header > div {
+            top: 50px;
+          }
+          &:last-child {
+            > :first-child,
+            > :last-child {
+              border-radius: 0;
+            }
+          }
+        }
       }
     }
     .player-records {
