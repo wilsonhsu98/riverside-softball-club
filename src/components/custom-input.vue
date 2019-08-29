@@ -218,8 +218,6 @@ $error-color: #ff695e;
 </style>
 
 <script>
-import Vue from 'vue';
-
 export default {
   props: [
     'type',
@@ -249,7 +247,7 @@ export default {
 
       this.focused = true;
       this.showPretty = false;
-      Vue.nextTick().then(() => {
+      this.$nextTick().then(() => {
         if (this.type === 'textarea') {
           this.$refs.textarea.focus();
         } else if (this.type === 'splitting-wording') {

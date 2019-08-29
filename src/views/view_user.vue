@@ -3,7 +3,7 @@
     <mobile-header />
     <div class="container">
       <template v-if="isAnonymous === false">
-        <img class="avatar" :src="accountInfo.photo" />
+        <img class="avatar" :src="$cacheImg(accountInfo.photo)" />
         <div class="info-wrapper">
           <div class="info">{{ accountInfo.name }}</div>
           <div class="info" v-if="accountInfo.email">
@@ -67,7 +67,11 @@
           v-for="team in teams"
           class="team"
           @click="switchTeam_(team.teamCode)"
-          :data-requests="team.requests === 0 ? undefined : team.requests"
+          :data-requests="
+            team.requests === 0 || team.teamCode === currentTeam
+              ? undefined
+              : team.requests
+          "
           :key="`team_${team.teamCode}`"
         >
           <i v-if="team.teamCode === currentTeam" class="fa fa-check" />

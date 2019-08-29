@@ -38,12 +38,11 @@
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span
+              <img
                 v-if="item.data.photo"
                 class="img"
-                :style="`background-image: url(${item.data.photo})`"
-              >
-              </span>
+                :src="$cacheImg(item.data.photo)"
+              />
               {{ item.name }}
             </span>
           </div>
@@ -137,12 +136,11 @@
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span
+              <img
                 v-if="item.data.photo"
                 class="img"
-                :style="`background-image: url(${item.data.photo})`"
-              >
-              </span>
+                :src="$cacheImg(item.data.photo)"
+              />
               {{ item.name }}
             </span>
           </div>

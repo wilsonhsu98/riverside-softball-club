@@ -105,15 +105,11 @@
               {{ new Date(lastUpdate).toLocaleString() }}
             </div>
           </template>
-          <i class="fa fa-refresh" @click="refreshPlayer_"></i>
         </div>
       </div>
     </div>
     <div id="table">
       <div class="header-row">
-        <span class="cell delete"
-          ><i class="fa fa-refresh" @click="refreshPlayer_"></i
-        ></span>
         <template v-for="col in displayedCols">
           <span
             v-if="col.name === 'Rank'"
@@ -152,9 +148,6 @@
           :class="`row-grid${item.name === userName ? ' current' : ''}`"
           :key="`div_${encodeURI(item.name)}`"
         >
-          <span class="cell delete"
-            ><i class="fa fa-trash" @click="deletePlayer_(item.name)"></i
-          ></span>
           <template v-for="(col, colIndex) in displayedCols">
             <span
               v-if="col.name === 'Rank'"
@@ -173,12 +166,11 @@
                 <span class="img" style="border-width: 1px">
                   <i class="fa fa-user-o"></i>
                 </span>
-                <span
+                <img
                   v-if="item.data.photo"
                   class="img"
-                  :style="`background-image: url(${item.data.photo})`"
-                >
-                </span>
+                  :src="$cacheImg(item.data.photo)"
+                />
                 {{ item.name }}
               </span>
             </span>
@@ -207,9 +199,7 @@
                   <span
                     v-if="cellIndex === cube.length - 1"
                     class="game"
-                    :key="
-                      `bar_${encodeURI(item.name)}_${cubeIndex}_${cellIndex}`
-                    "
+                    :key="`${cubeIndex}${cellIndex}`"
                     >{{ cell }}</span
                   >
                   <span
@@ -217,9 +207,7 @@
                     :class="
                       `item ${cell.color} ${cell.exclude ? 'exclude' : ''}`
                     "
-                    :key="
-                      `bar_${encodeURI(item.name)}_${cubeIndex}_${cellIndex}`
-                    "
+                    :key="`${cubeIndex}${cellIndex}`"
                     >{{ $t(cell.content) }}</span
                   >
                 </template>
@@ -275,19 +263,12 @@
   }
 }
 
-.dropdown {
-  height: 30px;
-  width: 110px;
-  border: 2px solid rgb(166, 166, 166);
-  background-color: rgb(248, 248, 248);
-  border-radius: 5px;
-  vertical-align: top;
-}
 i.fa {
   font-size: 28px;
   vertical-align: middle;
   cursor: pointer;
 }
+
 #table {
   display: table;
   width: 100%;
@@ -318,8 +299,7 @@ i.fa {
         height: 36px;
         overflow: hidden;
       }
-      &.Rank,
-      &.delete {
+      &.Rank {
         width: 45px;
       }
       &.name {
@@ -327,7 +307,7 @@ i.fa {
         padding-left: 0;
         text-align: center;
       }
-      &:nth-child(2n + 4):not(.sort) {
+      &:nth-child(2n + 3):not(.sort) {
         opacity: 1;
         > div {
           opacity: 0.6;
@@ -338,10 +318,10 @@ i.fa {
   .toggle-row {
     display: block;
     position: absolute;
-    left: 50px;
+    left: 0;
     z-index: 1;
     height: 36px;
-    width: calc(100% - 50px);
+    width: 100%;
     margin: 0;
     opacity: 0;
     cursor: pointer;
@@ -388,13 +368,13 @@ i.fa {
     display: table-cell;
     line-height: 36px;
     text-align: center;
-    &:nth-child(2n + 4) {
+    &:nth-child(2n + 3) {
       opacity: 0.6;
     }
     &.chart {
       background-color: #fff;
       position: absolute;
-      left: 190px;
+      left: 145px;
       right: 0;
       z-index: 2;
       overflow-x: auto;
@@ -489,7 +469,6 @@ i.fa {
   }
 }
 .search-bar__container,
-.condition .fa-refresh,
 .toggle-search {
   display: none;
 }
@@ -540,10 +519,6 @@ i.fa {
           max-height: 200vh;
           transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
           transition-delay: 0s;
-          .fa {
-            opacity: 1;
-            transition-delay: 0.4s;
-          }
         }
       }
     }
@@ -587,17 +562,6 @@ i.fa {
           }
         }
       }
-      .fa {
-        opacity: 0;
-        transition: opacity 0.1s 0s;
-        display: inline-block;
-        color: $header_color;
-      }
-      .fa-refresh {
-        position: absolute;
-        bottom: 10px;
-        left: 12px;
-      }
     }
   }
   #table {
@@ -627,8 +591,7 @@ i.fa {
           color: $current_user_bgcolor;
           &.name,
           &.Rank,
-          &.sort,
-          &.delete {
+          &.sort {
             background-color: $current_user_bgcolor;
             color: $current_user_color;
           }
@@ -637,7 +600,7 @@ i.fa {
           }
         }
       }
-      .cell:nth-child(2n + 4) {
+      .cell:nth-child(2n + 3) {
         opacity: 1;
       }
       &:last-child {
@@ -658,10 +621,10 @@ i.fa {
       order: 6;
       display: block;
       box-sizing: border-box;
-      &:not(.sort):not(.Rank):not(.name):not(.delete):not(.chart) {
+      &:not(.sort):not(.Rank):not(.name):not(.chart) {
         text-align: left;
       }
-      &:not(.Rank):not(.name):not(.delete):not(.chart) {
+      &:not(.Rank):not(.name):not(.chart) {
         &:before {
           content: attr(data-label) ':';
           display: inline-block;
@@ -681,11 +644,8 @@ i.fa {
         text-align: center;
         color: inherit;
       }
-      &.delete {
-        order: 4;
-      }
       &.chart {
-        order: 5;
+        order: 4;
         position: initial;
         margin: 0;
         border: none;
@@ -694,16 +654,10 @@ i.fa {
         display: flex;
       }
     }
-    .toggle-row {
-      left: 0;
-      cursor: initial;
-      &:checked {
-        & + .row-grid {
-          max-height: 10000px;
-          transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
-          transition-delay: 0s;
-        }
-      }
+    .toggle-row:checked + .row-grid {
+      max-height: 10000px;
+      transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
+      transition-delay: 0s;
     }
   }
 }
@@ -719,18 +673,12 @@ i.fa {
           width: 33%;
         }
         &.sort {
-          width: 33%;
-        }
-        &.delete {
-          width: 17%;
+          width: 50%;
         }
         &.chart {
           width: 100%;
         }
       }
-    }
-    .toggle-row {
-      width: calc(100% / 6 * 5);
     }
   }
   .search-bar {
@@ -779,18 +727,12 @@ i.fa {
           width: 20%;
         }
         &.sort {
-          width: 60%;
-        }
-        &.delete {
-          width: 10%;
+          width: 70%;
         }
         &.chart {
           width: 100%;
         }
       }
-    }
-    .toggle-row {
-      width: calc(100% / 10 * 9);
     }
   }
   .search-bar {
@@ -858,8 +800,6 @@ export default {
       'setSortBy',
       'setCheckAll',
       'toggleColumn',
-      'deletePlayer',
-      'refreshPlayer',
     ]),
     formatValue(value, col) {
       return ['AVG', 'OBP', 'SLG', 'OPS'].indexOf(col) > -1 && value !== '-'
@@ -880,9 +820,6 @@ export default {
       ) {
         this.toggleSearch = false;
         event.preventDefault();
-        if (event.target.classList.contains('fa-trash')) {
-          event.stopPropagation();
-        }
       }
     },
     setPeriod_(period) {
@@ -908,14 +845,6 @@ export default {
     toggleColumn_(column) {
       this.toggleTarget = null;
       this.toggleColumn(column);
-    },
-    deletePlayer_(player) {
-      this.toggleTarget = null;
-      this.deletePlayer(player);
-    },
-    refreshPlayer_() {
-      this.toggleTarget = null;
-      this.refreshPlayer();
     },
   },
   computed: {

@@ -48,6 +48,7 @@
               :to="{ name: 'user' }"
               active-class="active"
               :data-label="$t('menu_profile')"
+              :data-requests="teamRequest || undefined"
             >
               <i class="fa fa-user"></i>
             </router-link>
@@ -163,12 +164,20 @@ header {
   .main-container {
     padding-top: 0;
     padding-bottom: $footer_menu_height;
+    padding-bottom: calc(
+      #{$footer_menu_height} + constant(safe-area-inset-bottom)
+    ); /* iOS 11.0 */
+    padding-bottom: calc(
+      #{$footer_menu_height} + env(safe-area-inset-bottom)
+    ); /* iOS 11.2 */
   }
   header {
     height: $footer_menu_height;
     line-height: $footer_menu_height;
     bottom: 0;
     top: initial;
+    padding-bottom: constant(safe-area-inset-bottom); /* iOS 11.0 */
+    padding-bottom: env(safe-area-inset-bottom); /* iOS 11.2 */
     .icon {
       display: none;
     }
@@ -248,14 +257,16 @@ import defaultIcon from '../images/icon.png';
 export default {
   data() {
     return {
-      isFetchGame: false,
       defaultIcon,
+      teamRequest: 0,
     };
   },
   created() {
     this.initFromLS();
-    this.fetchGame();
     this.fetchUser();
+    if (this.$route.params.team) {
+      this.fetchTable(this.$route.params.team);
+    }
   },
   methods: {
     ...mapActions({
@@ -266,12 +277,6 @@ export default {
       fetchTeamRequests: 'fetchTeamRequests',
       logout: 'logout',
     }),
-    fetchGame() {
-      if (!this.isFetchGame && this.$route.params.team) {
-        this.fetchTable(this.$route.params.team);
-        this.isFetchGame = true;
-      }
-    },
   },
   computed: {
     ...mapGetters({
@@ -280,14 +285,30 @@ export default {
       role: 'role',
       currentTeamIcon: 'currentTeamIcon',
       teamRequests: 'teamRequests',
+      teams: 'teams',
     }),
   },
   watch: {
-    $route() {
-      this.fetchGame();
+    $route(to, from) {
+      if (to.params.team && to.params.team !== this.currentTeam) {
+        this.fetchTable(to.params.team);
+      }
+      if (from.params.team && from.params.team !== this.currentTeam) {
+        this.fetchTable(this.currentTeam);
+      }
     },
     currentTeam() {
       this.fetchTeamIcon(this.currentTeam);
+      if (!this.$route.params.team) {
+        this.fetchTable(this.currentTeam);
+      }
+      if (this.role === 'manager') {
+        this.teamRequest = this.teams
+          .filter(team => team.teamCode !== this.currentTeam)
+          .reduce((acc, team) => {
+            return acc + (team.requests || 0);
+          }, 0);
+      }
     },
     role() {
       if (this.role === 'manager') {

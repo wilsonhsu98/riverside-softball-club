@@ -6,7 +6,7 @@ import {
   promiseImage,
 } from '../root';
 import { types as userTypes } from './user';
-import { db, auth, timestamp, fieldValue } from '../../firebase';
+import { db, auth, timestamp } from '../../firebase';
 
 let snapShotTeam;
 let snapShotRequest;
@@ -87,17 +87,22 @@ const actions = {
                 { role: item.manager ? 'manager' : 'player' },
                 { merge: true },
               );
+              // batch.set(
+              //   db.collection('accounts').doc(item.uid),
+              //   { teams: fieldValue.arrayUnion(data.code) },
+              //   { merge: true },
+              // );
             } else if (item.self) {
               batch.set(
                 refPlayerDoc.collection('teams').doc(data.code),
                 { role: 'manager' },
                 { merge: true },
               );
-              batch.set(
-                refPlayerDoc,
-                { teams: fieldValue.arrayUnion(data.code) },
-                { merge: true },
-              );
+              // batch.set(
+              //   refPlayerDoc,
+              //   { teams: fieldValue.arrayUnion(data.code) },
+              //   { merge: true },
+              // );
             }
             batch.set(
               refTeamDoc.collection('players').doc(item.name),
@@ -152,11 +157,11 @@ const actions = {
                 { role: 'player' },
                 { merge: true },
               );
-              batch.set(
-                db.collection('accounts').doc(item.uid),
-                { teams: fieldValue.arrayUnion(data.code) },
-                { merge: true },
-              );
+              // batch.set(
+              //   db.collection('accounts').doc(item.uid),
+              //   { teams: fieldValue.arrayUnion(data.code) },
+              //   { merge: true },
+              // );
               batch.set(
                 refTeamDoc.collection('players').doc(item.name),
                 { manager: false, number: item.number || '', uid: item.uid },
@@ -174,11 +179,11 @@ const actions = {
                   .collection('teams')
                   .doc(data.code),
               );
-              batch.set(
-                db.collection('accounts').doc(doc.id),
-                { teams: fieldValue.arrayRemove(data.code) },
-                { merge: true },
-              );
+              // batch.set(
+              //   db.collection('accounts').doc(doc.id),
+              //   { teams: fieldValue.arrayRemove(data.code) },
+              //   { merge: true },
+              // );
             }
           });
           return batch.commit();
@@ -201,8 +206,26 @@ const actions = {
       refTeamDoc.collection('benches').get(),
       db
         .collection('accounts')
-        .where('teams', 'array-contains', teamCode)
-        .get(),
+        .get()
+        .then(accounts => {
+          return Promise.all(
+            accounts.docs.map(account =>
+              db.collection(`accounts/${account.id}/teams`).get(),
+            ),
+          );
+        })
+        .then(accountTeams => {
+          return Promise.all(
+            accountTeams
+              .filter(accountTeam => {
+                return accountTeam.docs.map(doc => doc.id).includes(teamCode);
+              })
+              .map(accountTeam => {
+                return db.doc(accountTeam.docs[0].ref.parent.parent.path).get();
+              }),
+          );
+        })
+        .then(res => ({ docs: res })),
     ]).then(res => {
       const [
         teamDoc,
@@ -442,11 +465,11 @@ const actions = {
               { role: 'player' },
               { merge: true },
             );
-            batch.set(
-              db.collection('accounts').doc(data.uid),
-              { teams: fieldValue.arrayUnion(data.teamCode) },
-              { merge: true },
-            );
+            // batch.set(
+            //   db.collection('accounts').doc(data.uid),
+            //   { teams: fieldValue.arrayUnion(data.teamCode) },
+            //   { merge: true },
+            // );
             batch.set(
               db
                 .collection('teams')
@@ -466,11 +489,11 @@ const actions = {
               { role: 'bench' },
               { merge: true },
             );
-            batch.set(
-              db.collection('accounts').doc(data.uid),
-              { teams: fieldValue.arrayUnion(data.teamCode) },
-              { merge: true },
-            );
+            // batch.set(
+            //   db.collection('accounts').doc(data.uid),
+            //   { teams: fieldValue.arrayUnion(data.teamCode) },
+            //   { merge: true },
+            // );
             batch.set(
               db
                 .collection('teams')

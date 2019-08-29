@@ -268,8 +268,26 @@ const actions = {
     };
     const operatePlayers = players => {
       db.collection('accounts')
-        .where('teams', 'array-contains', team)
         .get()
+        .then(accounts => {
+          return Promise.all(
+            accounts.docs.map(account =>
+              db.collection(`accounts/${account.id}/teams`).get(),
+            ),
+          );
+        })
+        .then(accountTeams => {
+          return Promise.all(
+            accountTeams
+              .filter(accountTeam => {
+                return accountTeam.docs.map(doc => doc.id).includes(team);
+              })
+              .map(accountTeam => {
+                return db.doc(accountTeam.docs[0].ref.parent.parent.path).get();
+              }),
+          );
+        })
+        .then(res => ({ docs: res }))
         .then(accountCollection => {
           const accounts = players.map(player => {
             const find = accountCollection.docs.find(

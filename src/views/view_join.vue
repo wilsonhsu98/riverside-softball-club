@@ -73,12 +73,11 @@
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span
+              <img
                 v-if="player.photo"
                 class="img"
-                :style="`background-image: url(${player.photo})`"
-              >
-              </span>
+                :src="$cacheImg(player.photo)"
+              />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
               }}</span>
@@ -100,12 +99,11 @@
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span
+              <img
                 v-if="player.photo"
                 class="img"
-                :style="`background-image: url(${player.photo})`"
-              >
-              </span>
+                :src="$cacheImg(player.photo)"
+              />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
               }}</span>
@@ -130,12 +128,11 @@
               <span class="img" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
-              <span
+              <img
                 v-if="player.photo"
                 class="img"
-                :style="`background-image: url(${player.photo})`"
-              >
-              </span>
+                :src="$cacheImg(player.photo)"
+              />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
               }}</span>

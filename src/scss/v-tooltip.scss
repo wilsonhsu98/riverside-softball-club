@@ -8,7 +8,8 @@
     background: $bg;
     color: $font;
     border-radius: 5px;
-    padding: 5px 10px 4px;
+    padding: 5px 10px;
+    box-sizing: border-box;
   }
   .tooltip-arrow {
     width: 0;
@@ -81,33 +82,36 @@
     opacity: 1;
     transition: opacity .15s;
   }
+  // &.popover,
   &.info {
     $color: rgba(#a6a6a6, .9);
+    outline: none;
     .tooltip-inner {
       background: $color;
       color: white;
       // padding: 24px;
       border-radius: 5px;
       box-shadow: 0 5px 30px rgba(black, .1);
-      max-width: calc(100vw - 30px);
+      max-width: calc(100vw - 20px);
+      transform: translateX(5px);
     }
     .tooltip-arrow {
       border-color: $color;
     }
   }
-  &.popover {
-    $color: #f9f9f9;
-    .popover-inner {
-      background: $color;
-      color: black;
-      padding: 24px;
-      border-radius: 5px;
-      box-shadow: 0 5px 30px rgba(black, .1);
-    }
-    .popover-arrow {
-      border-color: $color;
-    }
-  }
+  // &.popover {
+  //   $color: #f9f9f9;
+  //   .popover-inner {
+  //     background: $color;
+  //     color: black;
+  //     padding: 24px;
+  //     border-radius: 5px;
+  //     box-shadow: 0 5px 30px rgba(black, .1);
+  //   }
+  //   .popover-arrow {
+  //     border-color: $color;
+  //   }
+  // }
   ul {
     margin: 10px 0;
     padding: 0 0 0 20px;

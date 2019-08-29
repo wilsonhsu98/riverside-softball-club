@@ -64,7 +64,7 @@
             <img
               v-if="item.data.photo"
               class="img"
-              :src="item.data.photo"
+              :src="$cacheImg(item.data.photo)"
               onLoad="this.className='img'"
               onError="this.className='img-hidden'"
             />
@@ -117,19 +117,12 @@
   }
 }
 
-.dropdown {
-  height: 30px;
-  width: 110px;
-  border: 2px solid rgb(166, 166, 166);
-  background-color: rgb(248, 248, 248);
-  border-radius: 5px;
-  vertical-align: top;
-}
 i.fa {
   font-size: 28px;
   vertical-align: middle;
   cursor: pointer;
 }
+
 .search-bar__container,
 .toggle-search {
   display: none;

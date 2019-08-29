@@ -2,6 +2,7 @@ import Vue from 'vue';
 import store from './store';
 import router from './router';
 import i18n from './i18n';
+import { cacheImg } from './libs/utils';
 import './css/font-awesome.min.css';
 import './css/font.css';
 import './scss/_base.scss';
@@ -9,6 +10,7 @@ import VueTagsInput from '@johmun/vue-tags-input';
 import VTooltip from 'v-tooltip';
 import './scss/v-tooltip.scss';
 import draggable from 'vuedraggable';
+import smoothscroll from 'smoothscroll-polyfill';
 
 const componentsReq = require.context('./components/', false, /\.vue$/);
 componentsReq.keys().forEach(path => {
@@ -23,8 +25,15 @@ Vue.component('vue-tags-input', VueTagsInput);
 Vue.component('vue-draggable', draggable);
 Vue.use(VTooltip, {
   defaultTrigger: 'hover focus click',
+  disposeTimeout: 0,
 });
 Vue.config.productionTip = false;
+Vue.use({
+  install() {
+    Vue.cacheImg = cacheImg;
+    Vue.prototype.$cacheImg = cacheImg;
+  },
+});
 
 new Promise(resolve => {
   resolve(
@@ -50,10 +59,10 @@ const resetVH = () => {
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 };
 resetVH();
-
 window.addEventListener('resize', () => {
   resetVH();
 });
+smoothscroll.polyfill();
 
 document.title = 'Riverside Softball Club';
 const link = document.createElement('link');

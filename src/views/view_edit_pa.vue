@@ -1,152 +1,159 @@
 <template>
-  <div class="container">
+  <div>
     <mobile-header :back="back_" :icon="currentTeamIcon" :save="edit_" />
     <!-- {{ pa }}
     <div>{{ pa.name }}</div>
     <div>{{ pa.inn }}</div>
     <div>{{ pa.content }}</div> -->
-    <div class="left">
-      <div class="desc">
-        <div><minus-plus-number :value="inn" /> {{ $t('desc_inn') }}</div>
-        <div>{{ $t('desc_order', { n: order }) }}</div>
-        <div>{{ $t('desc_out', { n: 3 }) }}</div>
-        <div>
-          {{
-            $t('desc_batting', {
-              n: order % box[box.length - 1].order || box[box.length - 1].order,
-            })
-          }}
+    <div class="container">
+      <h1>
+        {{ $route.params.order === 'new' ? $t('add_pa') : $t('edit_pa') }}
+      </h1>
+      <div class="left">
+        <div class="desc">
+          <div><minus-plus-number :value="inn" /> {{ $t('desc_inn') }}</div>
+          <div>{{ $t('desc_order', { n: order }) }}</div>
+          <div>{{ $t('desc_out', { n: 3 }) }}</div>
+          <div>
+            {{
+              $t('desc_batting', {
+                n:
+                  order % box[box.length - 1].order ||
+                  box[box.length - 1].order,
+              })
+            }}
+          </div>
         </div>
-      </div>
-      <infield class="infield">
-        <div class="player-container">
-          <div
-            :class="`on-base-player ${b}`"
-            v-for="(b, bi) in ['first', 'second', 'third', 'home']"
-            :key="`onbase_${bi}`"
-          >
+        <infield class="infield">
+          <div class="player-container">
+            <div
+              :class="`on-base-player ${b}`"
+              v-for="(b, bi) in ['first', 'second', 'third', 'home']"
+              :key="`onbase_${bi}`"
+            >
+              <span
+                :class="
+                  `run${base[b].run ? ' select' : ''}${
+                    base[b].disabled ? ' disabled' : ''
+                  }`
+                "
+                @click="base[b].disabled || toggle(`base.${b}.run`)"
+              >
+                {{ $t('R') }}
+              </span>
+              <span class="name">
+                {{ base[b].name }}
+              </span>
+              <span
+                :class="
+                  `out${base[b].out ? ' select' : ''}${
+                    base[b].disabled ? ' disabled' : ''
+                  }`
+                "
+                @click="base[b].disabled || toggle(`base.${b}.out`)"
+              >
+                {{ $t('Out') }}
+              </span>
+            </div>
+          </div>
+        </infield>
+        <div class="content">
+          <div>
+            <span
+              :key="`item_${item}`"
+              v-for="item in ['1H', '2H', '3H', 'HR']"
+              :class="`red${content === item ? ' select' : ''}`"
+              @click="toggle('content', item)"
+            >
+              {{ $t(item) }}
+            </span>
             <span
               :class="
-                `run${base[b].run ? ' select' : ''}${
-                  base[b].disabled ? ' disabled' : ''
+                `rbi${rbi.value === 1 ? ' select' : ''}${
+                  rbi.one.disabled ? ' disabled' : ''
                 }`
               "
-              @click="base[b].disabled || toggle(`base.${b}.run`)"
+              @click="rbi.one.disabled || toggle('rbi.value', 1)"
             >
-              {{ $t('R') }}
+              {{ $t('RBI_count', { rbi: 1 }) }}
             </span>
-            <span class="name">
-              {{ base[b].name }}
+          </div>
+          <div>
+            <span
+              :key="`item_${item}`"
+              v-for="item in ['K', 'FO', 'GO', 'E']"
+              :class="`blue${content === item ? ' select' : ''}`"
+              @click="toggle('content', item)"
+            >
+              {{ $t(item) }}
             </span>
             <span
               :class="
-                `out${base[b].out ? ' select' : ''}${
-                  base[b].disabled ? ' disabled' : ''
+                `rbi${rbi.value === 2 ? ' select' : ''}${
+                  rbi.two.disabled ? ' disabled' : ''
                 }`
               "
-              @click="base[b].disabled || toggle(`base.${b}.out`)"
+              @click="rbi.two.disabled || toggle('rbi.value', 2)"
             >
-              {{ $t('Out') }}
+              {{ $t('RBI_count', { rbi: 2 }) }}
+            </span>
+          </div>
+          <div>
+            <span
+              :key="`item_${item}`"
+              v-for="item in ['FC', 'DP', 'TP']"
+              :class="`blue${content === item ? ' select' : ''}`"
+              @click="toggle('content', item)"
+            >
+              {{ $t(item) }}
+            </span>
+            <span></span>
+            <span
+              :class="
+                `rbi${rbi.value === 3 ? ' select' : ''}${
+                  rbi.three.disabled ? ' disabled' : ''
+                }`
+              "
+              @click="rbi.three.disabled || toggle('rbi.value', 3)"
+            >
+              {{ $t('RBI_count', { rbi: 3 }) }}
+            </span>
+          </div>
+          <div>
+            <span
+              :key="`item_${item}`"
+              v-for="item in ['BB', 'SF']"
+              :class="`yellow${content === item ? ' select' : ''}`"
+              @click="toggle('content', item)"
+            >
+              {{ $t(item) }}
+            </span>
+            <span></span><span></span>
+            <span
+              :class="
+                `rbi${rbi.value === 4 ? ' select' : ''}${
+                  rbi.four.disabled ? ' disabled' : ''
+                }`
+              "
+              @click="rbi.four.disabled || toggle('rbi.value', 4)"
+            >
+              {{ $t('RBI_count', { rbi: 4 }) }}
             </span>
           </div>
         </div>
-      </infield>
-      <div class="content">
-        <div>
-          <span
-            :key="`item_${item}`"
-            v-for="item in ['1H', '2H', '3H', 'HR']"
-            :class="`red${content === item ? ' select' : ''}`"
-            @click="toggle('content', item)"
-          >
-            {{ $t(item) }}
-          </span>
-          <span
-            :class="
-              `rbi${rbi.value === 1 ? ' select' : ''}${
-                rbi.one.disabled ? ' disabled' : ''
-              }`
-            "
-            @click="rbi.one.disabled || toggle('rbi.value', 1)"
-          >
-            {{ $t('RBI_count', { rbi: 1 }) }}
-          </span>
-        </div>
-        <div>
-          <span
-            :key="`item_${item}`"
-            v-for="item in ['K', 'FO', 'GO', 'E']"
-            :class="`blue${content === item ? ' select' : ''}`"
-            @click="toggle('content', item)"
-          >
-            {{ $t(item) }}
-          </span>
-          <span
-            :class="
-              `rbi${rbi.value === 2 ? ' select' : ''}${
-                rbi.two.disabled ? ' disabled' : ''
-              }`
-            "
-            @click="rbi.two.disabled || toggle('rbi.value', 2)"
-          >
-            {{ $t('RBI_count', { rbi: 2 }) }}
-          </span>
-        </div>
-        <div>
-          <span
-            :key="`item_${item}`"
-            v-for="item in ['FC', 'DP', 'TP']"
-            :class="`blue${content === item ? ' select' : ''}`"
-            @click="toggle('content', item)"
-          >
-            {{ $t(item) }}
-          </span>
-          <span></span>
-          <span
-            :class="
-              `rbi${rbi.value === 3 ? ' select' : ''}${
-                rbi.three.disabled ? ' disabled' : ''
-              }`
-            "
-            @click="rbi.three.disabled || toggle('rbi.value', 3)"
-          >
-            {{ $t('RBI_count', { rbi: 3 }) }}
-          </span>
-        </div>
-        <div>
-          <span
-            :key="`item_${item}`"
-            v-for="item in ['BB', 'SF']"
-            :class="`yellow${content === item ? ' select' : ''}`"
-            @click="toggle('content', item)"
-          >
-            {{ $t(item) }}
-          </span>
-          <span></span><span></span>
-          <span
-            :class="
-              `rbi${rbi.value === 4 ? ' select' : ''}${
-                rbi.four.disabled ? ' disabled' : ''
-              }`
-            "
-            @click="rbi.four.disabled || toggle('rbi.value', 4)"
-          >
-            {{ $t('RBI_count', { rbi: 4 }) }}
-          </span>
+      </div>
+      <div class="right">
+        <div class="coordination">
+          <coordination
+            :values="location"
+            :disabled="['BB', 'K'].includes(content)"
+          />
         </div>
       </div>
-    </div>
-    <div class="right">
-      <div class="coordination">
-        <coordination
-          :values="location"
-          :disabled="['BB', 'K'].includes(content)"
-        />
+      <div class="btn-container">
+        <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
+        <button class="btn" @click="edit_">{{ $t('btn_update') }}</button>
       </div>
-    </div>
-    <div class="btn-container">
-      <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
-      <button class="btn" @click="edit_">{{ $t('btn_update') }}</button>
     </div>
   </div>
 </template>
@@ -155,10 +162,13 @@
 @import '../scss/variable';
 
 .container {
-  text-align: center;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
+  h1 {
+    flex-basis: 100%;
+    margin-bottom: 15px;
+  }
   .desc {
     width: 300px;
     text-align: left;
@@ -327,15 +337,14 @@
     margin: 0;
     text-align: center;
   }
+  .left {
+    margin-right: 20px;
+  }
 }
-.left {
-  margin-right: 20px;
-}
+
 @media only screen and (max-width: 760px) {
   .container {
-    margin: 50px 0 0;
-    padding: 10px 0;
-    background-color: transparent;
+    /* background-color: transparent; */
     .content {
       span {
         font-size: 10px;
@@ -353,9 +362,9 @@
     .btn-container {
       display: none;
     }
-  }
-  .left {
-    margin-right: 0;
+    .left {
+      margin-right: 0;
+    }
   }
 }
 </style>
@@ -484,11 +493,11 @@ export default {
     },
   },
   watch: {
-    $route() {
-      this.setGame(this.$route.params.game);
-      this.setOrder(this.$route.params.order);
-      this.setPa();
-    },
+    // $route() {
+    //   this.setGame(this.$route.params.game);
+    //   this.setOrder(this.$route.params.order);
+    //   this.setPa();
+    // },
     box() {
       this.setPa();
     },

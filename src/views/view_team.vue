@@ -13,7 +13,7 @@
         :key="`request_${request.teamCode}`"
         v-for="request in teamRequests"
       >
-        <img :src="request.photo" />
+        <img :src="$cacheImg(request.photo)" />
         <p>{{ $t('msg_request_join', { team: request.teamName }) }}</p>
         <p class="request-msg">{{ request.msg }}</p>
         <p>{{ new Date(request.timestamp).toLocaleString() }}</p>
@@ -121,11 +121,11 @@
               v-model="player.manager"
               @change="releaseSelfManager($event, player)"
             />
-            {{ $t('manager') }}
+            <span>{{ $t('manager') }}</span>
           </label>
           <img
             v-if="player && player.uid && player.photo"
-            :src="player.photo"
+            :src="$cacheImg(player.photo)"
             class="binded"
           />
           <span v-if="player && player.uid">{{ $t('binded') }}</span>
@@ -160,7 +160,7 @@
               :checked="player.self"
               @change="rdoBindSelf(i)"
             />
-            {{ $t('bind_self') }}
+            <span>{{ $t('bind_self') }}</span>
           </label>
           <i class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
         </template>
@@ -197,7 +197,7 @@
           <label v-if="player && player.uid" style="width: 57px;"> </label>
           <img
             v-if="player && player.uid && player.photo"
-            :src="player.photo"
+            :src="$cacheImg(player.photo)"
             class="binded"
           />
           <i
@@ -356,6 +356,9 @@ $max-width: 400px;
     label,
     span {
       font-size: 12px;
+      line-height: 32px;
+      vertical-align: top;
+      display: inline-block;
     }
   }
   .error {
@@ -676,14 +679,14 @@ export default {
     }),
   },
   watch: {
-    $route() {
-      if (this.$route.params.team) {
-        this.teamCode_err = '';
-        this.teamName_err = '';
-        this.players_err = '';
-        this.fetchTeamInfo(this.$route.params.team);
-      }
-    },
+    // $route() {
+    //   if (this.$route.params.team) {
+    //     this.teamCode_err = '';
+    //     this.teamName_err = '';
+    //     this.players_err = '';
+    //     this.fetchTeamInfo(this.$route.params.team);
+    //   }
+    // },
     teamInfo() {
       this.teamCode = this.teamInfo.teamCode;
       this.teamName = this.teamInfo.teamName;
@@ -691,15 +694,13 @@ export default {
       this.otherNames = this.teamInfo.otherNames;
 
       this.icon = this.teamInfo.icon;
-      this.players = Array.from(
-        this.teamInfo.players.map(player => {
-          return {
-            ...player,
-            self: player.uid === this.userId,
-          };
-        }),
-      );
-      this.benches = Array.from(this.teamInfo.benches);
+      this.players = this.teamInfo.players.map(player => {
+        return {
+          ...player,
+          self: player.uid === this.userId,
+        };
+      });
+      this.benches = this.teamInfo.benches.map(player => ({ ...player }));
     },
   },
 };

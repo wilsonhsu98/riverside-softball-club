@@ -61,9 +61,20 @@
 	"box_tie": "TIE",
 	"box_header_player": "Player",
 
-	"ttl_toggle_avatar": "Display avatar",
+	"create_game": "Create a game",
 	"ttl_all_players": "All players",
 	"ttl_starting_players": "Starting players",
+	"msg_move_back": "Move to this area",
+	"pla_add_extra": "Add other",
+
+	"add_pa": "新增打席",
+	"edit_pa": "編輯打席",
+	"desc_inn": "局",
+	"desc_order": "全隊第 %{n} 打席",
+	"desc_out": "目前 %{n} 出局",
+	"desc_batting": "輪到第 %{n} 棒",
+	"Out": "出局",
+	"RBI_count": "%{rbi}分",
 
 	"create_team": "Create a team",
 	"manage_team": "Manage your team",
