@@ -1,4 +1,3 @@
 node_modules/
-functions/config.json
-config.json
 dist/
+.env

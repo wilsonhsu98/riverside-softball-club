@@ -7,7 +7,7 @@ import {
   // messaging,
 } from '../firebase';
 import router from '../router';
-import config from '../../config.json';
+import config from '../../config';
 import user from './modules/user';
 const lineLoginUrl =
   process.env.NODE_ENV === 'production'

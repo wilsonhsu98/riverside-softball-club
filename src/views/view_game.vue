@@ -523,7 +523,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import html2canvas from 'html2canvas';
 import axios from 'axios';
-import config from '../../config.json';
+import config from '../../config';
 import router from '../router';
 
 export default {
