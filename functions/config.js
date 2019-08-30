@@ -1,14 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  firebase: {
-    apiKey: process.env.VUE_APP_FIREBASE_APIKEY,
-    authDomain: process.env.VUE_APP_FIREBASE_AUTHDOMAIN,
-    databaseURL: process.env.VUE_APP_FIREBASE_DATABASEURL,
-    projectId: process.env.VUE_APP_FIREBASE_PROJECTID,
-    storageBucket: process.env.VUE_APP_FIREBASE_STORAGEBUCKET,
-    messagingSenderId: process.env.VUE_APP_FIREBASE_MESSAGINGSENDERID,
-  },
+  apiKey: process.env.VUE_APP_FIREBASE_APIKEY,
 
   serviceAccount: {
     type: process.env.VUE_APP_FIREBASE_SA_TYPE,

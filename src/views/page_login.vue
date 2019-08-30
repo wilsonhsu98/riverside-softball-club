@@ -7,10 +7,7 @@
     <button class="signin-btn fb" @click="fbLogin">
       {{ $t('login_fb_btn') }}
     </button>
-    <button
-      class="signin-btn line"
-      @click="lineLogin"
-    >
+    <button class="signin-btn line" @click="lineLogin">
       {{ $t('login_line_btn') }}
     </button>
     <button class="signin-btn github" @click="githubLogin">
@@ -123,8 +120,7 @@ import { mapGetters, mapActions } from 'vuex';
 
 export default {
   data() {
-    return {
-    };
+    return {};
   },
   created() {
     if (this.$route.params.custom) {

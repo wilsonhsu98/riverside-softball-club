@@ -162,6 +162,7 @@ app.use(cookieParser());
  * Redirects the User to the Instagram authentication consent screen. Also the 'state' cookie is set for later state verification.
  */
 router.get(OAUTH_REDIRECT_PATH, (req, res) => {
+  const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
   const state =
     (req.cookies && req.cookies.state) ||
     crypto.randomBytes(20).toString('hex');
@@ -179,16 +180,8 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
     httpOnly: true,
   });
 
-  const { projectId, databaseURL } = config.firebase;
-  const middle_dir =
-    req.get('host').indexOf('localhost:') === 0
-      ? `/${projectId}/${databaseURL}1`
-      : '';
-
   const redirectUri = oauth2.authorizationCode.authorizeURL({
-    redirect_uri: `${req.protocol}://${req.get(
-      'host',
-    )}${middle_dir}/api${OAUTH_CALLBACK_PATH}`,
+    redirect_uri: fullUrl.replace(OAUTH_REDIRECT_PATH, OAUTH_CALLBACK_PATH),
     scope: OAUTH_SCOPES,
     state: state,
   });
@@ -202,11 +195,7 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
  * This is meant to be used by Web Clients.
  */
 router.get(OAUTH_CALLBACK_PATH, (req, res) => {
-  const { projectId, databaseURL } = config.firebase;
-  const middle_dir =
-    req.get('host').indexOf('localhost:') === 0
-      ? `/${projectId}/${databaseURL}1`
-      : '';
+  const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
   // console.log('Received state cookie:', req.cookies && req.cookies.state);
   // console.log('Received state query parameter:', req.query.state);
@@ -223,9 +212,7 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
   oauth2.authorizationCode
     .getToken({
       code: req.query.code,
-      redirect_uri: `${req.protocol}://${req.get(
-        'host',
-      )}${middle_dir}/api${OAUTH_CALLBACK_PATH}`,
+      redirect_uri: fullUrl,
     })
     .then(results => {
       const payload = jwt.decode(results.id_token);
@@ -243,7 +230,7 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
       if (results.email) {
         return rp({
           method: 'POST',
-          uri: `${restUrl}/verifyPassword?key=${config.firebase.apiKey}`,
+          uri: `${restUrl}/verifyPassword?key=${config.apiKey}`,
           headers: { 'Content-Type': 'application/json' },
           body: {
             email: results.email,
@@ -271,7 +258,7 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
                 // create new user
                 return rp({
                   method: 'POST',
-                  uri: `${restUrl}/signupNewUser?key=${config.firebase.apiKey}`,
+                  uri: `${restUrl}/signupNewUser?key=${config.apiKey}`,
                   headers: { 'Content-Type': 'application/json' },
                   body: {
                     email: results.email,
@@ -379,7 +366,7 @@ function signInFirebaseTemplate(token) {
 		<script>
 			var token = '${token}';
 			var config = {
-				apiKey: '${config.firebase.apiKey}'
+				apiKey: '${config.apiKey}'
 			};
 			var app = firebase.initializeApp(config);
 			app.auth().signInWithCustomToken(token).then(function(res) {
