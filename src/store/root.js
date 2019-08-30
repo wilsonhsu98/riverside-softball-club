@@ -9,10 +9,10 @@ import {
 import router from '../router';
 import config from '../../config';
 import user from './modules/user';
-const lineLoginUrl =
-  process.env.NODE_ENV === 'production'
-    ? config.line.loginUrl
-    : 'http://localhost:5000/riversidesoftballclub/us-central1/api/line_oauth';
+const lineLoginUrl = config.line.loginUrl;
+  // process.env.NODE_ENV === 'production'
+  //   ? config.line.loginUrl
+  //   : 'http://localhost:5000/riversidesoftballclub/us-central1/api/line_oauth';
 let isFirst = true;
 let chkLoginStatusDone = false;
 let isLogout = false;

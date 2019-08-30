@@ -10,7 +10,6 @@
     <button
       class="signin-btn line"
       @click="lineLogin"
-      :disabled="isProduction ? true : false"
     >
       {{ $t('login_line_btn') }}
     </button>
@@ -125,7 +124,6 @@ import { mapGetters, mapActions } from 'vuex';
 export default {
   data() {
     return {
-      isProduction: process.env.NODE_ENV === 'production',
     };
   },
   created() {

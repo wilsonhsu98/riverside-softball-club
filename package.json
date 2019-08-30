@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve": "vue-cli-service serve --port 9527 --open",
+    "start:client": "vue-cli-service serve --port 9527 --open",
+    "start:server": "netlify-lambda serve functions -c webpack.server.js",
+    "build": "npm run build:client && npm run build:server && cd dist/server && npm install",
     "build:client": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "format": "prettier --write \"src/**/*.{js,vue}\" \"functions/**/*.js\"",
     "build:server": "netlify-lambda build functions -c webpack.server.js",
-    "build": "npm run build:client && npm run build:server && cd dist/server && npm install"
+    "lint": "vue-cli-service lint",
+    "format": "prettier --write \"src/**/*.{js,vue}\" \"functions/**/*.js\""
   },
   "dependencies": {
     "@johmun/vue-tags-input": "^2.0.0",
@@ -20,6 +21,7 @@
     "generate-json-webpack-plugin": "^0.3.1",
     "html2canvas": "^1.0.0-alpha.12",
     "request-promise": "^4.2.4",
+    "serverless-http": "^2.3.0",
     "simple-oauth2": "^2.3.0",
     "smoothscroll-polyfill": "^0.4.4",
     "svg-to-image": "^1.1.3",

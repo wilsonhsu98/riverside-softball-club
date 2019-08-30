@@ -139,6 +139,7 @@ const credentials = {
 const restUrl = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty';
 const oauth2 = require('simple-oauth2').create(credentials);
 const rp = require('request-promise');
+const serverless = require('serverless-http');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
@@ -151,6 +152,7 @@ const OAUTH_CALLBACK_PATH = '/line_oauth_callback';
 const OAUTH_SCOPES = 'openid profile email';
 
 const app = express();
+const router = express.Router();
 app.enable('trust proxy');
 app.use(express.static('public'));
 app.use(express.static('node_modules/instafeed.js'));
@@ -159,7 +161,7 @@ app.use(cookieParser());
 /**
  * Redirects the User to the Instagram authentication consent screen. Also the 'state' cookie is set for later state verification.
  */
-app.get(OAUTH_REDIRECT_PATH, (req, res) => {
+router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   const state =
     (req.cookies && req.cookies.state) ||
     crypto.randomBytes(20).toString('hex');
@@ -177,12 +179,10 @@ app.get(OAUTH_REDIRECT_PATH, (req, res) => {
     httpOnly: true,
   });
 
-  const { projectId, cloudResourceLocation } = JSON.parse(
-    process.env.FIREBASE_CONFIG,
-  );
+  const { projectId, databaseURL } = config.firebase;
   const middle_dir =
     req.get('host').indexOf('localhost:') === 0
-      ? `/${projectId}/${cloudResourceLocation}1`
+      ? `/${projectId}/${databaseURL}1`
       : '';
 
   const redirectUri = oauth2.authorizationCode.authorizeURL({
@@ -201,13 +201,11 @@ app.get(OAUTH_REDIRECT_PATH, (req, res) => {
  * The request also needs to specify a 'state' query parameter which will be checked against the 'state' cookie to avoid session Fixation attacks.
  * This is meant to be used by Web Clients.
  */
-app.get(OAUTH_CALLBACK_PATH, (req, res) => {
-  const { projectId, cloudResourceLocation } = JSON.parse(
-    process.env.FIREBASE_CONFIG,
-  );
+router.get(OAUTH_CALLBACK_PATH, (req, res) => {
+  const { projectId, databaseURL } = config.firebase;
   const middle_dir =
     req.get('host').indexOf('localhost:') === 0
-      ? `/${projectId}/${cloudResourceLocation}1`
+      ? `/${projectId}/${databaseURL}1`
       : '';
 
   // console.log('Received state cookie:', req.cookies && req.cookies.state);
@@ -245,7 +243,7 @@ app.get(OAUTH_CALLBACK_PATH, (req, res) => {
       if (results.email) {
         return rp({
           method: 'POST',
-          uri: `${restUrl}/verifyPassword?key=${config.apiKey}`,
+          uri: `${restUrl}/verifyPassword?key=${config.firebase.apiKey}`,
           headers: { 'Content-Type': 'application/json' },
           body: {
             email: results.email,
@@ -273,7 +271,7 @@ app.get(OAUTH_CALLBACK_PATH, (req, res) => {
                 // create new user
                 return rp({
                   method: 'POST',
-                  uri: `${restUrl}/signupNewUser?key=${config.apiKey}`,
+                  uri: `${restUrl}/signupNewUser?key=${config.firebase.apiKey}`,
                   headers: { 'Content-Type': 'application/json' },
                   body: {
                     email: results.email,
@@ -370,6 +368,7 @@ app.get(OAUTH_CALLBACK_PATH, (req, res) => {
       res.status(500).send(err.message);
     });
 });
+app.use('/.netlify/functions/index', router);
 
 /**
  * Generates the HTML template that signs the user in Firebase using the given token and closes the popup.
@@ -380,7 +379,7 @@ function signInFirebaseTemplate(token) {
 		<script>
 			var token = '${token}';
 			var config = {
-				apiKey: '${config.apiKey}'
+				apiKey: '${config.firebase.apiKey}'
 			};
 			var app = firebase.initializeApp(config);
 			app.auth().signInWithCustomToken(token).then(function(res) {
@@ -390,3 +389,4 @@ function signInFirebaseTemplate(token) {
 }
 
 exports.api = functions.https.onRequest(app);
+exports.handler = serverless(app);
