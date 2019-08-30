@@ -167,7 +167,7 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
     (req.cookies && req.cookies.state) ||
     crypto.randomBytes(20).toString('hex');
   // console.log('Setting state cookie for verification:', state);
-  const secureCookie = req.get('host').indexOf('localhost:') !== 0;
+  const secureCookie = true;//req.get('host').indexOf('localhost:') !== 0;
   // console.log('Need a secure cookie (i.e. not on localhost)?', secureCookie);
   res.cookie('state', state, {
     maxAge: 3600000,
