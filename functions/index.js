@@ -162,12 +162,12 @@ app.use(cookieParser());
  * Redirects the User to the Instagram authentication consent screen. Also the 'state' cookie is set for later state verification.
  */
 router.get(OAUTH_REDIRECT_PATH, (req, res) => {
-  const fullUrl = `${req.protocol}://${req.hostname}${req.originalUrl}`;
+  const fullUrl = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
   const state =
     (req.cookies && req.cookies.state) ||
     crypto.randomBytes(20).toString('hex');
   // console.log('Setting state cookie for verification:', state);
-  const secureCookie = req.hostname.indexOf('localhost:') !== 0;
+  const secureCookie = req.headers.host.indexOf('localhost:') !== 0;
   // console.log('Need a secure cookie (i.e. not on localhost)?', secureCookie);
   res.cookie('state', state, {
     maxAge: 3600000,
@@ -195,7 +195,7 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
  * This is meant to be used by Web Clients.
  */
 router.get(OAUTH_CALLBACK_PATH, (req, res) => {
-  const fullUrl = `${req.protocol}://${req.hostname}${req.originalUrl}`;
+  const fullUrl = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
 
   // console.log('Received state cookie:', req.cookies && req.cookies.state);
   // console.log('Received state query parameter:', req.query.state);
