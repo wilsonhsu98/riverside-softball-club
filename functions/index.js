@@ -384,4 +384,14 @@ function signInFirebaseTemplate(token) {
 }
 
 exports.api = functions.https.onRequest(app);
-exports.handler = serverless(app);
+// exports.handler = serverless(app);
+exports.handler = function(event, context, callback) {
+  const str = `
+  Body: ${event.body}<br>
+  Headers: ${JSON.stringify(event.headers)}<br>
+  Method: ${event.method}<br>
+  Params: ${event.params}<br>
+  Query: ${event.query}<br>
+  `;
+  callback(str, 200);
+};
