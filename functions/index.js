@@ -164,7 +164,7 @@ app.use(cookieParser());
  */
 router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   const isLocalhost = (req.get('host') || '').indexOf('localhost') !== 0;
-  const fullUrlObj = new URL(config.line.loginUrl);
+  const fullUrlObj = url.parse(config.line.loginUrl);
   const fullUrl = isLocalhost ? `${fullUrlObj.protocol}://${req.get('host')}${fullUrlObj.originalUrl}` : config.line.loginUrl;
   const state =
     (req.cookies && req.cookies.state) ||
@@ -198,7 +198,7 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
  */
 router.get(OAUTH_CALLBACK_PATH, (req, res) => {
   const isLocalhost = (req.get('host') || '').indexOf('localhost') !== 0;
-  const fullUrlObj = new URL(config.line.loginUrl);
+  const fullUrlObj = url.parse(config.line.loginUrl);
   const fullUrl = isLocalhost ? `${fullUrlObj.protocol}://${req.get('host')}${fullUrlObj.originalUrl}` : config.line.loginUrl;
 
   // console.log('Received state cookie:', req.cookies && req.cookies.state);
