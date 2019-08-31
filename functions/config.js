@@ -23,5 +23,6 @@ module.exports = {
   line: {
     clientId: process.env.VUE_APP_LINE_CLIENTID,
     clientSecret: process.env.VUE_APP_LINE_CLIENTSECRET,
+    loginUrl: process.env.VUE_APP_LINE_LOGINGURL,
   },
 };

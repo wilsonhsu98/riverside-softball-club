@@ -144,6 +144,7 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
+const url = require('url');
 
 // Path to the OAuth handlers.
 const OAUTH_REDIRECT_PATH = '/line_oauth';
@@ -153,8 +154,7 @@ const OAUTH_SCOPES = 'openid profile email';
 
 const app = express();
 const router = express.Router();
-app.set('trust proxy', true);
-// app.enable('trust proxy');
+app.enable('trust proxy');
 app.use(express.static('public'));
 app.use(express.static('node_modules/instafeed.js'));
 app.use(cookieParser());
@@ -163,29 +163,22 @@ app.use(cookieParser());
  * Redirects the User to the Instagram authentication consent screen. Also the 'state' cookie is set for later state verification.
  */
 router.get(OAUTH_REDIRECT_PATH, (req, res) => {
-  res.send(`
-  ~~~req.connection.remoteAddress:${JSON.stringify(req.connection)}<br>
-  ~~~req.get('host'):${req.get('host')}<br>
-  ~~~req.headers.host:${JSON.stringify(req.headers)}<br>
-  ~~~req.hostname:${req.hostname}<br>
-  `);
-  return;
-  /*
-  const fullUrl = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
+  const isLocalhost = (req.get('host') || '').indexOf('localhost') !== 0;
+  const fullUrlObj = new URL(config.line.loginUrl);
+  const fullUrl = isLocalhost ? `${fullUrlObj.protocol}://${req.get('host')}${fullUrlObj.originalUrl}` : config.line.loginUrl;
   const state =
     (req.cookies && req.cookies.state) ||
     crypto.randomBytes(20).toString('hex');
   // console.log('Setting state cookie for verification:', state);
-  const secureCookie = req.headers.host.indexOf('localhost:') !== 0;
   // console.log('Need a secure cookie (i.e. not on localhost)?', secureCookie);
   res.cookie('state', state, {
     maxAge: 3600000,
-    secure: secureCookie,
+    secure: isLocalhost,
     httpOnly: true,
   });
   res.cookie('from', req.query.from, {
     maxAge: 3600000,
-    secure: secureCookie,
+    secure: isLocalhost,
     httpOnly: true,
   });
 
@@ -196,7 +189,6 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   });
   // console.log('Redirecting to:', redirectUri);
   res.redirect(redirectUri);
-  */
 });
 
 /**
@@ -205,7 +197,9 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
  * This is meant to be used by Web Clients.
  */
 router.get(OAUTH_CALLBACK_PATH, (req, res) => {
-  const fullUrl = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
+  const isLocalhost = (req.get('host') || '').indexOf('localhost') !== 0;
+  const fullUrlObj = new URL(config.line.loginUrl);
+  const fullUrl = isLocalhost ? `${fullUrlObj.protocol}://${req.get('host')}${fullUrlObj.originalUrl}` : config.line.loginUrl;
 
   // console.log('Received state cookie:', req.cookies && req.cookies.state);
   // console.log('Received state query parameter:', req.query.state);
@@ -222,7 +216,7 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
   oauth2.authorizationCode
     .getToken({
       code: req.query.code,
-      redirect_uri: fullUrl,
+      redirect_uri: fullUrl.replace(OAUTH_REDIRECT_PATH, OAUTH_CALLBACK_PATH),
     })
     .then(results => {
       const payload = jwt.decode(results.id_token);
@@ -367,15 +361,6 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
 });
 app.use('/.netlify/functions/index', router);
 
-// Apply express middlewares
-// router.use(cors());
-// router.use(bodyParser.json());
-// router.use(bodyParser.urlencoded({ extended: true }));
-// router.use(awsServerlessExpressMiddleware.eventContext());
-
-// // Initialize awsServerlessExpress
-// const server = awsServerlessExpress.createServer(app);
-
 /**
  * Generates the HTML template that signs the user in Firebase using the given token and closes the popup.
  */
@@ -396,19 +381,3 @@ function signInFirebaseTemplate(token) {
 
 exports.api = functions.https.onRequest(app);
 exports.handler = serverless(app);
-// exports.handler = function(event, context, callback) {
-//   const str = `
-//   Body: ${event.body}<br>
-//   Headers: ${JSON.stringify(event.headers)}<br>
-//   Method: ${event.method}<br>
-//   Params: ${event.params}<br>
-//   Query: ${event.query}<br>
-//   `;
-//   callback(str, 200);
-// };
-
-
-// Export lambda handler
-// exports.handler = (event, context) => {
-//   return awsServerlessExpress.proxy(server, event, context);
-// };
