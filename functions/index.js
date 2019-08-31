@@ -164,7 +164,7 @@ app.use(cookieParser());
 router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   res.send(`
   ~~~req.get('host'):${req.get('host')}<br>
-  ~~~req.headers.host:${req.headers.host}<br>
+  ~~~req.headers.host:${JSON.stringify(req.headers)}<br>
   ~~~req.hostname:${req.hostname}<br>
   `);
   return;
