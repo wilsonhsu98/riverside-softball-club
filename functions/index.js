@@ -162,6 +162,12 @@ app.use(cookieParser());
  * Redirects the User to the Instagram authentication consent screen. Also the 'state' cookie is set for later state verification.
  */
 router.get(OAUTH_REDIRECT_PATH, (req, res) => {
+  res.send(`
+  ~~~req.get('host'):${req.get('host')}<br>
+  ~~~req.headers.host:${req.headers.host}<br>
+  ~~~req.hostname:${req.hostname}<br>
+  `);
+  return;
   const fullUrl = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
   const state =
     (req.cookies && req.cookies.state) ||
