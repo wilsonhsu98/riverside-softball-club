@@ -163,7 +163,7 @@ app.use(cookieParser());
  * Redirects the User to the Instagram authentication consent screen. Also the 'state' cookie is set for later state verification.
  */
 router.get(OAUTH_REDIRECT_PATH, (req, res) => {
-  const isLocalhost = (req.get('host') || '').indexOf('localhost') !== 0;
+  const isLocalhost = (req.get('host') || '').indexOf('localhost') > -1;
   const fullUrlObj = url.parse(config.line.loginUrl);
   const fullUrl = isLocalhost ? `${fullUrlObj.protocol}://${req.get('host')}${fullUrlObj.originalUrl}` : config.line.loginUrl;
   const state =
@@ -197,7 +197,7 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
  * This is meant to be used by Web Clients.
  */
 router.get(OAUTH_CALLBACK_PATH, (req, res) => {
-  const isLocalhost = (req.get('host') || '').indexOf('localhost') !== 0;
+  const isLocalhost = (req.get('host') || '').indexOf('localhost') > -1;
   const fullUrlObj = url.parse(config.line.loginUrl);
   const fullUrl = isLocalhost ? `${fullUrlObj.protocol}://${req.get('host')}${fullUrlObj.originalUrl}` : config.line.loginUrl;
 
