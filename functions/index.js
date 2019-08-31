@@ -168,6 +168,7 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   ~~~req.hostname:${req.hostname}<br>
   `);
   return;
+  /*
   const fullUrl = `${req.protocol}://${req.headers.host}${req.originalUrl}`;
   const state =
     (req.cookies && req.cookies.state) ||
@@ -193,6 +194,7 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   });
   // console.log('Redirecting to:', redirectUri);
   res.redirect(redirectUri);
+  */
 });
 
 /**
