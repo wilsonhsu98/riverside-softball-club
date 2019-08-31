@@ -153,6 +153,7 @@ const OAUTH_SCOPES = 'openid profile email';
 
 const app = express();
 const router = express.Router();
+app.set('trust proxy', true);
 // app.enable('trust proxy');
 app.use(express.static('public'));
 app.use(express.static('node_modules/instafeed.js'));
@@ -163,6 +164,7 @@ app.use(cookieParser());
  */
 router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   res.send(`
+  ~~~req.connection.remoteAddress:${JSON.stringify(req.connection)}<br>
   ~~~req.get('host'):${req.get('host')}<br>
   ~~~req.headers.host:${JSON.stringify(req.headers)}<br>
   ~~~req.hostname:${req.hostname}<br>
