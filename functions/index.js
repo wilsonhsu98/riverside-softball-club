@@ -153,7 +153,7 @@ const OAUTH_SCOPES = 'openid profile email';
 
 const app = express();
 const router = express.Router();
-app.enable('trust proxy');
+// app.enable('trust proxy');
 app.use(express.static('public'));
 app.use(express.static('node_modules/instafeed.js'));
 app.use(cookieParser());
@@ -365,6 +365,15 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
 });
 app.use('/.netlify/functions/index', router);
 
+// Apply express middlewares
+// router.use(cors());
+// router.use(bodyParser.json());
+// router.use(bodyParser.urlencoded({ extended: true }));
+// router.use(awsServerlessExpressMiddleware.eventContext());
+
+// // Initialize awsServerlessExpress
+// const server = awsServerlessExpress.createServer(app);
+
 /**
  * Generates the HTML template that signs the user in Firebase using the given token and closes the popup.
  */
@@ -384,14 +393,20 @@ function signInFirebaseTemplate(token) {
 }
 
 exports.api = functions.https.onRequest(app);
-// exports.handler = serverless(app);
-exports.handler = function(event, context, callback) {
-  const str = `
-  Body: ${event.body}<br>
-  Headers: ${JSON.stringify(event.headers)}<br>
-  Method: ${event.method}<br>
-  Params: ${event.params}<br>
-  Query: ${event.query}<br>
-  `;
-  callback(str, 200);
-};
+exports.handler = serverless(app);
+// exports.handler = function(event, context, callback) {
+//   const str = `
+//   Body: ${event.body}<br>
+//   Headers: ${JSON.stringify(event.headers)}<br>
+//   Method: ${event.method}<br>
+//   Params: ${event.params}<br>
+//   Query: ${event.query}<br>
+//   `;
+//   callback(str, 200);
+// };
+
+
+// Export lambda handler
+// exports.handler = (event, context) => {
+//   return awsServerlessExpress.proxy(server, event, context);
+// };
