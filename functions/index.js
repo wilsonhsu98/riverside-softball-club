@@ -166,23 +166,24 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   const isLocalhost = (req.get('host') || '').indexOf('localhost') > -1;
   const fullUrlObj = url.parse(config.line.loginUrl);
   const fullUrl = isLocalhost
-    ? `${fullUrlObj.protocol}://${req.get('host')}${fullUrlObj.originalUrl}`
+    ? `http://${req.get('host')}${fullUrlObj.path}`
     : config.line.loginUrl;
   const state =
     (req.cookies && req.cookies.state) ||
     crypto.randomBytes(20).toString('hex');
   // console.log('Setting state cookie for verification:', state);
   // console.log('Need a secure cookie (i.e. not on localhost)?', secureCookie);
-  res.cookie('state', state, {
-    maxAge: 3600000,
-    secure: isLocalhost,
-    httpOnly: true,
-  });
   res.cookie('from', req.query.from, {
     maxAge: 3600000,
-    secure: isLocalhost,
+    secure: !isLocalhost,
     httpOnly: true,
   });
+  res.cookie('state', state, {
+    maxAge: 3600000,
+    secure: !isLocalhost,
+    httpOnly: true,
+  });
+
 
   const redirectUri = oauth2.authorizationCode.authorizeURL({
     redirect_uri: fullUrl.replace(OAUTH_REDIRECT_PATH, OAUTH_CALLBACK_PATH),
@@ -202,10 +203,10 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
   const isLocalhost = (req.get('host') || '').indexOf('localhost') > -1;
   const fullUrlObj = url.parse(config.line.loginUrl);
   const fullUrl = isLocalhost
-    ? `${fullUrlObj.protocol}://${req.get('host')}${fullUrlObj.originalUrl}`
+    ? `http://${req.get('host')}${fullUrlObj.path}`
     : config.line.loginUrl;
 
-  // console.log('Received state cookie:', req.cookies && req.cookies.state);
+  // console.log('Received state cookie:', req.cookies);
   // console.log('Received state query parameter:', req.query.state);
   if (req.cookies && !req.cookies.state) {
     res

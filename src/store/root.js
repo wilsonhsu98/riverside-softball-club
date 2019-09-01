@@ -9,10 +9,10 @@ import {
 import router from '../router';
 import config from '../../config';
 import user from './modules/user';
-const lineLoginUrl = config.line.loginUrl;
-  // process.env.NODE_ENV === 'production'
-  //   ? config.line.loginUrl
-  //   : 'http://localhost:5000/riversidesoftballclub/us-central1/api/line_oauth';
+// const lineLoginUrl = config.line.loginUrl;
+const lineLoginUrl = process.env.NODE_ENV === 'production'
+  ? config.line.loginUrl
+  : 'http://localhost:9000/.netlify/functions/index/line_oauth';
 let isFirst = true;
 let chkLoginStatusDone = false;
 let isLogout = false;
@@ -93,6 +93,7 @@ const actions = {
     auth.signInWithCustomToken(token).then(result => {
       const user = result.user;
       if (user) {
+        commit(types.SET_PROVIDERID, 'password');
         commit(types.SET_TOKEN, token);
         commit(types.SET_USERID, user.uid);
         commit(types.SET_ANONYMOUS, false);
