@@ -168,22 +168,30 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
   const fullUrl = isLocalhost
     ? `http://${req.get('host')}${fullUrlObj.path}`
     : config.line.loginUrl;
+  // const state =
+  //   (req.cookies && req.cookies.state) ||
+  //   crypto.randomBytes(20).toString('hex');
+  // // console.log('Setting state cookie for verification:', state);
+  // // console.log('Need a secure cookie (i.e. not on localhost)?', secureCookie);
+  // res.cookie('from', req.query.from, {
+  //   maxAge: 3600000,
+  //   secure: !isLocalhost,
+  //   httpOnly: true,
+  // });
+  // res.cookie('state', state, {
+  //   maxAge: 3600000,
+  //   secure: !isLocalhost,
+  //   httpOnly: true,
+  // });
+
   const state =
     (req.cookies && req.cookies.state) ||
-    crypto.randomBytes(20).toString('hex');
-  // console.log('Setting state cookie for verification:', state);
-  // console.log('Need a secure cookie (i.e. not on localhost)?', secureCookie);
-  res.cookie('from', req.query.from, {
-    maxAge: 3600000,
-    secure: !isLocalhost,
-    httpOnly: true,
-  });
+    `${crypto.randomBytes(20).toString('hex')}|||${req.query.from}`;
   res.cookie('state', state, {
     maxAge: 3600000,
     secure: !isLocalhost,
     httpOnly: true,
   });
-
 
   const redirectUri = oauth2.authorizationCode.authorizeURL({
     redirect_uri: fullUrl.replace(OAUTH_REDIRECT_PATH, OAUTH_CALLBACK_PATH),
@@ -191,6 +199,7 @@ router.get(OAUTH_REDIRECT_PATH, (req, res) => {
     state: state,
   });
   // console.log('Redirecting to:', redirectUri);
+  // res.status(200).send(redirectUri);
   res.redirect(redirectUri);
 });
 
@@ -353,8 +362,13 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
     })
     .then(firebaseToken => {
       // Serve an HTML page that signs the user in and updates the user profile.
-      if (req.cookies.from !== 'undefined') {
-        res.redirect(`${req.cookies.from}/${firebaseToken}`);
+      // if (req.cookies.from !== 'undefined') {
+      //   res.redirect(`${req.cookies.from}/${firebaseToken}`);
+      // } else {
+      //   res.send(signInFirebaseTemplate(firebaseToken));
+      // }
+      if (req.cookies.state) {
+        res.redirect(`${req.cookies.state.split('|||')[1]}/${firebaseToken}`);
       } else {
         res.send(signInFirebaseTemplate(firebaseToken));
       }

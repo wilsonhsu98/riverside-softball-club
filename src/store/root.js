@@ -10,9 +10,10 @@ import router from '../router';
 import config from '../../config';
 import user from './modules/user';
 // const lineLoginUrl = config.line.loginUrl;
-const lineLoginUrl = process.env.NODE_ENV === 'production'
-  ? config.line.loginUrl
-  : 'http://localhost:9000/.netlify/functions/index/line_oauth';
+const lineLoginUrl =
+  process.env.NODE_ENV === 'production'
+    ? config.line.loginUrl
+    : 'http://localhost:9000/.netlify/functions/index/line_oauth';
 let isFirst = true;
 let chkLoginStatusDone = false;
 let isLogout = false;
