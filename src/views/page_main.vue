@@ -302,7 +302,7 @@ export default {
       if (!this.$route.params.team) {
         this.fetchTable(this.currentTeam);
       }
-      if (this.role === 'manager') {
+      if (this.role === 'manager' && Array.isArray(this.teams)) {
         this.teamRequest = this.teams
           .filter(team => team.teamCode !== this.currentTeam)
           .reduce((acc, team) => {
