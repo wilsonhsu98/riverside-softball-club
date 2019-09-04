@@ -266,6 +266,8 @@ export default {
     this.fetchUser();
     if (this.$route.params.team) {
       this.fetchTable(this.$route.params.team);
+    } else if (this.currentTeam) {
+      this.fetchTable(this.currentTeam);
     }
   },
   methods: {
