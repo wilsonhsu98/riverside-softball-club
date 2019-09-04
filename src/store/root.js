@@ -63,7 +63,12 @@ const getters = {
   currentTeam: state => state.currentTeam,
   currentTeamIcon: state => state.currentTeamIcon,
   role: state => state.role,
-  isAnonymous: state => state.isAnonymous,
+  isAnonymous: state => {
+    if (state.userId || window.localStorage.getItem('user')) {
+      return false;
+    }
+    return state.isAnonymous;
+  },
 };
 
 const actions = {
@@ -224,8 +229,8 @@ const actions = {
           commit(types.LOADING, false);
           return;
         }
-        commit(types.SET_ANONYMOUS, false);
         if (user.uid.match(/LINE: /)) {
+          commit(types.SET_ANONYMOUS, false);
           commit(types.LOADING, false);
           return;
         }
@@ -340,6 +345,7 @@ const actions = {
             }
             commit(types.SET_USERID, user.uid);
             commit(types.SET_ACCOUNT_INFO, { ...other });
+            commit(types.SET_ANONYMOUS, false);
             if (router.history.current.path === '/login') {
               router.push('/main/user');
             }
