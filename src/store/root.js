@@ -171,6 +171,10 @@ const actions = {
     auth
       .getRedirectResult()
       .then(result => {
+        if (!result.user) {
+          commit(types.CLEAN_TOKEN);
+          commit(types.LOADING, false);
+        }
         if (result.credential) {
           commit(types.SET_PROVIDERID, result.credential.providerId);
           commit(types.SET_TOKEN, result.credential.accessToken);
