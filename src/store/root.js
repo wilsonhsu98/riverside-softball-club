@@ -514,4 +514,13 @@ const promiseImage = (img, type) => {
 const snapShot = {};
 const snapShotRequest = {};
 
-export { types, state, getters, actions, mutations, promiseImage, snapShot, snapShotRequest };
+export {
+  types,
+  state,
+  getters,
+  actions,
+  mutations,
+  promiseImage,
+  snapShot,
+  snapShotRequest,
+};
