@@ -366,6 +366,12 @@ const actions = {
   logout({ commit, state, getters }) {
     isLogout = true;
     commit(types.LOADING, { img: true });
+    Object.keys(snapShot).forEach(key => {
+      if (typeof snapShot[key] === 'function') snapShot[key]();
+    });
+    Object.keys(snapShotRequest).forEach(key => {
+      if (typeof snapShotRequest[key] === 'function') snapShotRequest[key]();
+    });
     auth
       .signOut()
       .then(() => {
@@ -505,4 +511,7 @@ const promiseImage = (img, type) => {
   });
 };
 
-export { types, state, getters, actions, mutations, promiseImage };
+const snapShot = {};
+const snapShotRequest = {};
+
+export { types, state, getters, actions, mutations, promiseImage, snapShot, snapShotRequest };

@@ -4,13 +4,10 @@ import {
   // getters as rootGetters,
   // state as rootState,
   promiseImage,
+  snapShot,
 } from '../root';
 import { types as userTypes } from './user';
 import { db, auth, timestamp } from '../../firebase';
-
-let snapShotTeam;
-let snapShotRequest;
-let snapShotTeamRequest;
 
 const types = {
   FETCH_TEAM: 'TEAM/FETCH_TEAM',
@@ -272,8 +269,8 @@ const actions = {
       const refTeamDoc = db.collection('teams').doc(teamCode);
       let queryCount = 0;
       const realtimeCount = 1;
-      if (typeof snapShotTeam === 'function') snapShotTeam();
-      snapShotTeam = refTeamDoc.onSnapshot(doc => {
+      if (typeof snapShot.team === 'function') snapShot.team();
+      snapShot.team = refTeamDoc.onSnapshot(doc => {
         queryCount += 1;
         if (queryCount > realtimeCount) {
           // realtime
@@ -371,8 +368,8 @@ const actions = {
   },
   fetchRequests({ commit }, uid) {
     commit(rootTypes.LOADING, true);
-    if (typeof snapShotRequest === 'function') snapShotRequest();
-    snapShotRequest = db
+    if (typeof snapShot.request === 'function') snapShot.request();
+    snapShot.request = db
       .collection('requests')
       .where('uid', '==', uid)
       .onSnapshot(querySnapshot => {
@@ -393,7 +390,7 @@ const actions = {
       });
   },
   disconnectRequests() {
-    if (typeof snapShotRequest === 'function') snapShotRequest();
+    if (typeof snapShot.request === 'function') snapShot.request();
   },
   fetchTeamRequests({ commit }, teamCode) {
     if (teamCode) {
@@ -419,8 +416,8 @@ const actions = {
         });
       };
 
-      if (typeof snapShotTeamRequest === 'function') snapShotTeamRequest();
-      snapShotTeamRequest = db
+      if (typeof snapShot.teamRequest === 'function') snapShot.teamRequest();
+      snapShot.teamRequest = db
         .collection('requests')
         .where('teamCode', '==', teamCode)
         .onSnapshot(querySnapshot => {

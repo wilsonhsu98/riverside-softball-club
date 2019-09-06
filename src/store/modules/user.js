@@ -3,13 +3,11 @@ import {
   getters as rootGetters,
   state as rootState,
   promiseImage,
+  snapShot,
+  snapShotRequest,
 } from '../root';
 import router from '../../router';
 import { db, timestamp } from '../../firebase';
-
-let snapShotAccount;
-let snapShotTeams;
-const snapShotRequest = {};
 
 const types = {
   FETCH_TEAMS: 'TEAM/FETCH_TEAMS',
@@ -83,8 +81,8 @@ const actions = {
     if (userId) {
       let queryCount = 0;
       const realtimeCount = 1;
-      if (typeof snapShotAccount === 'function') snapShotAccount();
-      snapShotAccount = db
+      if (typeof snapShot.account === 'function') snapShot.account();
+      snapShot.account = db
         .collection('accounts')
         .doc(userId)
         .onSnapshot(snapshot => {
@@ -106,8 +104,8 @@ const actions = {
             }
           }
         });
-      if (typeof snapShotTeams === 'function') snapShotTeams();
-      snapShotTeams = db
+      if (typeof snapShot.teams === 'function') snapShot.teams();
+      snapShot.teams = db
         .collection('accounts')
         .doc(userId)
         .collection('teams')

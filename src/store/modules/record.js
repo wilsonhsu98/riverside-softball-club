@@ -2,12 +2,10 @@ import {
   types as rootTypes,
   // getters as rootGetters,
   state as rootState,
+  snapShot,
 } from '../root';
 import utils from '../../libs/utils';
 import { db } from '../../firebase';
-
-let snapShotGames;
-let snapShotplayers;
 
 const types = {
   INIT_FROM_LS: 'RECORD/INIT_FROM_LS',
@@ -334,8 +332,8 @@ const actions = {
     commit(rootTypes.LOADING, true);
     let queryCount = 0;
     const realtimeCount = 2;
-    if (typeof snapShotGames === 'function') snapShotGames();
-    snapShotGames = db
+    if (typeof snapShot.games === 'function') snapShot.games();
+    snapShot.games = db
       .collection('teams')
       .doc(team)
       .collection('games')
@@ -360,8 +358,8 @@ const actions = {
           }
         }
       });
-    if (typeof snapShotplayers === 'function') snapShotplayers();
-    snapShotplayers = db
+    if (typeof snapShot.players === 'function') snapShot.players();
+    snapShot.players = db
       .collection('teams')
       .doc(team)
       .collection('players')
