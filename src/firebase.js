@@ -23,7 +23,7 @@ const providerMapping = {
   'github.com': new firebase.auth.GithubAuthProvider(),
 };
 const credentialMapping = {
-  'google.com': token => firebase.auth.GoogleAuthProvider.credential(token),
+  'google.com': token => firebase.auth.GoogleAuthProvider.credential(null, token),
   'facebook.com': token => firebase.auth.FacebookAuthProvider.credential(token),
   'github.com': token => firebase.auth.GithubAuthProvider.credential(token),
 };

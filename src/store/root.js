@@ -352,12 +352,12 @@ const actions = {
             commit(types.LOADING, false);
           });
       } else {
-        // wait for signin
-        // commit(types.CLEAN_TOKEN);
         if (isLogout === true || router.history.current.params.custom) {
           isLogout = false;
           commit(types.LOADING, { img: true });
         } else {
+          // wait for signin
+          commit(types.CLEAN_TOKEN);
           commit(types.LOADING, false);
         }
       }
