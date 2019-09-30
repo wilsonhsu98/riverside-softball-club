@@ -69,12 +69,10 @@ const resetVH = () => {
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 };
-window.addEventListener('load', () => {
-  resetVH();
-});
 window.addEventListener('resize', () => {
   resetVH();
 });
+window.dispatchEvent(new Event('resize'));
 smoothscroll.polyfill();
 
 document.title = 'Riverside Softball Club';
