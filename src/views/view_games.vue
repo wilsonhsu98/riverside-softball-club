@@ -73,6 +73,7 @@
   padding: 10px 15px;
   width: 100px;
   margin-top: 10px;
+  outline: none;
 }
 .container {
   .row {
