@@ -69,11 +69,9 @@ const resetVH = () => {
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
 };
+resetVH();
 window.addEventListener('resize', () => {
   resetVH();
-});
-window.addEventListener('load', () => {
-  window.dispatchEvent(new Event('resize'));
 });
 smoothscroll.polyfill();
 
