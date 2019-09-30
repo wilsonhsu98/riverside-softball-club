@@ -3,29 +3,55 @@
     <mobile-header :icon="currentTeamIcon" />
     <div
       class="container"
-      :class="{ empty: role === 'manager' && gameList.length === 0 }"
+      ref="container"
+      :class="{ empty: role === 'manager' && gameList_.length === 0 }"
     >
-      <template v-for="item in gameList">
+      <template v-for="item in gameList_">
         <div class="row" :data-date="item.date" :key="`date_${item.date}`">
           <template v-for="sub in item.games">
-            <div class="item" :key="`game_${sub.game}`">
-              <router-link
-                :to="{
-                  name: 'game',
-                  params: { team: $route.params.team, game: sub.game },
-                }"
-                :class="`result ${sub.result} ${sub.group}`"
-              >
-                {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
-              </router-link>
-              <div class="name">{{ sub.opponent || sub.game }}</div>
-            </div>
-            <!-- <div class="item" v-else>
-              <div :class="`result ${sub.result} ${sub.group} ${sub.hasOrder ? '' : 'no-order'}`">
-                {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+            <v-popover
+              placement="bottom"
+              trigger="click"
+              offset="0"
+              class="cell"
+              delay="300"
+              :popoverClass="`box-tip ${sub.result}`"
+              :autoHide="true"
+              :key="`game_${sub.game}`"
+              :container="$refs.container"
+            >
+              <div class="item">
+                <div :class="`result ${sub.result} ${sub.group}`">
+                  {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+                </div>
+                <div class="name">{{ sub.opponent || sub.game }}</div>
               </div>
-              <div class="name">{{ sub.opponent || sub.game }}</div>
-            </div> -->
+              <template slot="popover">
+                <div v-if="sub.league && sub.group">
+                  {{ `${sub.league} ${$t('box_group', { g: sub.group })}` }}
+                  <template v-if="sub.year && sub.season">
+                    {{ `(${sub.year} ${sub.season})` }}
+                  </template>
+                  <div>{{ sub.game }}</div>
+                  <div>
+                    {{
+                      sub.opponent
+                        ? $t('box_opponent', { opponent: sub.opponent })
+                        : $t('box_forgot_opponent')
+                    }}
+                  </div>
+                </div>
+                <router-link
+                  :to="{
+                    name: 'game',
+                    params: { team: $route.params.team, game: sub.game },
+                  }"
+                  tag="button"
+                  class="link-btn"
+                  >{{ $t('btn_view_box') }}
+                </router-link>
+              </template>
+            </v-popover>
           </template>
         </div>
       </template>
@@ -42,16 +68,24 @@
 
 <style lang="scss" scoped>
 @import '../scss/variable';
-
+.link-btn {
+  background-color: $header_bgcolor;
+  padding: 10px 15px;
+  width: 100px;
+  margin-top: 10px;
+}
 .container {
   .row {
     padding-bottom: 20px;
     display: flex;
     position: relative;
-    .item {
+    .cell {
       color: $row_color;
       text-align: center;
       flex: 1;
+      .item {
+        cursor: pointer;
+      }
       .result {
         border-radius: 50%;
         display: inline-block;
@@ -103,9 +137,10 @@
   }
   .button-container {
     margin-top: -50px;
+    margin-left: auto;
     padding: 0;
     text-align: right;
-    width: 100%;
+    width: 60px;
     position: sticky;
     bottom: 20px;
     background: none;
@@ -138,7 +173,7 @@
   .container {
     padding: 10px 0 0;
     background-color: transparent;
-    .row .item .result,
+    .row .cell .result,
     .row:after {
       color: #fff;
     }
@@ -169,9 +204,14 @@ import { mapGetters, mapActions } from 'vuex';
 
 export default {
   data() {
-    return {};
+    return {
+      gameList_: [],
+    };
   },
   created() {},
+  mounted() {
+    this.gameList_ = this.gameList;
+  },
   methods: {
     ...mapActions({}),
   },

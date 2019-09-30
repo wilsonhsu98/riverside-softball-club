@@ -89,29 +89,52 @@
     .tooltip-inner {
       background: $color;
       color: white;
-      // padding: 24px;
       border-radius: 5px;
       box-shadow: 0 5px 30px rgba(black, .1);
-      max-width: calc(100vw - 20px);
-      transform: translateX(5px);
+      max-width: calc(100vw - 40px);
     }
     .tooltip-arrow {
       border-color: $color;
     }
   }
-  // &.popover {
-  //   $color: #f9f9f9;
-  //   .popover-inner {
-  //     background: $color;
-  //     color: black;
-  //     padding: 24px;
-  //     border-radius: 5px;
-  //     box-shadow: 0 5px 30px rgba(black, .1);
-  //   }
-  //   .popover-arrow {
-  //     border-color: $color;
-  //   }
-  // }
+  &.box-tip {
+    &.win {
+      $color:rgba(239, 16, 16, .6);
+      .tooltip-inner {
+        background: $color;
+      }
+      .tooltip-arrow {
+        border-color: $color;
+      }
+    }
+    &.tie {
+      $color: rgba(239, 175, 52, .9);
+      .tooltip-inner {
+        background: $color;
+      }
+      .tooltip-arrow {
+        border-color: $color;
+      }
+    }
+    &.lose {
+      $color: rgba(77, 157, 229, .9);
+      .tooltip-inner {
+        background: $color;
+      }
+      .tooltip-arrow {
+        border-color: $color;
+      }
+    }
+    outline: none;
+    text-align: center;
+    .tooltip-inner {
+      color: white;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 5px 30px rgba(black, .1);
+      max-width: calc(100vw - 40px);
+    }
+  }
   ul {
     margin: 10px 0;
     padding: 0 0 0 20px;

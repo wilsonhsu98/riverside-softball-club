@@ -5,7 +5,7 @@
       :icon="$route.params.team ? currentTeamIcon : undefined"
       :save="editTeam_"
     />
-    <div class="container">
+    <div class="container" ref="container">
       <h1>{{ $route.params.team ? $t('manage_team') : $t('create_team') }}</h1>
 
       <div
@@ -88,7 +88,11 @@
         <i
           class="fa fa-info-circle"
           v-if="$route.params.team"
-          v-tooltip="{ content: $t('tip_player'), classes: ['info'] }"
+          v-tooltip="{
+            content: $t('tip_player'),
+            classes: ['info'],
+            container: $refs.container,
+          }"
         ></i>
         <i
           class="fa fa-plus-circle"
@@ -170,7 +174,11 @@
         {{ $t('ttl_bench_list') }}
         <i
           class="fa fa-info-circle"
-          v-tooltip="{ content: $t('tip_bench'), classes: ['info'] }"
+          v-tooltip="{
+            content: $t('tip_bench'),
+            classes: ['info'],
+            container: $refs.container,
+          }"
         ></i>
       </h2>
 
@@ -202,7 +210,11 @@
           />
           <i
             class="fa fa-commenting-o"
-            v-tooltip="{ content: player.msg, classes: ['info'] }"
+            v-tooltip="{
+              content: player.msg,
+              classes: ['info'],
+              container: $refs.container,
+            }"
           ></i>
           <i
             v-if="player.uid !== userId"

@@ -23,9 +23,20 @@ componentsReq.keys().forEach(path => {
 });
 Vue.component('vue-tags-input', VueTagsInput);
 Vue.component('vue-draggable', draggable);
-Vue.use(VTooltip, {
+const tootipConfig = {
   defaultTrigger: 'hover focus click',
-  disposeTimeout: 0,
+  disposeTimeout: 1000,
+  defaultPopperOptions: {
+    modifiers: {
+      preventOverflow: { padding: 20 },
+    },
+  },
+};
+Vue.use(VTooltip, {
+  ...tootipConfig,
+  popover: {
+    ...tootipConfig,
+  },
 });
 Vue.config.productionTip = false;
 Vue.use({

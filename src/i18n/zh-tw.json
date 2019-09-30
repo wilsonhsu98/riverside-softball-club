@@ -52,6 +52,7 @@
 	"H_note": "安打數相同，打席數較少者排序在前",
 	"HR_note": "全壘打數相同，打席數較少者排序在前",
 	"RBI_note": "打點相同，打席數較少者排序在前",
+	"btn_view_box": "觀看盒子",
 	"box_group": "%{g}組",
 	"box_opponent": "V.S. %{opponent}",
 	"box_forgot_opponent": "對手不記得了",
