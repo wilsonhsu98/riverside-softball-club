@@ -72,7 +72,9 @@ const resetVH = () => {
 window.addEventListener('resize', () => {
   resetVH();
 });
-window.dispatchEvent(new Event('resize'));
+window.addEventListener('load', () => {
+  window.dispatchEvent(new Event('resize'));
+});
 smoothscroll.polyfill();
 
 document.title = 'Riverside Softball Club';
