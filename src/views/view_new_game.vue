@@ -714,7 +714,7 @@ i.fa {
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import router from '../router';
-import { setTimeout } from 'timers';
+import { scrollTo } from  '../libs/utils';
 
 export default {
   data() {
@@ -897,15 +897,7 @@ export default {
         const element = document.querySelector(
           `[data-order="${this.target_order}"]`,
         );
-        if (element) {
-          const y = element.getBoundingClientRect().top + window.pageYOffset;
-          const yOffset = window.innerHeight * 0.01 * 50;
-
-          window.scrollTo({
-            top: Math.max(0, y - yOffset + element.offsetHeight / 2),
-            behavior: 'smooth',
-          });
-        }
+        scrollTo(element);
       });
 
       // do nothing if swap in source list

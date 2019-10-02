@@ -164,14 +164,20 @@ header {
   .main-container {
     padding-top: 0;
     padding-bottom: $footer_menu_height;
-
+    padding-bottom: calc(
+      #{$footer_menu_height} + constant(safe-area-inset-bottom)
+    ); /* iOS 11.0 */
+    padding-bottom: calc(
+      #{$footer_menu_height} + env(safe-area-inset-bottom)
+    ); /* iOS 11.2 */
   }
   header {
     height: $footer_menu_height;
     line-height: $footer_menu_height;
     bottom: 0;
     top: initial;
-
+    padding-bottom: constant(safe-area-inset-bottom); /* iOS 11.0 */
+    padding-bottom: env(safe-area-inset-bottom); /* iOS 11.2 */
     .icon {
       display: none;
     }
@@ -294,8 +300,10 @@ export default {
       }
     },
     currentTeam() {
-      this.fetchTeamIcon(this.currentTeam);
-      if (!this.$route.params.team) {
+      if (this.currentTeam) {
+        this.fetchTeamIcon(this.currentTeam);
+      }
+      if (!this.$route.params.team && this.currentTeam) {
         this.fetchTable(this.currentTeam);
       }
       if (this.role === 'manager' && Array.isArray(this.teams)) {

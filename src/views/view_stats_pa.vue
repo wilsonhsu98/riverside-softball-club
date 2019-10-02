@@ -141,7 +141,7 @@
           name="expand"
           class="toggle-row non-input"
           :checked="toggleTarget === item.name"
-          @click="toggleRadio(item.name)"
+          @click="e => toggleRadio(e, item.name)"
           :key="`chk_${encodeURI(item.name)}`"
         />
         <div
@@ -772,6 +772,7 @@ i.fa {
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
+import { scrollTo } from '../libs/utils';
 const clickEvent = (() => {
   if ('ontouchstart' in document.documentElement === true) return 'touchstart';
   else return 'click';
@@ -806,11 +807,16 @@ export default {
         ? value.toFixed(3)
         : value;
     },
-    toggleRadio(target) {
+    toggleRadio(e, target) {
       if (this.toggleTarget === target) {
         this.toggleTarget = null;
       } else {
         this.toggleTarget = target;
+        const scrollToHandler = function() {
+          scrollTo(e.target.nextSibling);
+          e.target.nextSibling.removeEventListener('transitionend', scrollToHandler);
+        };
+        e.target.nextSibling.addEventListener('transitionend', scrollToHandler);
       }
     },
     collapseSearch(event) {

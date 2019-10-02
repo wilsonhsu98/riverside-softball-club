@@ -517,6 +517,19 @@ const cacheImg = url => {
   }
 };
 
+function scrollTo(element) {
+  // check is dom node
+  if (!!element && element.nodeType === 1) {
+    const y = element.getBoundingClientRect().top + window.pageYOffset;
+    const yOffset = window.innerHeight * 0.01 * 50;
+
+    window.scrollTo({
+      top: Math.max(0, y - yOffset + element.clientHeight / 2),
+      behavior: 'smooth',
+    });
+  }
+}
+
 export default {
   parseGame,
   genStatistics,
@@ -524,4 +537,4 @@ export default {
   displayGame,
 };
 
-export { cacheImg };
+export { cacheImg, scrollTo };
