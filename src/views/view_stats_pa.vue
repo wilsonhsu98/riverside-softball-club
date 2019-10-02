@@ -170,6 +170,7 @@
                   v-if="item.data.photo"
                   class="img"
                   :src="$cacheImg(item.data.photo)"
+                  onError="this.style.display='none'"
                 />
                 {{ item.name }}
               </span>
@@ -578,7 +579,7 @@ i.fa {
 
       z-index: 0;
       background-color: #fff;
-      transition: max-height 1s cubic-bezier(0, 1, 0, 1) -0.1s;
+      transition: max-height .8s cubic-bezier(0, 1, 0, 1) -0.1s;
       max-height: 36px;
       &:nth-child(4n + 1) {
         background-color: $row_odd_bgcolor;
@@ -655,7 +656,7 @@ i.fa {
       }
     }
     .toggle-row:checked + .row-grid {
-      max-height: 10000px;
+      max-height: 200vh;
       transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
       transition-delay: 0s;
     }
