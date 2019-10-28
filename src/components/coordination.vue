@@ -1,417 +1,358 @@
 <template>
-  <div :class="`canvas ${disabled ? 'disabled' : ''}`" ref="canvas">
-    <div class="in-field">
-      <div class="warning-track">
-        <div class="out-field">
-          <div class="out-field-gress r-270">
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-          </div>
-          <div class="out-field-gress r-180">
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-            <div class="gress-mask"></div>
-          </div>
-        </div>
-      </div>
-      <div class="in-field-track"></div>
-      <div class="in-field-gress">
-        <div class="first-base base"></div>
-        <div class="second-base base"></div>
-        <div class="third-base base"></div>
-        <div class="pitcher base"></div>
-
-        <div class="gress r-270">
-          <div class="gress-mask"></div>
-          <div class="gress-mask"></div>
-          <div class="gress-mask"></div>
-          <div class="gress-mask"></div>
-          <div class="gress-mask"></div>
-        </div>
-        <div class="gress r-180">
-          <div class="gress-mask"></div>
-          <div class="gress-mask"></div>
-          <div class="gress-mask"></div>
-          <div class="gress-mask"></div>
-          <div class="gress-mask"></div>
-        </div>
-      </div>
-    </div>
-    <div class="cover cover-left">
-      <div class="cover-ground"></div>
-    </div>
-    <div class="cover cover-right">
-      <div class="cover-ground"></div>
-    </div>
-    <div class="home">
-      <div class="home-batting-left home-batting"></div>
-      <div class="home-base"></div>
-      <div class="home-batting-right home-batting"></div>
-    </div>
-    <div class="coordinate-area" @mousedown="trackXY">
-      <div
-        class="dot"
-        v-for="(item, i) in xy"
-        :style="{
-          left: `${item.realX}px`,
-          top: `${item.realY}px`,
-          backgroundColor: item.color,
-        }"
-        :key="`dot_${i}`"
-      ></div>
-    </div>
-  </div>
+  <canvas ref="canvas" @mousedown="trackXY" :disabled="disabled"></canvas>
 </template>
 
 <style lang="scss" scoped>
-$green: #6aa253;
-$orange: #e3ab78;
-.canvas {
-  display: inline-block;
+canvas {
   width: 500px;
   height: 500px;
-  background-color: $green;
-  overflow: hidden;
-  position: relative;
-  &.disabled {
-    opacity: 0.5;
-  }
-  .in-field {
-    display: inline-block;
-    width: 25%;
-    height: 25%;
-    top: 60%;
-    left: 50%;
-    transform: rotate(-45deg);
-    transform-origin: 0% 100%;
-    position: absolute;
-    .warning-track {
-      display: inline-block;
-      width: 475%;
-      height: 475%;
-      border-radius: 50%;
-      background-color: $orange;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      .out-field {
-        display: inline-block;
-        width: 90%;
-        height: 90%;
-        background-color: $green;
-        border-radius: 50%;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        overflow: hidden;
-        text-align: right;
-        .out-field-gress {
-          display: inline-block;
-          width: 62%;
-          height: 62%;
-          transform-origin: 50% 50%;
-          position: absolute;
-          right: 0;
-          &.r-180 {
-            transform: rotate(180deg);
-          }
-          &.r-270 {
-            transform: rotate(270deg);
-          }
-        }
-      }
-    }
-    .in-field-track {
-      display: inline-block;
-      width: 180%;
-      height: 180%;
-      border-radius: 50%;
-      background-color: $orange;
-      top: 50%;
-      left: 50%;
-      position: absolute;
-      transform: translate(-50%, -50%);
-    }
-    .in-field-gress {
-      display: inline-block;
-      width: 100%;
-      height: 100%;
-      background-color: $green;
-      top: 49%;
-      left: 49%;
-      position: absolute;
-      transform: translate(-49%, -49%);
-
-      .base {
-        display: inline-block;
-        width: 35%;
-        height: 35%;
-        background-color: $orange;
-        border-radius: 50%;
-        position: absolute;
-        z-index: 1;
-        &:before {
-          content: '';
-          display: inline-block;
-          width: 40%;
-          height: 40%;
-          background-color: white;
-          top: 50%;
-          left: 50%;
-          position: absolute;
-          transform: translate(-50%, -50%);
-        }
-      }
-      .first-base {
-        right: -17%;
-        bottom: -17%;
-      }
-      .second-base {
-        top: -17%;
-        right: -17%;
-      }
-      .third-base {
-        top: -17%;
-        left: -17%;
-      }
-      .pitcher {
-        top: 50%;
-        left: 50%;
-        transform: rotate(-45deg) translate(-50%, -50%);
-        transform-origin: 0 0;
-        &:before {
-          width: 10%;
-        }
-      }
-      .gress {
-        display: inline-block;
-        width: 100%;
-        height: 100%;
-        transform-origin: 50% 50%;
-        position: absolute;
-        right: 0;
-        overflow: hidden;
-        &.r-180 {
-          transform: rotate(180deg);
-        }
-        &.r-270 {
-          transform: rotate(270deg);
-        }
-      }
-    }
-  }
-  .cover {
-    width: 50%;
-    height: 87.2%;
-    display: inline-block;
-    position: absolute;
-    &-left {
-      transform: rotate(-45deg);
-      transform-origin: 100% 100%;
-      left: 0;
-      &:before {
-        right: 0;
-      }
-      &:after {
-        left: 0;
-      }
-      .cover-ground {
-        right: -3%;
-      }
-    }
-    &-right {
-      transform: rotate(45deg);
-      transform-origin: 0% 100%;
-      right: 0;
-      &:before {
-        left: 0;
-      }
-      &:after {
-        right: 0;
-      }
-      .cover-ground {
-        left: -3%;
-      }
-    }
-    &:before {
-      content: '';
-      display: inline-block;
-      width: 2%;
-      height: 100%;
-      background-color: #fafbf5;
-      position: absolute;
-      z-index: 1;
-    }
-    &:after {
-      content: '';
-      display: inline-block;
-      width: 95%;
-      height: 100%;
-      background-color: $green;
-      position: absolute;
-      top: 0;
-    }
-    &-ground {
-      display: inline-block;
-      width: 8%;
-      height: 67%;
-      background-color: $orange;
-      position: absolute;
-    }
-  }
-  .home {
-    display: inline-block;
-    width: 12%;
-    height: 12%;
-    background-color: $orange;
-    position: absolute;
-    left: 50%;
-    bottom: 8%;
-    transform: translateX(-50%);
-    .home-base {
-      display: inline-block;
-      width: 25%;
-      height: 25%;
-      position: absolute;
-      top: 21%;
-      left: 50%;
-      transform: translateX(-50%);
-      &:before {
-        content: '';
-        display: inline-block;
-        width: 100%;
-        height: 70%;
-        background-color: #fafbf5;
-        position: absolute;
-        top: 30%;
-        left: 0;
-      }
-      &:after {
-        content: '';
-        display: inline-block;
-        width: 70%;
-        height: 70%;
-        background-color: #fafbf5;
-        transform: rotate(45deg);
-        transform-origin: 0 100%;
-        position: absolute;
-        top: 29%;
-        left: 0;
-      }
-    }
-    .home-batting {
-      display: inline-block;
-      width: 31%;
-      height: 68%;
-      background-color: #fafbf5;
-      position: absolute;
-      top: 12%;
-      &:before {
-        content: '';
-        display: inline-block;
-        width: 78%;
-        height: 77%;
-        position: absolute;
-        top: 13%;
-        background-color: $orange;
-      }
-      &-left {
-        left: 0;
-        &:before {
-          left: 0;
-        }
-      }
-      &-right {
-        right: 0;
-        &:before {
-          right: 0;
-        }
-      }
-    }
-  }
-  .coordinate-area {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    .dot {
-      display: inline-block;
-      width: 1%;
-      height: 1%;
-      background-color: yellow;
-      border-radius: 50%;
-      position: absolute;
-    }
-  }
-  .gress-mask {
-    height: 30px;
-    opacity: 0.1;
-    background-color: white;
-    margin: 30px 0;
+  &[disabled] {
+    cursor: not-allowed;
   }
 }
 @media only screen and (max-width: 760px) {
-  .canvas {
-    // width: calc(100vw - 20px);
-    // height: calc(100vw - 20px);
+  canvas {
     width: 300px;
     height: 300px;
-    .gress-mask {
-      height: 20px;
-      opacity: 0.1;
-      background-color: white;
-      margin: 20px 0;
-    }
   }
 }
 </style>
 
 <script>
 export default {
-  props: ['values', 'disabled'],
+  props: ['values', 'disabled', 'no_track', 'fixedSize'],
   data() {
     return {
       xy: this.values || [],
     };
   },
   mounted() {
-    this.resetDot();
-    window.addEventListener('resize', this.resetDot);
+    this.draw();
+    if (!this.fixedSize) {
+      window.addEventListener('resize', this.draw);
+    }
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.resetDot);
+    if (!this.fixedSize) {
+      window.removeEventListener('resize', this.draw);
+    }
   },
   methods: {
+    draw() {
+      const canvas = this.$refs.canvas;
+      const { width } = canvas.getBoundingClientRect();
+
+      if (this.fixedSize) {
+        canvas.style.width = `${this.fixedSize}px`;
+        canvas.style.height = `${this.fixedSize}px`;
+        canvas.width = this.fixedSize;
+        canvas.height = this.fixedSize;
+      } else {
+        canvas.width = width;
+        canvas.height = width;
+      }
+
+      const { width: base } = canvas.getBoundingClientRect();
+      const ctx = canvas.getContext('2d');
+
+      const green = '#6aa253';
+      const orange = '#e3ab78';
+      const white = '#fff';
+      const grassWidth = base * 0.051;
+      const outfieldRadius = (base * 0.45) / 2;
+      const clip = outfieldRadius * 0.8;
+      const p = {
+        x: base * 0.5,
+        y: base * 0.67,
+        width: base * 0.036,
+        height: base * 0.01,
+      };
+      const c = {
+        x: base * 0.5,
+        y: base * 0.67 + ((base * 0.45) / 2) * 0.8,
+      };
+      const baseCircle = base * 0.044;
+      const battingRectTranslate = base * 0.051 * 0.5;
+      const orangeBaseLineWidth = base * 0.04;
+      const whiteBaseLineWidth = orangeBaseLineWidth * 0.22;
+      const batterBox = {
+        width: base * 0.048,
+        height: base * 0.08,
+      };
+      const aBase = base * 0.02;
+      const rotateBase = base * 0.034;
+
+      // background
+      ctx.beginPath();
+      ctx.fillStyle = green;
+      ctx.fillRect(0, 0, base, base);
+
+      // grass
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate((-135 * Math.PI) / 180);
+      ctx.fillStyle = 'rgba(255, 255, 255, .1)';
+      Array.apply(null, Array(7)).forEach((undefined, i) => {
+        ctx.fillRect(0, grassWidth + grassWidth * i * 2, base, grassWidth);
+        ctx.fillRect(grassWidth + grassWidth * i * 2, 0, grassWidth, base);
+      });
+      ctx.restore();
+
+      // infield
+      ctx.beginPath();
+      ctx.moveTo(p.x, p.y - outfieldRadius);
+      ctx.arcTo(
+        p.x + outfieldRadius,
+        p.y - outfieldRadius,
+        p.x + outfieldRadius,
+        p.y,
+        outfieldRadius,
+      );
+      ctx.arcTo(
+        p.x + outfieldRadius,
+        p.y + outfieldRadius,
+        p.x,
+        p.y + outfieldRadius,
+        outfieldRadius,
+      );
+      ctx.arcTo(
+        p.x - outfieldRadius,
+        p.y + outfieldRadius,
+        p.x - outfieldRadius,
+        p.y,
+        outfieldRadius,
+      );
+      ctx.arcTo(
+        p.x - outfieldRadius,
+        p.y - outfieldRadius,
+        p.x,
+        p.y - outfieldRadius,
+        outfieldRadius,
+      );
+      ctx.moveTo(p.x, p.y - clip);
+      ctx.lineTo(p.x + clip, p.y);
+      ctx.lineTo(p.x, p.y + clip);
+      ctx.lineTo(p.x - clip, p.y);
+      ctx.lineTo(p.x, p.y - clip);
+      ctx.fillStyle = orange;
+      ctx.fill('evenodd');
+
+      // warning track
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, base * 0.563, 0, 2 * Math.PI);
+      ctx.lineWidth = base * 0.058;
+      ctx.strokeStyle = orange;
+      ctx.stroke();
+
+      // p - orange background
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, baseCircle, 0, 2 * Math.PI);
+      ctx.fillStyle = orange;
+      ctx.fill();
+
+      // 1B - orange background
+      ctx.beginPath();
+      ctx.arc(p.x + clip, p.y, baseCircle, 0, 2 * Math.PI);
+      ctx.fillStyle = orange;
+      ctx.fill();
+
+      // 2B - orange background
+      ctx.beginPath();
+      ctx.arc(p.x, p.y - clip, baseCircle, 0, 2 * Math.PI);
+      ctx.fillStyle = orange;
+      ctx.fill();
+
+      // 3B - orange background
+      ctx.beginPath();
+      ctx.arc(p.x - clip, p.y, baseCircle, 0, 2 * Math.PI);
+      ctx.fillStyle = orange;
+      ctx.fill();
+
+      // yard
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, base, 0, 2 * Math.PI);
+      ctx.lineWidth = base * 0.817;
+      ctx.strokeStyle = green;
+      ctx.stroke();
+
+      // right green triangle
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate((-45 * Math.PI) / 180);
+      ctx.fillStyle = green;
+      ctx.fillRect(0, orangeBaseLineWidth, base, base);
+      ctx.restore();
+
+      // left green triangle
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate((45 * Math.PI) / 180);
+      ctx.fillStyle = green;
+      ctx.fillRect(0, orangeBaseLineWidth, -base, base);
+      ctx.restore();
+
+      // batting cirle - orange background
+      ctx.beginPath();
+      ctx.arc(
+        p.x,
+        p.y + clip * 1.1,
+        baseCircle * 2.5,
+        -0.25 * Math.PI,
+        1.25 * Math.PI,
+      );
+      ctx.fillStyle = orange;
+      ctx.fill();
+
+      // batting circle - white border
+      ctx.beginPath();
+      ctx.arc(
+        p.x,
+        p.y + clip * 1.1,
+        baseCircle * 2.5,
+        -0.2 * Math.PI,
+        1.2 * Math.PI,
+      );
+      ctx.lineWidth = whiteBaseLineWidth;
+      ctx.strokeStyle = white;
+      ctx.stroke();
+
+      // right base line - orange track & white line
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate((-45 * Math.PI) / 180);
+      ctx.fillStyle = orange;
+      ctx.fillRect(0, 0, base, orangeBaseLineWidth);
+      ctx.fillStyle = white;
+      ctx.fillRect(
+        orangeBaseLineWidth * 1.4,
+        orangeBaseLineWidth * 0.38,
+        base,
+        orangeBaseLineWidth * 0.24,
+      );
+      ctx.restore();
+
+      // left base line - orange track & white line
+      ctx.save();
+      ctx.translate(c.x, c.y);
+      ctx.rotate((45 * Math.PI) / 180);
+      ctx.fillStyle = orange;
+      ctx.fillRect(0, 0, -base, orangeBaseLineWidth);
+      ctx.fillStyle = white;
+      ctx.fillRect(
+        -orangeBaseLineWidth * 1.4,
+        orangeBaseLineWidth * 0.38,
+        -base,
+        orangeBaseLineWidth * 0.24,
+      );
+      ctx.restore();
+
+      // right batter box
+      ctx.beginPath();
+      ctx.rect(
+        c.x + battingRectTranslate,
+        c.y - battingRectTranslate,
+        batterBox.width,
+        batterBox.height,
+      );
+      ctx.lineWidth = whiteBaseLineWidth;
+      ctx.strokeStyle = white;
+      ctx.stroke();
+
+      // left batter box
+      ctx.beginPath();
+      ctx.rect(
+        c.x - battingRectTranslate,
+        c.y - battingRectTranslate,
+        -batterBox.width,
+        batterBox.height,
+      );
+      ctx.lineWidth = whiteBaseLineWidth;
+      ctx.strokeStyle = white;
+      ctx.stroke();
+
+      // home base
+      ctx.beginPath();
+      ctx.moveTo(c.x, c.y + aBase);
+      ctx.lineTo(c.x - base * 0.015, c.y + aBase * 0.5);
+      ctx.lineTo(c.x - base * 0.015, c.y - aBase * 0.5);
+      ctx.lineTo(c.x + base * 0.015, c.y - aBase * 0.5);
+      ctx.lineTo(c.x + base * 0.015, c.y + aBase * 0.5);
+      ctx.lineTo(c.x, c.y + aBase);
+      ctx.fillStyle = white;
+      ctx.fill();
+
+      // p
+      ctx.beginPath();
+      ctx.fillStyle = white;
+      ctx.fillRect(
+        p.x - p.width * 0.5,
+        p.y - p.height * 0.5,
+        p.width,
+        p.height,
+      );
+
+      // 1B
+      ctx.save();
+      ctx.translate(p.x + clip, p.y - aBase);
+      ctx.rotate((45 * Math.PI) / 180);
+      ctx.fillStyle = white;
+      ctx.fillRect(0, 0, rotateBase, rotateBase);
+      ctx.restore();
+
+      // 2B
+      ctx.save();
+      ctx.translate(p.x, p.y - clip - aBase);
+      ctx.rotate((45 * Math.PI) / 180);
+      ctx.fillStyle = white;
+      ctx.fillRect(0, 0, rotateBase, rotateBase);
+      ctx.restore();
+
+      // 3B
+      ctx.save();
+      ctx.translate(p.x - clip, p.y - aBase);
+      ctx.rotate((45 * Math.PI) / 180);
+      ctx.fillStyle = white;
+      ctx.fillRect(0, 0, rotateBase, rotateBase);
+      ctx.restore();
+
+      this.xy.forEach(item => {
+        ctx.beginPath();
+        ctx.arc(
+          (item.x / 100) * base,
+          (item.y / 100) * base,
+          base * 0.01,
+          0,
+          2 * Math.PI,
+        );
+        ctx.fillStyle = item.color || 'yellow';
+        ctx.fill();
+        ctx.arc(
+          (item.x / 100) * base,
+          (item.y / 100) * base,
+          base * 0.01,
+          0,
+          2 * Math.PI,
+        );
+        ctx.lineWidth = base * 0.001;
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+      });
+
+      if (this.disabled) {
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255, 255, 255, .3)';
+        ctx.fillRect(0, 0, base, base);
+      }
+    },
     trackXY(event) {
-      if (this.disabled) return;
+      if (this.disabled || this.no_track) return;
       if (Array.isArray(this.values) && this.values.length > 1) return;
-      const { left, top, width, height } = this.$refs[
-        'canvas'
-      ].getBoundingClientRect();
+      const {
+        left,
+        top,
+        width,
+        height,
+      } = this.$refs.canvas.getBoundingClientRect();
       const x = parseInt(
         ((event.pageX - left - window.scrollX) / width) * 100,
         10,
@@ -469,18 +410,10 @@ export default {
         {
           x,
           y,
-          realX: (x / 100) * this.$refs['canvas'].offsetWidth,
-          realY: (y / 100) * this.$refs['canvas'].offsetHeight,
           location,
         },
       ];
-    },
-    resetDot() {
-      this.xy.forEach(item => {
-        item.realX = (item.x / 100) * this.$refs['canvas'].offsetWidth;
-        item.realY = (item.y / 100) * this.$refs['canvas'].offsetHeight;
-      });
-      this.xy = [].concat(this.xy);
+      this.draw();
     },
   },
   watch: {
@@ -490,8 +423,8 @@ export default {
     disabled() {
       if (this.disabled) {
         this.xy = [];
-        this.resetDot();
       }
+      this.draw();
     },
   },
 };

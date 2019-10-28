@@ -714,7 +714,7 @@ i.fa {
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import router from '../router';
-import { scrollTo } from  '../libs/utils';
+import { scrollTo } from '../libs/utils';
 
 export default {
   data() {

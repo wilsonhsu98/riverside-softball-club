@@ -579,7 +579,7 @@ i.fa {
 
       z-index: 0;
       background-color: #fff;
-      transition: max-height .8s cubic-bezier(0, 1, 0, 1) -0.1s;
+      transition: max-height 0.8s cubic-bezier(0, 1, 0, 1) -0.1s;
       max-height: 36px;
       &:nth-child(4n + 1) {
         background-color: $row_odd_bgcolor;
@@ -815,7 +815,10 @@ export default {
         this.toggleTarget = target;
         const scrollToHandler = function() {
           scrollTo(e.target.nextSibling);
-          e.target.nextSibling.removeEventListener('transitionend', scrollToHandler);
+          e.target.nextSibling.removeEventListener(
+            'transitionend',
+            scrollToHandler,
+          );
         };
         e.target.nextSibling.addEventListener('transitionend', scrollToHandler);
       }
