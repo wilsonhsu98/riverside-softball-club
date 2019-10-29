@@ -183,6 +183,7 @@ select::-ms-expand {
 		position: sticky;
 		bottom: 0;
 		background-color: rgba(255, 255, 255, 0.8);
+		z-index: 1;
 	}
 	.btn {
 		background-color: $header_bgcolor;

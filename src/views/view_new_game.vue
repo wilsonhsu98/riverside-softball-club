@@ -287,6 +287,10 @@
           </div>
         </div>
       </div>
+      <div class="btn-container">
+        <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
+        <button class="btn" @click="edit">{{ $t('btn_update') }}</button>
+      </div>
     </div>
   </div>
 </template>
@@ -761,7 +765,28 @@ export default {
     back_() {
       router.back();
     },
-    edit() {},
+    edit() {
+      const result = this.ORDER
+        .map(i => this[`order_${i}`][0] && this[`order_${i}`][0].name)
+        .reduce((acc, item, i) => {
+          if (item) {
+            acc[i] = item;
+          }
+          return acc;
+        }, []);
+      const actualCount = result.filter(item => item).length;
+      const maxCount = result.length;
+      if (actualCount < maxCount) {
+        // should be continuously
+        alert(this.$t('msg_sould_continuously'));
+        return;
+      } else if (maxCount < 9) {
+        // should more than 9 players
+        alert(this.$t('msg_sould_more_than_9player'));
+        return;
+      }
+      // call save action
+    },
     order_(i) {
       return this[`order_${i}`];
     },
@@ -947,7 +972,7 @@ export default {
       );
     },
     addToSource() {
-      if (this.extra) {
+      if (this.extra && !this.extraList.includes(this.extra)) {
         this.extraList = [...this.extraList, this.extra];
         this.extra = '';
         this.doResetSource();
@@ -963,7 +988,7 @@ export default {
     },
     formatValue(value, col) {
       return value !== undefined &&
-        ['AVG', 'OBP', 'SLG', 'OPS'].indexOf(col) > -1 &&
+        ['AVG', 'OBP', 'SLG', 'OPS'].includes(col) &&
         value !== '-'
         ? value.toFixed(3)
         : value;

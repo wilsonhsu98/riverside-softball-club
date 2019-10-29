@@ -67,6 +67,8 @@
 	"ttl_starting_players": "Starting players",
 	"msg_move_back": "Move to this area",
 	"pla_add_extra": "Add other",
+	"msg_sould_continuously": "尚有未選擇的棒次",
+	"msg_sould_more_than_9player": "至少需選擇9名球員",
 
 	"add_pa": "新增打席",
 	"edit_pa": "編輯打席",

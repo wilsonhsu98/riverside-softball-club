@@ -127,12 +127,17 @@
     }
     outline: none;
     text-align: center;
+    $color: rgba(158, 158,158, 0.9);
     .tooltip-inner {
       color: white;
       padding: 10px;
       border-radius: 5px;
       box-shadow: 0 5px 30px rgba(black, .1);
       max-width: calc(100vw - 40px);
+      background: $color;
+    }
+    .tooltip-arrow {
+      border-color: $color;
     }
   }
   ul {

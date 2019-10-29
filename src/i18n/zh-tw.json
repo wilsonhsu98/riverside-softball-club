@@ -67,6 +67,8 @@
 	"ttl_starting_players": "先發名單",
 	"msg_move_back": "移回此區",
 	"pla_add_extra": "新增傭兵",
+	"msg_sould_continuously": "尚有未選擇的棒次",
+	"msg_sould_more_than_9player": "至少需選擇9名球員",
 
 	"add_pa": "新增打席",
 	"edit_pa": "編輯打席",

@@ -1,8 +1,14 @@
 <template>
-  <canvas ref="canvas" @mousedown="trackXY" :disabled="disabled"></canvas>
+  <div class="root-container">
+    <canvas ref="canvas" @mousedown="trackXY" :disabled="disabled"></canvas>
+    <img v-if="isImage" :src="imgSrc"/>
+  </div>
 </template>
 
 <style lang="scss" scoped>
+.root-container {
+  position: relative;
+}
 canvas {
   width: 500px;
   height: 500px;
@@ -10,8 +16,15 @@ canvas {
     cursor: not-allowed;
   }
 }
+img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 500px;
+  height: 500px;
+}
 @media only screen and (max-width: 760px) {
-  canvas {
+  canvas, img {
     width: 300px;
     height: 300px;
   }
@@ -24,6 +37,8 @@ export default {
   data() {
     return {
       xy: this.values || [],
+      isImage: Array.isArray(this.values) && this.values.length > 1,
+      imgSrc: '',
     };
   },
   mounted() {
@@ -343,6 +358,7 @@ export default {
         ctx.fillStyle = 'rgba(255, 255, 255, .3)';
         ctx.fillRect(0, 0, base, base);
       }
+      this.imgSrc = canvas.toDataURL("image/png");
     },
     trackXY(event) {
       if (this.disabled || this.no_track) return;
