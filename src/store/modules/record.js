@@ -57,6 +57,7 @@ const state = {
     { name: 'OBP', visible: true },
     { name: 'SLG', visible: true },
     { name: 'OPS', visible: true },
+    { name: 'level', visible: true },
   ],
   game: '',
   order: 0,

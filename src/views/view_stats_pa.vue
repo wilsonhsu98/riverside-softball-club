@@ -175,6 +175,17 @@
                 {{ item.name }}
               </span>
             </span>
+            <div
+              v-else-if="col.name === 'level'"
+              class="cell level"
+              :key="`row_${encodeURI(item.name)}_${colIndex}`"
+            >
+              {{
+                `${Math.floor((item.AVG * 1000) / 100)}/${Math.floor(
+                  (item.OBP * 1000) / 100,
+                )}/${Math.floor((item.SLG * 1000) / 100)}`
+              }}
+            </div>
             <span
               v-else
               :class="`cell${col.name === sortBy ? ' sort' : ''}`"
@@ -287,10 +298,10 @@ i.fa {
     color: $header_color;
     .cell {
       background: $header_bgcolor;
-      &:first-child {
+      &:first-of-type {
         border-top-left-radius: 10px;
       }
-      &:last-child {
+      &:last-of-type {
         border-top-right-radius: 10px;
       }
       &:not(.Rank):not(.name) {
@@ -327,7 +338,7 @@ i.fa {
     opacity: 0;
     cursor: pointer;
     &:checked {
-      & + .row-grid .cell:nth-last-child(2) {
+      & + .row-grid span.cell:last-of-type {
         display: block;
         border-bottom-right-radius: 0;
       }
@@ -345,11 +356,11 @@ i.fa {
       background-color: $row_odd_bgcolor;
     }
     &:last-child {
-      .cell {
-        &:first-child {
+      span.cell {
+        &:first-of-type {
           border-bottom-left-radius: 10px;
         }
-        &:nth-last-child(2) {
+        &:last-of-type {
           border-bottom-right-radius: 10px;
         }
       }
@@ -369,7 +380,7 @@ i.fa {
     display: table-cell;
     line-height: 36px;
     text-align: center;
-    &:nth-child(2n + 3) {
+    &span:nth-of-type(2n + 3) {
       opacity: 0.6;
     }
     &.chart {
@@ -466,6 +477,9 @@ i.fa {
       > div {
         opacity: 1;
       }
+    }
+    &.level {
+      display: none;
     }
   }
 }
@@ -590,8 +604,9 @@ i.fa {
       &.current {
         .cell {
           color: $current_user_bgcolor;
-          &.name,
           &.Rank,
+          &.name,
+          &.level,
           &.sort {
             background-color: $current_user_bgcolor;
             color: $current_user_color;
@@ -605,11 +620,11 @@ i.fa {
         opacity: 1;
       }
       &:last-child {
-        .cell {
-          &:first-child {
+        span.cell {
+          &:first-of-type {
             border-bottom-left-radius: 0;
           }
-          &:nth-last-child(2) {
+          &:last-of-type {
             border-bottom-right-radius: 0;
           }
         }
@@ -622,10 +637,10 @@ i.fa {
       order: 6;
       display: block;
       box-sizing: border-box;
-      &:not(.sort):not(.Rank):not(.name):not(.chart) {
+      &:not(.sort):not(.Rank):not(.name):not(.chart):not(.level) {
         text-align: left;
       }
-      &:not(.Rank):not(.name):not(.chart) {
+      &:not(.Rank):not(.name):not(.chart):not(.level) {
         &:before {
           content: attr(data-label) ':';
           display: inline-block;
@@ -640,13 +655,16 @@ i.fa {
       &.name {
         order: 2;
       }
-      &.sort {
+      &.level {
         order: 3;
-        text-align: center;
+        display: block;
+      }
+      &.sort {
+        order: 4;
         color: inherit;
       }
       &.chart {
-        order: 4;
+        order: 5;
         position: initial;
         margin: 0;
         border: none;
@@ -668,13 +686,16 @@ i.fa {
       .cell {
         width: 33%;
         &.Rank {
-          width: 17%;
+          width: 10%;
         }
         &.name {
           width: 33%;
         }
+        &.level {
+          width: 70px;
+        }
         &.sort {
-          width: 50%;
+          width: calc(57% - 70px);
         }
         &.chart {
           width: 100%;
@@ -727,8 +748,11 @@ i.fa {
         &.name {
           width: 20%;
         }
+        &.level {
+          width: 80px;
+        }
         &.sort {
-          width: 70%;
+          width: calc(70% - 80px);
         }
         &.chart {
           width: 100%;
