@@ -57,7 +57,6 @@ const state = {
     { name: 'OBP', visible: true },
     { name: 'SLG', visible: true },
     { name: 'OPS', visible: true },
-    { name: 'level', visible: true },
   ],
   game: '',
   order: 0,
@@ -83,7 +82,9 @@ const getters = {
   },
   conditionCols: state => {
     return state.cols
-      .filter(item => item.name !== 'Rank' && item.name !== 'name')
+      .filter(
+        item => item.name !== 'Rank' && item.name !== 'name' && item.visible,
+      )
       .map(item => ({
         name: item.name,
         visible: item.visible,

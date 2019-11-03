@@ -175,17 +175,6 @@
                 {{ item.name }}
               </span>
             </span>
-            <div
-              v-else-if="col.name === 'level'"
-              class="cell level"
-              :key="`row_${encodeURI(item.name)}_${colIndex}`"
-            >
-              {{
-                `${Math.floor((item.AVG * 1000) / 100)}/${Math.floor(
-                  (item.OBP * 1000) / 100,
-                )}/${Math.floor((item.SLG * 1000) / 100)}`
-              }}
-            </div>
             <span
               v-else
               :class="`cell${col.name === sortBy ? ' sort' : ''}`"
@@ -195,6 +184,13 @@
               {{ formatValue(item[col.name], col.name) }}
             </span>
           </template>
+          <div class="cell level">
+            {{
+              `${Math.floor((item.AVG * 1000) / 100)}/${Math.floor(
+                (item.OBP * 1000) / 100,
+              )}/${Math.floor((item.SLG * 1000) / 100)}`
+            }}
+          </div>
           <div
             v-if="item.listByGame.length"
             class="cell chart"
