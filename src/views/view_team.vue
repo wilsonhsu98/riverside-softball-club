@@ -111,6 +111,7 @@
           />
           <input
             type="number"
+            pattern="\d*"
             min="0"
             oninput="validity.valid||(value='');"
             class="txt-number"
@@ -150,6 +151,7 @@
           />
           <input
             type="number"
+            pattern="\d*"
             min="0"
             oninput="validity.valid||(value='');"
             class="txt-number"
@@ -196,6 +198,7 @@
           />
           <input
             type="number"
+            pattern="\d*"
             min="0"
             oninput="validity.valid||(value='');"
             class="txt-number"

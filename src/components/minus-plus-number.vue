@@ -3,6 +3,7 @@
     <div class="dec button" @click="minus"></div>
     <input
       type="number"
+      pattern="\d*"
       oninput="validity.valid||(value='');"
       class="input"
       v-model.number="num"
