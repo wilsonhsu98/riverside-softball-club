@@ -113,11 +113,12 @@
             type="number"
             pattern="\d*"
             min="0"
-            oninput="validity.valid||(value='');"
             class="txt-number"
             :placeholder="$t('number')"
-            v-model.number="player.number"
+            @input="checkNumber"
+            v-model.number.lazy="player.number"
           />
+          <!-- oninput="console.log(this);if(value.length>11)value=value.slice(0,11)" -->
           <label v-if="player && player.uid" :for="`chk${i}`">
             <input
               type="checkbox"
@@ -153,10 +154,10 @@
             type="number"
             pattern="\d*"
             min="0"
-            oninput="validity.valid||(value='');"
             class="txt-number"
             :placeholder="$t('number')"
-            v-model.number="player.number"
+            @input="checkNumber"
+            v-model.number.lazy="player.number"
           />
           <label :for="`rdo${i}`">
             <input
@@ -200,10 +201,10 @@
             type="number"
             pattern="\d*"
             min="0"
-            oninput="validity.valid||(value='');"
             class="txt-number"
             :placeholder="$t('number')"
-            v-model.number="player.number"
+            @input="checkNumber"
+            v-model.number.lazy="player.number"
           />
           <label v-if="player && player.uid" style="width: 57px;"> </label>
           <img
@@ -243,7 +244,6 @@
 
 <style lang="scss" scoped>
 @import '../scss/variable';
-$max-width: 400px;
 
 .container {
   .request {
@@ -346,10 +346,10 @@ $max-width: 400px;
     align-items: center;
     .txt-player,
     .txt-number {
-      border: 1px solid #ced4da;
+      border: 2px solid #ced4da;
       border-radius: 4px;
       box-sizing: border-box;
-      font-size: 12px;
+      font-size: $input-font-size - 4;
       line-height: 14px;
       height: 32px;
       display: inline-block;
@@ -554,6 +554,13 @@ export default {
       fetchTeamInfo: 'fetchTeamInfo',
       handleRequest: 'handleRequest',
     }),
+    checkNumber(e) {
+      if (!e.target.validity.valid) {
+        e.target.value = '';
+      } else if (e.target.value.length > 2) {
+        e.target.value = e.target.value.slice(0, 2);
+      }
+    },
     validate() {
       this.players = this.players
         .map(item => {

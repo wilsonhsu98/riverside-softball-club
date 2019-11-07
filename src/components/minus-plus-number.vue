@@ -4,11 +4,11 @@
     <input
       type="number"
       pattern="\d*"
-      oninput="validity.valid||(value='');"
-      class="input"
-      v-model.number="num"
       min="1"
+      class="input"
       :disabled="disabled"
+      @input="checkNumber"
+      v-model.number.lazy="num"
     />
     <div class="inc button" @click="plus"></div>
   </div>
@@ -32,6 +32,7 @@
   text-align: center;
   height: 30px;
   box-sizing: border-box;
+  outline: none;
   border: 2px solid rgb(166, 166, 166);
   background-color: rgb(248, 248, 248);
   vertical-align: top;
@@ -108,6 +109,11 @@ export default {
     minus() {
       if (!this.disabled) {
         this.val -= this.val > 1 ? 1 : 0;
+      }
+    },
+    checkNumber(e) {
+      if (!e.target.validity.valid) {
+        e.target.value = '';
       }
     },
   },

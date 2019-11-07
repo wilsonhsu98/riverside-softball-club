@@ -174,7 +174,6 @@
 
 <style lang="scss" scoped>
 @import '../scss/variable';
-$max-width: 400px;
 
 .container {
   .request {

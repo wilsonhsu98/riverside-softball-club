@@ -84,8 +84,7 @@
 </template>
 
 <style lang="scss" scoped>
-$font-size: 14px;
-$error-color: #ff695e;
+@import '../scss/variable';
 
 .field-wrapper {
   position: relative;
@@ -107,7 +106,7 @@ $error-color: #ff695e;
     padding: 0 10px 0 4px;
     left: 8px;
     z-index: 1;
-    font-size: $font-size;
+    font-size: $input-font-size;
   }
   &.focused {
     .field-wrapper-children {
@@ -123,10 +122,10 @@ $error-color: #ff695e;
   &.has-value {
     label {
       background-color: #fff;
-      font-size: $font-size - 2;
-      top: -7px;
+      font-size: $input-font-size - 2;
+      top: -$input-font-size/2;
       padding: 0 4px;
-      line-height: $font-size;
+      line-height: $input-font-size;
     }
   }
   &.disabled .field-wrapper-children > * {
@@ -137,7 +136,7 @@ $error-color: #ff695e;
     border-color: #3b5998;
   }
   &-children {
-    border: 1px solid #ced4da;
+    border: 2px solid #ced4da;
     border-radius: 4px;
   }
   input,
@@ -148,23 +147,23 @@ $error-color: #ff695e;
     border: none;
     box-sizing: border-box;
     border-radius: 4px;
-    font-size: $font-size;
+    font-size: $input-font-size;
     width: 100%;
   }
   input {
     height: 38px;
-    line-height: $font-size + 2;
+    line-height: $input-font-size + 2;
     padding: 0 10px;
   }
   textarea {
-    line-height: $font-size + 2;
+    line-height: $input-font-size + 2;
     padding: 10px;
   }
   .split {
     width: 100%;
     padding: 0 10px;
     box-sizing: border-box;
-    font-size: $font-size - 2;
+    font-size: $input-font-size - 2;
     box-sizing: border-box;
     min-height: 38px;
     padding-top: 8px;
@@ -210,7 +209,7 @@ $error-color: #ff695e;
   }
   &-message {
     padding: 0 10px;
-    font-size: $font-size - 2;
+    font-size: $input-font-size - 2;
     box-sizing: border-box;
     color: $error-color;
   }

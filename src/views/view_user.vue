@@ -93,7 +93,6 @@
 
 <style lang="scss" scoped>
 @import '../scss/variable';
-$max-width: 400px;
 
 .container {
   display: flex;
@@ -146,14 +145,14 @@ $max-width: 400px;
     }
     &__name {
       margin: 0;
-      font-size: 12px;
+      font-size: 14px;
       line-height: 14px;
     }
   }
   .team-wrapper {
     flex: 1 0 268px;
     height: 100%;
-    border: 1px solid #ced4da;
+    border: 2px solid #ced4da;
     border-radius: 4px;
     margin-top: 12px;
     padding: 10px 5px 5px;
@@ -171,7 +170,7 @@ $max-width: 400px;
       top: -7px;
       z-index: 1;
       background-color: #fff;
-      font-size: 12px;
+      font-size: 14px;
       padding: 0 4px;
       line-height: 14px;
     }
