@@ -127,7 +127,10 @@
                 v-for="player in sourceList"
                 :key="player.name"
               >
-                <i class="handle" @touchstart="e => moveByDblclick(e, player)" @click="e => moveByDblclick(e, player)"
+                <i
+                  class="handle"
+                  @touchstart="e => moveByDblclick(e, player)"
+                  @click="e => moveByDblclick(e, player)"
                   ><drag-n-drop
                 /></i>
                 <span class="name">
