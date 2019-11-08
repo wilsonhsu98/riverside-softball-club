@@ -57,7 +57,10 @@
       </template>
       <div class="button-container" v-if="role === 'manager'">
         <router-link
-          :to="{ name: 'new_game', params: { team: $route.params.team } }"
+          :to="{
+            name: 'create_game_info',
+            params: { team: $route.params.team },
+          }"
           tag="span"
           >＋</router-link
         >

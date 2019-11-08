@@ -132,7 +132,13 @@ select::-ms-expand {
 	}
 }
 
+.vc-highlight {
+	background-color: $header_bgcolor!important;
+}
 
+.is-today .vc-bar {
+	background-color: $active_bgcolor!important;
+}
 
 .field-wrapper-children {
 	.vue-tags-input[class] {

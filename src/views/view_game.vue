@@ -14,14 +14,24 @@
               : $t('box_forgot_opponent')
           }}
         </div>
-        <div class="result" v-if="boxSummary.result">
-          {{
-            $t('box_summary', {
-              h: boxSummary.h,
-              r: boxSummary.r,
-              result: $t(`box_${boxSummary.result}`),
-            })
-          }}
+        <div class="result">
+          <template v-if="boxSummary.result">
+            {{
+              $t('box_summary', {
+                h: boxSummary.h,
+                r: boxSummary.r,
+                result: $t(`box_${boxSummary.result}`),
+              })
+            }}
+          </template>
+          <router-link
+            :to="{
+              name: 'edit_game_info',
+              params: { team: $route.params.team, game: $route.params.game },
+            }"
+            class="fa fa-pencil"
+            tag="i"
+          />
         </div>
       </div>
       <div class="box-table simple">
@@ -226,6 +236,19 @@
       top: 20px;
       right: 20px;
       font-size: 30px;
+    }
+    .fa {
+      color: white;
+      background-color: $current_user_bgcolor;
+      border-radius: 4px;
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      font-size: 18px;
+      box-sizing: border-box;
+      cursor: pointer;
+      text-align: center;
+      vertical-align: middle;
     }
   }
   .box-table {
@@ -446,6 +469,11 @@
       .result {
         position: initial;
         font-size: 14px;
+      }
+      .fa {
+        position: absolute;
+        right: 10px;
+        bottom: 10px;
       }
     }
     .box-table {

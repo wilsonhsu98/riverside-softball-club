@@ -8,6 +8,7 @@ import './css/font.css';
 import './scss/_base.scss';
 import VueTagsInput from '@johmun/vue-tags-input';
 import VTooltip from 'v-tooltip';
+import VCalendar from 'v-calendar';
 import './scss/v-tooltip.scss';
 import draggable from 'vuedraggable';
 import smoothscroll from 'smoothscroll-polyfill';
@@ -38,6 +39,13 @@ Vue.use(VTooltip, {
     ...tootipConfig,
   },
 });
+Vue.use(VCalendar, {
+  locales: {
+    'zh-TW': {
+      firstDayOfWeek: 2,
+    },
+  },
+});
 Vue.config.productionTip = false;
 Vue.use({
   install() {
@@ -59,7 +67,7 @@ new Promise(resolve => {
   store.dispatch('chkLoginStatus');
 });
 
-const version = 5;
+const version = 6;
 if (window.localStorage.getItem('version') !== version.toString()) {
   window.localStorage.clear();
   window.localStorage.setItem('version', version.toString());
@@ -68,6 +76,7 @@ if (window.localStorage.getItem('version') !== version.toString()) {
 const resetVH = () => {
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
+  // document.documentElement.style.maxHeight = `${window.innerHeight}px`;
 };
 resetVH();
 window.addEventListener('resize', () => {

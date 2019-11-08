@@ -1,10 +1,6 @@
 <template>
   <div>
-    <mobile-header
-      :back="$route.params.team ? back_ : undefined"
-      :icon="$route.params.team ? currentTeamIcon : undefined"
-      :save="edit"
-    />
+    <mobile-header :back="back_" :icon="currentTeamIcon" :save="edit" />
     <div class="container" ref="container">
       <h1>{{ $t('create_game') }}</h1>
       <div class="condition">
@@ -131,7 +127,7 @@
                 v-for="player in sourceList"
                 :key="player.name"
               >
-                <i class="handle" @click="e => moveByDblclick(e, player)"
+                <i class="handle" @touchstart="e => moveByDblclick(e, player)" @click="e => moveByDblclick(e, player)"
                   ><drag-n-drop
                 /></i>
                 <span class="name">
@@ -263,6 +259,7 @@
                   >
                     <i
                       class="handle"
+                      @touchstart="e => moveByDblclick(e, player, order)"
                       @click="e => moveByDblclick(e, player, order)"
                       ><drag-n-drop
                     /></i>
@@ -766,25 +763,39 @@ export default {
       router.back();
     },
     edit() {
-      const result = this.ORDER
-        .map(i => this[`order_${i}`][0] && this[`order_${i}`][0].name)
-        .reduce((acc, item, i) => {
-          if (item) {
-            acc[i] = item;
-          }
-          return acc;
-        }, []);
+      const result = this.ORDER.map(
+        i => this[`order_${i}`][0] && this[`order_${i}`][0].name,
+      ).reduce((acc, item, i) => {
+        if (item) {
+          acc[i] = item;
+        }
+        return acc;
+      }, []);
       const actualCount = result.filter(item => item).length;
       const maxCount = result.length;
-      if (actualCount < maxCount) {
-        // should be continuously
-        alert(this.$t('msg_sould_continuously'));
-        return;
-      } else if (maxCount < 9) {
-        // should more than 9 players
-        alert(this.$t('msg_sould_more_than_9player'));
+
+      const errorStr = [
+        {
+          // should be continuously
+          condition: actualCount < maxCount,
+          err: this.$t('msg_sould_continuously'),
+        },
+        {
+          // should more than 9 players
+          condition: actualCount < 9,
+          err: this.$t('msg_sould_more_than_9player'),
+        },
+      ]
+        .reduce((acc, check) => {
+          return check.condition ? acc.concat(check.err) : acc;
+        }, [])
+        .join('\\n');
+
+      if (errorStr) {
+        alert(errorStr);
         return;
       }
+
       // call save action
     },
     order_(i) {

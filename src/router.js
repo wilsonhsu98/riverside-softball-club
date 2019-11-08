@@ -57,8 +57,20 @@ const router = new VueRouter({
         },
         {
           path: 'games/:team/new',
-          name: 'new_game',
-          component: require('./views/view_new_game').default,
+          name: 'create_game_info',
+          component: require('./views/view_game_info').default,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'games/:team/:game/edit',
+          name: 'edit_game_info',
+          component: require('./views/view_game_info').default,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'games/:team/:game/order',
+          name: 'game_order',
+          component: require('./views/view_order').default,
           meta: { requiresAuth: true },
         },
         {

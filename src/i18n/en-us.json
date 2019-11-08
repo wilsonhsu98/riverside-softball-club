@@ -63,6 +63,27 @@
 	"box_header_player": "Player",
 
 	"create_game": "Create a game",
+	"edit_game": "修改比賽",
+	"ttl_game_time": "比賽日期",
+	"ttl_league": "聯盟",
+	"ttl_group": "組別",
+	"ttl_opponent": "對手",
+	"ttl_game_type": "比賽性質",
+	"ttl_fun": "友誼賽",
+	"ttl_regular": "季賽",
+	"ttl_playoff": "季後賽",
+	"ttl_place": "休息區",
+	"ttl_1st": "一壘側",
+	"ttl_3rd": "三壘側",
+	"ttl_home": "本後",
+	"ttl_top_bot": "攻守",
+	"ttl_top": "先攻",
+	"ttl_bot": "先守",
+	"ttl_game_tag": "標籤",
+	"pla_game_tag": "請使用逗點,分隔多個標籤",
+	"btn_next": "下一步",
+
+	"place_order": "排棒次",
 	"ttl_all_players": "All players",
 	"ttl_starting_players": "Starting players",
 	"msg_move_back": "Move to this area",
@@ -122,5 +143,6 @@
 	"btn_join": "Request to Join",
 	"ttl_switch_team": "Current teams (tap to switch)",
 	"ttl_current_team": "Current team",
-	"required": "Required column"
+	"required": "Required column",
+	"vc-year": ""
 }
