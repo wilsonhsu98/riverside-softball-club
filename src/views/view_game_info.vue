@@ -128,6 +128,7 @@
 @import '../scss/variable';
 
 .container {
+  position: relative;
   .field-wrapper {
     max-width: $max-width;
     width: 100%;
@@ -199,6 +200,24 @@
         }
       }
     }
+  }
+  &::after {
+    content: '';
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    animation-name: hidemask;
+    animation-duration: 0.1s;
+    animation-fill-mode: forwards;
+  }
+}
+@keyframes hidemask {
+  to {
+    content: none;
+    visibility: hidden;
   }
 }
 
