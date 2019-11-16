@@ -25,10 +25,17 @@ exports.import_game = functions.https.onRequest((req, res) => {
       ],
       year: teddySummary ? teddySummary['年度'] : '',
       season: teddySummary ? teddySummary['季度'] : '',
+      gameType: teddySummary
+        ? teddySummary['季度'].indexOf('季後') > -1
+          ? 'playoff'
+          : 'regular'
+        : '',
       opponent: teddySummary ? teddySummary['對手'] : '',
       league: teddySummary ? teddySummary['聯盟'] : '',
       coach: teddySummary ? teddySummary['教練'] : '',
-      place: teddySummary ? teddySummary['休息區'] : '',
+      place: ['零', '一', '二', '三'].indexOf(
+        teddySummary ? teddySummary['休息區'] : '',
+      ),
       group: teddySummary ? teddySummary['組別'] : '',
       timestamp,
     })
