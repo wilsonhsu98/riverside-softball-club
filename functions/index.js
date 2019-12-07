@@ -18,6 +18,7 @@ exports.import_game = functions.https.onRequest((req, res) => {
     .collection('games')
     .doc(game)
     .set({
+      version: 'import',
       orders: parseResult.orders,
       errors: parseResult.errors,
       result: ['win', 'lose', 'tie', ''][
