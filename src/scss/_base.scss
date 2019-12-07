@@ -35,7 +35,7 @@ button {
 	margin: 0 5px;
 	color: #FFF;
 	border: none;
-	border-radius: 2px;
+	border-radius: 5px;
 	background: rgba(158,158,158,.2);
 	box-shadow: 0 2px 2px 0 rgba(0,0,0,.14), 0 3px 1px -2px rgba(0,0,0,.2), 0 1px 5px 0 rgba(0,0,0,.12);
 	cursor: pointer;
@@ -83,12 +83,12 @@ select::-ms-expand {
 	&:after {
 		content: '\F078';
 		font: normal normal normal 12px/1 FontAwesome;
-		color: #a6a6a6;
+		color: $gray;
 		right: 7px;
 		top: 2px;
 		height: 26px;
 		padding: 7px 0px 0px 4px;
-		border-left: 2px solid #a6a6a6;
+		border-left: 2px solid $gray;
 		position: absolute;
 		pointer-events: none;
 		box-sizing: border-box;
@@ -125,7 +125,7 @@ select::-ms-expand {
 		border-radius: 5px;
 		vertical-align: top;
 		outline: none;
-		font-size: $input-font-size - 4;
+		font-size: $input_font_size - 4;
 	}
 	&:disabled {
 		opacity: .5;
@@ -150,7 +150,7 @@ select::-ms-expand {
 		.ti-tag,
 		.ti-tag-input[class],
 		.ti-new-tag-input:not([placeholder='']) {
-			font-size: $input-font-size;
+			font-size: $input_font_size;
 		}
 		.ti-tag-input[class] {
 			height: 100%;
@@ -162,6 +162,7 @@ select::-ms-expand {
 		}
 		.ti-new-tag-input:not([placeholder='']) {
 			min-width: 190px;
+			line-height: 20px;
 		}
 		.ti-tag-center[class] {
 			line-height: 19px;
@@ -200,6 +201,7 @@ select::-ms-expand {
 		background-color: $header_bgcolor;
 		padding: 10px 15px;
 		width: 100px;
+		outline: none;
 	}
 }
 
@@ -219,4 +221,12 @@ select::-ms-expand {
 			display: none;
 		}
 	}
+}
+
+@media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
+
+}
+
+@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
+
 }

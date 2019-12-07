@@ -481,8 +481,7 @@ const displayGame = (players, records, errors, role) => {
     item.summary = `${ab}-${h}`;
     item.error = error && error.count;
   });
-
-  return [header].concat(arr);
+  return [[...header, startOrder]].concat(arr);
 };
 
 function toDataURL(src, callback, outputFormat) {

@@ -72,10 +72,10 @@
 <style lang="scss" scoped>
 @import '../scss/variable';
 .link-btn {
-  background-color: $header_bgcolor;
+  background-color: $active_bgcolor;
   padding: 10px 15px;
-  width: 100px;
-  margin-top: 10px;
+  width: 80%;
+  margin: 10px 0 5px;
   outline: none;
 }
 .container {
@@ -100,7 +100,7 @@
         font-size: 40px;
         font-weight: bold;
         text-decoration: none;
-        color: #ccc;
+        color: $gray;
         box-sizing: border-box;
         border: 5px solid;
         border-color: $row_odd_bgcolor;
@@ -112,13 +112,13 @@
           color: #fff;
         }
         &.win {
-          background-color: #ef1010;
+          background-color: $hit;
         }
         &.tie {
-          background-color: #efaf34;
+          background-color: $nonpa;
         }
         &.lose {
-          background-color: #4d9de5;
+          background-color: $ng;
         }
         // &.C { border-color: $header_bgcolor; }
         // &.G { border-color: $row_odd_bgcolor; }
@@ -132,7 +132,7 @@
       content: attr(data-date);
       display: inline-block;
       text-decoration: underline;
-      color: #ccc;
+      color: $gray;
       position: absolute;
       left: 50%;
       bottom: 5px;
@@ -197,6 +197,7 @@
       .button-container {
         position: absolute;
         bottom: 0;
+        right: 0;
       }
     }
   }
@@ -213,9 +214,7 @@ export default {
     };
   },
   created() {},
-  mounted() {
-    this.gameList_ = this.gameList;
-  },
+  mounted() {},
   methods: {
     ...mapActions({}),
   },
@@ -225,6 +224,16 @@ export default {
       currentTeamIcon: 'currentTeamIcon',
       role: 'role',
     }),
+  },
+  watch: {
+    gameList: {
+      handler() {
+        this.$nextTick(() => {
+          this.gameList_ = this.gameList;
+        });
+      },
+      immediate: true,
+    },
   },
 };
 </script>

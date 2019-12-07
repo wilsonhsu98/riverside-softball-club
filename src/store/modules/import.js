@@ -65,7 +65,7 @@ const actions = {
   toggleTodo({ commit }, item) {
     commit(types.SET_TODO, item);
   },
-  importData({ commit }, team = 'OldStar') {
+  importData({ commit, dispatch }, team = 'OldStar') {
     commit(rootTypes.LOADING, true);
     axios
       .all(
@@ -96,17 +96,28 @@ const actions = {
               .collection('games')
               .doc(item.table),
             {
+              version: 'import',
               orders: parseResult.orders,
               errors: parseResult.errors,
               result: ['win', 'lose', 'tie', ''][
                 ['勝', '敗', '和', ''].indexOf(
-                  teddySummary ? teddySummary['結果'] : 3,
+                  teddySummary ? teddySummary['結果'] : '',
                 )
               ],
               year: teddySummary ? teddySummary['年度'] : '',
               season: teddySummary ? teddySummary['季度'] : '',
+              gameType: teddySummary
+                ? teddySummary['季度'].indexOf('季後') > -1
+                  ? 'playoff'
+                  : 'regular'
+                : '',
               opponent: teddySummary ? teddySummary['對手'] : '',
               league: teddySummary ? teddySummary['聯盟'] : '',
+              coach: teddySummary ? teddySummary['教練'] : '',
+              place:
+                ['', '一', '二', '三'].indexOf(
+                  teddySummary ? teddySummary['休息區'] : '',
+                ) || '',
               group: teddySummary ? teddySummary['組別'] : '',
               timestamp,
             },
@@ -116,7 +127,7 @@ const actions = {
         return batch.commit();
       })
       .then(() => {
-        this.dispatch('fetchTwoOrigin', team);
+        dispatch('fetchTwoOrigin', team);
       })
       .catch(err => {
         alert(err);
@@ -141,17 +152,28 @@ const actions = {
           .collection('games')
           .doc(game)
           .set({
+            version: 'import',
             orders: parseResult.orders,
             errors: parseResult.errors,
             result: ['win', 'lose', 'tie', ''][
               ['勝', '敗', '和', ''].indexOf(
-                teddySummary ? teddySummary['結果'] : 3,
+                teddySummary ? teddySummary['結果'] : '',
               )
             ],
             year: teddySummary ? teddySummary['年度'] : '',
             season: teddySummary ? teddySummary['季度'] : '',
+            gameType: teddySummary
+              ? teddySummary['季度'].indexOf('季後') > -1
+                ? 'playoff'
+                : 'regular'
+              : '',
             opponent: teddySummary ? teddySummary['對手'] : '',
             league: teddySummary ? teddySummary['聯盟'] : '',
+            coach: teddySummary ? teddySummary['教練'] : '',
+            place:
+              ['', '一', '二', '三'].indexOf(
+                teddySummary ? teddySummary['休息區'] : '',
+              ) || '',
             group: teddySummary ? teddySummary['組別'] : '',
             timestamp,
           });

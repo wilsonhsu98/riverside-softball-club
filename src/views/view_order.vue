@@ -1,6 +1,11 @@
 <template>
   <div>
-    <mobile-header :back="back_" :icon="currentTeamIcon" :save="edit" />
+    <mobile-header
+      :back="back_"
+      :icon="currentTeamIcon"
+      :save="edit"
+      :save_label="$t('btn_start_game')"
+    />
     <div class="container" ref="container">
       <h1>{{ $t('create_game') }}</h1>
       <div class="condition">
@@ -289,7 +294,7 @@
       </div>
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
-        <button class="btn" @click="edit">{{ $t('btn_update') }}</button>
+        <button class="btn" @click="edit">{{ $t('btn_start_game') }}</button>
       </div>
     </div>
   </div>
@@ -339,10 +344,10 @@
   width: 24px;
   height: 24px;
   display: inline-block;
-  border: 2px solid #a6a6a6;
+  border: 2px solid $gray;
   text-align: center;
   border-radius: 50%;
-  color: #a6a6a6;
+  color: $gray;
   background-color: #fff;
   position: relative;
   left: 50%;
@@ -428,14 +433,14 @@
   bottom: 0;
   left: 0;
   box-sizing: border-box;
-  border: 1px solid #ced4da;
+  border: 1px solid $input_border;
   border-radius: 4px;
   padding: 10px;
   margin: 0;
   min-width: auto;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   legend {
-    color: #b5b5b5;
+    color: $input_font;
     font-size: 12px;
   }
   &.all-players {
@@ -544,7 +549,7 @@
     color: $active_bgcolor;
     padding-left: 5px;
     > input[type='text'] {
-      color: #a6a6a6;
+      color: $gray;
       font-size: 16px;
       border: none;
       outline: none;
@@ -631,13 +636,13 @@
     color: #fff;
     margin-bottom: 1px;
     &.red {
-      background-color: #ef1010;
+      background-color: $hit;
     }
     &.yellow {
-      background-color: #efaf34;
+      background-color: $nonpa;
     }
     &.blue {
-      background-color: #4d9de5;
+      background-color: $ng;
     }
     &.exclude {
       opacity: 0.5;
@@ -749,18 +754,15 @@ export default {
     };
   },
   created() {
-    if (this.$route.params.team) {
-      this.fetchTeamInfo(this.$route.params.team);
-    }
     this.sortBy_ = this.sortBy;
   },
   methods: {
     ...mapActions({
-      fetchTeamInfo: 'fetchTeamInfo',
       setPeriod: 'setPeriod',
       setTop: 'setTop',
       setUnlimitedPA: 'setUnlimitedPA',
       setSortBy: 'setSortBy',
+      editGameOrder: 'editGameOrder',
     }),
     back_() {
       router.back();
@@ -792,7 +794,7 @@ export default {
         .reduce((acc, check) => {
           return check.condition ? acc.concat(check.err) : acc;
         }, [])
-        .join('\\n');
+        .join('\n');
 
       if (errorStr) {
         alert(errorStr);
@@ -800,6 +802,11 @@ export default {
       }
 
       // call save action
+      this.editGameOrder({
+        teamCode: this.$route.params.team,
+        gameId: this.$route.params.game,
+        orders: result.map(name => ({ name })),
+      });
     },
     order_(i) {
       return this[`order_${i}`];
@@ -1023,23 +1030,21 @@ export default {
     }),
   },
   watch: {
-    $route() {
-      if (this.$route.params.team) {
-        this.fetchTeamInfo(this.$route.params.team);
-      }
-    },
     genStatistics() {
       this.doResetSource();
     },
-    teamInfo() {
-      // 請假球員清空
-      // 先發球員清空
-      // 成績排序 + 沒成績球員
-      this.releaseHiddenPlayer();
-      this.ORDER.forEach(order => {
-        this[`order_${order}`] = [];
-      });
-      this.sourceList = this.resetSource();
+    teamInfo: {
+      handler() {
+        // 請假球員清空
+        // 先發球員清空
+        // 成績排序 + 沒成績球員
+        this.releaseHiddenPlayer();
+        this.ORDER.forEach(order => {
+          this[`order_${order}`] = [];
+        });
+        this.sourceList = this.resetSource();
+      },
+      immediate: true,
     },
     sortBy() {
       this.sortBy_ = this.sortBy;

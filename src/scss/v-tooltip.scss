@@ -1,3 +1,5 @@
+@import "variable";
+
 .tooltip {
   $bg: rgba(#ffd1d0, .9);
   $font: #ff695e;
@@ -7,7 +9,7 @@
   .tooltip-inner {
     background: $bg;
     color: $font;
-    border-radius: 5px;
+    border-radius: 10px;
     padding: 5px 10px;
     box-sizing: border-box;
   }
@@ -84,12 +86,11 @@
   }
   // &.popover,
   &.info {
-    $color: rgba(#a6a6a6, .9);
+    $color: rgba($gray, .9);
     outline: none;
     .tooltip-inner {
       background: $color;
       color: white;
-      border-radius: 5px;
       box-shadow: 0 5px 30px rgba(black, .1);
       max-width: calc(100vw - 40px);
     }
@@ -131,8 +132,8 @@
     .tooltip-inner {
       color: white;
       padding: 10px;
-      border-radius: 5px;
       box-shadow: 0 5px 30px rgba(black, .1);
+      min-width: 200px;
       max-width: calc(100vw - 40px);
       background: $color;
     }
@@ -143,5 +144,11 @@
   ul {
     margin: 10px 0;
     padding: 0 0 0 20px;
+  }
+}
+
+@media only screen and (max-width: 420px) and (max-aspect-ratio: 13/9) {
+  .tooltip.box-tip .tooltip-inner {
+    width: calc(100vw - 40px);
   }
 }

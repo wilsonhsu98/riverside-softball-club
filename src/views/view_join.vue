@@ -177,11 +177,11 @@
 
 .container {
   .request {
-    background-color: #b5b5b5;
+    background-color: $input_font;
     color: #fff;
     box-sizing: border-box;
     padding: 5px 8px;
-    max-width: $max-width;
+    max-width: $max_width;
     width: 100%;
     margin: 15px auto;
     border-radius: 5px;
@@ -217,7 +217,7 @@
     }
   }
   .field-wrapper {
-    max-width: $max-width;
+    max-width: $max_width;
     width: 100%;
     margin: 0 auto;
     i.fa {
@@ -226,11 +226,11 @@
       cursor: pointer;
       line-height: 36px;
       margin-right: 5px;
-      color: #b5b5b5;
+      color: $input_font;
     }
   }
   .search-result {
-    max-width: $max-width;
+    max-width: $max_width;
     width: 100%;
     margin: 0 auto;
   }
@@ -256,7 +256,7 @@
   .section-header {
     position: absolute;
     background-color: #fff;
-    color: #b5b5b5;
+    color: $input_font;
     font-size: 12px;
     top: -7px;
     left: 50%;
@@ -266,7 +266,7 @@
   }
   .team-info {
     margin-top: 20px;
-    border-top: 1px solid #ced4da;
+    border-top: 1px solid $input_border;
     padding-left: 110px;
     padding-top: 5px;
     background: 5px 50% no-repeat;
@@ -289,7 +289,7 @@
   }
   .team-player,
   .team-other {
-    border-top: 1px solid #ced4da;
+    border-top: 1px solid $input_border;
     position: relative;
     padding: 10px 0;
     input[type='text'] {
@@ -300,7 +300,7 @@
       box-sizing: border-box;
       border-radius: 4px;
       width: 65px;
-      border: 1px solid #ced4da;
+      border: 1px solid $input_border;
       font-size: 12px;
       line-height: 14px;
       height: 32px;
@@ -404,6 +404,9 @@ export default {
   },
   mounted() {},
   beforeDestroy() {
+    if (this.currentTeam) {
+      this.fetchTeamInfo(this.currentTeam);
+    }
     this.searchTeams({ keyword: '', type: 'join' });
     this.disconnectRequests();
   },
@@ -460,6 +463,7 @@ export default {
     ...mapGetters({
       teamInfo: 'teamInfo',
       teamList: 'teamList',
+      currentTeam: 'currentTeam',
       accountInfo: 'accountInfo',
       userId: 'userId',
       requests: 'requests',

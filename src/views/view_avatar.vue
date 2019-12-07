@@ -51,7 +51,7 @@
 @import '../scss/variable';
 
 .avatar-container {
-  max-width: $max-width;
+  max-width: $max_width;
   width: 100%;
   margin: 15px auto;
   text-align: center;

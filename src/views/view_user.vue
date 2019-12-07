@@ -137,7 +137,7 @@
       height: 18px;
       width: 18px;
       line-height: 18px;
-      font-size: 10px;
+      font-size: 12px;
       background-color: #ff2200;
       border-radius: 50%;
       text-align: center;
@@ -152,7 +152,7 @@
   .team-wrapper {
     flex: 1 0 268px;
     height: 100%;
-    border: 1px solid #ced4da;
+    border: 1px solid $input_border;
     border-radius: 4px;
     margin-top: 12px;
     padding: 10px 5px 5px;
@@ -160,7 +160,7 @@
     box-sizing: border-box;
     label {
       position: absolute;
-      color: #b5b5b5;
+      color: $input_font;
       max-width: 90%;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -189,6 +189,7 @@
     padding: 10px 15px;
     vertical-align: middle;
     height: 36px;
+    outline: none;
   }
   .logout-btn {
     display: none;
@@ -210,7 +211,7 @@
       text-decoration: underline;
     }
     .field-wrapper {
-      max-width: $max-width;
+      max-width: $max_width;
       width: 100%;
       margin: 0 auto;
       i.fa {
@@ -219,7 +220,7 @@
         cursor: pointer;
         line-height: 36px;
         margin-right: 5px;
-        color: #b5b5b5;
+        color: $input_font;
       }
     }
     & + .team-wrapper {

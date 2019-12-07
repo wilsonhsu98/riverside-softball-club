@@ -203,7 +203,7 @@ i.fa {
       padding: 10px;
       background-color: $row_even_bgcolor;
       margin-top: auto;
-      font-size: 10px;
+      font-size: 12px;
     }
   }
 }

@@ -11,6 +11,7 @@ import { db, auth, timestamp } from '../../firebase';
 
 const types = {
   FETCH_TEAM: 'TEAM/FETCH_TEAM',
+  CLEAR_TEAM: 'TEAM/CLEAR_TEAM',
   SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
   FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
   FETCH_TEAM_REQUESTS: 'TEAM/FETCH_TEAM_REQUESTS',
@@ -23,6 +24,7 @@ const state = {
     teamIntro: '',
     otherNames: '',
     players: [{}],
+    benches: [{}],
     icon: '',
   },
   teamList: [],
@@ -195,6 +197,7 @@ const actions = {
       });
   },
   fetchTeamInfo({ commit }, teamCode) {
+    commit(types.CLEAR_TEAM);
     commit(rootTypes.LOADING, true);
     const refTeamDoc = db.collection('teams').doc(teamCode);
     Promise.all([
@@ -512,6 +515,17 @@ const actions = {
 };
 
 const mutations = {
+  [types.CLEAR_TEAM](state) {
+    state.teamInfo = {
+      teamCode: '',
+      teamName: '',
+      teamIntro: '',
+      otherNames: '',
+      players: [{}],
+      benches: [{}],
+      icon: '',
+    };
+  },
   [types.FETCH_TEAM](state, data) {
     state.teamInfo = {
       teamCode: data.id,
@@ -519,7 +533,7 @@ const mutations = {
       teamIntro: data.intro,
       otherNames: data.subNames,
       players: Array.from(data.players).sort((a, b) => a.number - b.number),
-      benches: data.benches,
+      benches: Array.from(data.benches).sort((a, b) => a.number - b.number),
       icon: data.icon,
     };
   },

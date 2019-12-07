@@ -1,5 +1,6 @@
 <template>
   <div class="main-container">
+    <router-view class="content"></router-view>
     <header>
       <div class="header-container">
         <img class="icon" :src="currentTeamIcon || defaultIcon" />
@@ -59,7 +60,6 @@
         </ul>
       </div>
     </header>
-    <router-view class="content"></router-view>
     <loading v-if="loading" :text="loading.text"></loading>
   </div>
 </template>
@@ -79,7 +79,7 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  z-index: 2;
+  /* z-index: 2; */
   background-color: $header_bgcolor;
   height: $header_menu_height;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.13), 0 0 2px 0 rgba(0, 0, 0, 0.2);
@@ -129,8 +129,8 @@ header {
       height: 18px;
       width: 18px;
       line-height: 18px;
-      font-size: 10px;
-      background-color: #ff2200;
+      font-size: 12px;
+      background-color: $request_bgcolor;
       border-radius: 50%;
       text-align: center;
       color: #fff;
@@ -150,7 +150,7 @@ header {
   width: 980px;
   margin: 0 auto;
   position: relative;
-  z-index: 0;
+  /* z-index: 0; */
 }
 @media only screen and (max-width: 990px) {
   header .header-container,
@@ -235,7 +235,7 @@ header {
         right: -8px;
         top: initial;
         bottom: 16px;
-        background-color: #ff2200;
+        background-color: $request_bgcolor;
       }
       &:hover:not(.active) {
         background: none;
@@ -266,8 +266,10 @@ export default {
     this.fetchUser();
     if (this.$route.params.team) {
       this.fetchTable(this.$route.params.team);
+      this.fetchTeamInfo(this.$route.params.team);
     } else if (this.currentTeam) {
       this.fetchTable(this.currentTeam);
+      this.fetchTeamInfo(this.currentTeam);
     }
   },
   methods: {
@@ -275,6 +277,7 @@ export default {
       initFromLS: 'initFromLS',
       fetchTable: 'fetchTable',
       fetchUser: 'fetchUser',
+      fetchTeamInfo: 'fetchTeamInfo',
       fetchTeamIcon: 'fetchTeamIcon',
       fetchTeamRequests: 'fetchTeamRequests',
       logout: 'logout',
@@ -294,14 +297,17 @@ export default {
     $route(to, from) {
       if (to.params.team && to.params.team !== this.currentTeam) {
         this.fetchTable(to.params.team);
+        this.fetchTeamInfo(to.params.team);
       }
       if (from.params.team && from.params.team !== this.currentTeam) {
         this.fetchTable(this.currentTeam);
+        this.fetchTeamInfo(this.currentTeam);
       }
     },
     currentTeam() {
       if (this.currentTeam) {
         this.fetchTeamIcon(this.currentTeam);
+        this.fetchTeamInfo(this.currentTeam);
       }
       if (!this.$route.params.team && this.currentTeam) {
         this.fetchTable(this.currentTeam);

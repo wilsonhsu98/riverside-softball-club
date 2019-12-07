@@ -28,7 +28,6 @@
       </div>
 
       <custom-input
-        class="field-wrapper"
         limit="en-only"
         :name="$t('ttl_team_code')"
         :placeholder="$t('pla_en_only')"
@@ -38,14 +37,12 @@
       />
 
       <custom-input
-        class="field-wrapper"
         :name="$t('ttl_team_name')"
         :error="teamName_err"
         v-model="teamName"
       />
 
       <custom-input
-        class="field-wrapper"
         type="splitting-wording"
         :name="$t('ttl_other_names')"
         :placeholder="$t('pla_split_names')"
@@ -53,7 +50,6 @@
       />
 
       <custom-input
-        class="field-wrapper"
         type="textarea"
         rows="3"
         :name="$t('ttl_team_intro')"
@@ -249,11 +245,11 @@
   .request {
     color: #fff;
     box-sizing: border-box;
-    max-width: $max-width;
+    max-width: $max_width;
     width: 100%;
     margin: 15px auto;
     border-radius: 5px;
-    background-color: #b5b5b5;
+    background-color: $input_font;
     padding: 5px 8px 10px 60px;
     min-height: 100px;
     display: flex;
@@ -298,14 +294,14 @@
     }
   }
   h2 {
-    max-width: $max-width;
+    max-width: $max_width;
     width: 100%;
     margin: 0 auto;
     padding: 15px 0 2px 8px;
     font-size: 12px;
     font-weight: normal;
     text-align: left;
-    color: #b5b5b5;
+    color: $input_font;
     box-sizing: border-box;
     &.player-header {
       position: relative;
@@ -315,7 +311,7 @@
     }
   }
   .field-wrapper {
-    max-width: $max-width;
+    max-width: $max_width;
     width: 100%;
     margin: 0 auto;
   }
@@ -338,7 +334,7 @@
     border-radius: 50%;
   }
   .player {
-    max-width: $max-width;
+    max-width: $max_width;
     width: 100%;
     margin: 0 auto 5px;
     position: relative;
@@ -346,10 +342,10 @@
     align-items: center;
     .txt-player,
     .txt-number {
-      border: 2px solid #ced4da;
+      border: 2px solid $input_border;
       border-radius: 4px;
       box-sizing: border-box;
-      font-size: $input-font-size - 4;
+      font-size: $input_font_size - 4;
       line-height: 14px;
       height: 32px;
       display: inline-block;
@@ -377,7 +373,7 @@
     }
   }
   .error {
-    max-width: $max-width;
+    max-width: $max_width;
     width: 100%;
     margin: 0 auto;
     padding: 0 10px;
@@ -541,17 +537,12 @@ export default {
       transparentPng,
     };
   },
-  created() {
-    if (this.$route.params.team) {
-      this.fetchTeamInfo(this.$route.params.team);
-    }
-  },
+  created() {},
   mounted() {},
   beforeDestroy() {},
   methods: {
     ...mapActions({
       editTeam: 'editTeam',
-      fetchTeamInfo: 'fetchTeamInfo',
       handleRequest: 'handleRequest',
     }),
     checkNumber(e) {
@@ -643,18 +634,21 @@ export default {
       router.back();
     },
     editTeam_() {
-      if (this.validate()) {
-        this.editTeam({
-          code: this.teamCode,
-          name: this.teamName,
-          subNames: this.otherNames,
-          intro: this.teamIntro,
-          players: this.players,
-          benches: this.benches,
-          icon: this.icon,
-          isNew: !this.$route.params.team,
-        });
-      }
+      // wait for tags component ready
+      setTimeout(() => {
+        if (this.validate()) {
+          this.editTeam({
+            code: this.teamCode,
+            name: this.teamName,
+            subNames: this.otherNames,
+            intro: this.teamIntro,
+            players: this.players,
+            benches: this.benches,
+            icon: this.icon,
+            isNew: !this.$route.params.team,
+          });
+        }
+      });
     },
     rdoBindSelf(index) {
       this.players = this.players.map((player, i) => {
@@ -701,28 +695,25 @@ export default {
     }),
   },
   watch: {
-    // $route() {
-    //   if (this.$route.params.team) {
-    //     this.teamCode_err = '';
-    //     this.teamName_err = '';
-    //     this.players_err = '';
-    //     this.fetchTeamInfo(this.$route.params.team);
-    //   }
-    // },
-    teamInfo() {
-      this.teamCode = this.teamInfo.teamCode;
-      this.teamName = this.teamInfo.teamName;
-      this.teamIntro = this.teamInfo.teamIntro;
-      this.otherNames = this.teamInfo.otherNames;
+    teamInfo: {
+      handler() {
+        if (this.$route.params.team) {
+          this.teamCode = this.teamInfo.teamCode;
+          this.teamName = this.teamInfo.teamName;
+          this.teamIntro = this.teamInfo.teamIntro;
+          this.otherNames = this.teamInfo.otherNames;
 
-      this.icon = this.teamInfo.icon;
-      this.players = this.teamInfo.players.map(player => {
-        return {
-          ...player,
-          self: player.uid === this.userId,
-        };
-      });
-      this.benches = this.teamInfo.benches.map(player => ({ ...player }));
+          this.icon = this.teamInfo.icon;
+          this.players = this.teamInfo.players.map(player => {
+            return {
+              ...player,
+              self: player.uid === this.userId,
+            };
+          });
+          this.benches = this.teamInfo.benches.map(player => ({ ...player }));
+        }
+      },
+      immediate: true,
     },
   },
 };

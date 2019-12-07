@@ -3,7 +3,11 @@
     <i v-if="back" class="fa fa-arrow-left" @click="back_"></i>
     <span v-else></span>
     <img class="icon" :src="icon || defaultIcon" />
-    <div v-if="save" class="save-btn" @click="save_">
+    <div
+      v-if="save"
+      :class="`save-btn${disabled === true ? ' disabled' : ''}`"
+      @click="save_"
+    >
       {{ save_label || $t('btn_update') }}
     </div>
     <span v-else></span>
@@ -30,6 +34,10 @@ header {
     line-height: 50px;
     padding: 0 14px;
     cursor: pointer;
+    &.disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
   }
 }
 
@@ -65,7 +73,7 @@ header {
 import defaultIcon from '../images/icon.png';
 
 export default {
-  props: ['back', 'icon', 'save', 'save_label'],
+  props: ['back', 'icon', 'save', 'save_label', 'disabled'],
   data() {
     return {
       defaultIcon,
@@ -78,7 +86,7 @@ export default {
       }
     },
     save_() {
-      if (typeof this.save === 'function') {
+      if (typeof this.save === 'function' && this.disabled !== true) {
         this.save();
       }
     },

@@ -415,13 +415,13 @@ i.fa {
         color: #fff;
         margin-bottom: 1px;
         &.red {
-          background-color: #ef1010;
+          background-color: $hit;
         }
         &.yellow {
-          background-color: #efaf34;
+          background-color: $nonpa;
         }
         &.blue {
-          background-color: #4d9de5;
+          background-color: $ng;
         }
         &.exclude {
           opacity: 0.5;

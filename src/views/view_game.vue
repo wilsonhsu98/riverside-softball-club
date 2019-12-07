@@ -2,8 +2,12 @@
   <div>
     <mobile-header :back="back_" :icon="currentTeamIcon" />
     <div class="gamebox-container">
-      <div class="box-summary" v-if="boxSummary.league && boxSummary.group">
-        {{ `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}` }}
+      <div class="box-summary">
+        <template v-if="boxSummary.league && boxSummary.group">
+          {{
+            `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}`
+          }}
+        </template>
         <template v-if="boxSummary.year && boxSummary.season">
           {{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
         </template>
@@ -111,7 +115,7 @@
           <span class="summary">{{ item.summary }}</span>
         </div>
       </div>
-      <div class="box-table normal">
+      <div class="box-table normal" v-if="box.slice(1).length">
         <div class="player-records header">
           <div class="player">
             <span class="order">#</span>
@@ -123,7 +127,7 @@
               <div
                 class="record"
                 :key="`header_${innIndex}`"
-                v-for="(inn, innIndex) in box[0]"
+                v-for="(inn, innIndex) in box[0].slice(0, -1)"
               >
                 <span class="content">{{
                   box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
@@ -210,10 +214,20 @@
       </div>
     </div>
     <div style="text-align: center; margin: 10px;">
-      <button class="share-btn" @click="screenshot">
+      <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
         <i class="fa fa-facebook-square"></i>
         {{ $t('fb_share') }}
       </button>
+      <router-link
+        v-else
+        :to="{
+          name: 'game_order',
+          params: { team: $route.params.team, game: $route.params.game },
+        }"
+        class="btn"
+        tag="button"
+        >{{ $t('btn_fill_order') }}</router-link
+      >
     </div>
   </div>
 </template>
@@ -231,6 +245,7 @@
     position: relative;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    min-height: 37px;
     .result {
       position: absolute;
       top: 20px;
@@ -377,16 +392,16 @@
           height: 34px;
           position: relative;
           &.red {
-            background-color: #ef1010;
+            background-color: $hit;
           }
           &.yellow {
-            background-color: #efaf34;
+            background-color: $nonpa;
           }
           &.blue {
-            background-color: #4d9de5;
+            background-color: $ng;
           }
           &.gray {
-            background-color: #ccc;
+            background-color: $gray;
           }
           &.run:before {
             content: attr(data-run);
@@ -397,9 +412,9 @@
             top: 0;
             left: 0;
             line-height: 17px;
-            font-size: 10px;
+            font-size: 12px;
             text-align: center;
-            background-color: #3f00ff;
+            background-color: $run;
           }
           &.rbi:after {
             content: attr(data-rbi);
@@ -410,9 +425,9 @@
             bottom: 0;
             right: 0;
             line-height: 17px;
-            font-size: 10px;
+            font-size: 12px;
             text-align: center;
-            background-color: #2497a2;
+            background-color: $rbi;
           }
           &.new {
             background-color: $current_user_bgcolor;
@@ -454,6 +469,12 @@
     margin-right: 4px;
   }
 }
+.btn {
+  background-color: $header_bgcolor;
+  padding: 10px 15px;
+  width: 100px;
+  outline: none;
+}
 @media only screen and (max-width: 760px) {
   .gamebox-container {
     font-size: 14px;
@@ -466,6 +487,7 @@
       color: $row_color;
       font-size: 14px;
       box-shadow: none;
+      min-height: 26px;
       .result {
         position: initial;
         font-size: 14px;
@@ -511,7 +533,7 @@
           }
           .content {
             width: auto;
-            font-size: 10px;
+            font-size: 12px;
             flex: 1;
             max-width: 60px;
             height: 34px;

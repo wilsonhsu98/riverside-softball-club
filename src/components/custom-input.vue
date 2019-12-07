@@ -5,7 +5,7 @@
       { focused, disabled, 'has-value': value, 'has-error': error },
     ]"
   >
-    <div class="field-wrapper-item" @click="focus">
+    <div class="field-wrapper-item" @mousedown.prevent="focus">
       <label>{{ name }}</label>
       <div class="field-wrapper-children">
         <template v-if="type === 'textarea'">
@@ -97,16 +97,17 @@
   label {
     position: absolute;
     line-height: 40px;
-    color: #b5b5b5;
+    color: $input_font;
     max-width: 90%;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
     transition: all 0.1s;
-    padding: 0 10px 0 4px;
-    left: 8px;
+    padding: 0 10px 0 12px;
+    left: 0;
+    right: 0;
     z-index: 1;
-    font-size: $input-font-size;
+    font-size: $input_font_size;
   }
   &.focused {
     .field-wrapper-children {
@@ -122,10 +123,12 @@
   &.has-value {
     label {
       background-color: #fff;
-      font-size: $input-font-size - 2;
-      top: -$input-font-size/2;
+      font-size: $input_font_size - 2;
+      top: -$input_font_size/2;
       padding: 0 4px;
-      line-height: $input-font-size;
+      left: 8px;
+      right: auto;
+      line-height: $input_font_size;
     }
   }
   &.disabled .field-wrapper-children > * {
@@ -136,7 +139,7 @@
     border-color: #3b5998;
   }
   &-children {
-    border: 2px solid #ced4da;
+    border: 2px solid $input_border;
     border-radius: 4px;
   }
   input,
@@ -147,23 +150,23 @@
     border: none;
     box-sizing: border-box;
     border-radius: 4px;
-    font-size: $input-font-size;
+    font-size: $input_font_size;
     width: 100%;
   }
   input {
     height: 38px;
-    line-height: $input-font-size + 2;
+    line-height: $input_font_size + 2;
     padding: 0 10px;
   }
   textarea {
-    line-height: $input-font-size + 2;
+    line-height: $input_font_size + 2;
     padding: 10px;
   }
   .split {
     width: 100%;
     padding: 0 10px;
     box-sizing: border-box;
-    font-size: $input-font-size - 2;
+    font-size: $input_font_size - 2;
     box-sizing: border-box;
     min-height: 38px;
     padding-top: 8px;
@@ -209,7 +212,7 @@
   }
   &-message {
     padding: 0 10px;
-    font-size: $input-font-size - 2;
+    font-size: $input_font_size - 2;
     box-sizing: border-box;
     color: $error-color;
   }
@@ -238,8 +241,6 @@ export default {
   },
   methods: {
     focus(e) {
-      // console.log(e.target);
-      // console.log(e.currentTarget);
       if (e.target.tagName === 'SPAN') return;
       // if (this.type === 'splitting-wording' && this.value) return;
       if (this.disabled) return;

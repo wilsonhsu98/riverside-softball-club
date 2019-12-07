@@ -8,6 +8,7 @@ import importGame from './modules/import';
 import record from './modules/record';
 import team from './modules/team';
 import user from './modules/user';
+import game from './modules/game';
 
 Vue.use(Vuex);
 
@@ -21,6 +22,7 @@ export default new Vuex.Store({
     record,
     team,
     user,
+    game,
   },
   strict: true,
 });
