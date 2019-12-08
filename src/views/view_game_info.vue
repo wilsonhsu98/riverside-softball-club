@@ -109,9 +109,13 @@
         </label>
       </div>
 
-      <div class="field-wrapper field-wrapper-item" @click="changeCoach">
+      <div
+        class="field-wrapper field-wrapper-item"
+        :class="coach ? '' : 'empty'"
+        @click="changeCoach"
+      >
         <span>{{ $t('ttl_coach') }}</span>
-        <label>{{ coach }}</label>
+        <label v-if="coach">{{ coach }}</label>
       </div>
 
       <custom-input
@@ -128,28 +132,15 @@
         </button>
       </div>
     </div>
-    <modal name="coach" :adaptive="true" :maxWidth="260" :maxHeight="280">
-      <div class="player-modal">
-        <div class="label-container current">
-          <label>{{ $t('ttl_current_option') }}</label>
-          <div v-if="currentCoach" class="delete-wrapper">
-            <player :player="currentCoach" />
-            <i class="fa fa-times" @click="clearCoach"></i>
-          </div>
-        </div>
-        <div class="label-container bench">
-          <label>{{ $t('ttl_all_player') }}</label>
-          <div class="player-list-container">
-            <player
-              v-for="player in teamInfo.players"
-              :key="player.name"
-              :player="player"
-              @click="selectCoach"
-            />
-          </div>
-        </div>
-      </div>
-    </modal>
+    <player-modal
+      name="coach"
+      :current="currentCoach"
+      :current_label="$t('ttl_current_option')"
+      :clear="clearCoach"
+      :third="teamInfo.players"
+      :third_label="$t('ttl_all_player')"
+      :select="selectCoach"
+    ></player-modal>
   </div>
 </template>
 
@@ -204,6 +195,11 @@
     &.has-error {
       border-color: $error-color;
     }
+    &.empty > span {
+      position: initial;
+      font-size: $input_font_size;
+      padding: 0;
+    }
     .game-time-flex {
       display: flex;
       .date-picker {
@@ -229,9 +225,10 @@
             font-size: $input_font_size;
             line-height: $input_font_size - 2;
             height: 24px;
-            width: 24px;
+            width: 20px;
             display: inline-block;
             margin: 0 10px 0 0;
+            padding: 0;
             text-align: center;
             outline: none;
           }
@@ -250,138 +247,6 @@
     animation-name: hidemask;
     animation-duration: 0.1s;
     animation-fill-mode: forwards;
-  }
-}
-
-.player-modal {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 20px 10px 10px;
-  box-sizing: border-box;
-}
-
-.label-container {
-  border-top: 1px solid $input_border;
-  position: relative;
-  padding: 10px 0 0;
-  height: 60px;
-  box-sizing: border-box;
-  label {
-    position: absolute;
-    background-color: #fff;
-    color: $input_font;
-    font-size: 12px;
-    top: -7px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 0 4px;
-    line-height: 14px;
-    white-space: nowrap;
-  }
-  &.current .player {
-    cursor: initial;
-    color: #777;
-    border-color: #777;
-    background-color: transparent;
-    &::v-deep .img {
-      border-color: #777;
-    }
-  }
-  .delete-wrapper {
-    position: relative;
-    .fa-times {
-      cursor: pointer;
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 20px;
-      height: 20px;
-      line-height: 20px;
-      background-color: $request_bgcolor;
-      color: #fff;
-      text-align: center;
-      border-radius: 50%;
-    }
-  }
-  &.bench {
-    flex: 1;
-    display: flex;
-    height: 0;
-    margin-top: 5px;
-    .player {
-      flex: 0 1 calc(50% - 4px);
-    }
-  }
-}
-
-.player-list-container {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  overflow-y: auto;
-}
-
-.player {
-  cursor: pointer;
-  box-sizing: border-box;
-  position: relative;
-  height: 40px;
-  line-height: 40px;
-  width: 100%;
-  background-color: $row_odd_bgcolor;
-  color: $row_color;
-  border: 2px solid $row_color;
-  border-radius: 5px;
-  margin: 0 5px 5px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  display: inline-block;
-  &:nth-child(even) {
-    margin-right: 0;
-  }
-  &::v-deep {
-    .name {
-      margin-left: 5px;
-      text-align: left;
-      line-height: 36px;
-      box-sizing: border-box;
-      display: flex;
-      .avatar {
-        position: relative;
-        display: inline-block;
-        height: 32px;
-        vertical-align: top;
-        margin-right: 4px;
-        flex: 0 0 32px;
-      }
-      .img {
-        display: inline-block;
-        width: 32px;
-        height: 32px;
-        border: 0 solid $row_color;
-        box-sizing: border-box;
-        border-radius: 50%;
-        background: 50% 50% no-repeat;
-        background-size: 32px auto;
-        position: absolute;
-        top: 2px;
-        left: 0;
-        text-align: center;
-        line-height: 26px;
-        .fa-user-o {
-          font-size: 20px;
-          vertical-align: middle;
-        }
-      }
-      .number {
-        display: inline-block;
-        width: 16px;
-        text-align: center;
-        flex: 0 0 16px;
-      }
-    }
   }
 }
 
@@ -585,32 +450,6 @@ export default {
       if (this.mode === 'edit' && this.gameDate === this.prevId.split('-')[0]) {
         this.gamePostfix = this.prevId.split('-')[1];
       }
-    },
-  },
-  components: {
-    player: {
-      template: `<div class="player" @click="select">
-            <span class="name">
-              <span class="avatar">
-                <span class="img" style="border-width: 1px">
-                  <i class="fa fa-user-o"></i>
-                </span>
-                <img
-                  v-if="player.photo"
-                  class="img"
-                  :src="$cacheImg(player.photo)"
-                />
-              </span>
-              <span class="number">{{ player.number || '?' }}</span>
-              <span>{{ player.name }}</span>
-            </span>
-          </div>`,
-      props: ['player'],
-      methods: {
-        select() {
-          this.$emit('click', this.player);
-        },
-      },
     },
   },
 };

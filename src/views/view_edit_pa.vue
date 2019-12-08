@@ -194,38 +194,17 @@
         </button>
       </div>
     </div>
-    <modal name="player" :adaptive="true" :maxWidth="260" :maxHeight="280">
-      <div class="player-modal">
-        <div class="two-column">
-          <div class="label-container current">
-            <label>{{ $t('ttl_current_player') }}</label>
-            <div class="delete-wrapper">
-              <player v-if="currentPlayer" :player="currentPlayer" />
-              <i
-                v-if="changeMode === 'runner' && currentPlayer"
-                class="fa fa-times"
-                @click="clearRunnder"
-              ></i>
-            </div>
-          </div>
-          <div v-if="reJoinPlayer" class="label-container rejoin">
-            <label>{{ $t('ttl_rejoin_player') }}</label>
-            <player :player="reJoinPlayer" @click="selectPlayer" />
-          </div>
-        </div>
-        <div class="label-container bench">
-          <label>{{ $t('ttl_bench_player') }}</label>
-          <div class="player-list-container">
-            <player
-              v-for="player in benchPlayers"
-              :key="player.name"
-              :player="player"
-              @click="selectPlayer"
-            />
-          </div>
-        </div>
-      </div>
-    </modal>
+    <player-modal
+      name="player"
+      :current="currentPlayer"
+      :current_label="$t('ttl_current_player')"
+      :clear="changeMode === 'runner' ? clearRunnder : undefined"
+      :second="reJoinPlayer"
+      :second_label="$t('ttl_rejoin_player')"
+      :third="benchPlayers"
+      :third_label="$t('ttl_bench_player')"
+      :select="selectPlayer"
+    ></player-modal>
   </div>
 </template>
 
@@ -433,146 +412,6 @@
   }
   .left {
     margin-right: 20px;
-  }
-}
-
-.player-modal {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: 20px 10px 10px;
-  box-sizing: border-box;
-}
-
-.two-column {
-  display: flex;
-}
-
-.label-container {
-  border-top: 1px solid $input_border;
-  position: relative;
-  padding: 10px 0 0;
-  flex: 1;
-  height: 60px;
-  box-sizing: border-box;
-  label {
-    position: absolute;
-    background-color: #fff;
-    color: $input_font;
-    font-size: 12px;
-    top: -7px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 0 4px;
-    line-height: 14px;
-    white-space: nowrap;
-  }
-  &.current .player {
-    cursor: initial;
-    color: #777;
-    border-color: #777;
-    background-color: transparent;
-    &::v-deep .img {
-      border-color: #777;
-    }
-  }
-  .delete-wrapper {
-    position: relative;
-    .fa-times {
-      cursor: pointer;
-      position: absolute;
-      top: -4px;
-      right: -4px;
-      width: 20px;
-      height: 20px;
-      line-height: 20px;
-      background-color: $request_bgcolor;
-      color: #fff;
-      text-align: center;
-      border-radius: 50%;
-    }
-  }
-  &.rejoin {
-    margin-left: 5px;
-  }
-  &.bench {
-    flex: 1;
-    display: flex;
-    height: 0;
-    margin-top: 5px;
-    .player {
-      flex: 0 1 calc(50% - 4px);
-    }
-  }
-}
-
-.player-list-container {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  overflow-y: auto;
-}
-
-.player {
-  cursor: pointer;
-  box-sizing: border-box;
-  position: relative;
-  height: 40px;
-  line-height: 40px;
-  width: 100%;
-  background-color: $row_odd_bgcolor;
-  color: $row_color;
-  border: 2px solid $row_color;
-  border-radius: 5px;
-  margin: 0 5px 5px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  display: inline-block;
-  &:nth-child(even) {
-    margin-right: 0;
-  }
-  &::v-deep {
-    .name {
-      margin-left: 5px;
-      text-align: left;
-      line-height: 36px;
-      box-sizing: border-box;
-      display: flex;
-      .avatar {
-        position: relative;
-        display: inline-block;
-        height: 32px;
-        vertical-align: top;
-        margin-right: 4px;
-        flex: 0 0 32px;
-      }
-      .img {
-        display: inline-block;
-        width: 32px;
-        height: 32px;
-        border: 0 solid $row_color;
-        box-sizing: border-box;
-        border-radius: 50%;
-        background: 50% 50% no-repeat;
-        background-size: 32px auto;
-        position: absolute;
-        top: 2px;
-        left: 0;
-        text-align: center;
-        line-height: 26px;
-        .fa-user-o {
-          font-size: 20px;
-          vertical-align: middle;
-        }
-      }
-      .number {
-        display: inline-block;
-        width: 16px;
-        text-align: center;
-        flex: 0 0 16px;
-      }
-    }
   }
 }
 
@@ -959,32 +798,6 @@ export default {
       currentTeamIcon: 'currentTeamIcon',
       pa: 'pa',
     }),
-  },
-  components: {
-    player: {
-      template: `<div class="player" @click="select">
-            <span class="name">
-              <span class="avatar">
-                <span class="img" style="border-width: 1px">
-                  <i class="fa fa-user-o"></i>
-                </span>
-                <img
-                  v-if="player.photo"
-                  class="img"
-                  :src="$cacheImg(player.photo)"
-                />
-              </span>
-              <span class="number">{{ player.number || '?' }}</span>
-              <span>{{ player.name }}</span>
-            </span>
-          </div>`,
-      props: ['player'],
-      methods: {
-        select() {
-          this.$emit('click', this.player);
-        },
-      },
-    },
   },
 };
 </script>
