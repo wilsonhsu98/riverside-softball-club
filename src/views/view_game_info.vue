@@ -229,7 +229,7 @@
             font-size: $input_font_size;
             line-height: $input_font_size - 2;
             height: 24px;
-            width: 20px;
+            width: 24px;
             display: inline-block;
             margin: 0 10px 0 0;
             text-align: center;
