@@ -434,7 +434,12 @@
           }
           &.editable {
             cursor: pointer;
-            &:hover {
+            @media (hover: hover) and (pointer: fine) {
+              &:hover {
+                opacity: 0.8;
+              }
+            }
+            &:active {
               opacity: 0.8;
             }
           }

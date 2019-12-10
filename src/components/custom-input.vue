@@ -135,8 +135,10 @@
     cursor: not-allowed;
     background: transparent;
   }
-  &:hover:not(.disabled) .field-wrapper-children {
-    border-color: #3b5998;
+  @media (hover: hover) and (pointer: fine) {
+    &:hover:not(.disabled) .field-wrapper-children {
+      border-color: #3b5998;
+    }
   }
   &-children {
     border: 2px solid $input_border;

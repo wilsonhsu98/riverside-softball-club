@@ -138,7 +138,12 @@ header {
     &:after {
       content: attr(data-label);
     }
-    &:hover:not(.active) {
+    @media (hover: hover) and (pointer: fine) {
+      &:hover:not(.active) {
+        background-color: $menu_hover;
+      }
+    }
+    &:active:not(.active) {
       background-color: $menu_hover;
     }
     .fa {
@@ -237,7 +242,12 @@ header {
         bottom: 16px;
         background-color: $request_bgcolor;
       }
-      &:hover:not(.active) {
+      @media (hover: hover) and (pointer: fine) {
+        &:hover:not(.active) {
+          background: none;
+        }
+      }
+      &:active:not(.active) {
         background: none;
       }
     }

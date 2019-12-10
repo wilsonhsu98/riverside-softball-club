@@ -150,9 +150,7 @@ i.fa {
       padding-right: 10px;
       span {
         cursor: pointer;
-        &:hover {
-          text-decoration: underline;
-        }
+        text-decoration: underline;
       }
     }
     .row {

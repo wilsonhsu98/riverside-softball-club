@@ -353,8 +353,12 @@
       padding: 0 8px;
       margin-right: 4px;
       outline: none;
-      &:focus,
-      &:hover {
+      @media (hover: hover) and (pointer: fine) {
+        &:hover {
+          border-color: #3b5998;
+        }
+      }
+      &:focus {
         border-color: #3b5998;
       }
     }
