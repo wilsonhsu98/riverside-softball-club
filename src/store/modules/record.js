@@ -6,6 +6,7 @@ import {
 } from '../root';
 import utils from '../../libs/utils';
 import { db } from '../../firebase';
+import workerCreater from '../../web-worker';
 
 const types = {
   INIT_FROM_LS: 'RECORD/INIT_FROM_LS',
@@ -18,12 +19,12 @@ const types = {
   SET_SORTBY: 'RECORD/SET_SORTBY',
   SET_CHECKALL: 'RECORD/SET_CHECKALL',
   SET_COLS: 'RECORD/SET_COLS',
-  DEL_PLAYER: 'RECORD/DEL_PLAYER',
-  REFRESH_PLAYER: 'RECORD/REFRESH_PLAYER',
   SET_LASTUPDATE: 'RECORD/SET_LASTUPDATE',
   SET_GAME: 'RECORD/SET_GAME',
   SET_ORDER: 'RECORD/SET_ORDER',
   GET_GAMELIST: 'RECORD/GET_GAMELIST',
+  SET_GENSTATISTICS: 'RECORD/SET_GENSTATISTICS',
+  SET_ITEMSTATS: 'RECORD/SET_ITEMSTATS',
 };
 
 const state = {
@@ -32,7 +33,6 @@ const state = {
   period: [{ period: 'period_all', select: true }],
   top: 10,
   unlimitedPA: false,
-  hiddenPlayer: [],
   sortBy: 'OPS',
   lastUpdate: '',
   cols: [
@@ -61,6 +61,8 @@ const state = {
   game: '',
   order: 0,
   gameList: [],
+  genStatistics: [],
+  itemStats: { AVG: [], H: [], HR: [], RBI: [] },
 };
 
 const getters = {
@@ -82,45 +84,14 @@ const getters = {
   },
   conditionCols: state => {
     return state.cols
-      .filter(
-        item => item.name !== 'Rank' && item.name !== 'name' && item.visible,
-      )
+      .filter(item => item.name !== 'Rank' && item.name !== 'name')
       .map(item => ({
         name: item.name,
         visible: item.visible,
         disabled: item.name === state.sortBy,
       }));
   },
-  genStatistics: state => {
-    return utils
-      .genStatistics(
-        state.players,
-        state.records,
-        state.unlimitedPA ? undefined : state.top,
-        state.period.find(item => item.select).games,
-      )
-      .filter(
-        item =>
-          item.PA !== '-' &&
-          (state.unlimitedPA || item.PA === state.top) &&
-          state.hiddenPlayer.indexOf(item.name) === -1,
-      )
-      .sort((a, b) => {
-        if (['AVG', 'OBP', 'SLG', 'OPS'].indexOf(state.sortBy) > -1) {
-          return b[state.sortBy] === a[state.sortBy]
-            ? b['PA'] - a['PA']
-            : b[state.sortBy] - a[state.sortBy];
-        } else {
-          if (b[state.sortBy] === 0 && a[state.sortBy] === 0) {
-            return b['PA'] - a['PA'];
-          } else {
-            return b[state.sortBy] === a[state.sortBy]
-              ? a['PA'] - b['PA']
-              : b[state.sortBy] - a[state.sortBy];
-          }
-        }
-      });
-  },
+  genStatistics: state => state.genStatistics,
   displayedCols: state => {
     return state.cols.filter(item => item.visible);
   },
@@ -170,62 +141,7 @@ const getters = {
   },
   gameList: state => state.gameList,
   periodGames: state => state.period.find(item => item.select).games || [],
-  itemStats: state => {
-    const games = state.period.find(item => item.select).games || [];
-    const minimunPA = games.length * 1.6;
-    const records = utils.genStatistics(
-      state.players,
-      state.records,
-      undefined,
-      games,
-    );
-    return {
-      AVG: records
-        .filter(item => item.PA !== '-' && item.AVG > 0 && item.PA >= minimunPA)
-        .sort((a, b) =>
-          b['AVG'] === a['AVG'] ? b['PA'] - a['PA'] : b['AVG'] - a['AVG'],
-        )
-        .map(item => ({
-          name: item.name,
-          PA: item.PA,
-          AVG: item.AVG.toFixed(3),
-          data: item.data,
-        })),
-      H: records
-        .filter(item => item.PA !== '-' && item.H > 0)
-        .sort((a, b) =>
-          b['H'] === a['H'] ? a['PA'] - b['PA'] : b['H'] - a['H'],
-        )
-        .map(item => ({
-          name: item.name,
-          PA: item.PA,
-          H: item.H,
-          data: item.data,
-        })),
-      HR: records
-        .filter(item => item.PA !== '-' && item.HR > 0)
-        .sort((a, b) =>
-          b['HR'] === a['HR'] ? a['PA'] - b['PA'] : b['HR'] - a['HR'],
-        )
-        .map(item => ({
-          name: item.name,
-          PA: item.PA,
-          HR: item.HR,
-          data: item.data,
-        })),
-      RBI: records
-        .filter(item => item.PA !== '-' && item.RBI > 0)
-        .sort((a, b) =>
-          b['RBI'] === a['RBI'] ? a['PA'] - b['PA'] : b['RBI'] - a['RBI'],
-        )
-        .map(item => ({
-          name: item.name,
-          PA: item.PA,
-          RBI: item.RBI,
-          data: item.data,
-        })),
-    };
-  },
+  itemStats: state => state.itemStats,
 };
 
 const actions = {
@@ -263,6 +179,8 @@ const actions = {
       commit(types.GET_PERIOD, period);
       commit(types.GET_RECORDS, records);
       commit(types.GET_GAMELIST, period);
+      actions.workerGenStatistics({ commit });
+      actions.workerItemStats({ commit });
       window.localStorage.setItem('period', JSON.stringify(period));
       window.localStorage.setItem('records', JSON.stringify(records));
     };
@@ -327,6 +245,8 @@ const actions = {
         types.GET_GAMELIST,
         JSON.parse(window.localStorage.getItem('period')),
       );
+      actions.workerGenStatistics({ commit });
+      actions.workerItemStats({ commit });
       if (window.localStorage.getItem('lastUpdate')) {
         commit(types.SET_LASTUPDATE, window.localStorage.getItem('lastUpdate'));
       }
@@ -389,16 +309,21 @@ const actions = {
   },
   setPeriod({ commit }, value) {
     commit(types.SET_PERIOD, value);
+    actions.workerGenStatistics({ commit });
+    actions.workerItemStats({ commit });
   },
   setTop({ commit }, value) {
     commit(types.SET_TOP, value);
+    actions.workerGenStatistics({ commit });
   },
   setUnlimitedPA({ commit }, value) {
     commit(types.SET_UNLIMITED_PA, value);
+    actions.workerGenStatistics({ commit });
   },
   setSortBy({ commit }, value) {
     commit(types.SET_SORTBY, value);
     commit(types.SET_COLS, { col: value, visible: true });
+    actions.workerGenStatistics({ commit });
   },
   setCheckAll({ commit }, isCheckAll) {
     commit(types.SET_CHECKALL, isCheckAll);
@@ -406,17 +331,44 @@ const actions = {
   toggleColumn({ commit }, col) {
     commit(types.SET_COLS, { col });
   },
-  deletePlayer({ commit }, player) {
-    commit(types.DEL_PLAYER, player);
-  },
-  refreshPlayer({ commit }) {
-    commit(types.REFRESH_PLAYER);
-  },
   setGame({ commit }, gemeDate) {
     commit(types.SET_GAME, gemeDate);
   },
   setOrder({ commit }, order) {
     commit(types.SET_ORDER, order);
+  },
+  workerGenStatistics({ commit }) {
+    commit(rootTypes.LOADING, true);
+    workerCreater(
+      {
+        cmd: 'GenStatistics',
+        players: state.players,
+        records: state.records,
+        unlimitedPA: state.unlimitedPA,
+        top: state.top,
+        period: state.period,
+        sortBy: state.sortBy,
+      },
+      data => {
+        commit(types.SET_GENSTATISTICS, data);
+        commit(rootTypes.LOADING, false);
+      },
+    );
+  },
+  workerItemStats({ commit }) {
+    commit(rootTypes.LOADING, true);
+    workerCreater(
+      {
+        cmd: 'ItemStats',
+        players: state.players,
+        records: state.records,
+        period: state.period,
+      },
+      data => {
+        commit(types.SET_ITEMSTATS, data);
+        commit(rootTypes.LOADING, false);
+      },
+    );
   },
 };
 
@@ -433,8 +385,6 @@ const mutations = {
     if (pref_period) state.period = JSON.parse(pref_period);
     const pref_cols = window.localStorage.getItem('pref_cols');
     if (pref_cols) state.cols = JSON.parse(pref_cols);
-    const pref_hiddenplayer = window.localStorage.getItem('pref_hiddenplayer');
-    if (pref_hiddenplayer) state.hiddenPlayer = JSON.parse(pref_hiddenplayer);
   },
   [types.GET_PERIOD](state, data) {
     state.period.find(item => item.period === 'period_all').games = data
@@ -530,20 +480,6 @@ const mutations = {
     item.visible = visible || !item.visible;
     window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
-  [types.DEL_PLAYER](state, player) {
-    state.hiddenPlayer = Array.from(state.hiddenPlayer).concat([player]);
-    window.localStorage.setItem(
-      'pref_hiddenplayer',
-      JSON.stringify(state.hiddenPlayer),
-    );
-  },
-  [types.REFRESH_PLAYER](state) {
-    state.hiddenPlayer = [];
-    window.localStorage.setItem(
-      'pref_hiddenplayer',
-      JSON.stringify(state.hiddenPlayer),
-    );
-  },
   [types.SET_LASTUPDATE](state, date) {
     state.lastUpdate = date;
   },
@@ -555,6 +491,12 @@ const mutations = {
   },
   [types.GET_GAMELIST](state, data) {
     state.gameList = utils.genGameList(data);
+  },
+  [types.SET_GENSTATISTICS](state, data) {
+    state.genStatistics = data;
+  },
+  [types.SET_ITEMSTATS](state, data) {
+    state.itemStats = data;
   },
 };
 

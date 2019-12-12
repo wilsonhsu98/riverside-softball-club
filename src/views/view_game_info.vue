@@ -49,7 +49,7 @@
           </div>
         </div>
       </div>
-      <div v-if="gameId_err" class="field-wrapper-message">
+      <div v-if="gameId_err" class="field-wrapper field-wrapper-message">
         {{ gameId_err }}
       </div>
 

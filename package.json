@@ -9,7 +9,7 @@
     "build:client": "vue-cli-service build",
     "build:server": "netlify-lambda build functions -c webpack.server.js",
     "lint": "vue-cli-service lint",
-    "format": "prettier --write \"src/**/*.{js,vue}\" \"functions/**/*.js\""
+    "format": "prettier --write \"src/**/*.{js,vue}\" \"functions/**/*.js\" \"public/**/*.{js,vue}\""
   },
   "dependencies": {
     "@johmun/vue-tags-input": "^2.0.0",
