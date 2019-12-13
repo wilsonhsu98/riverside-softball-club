@@ -19,6 +19,7 @@
               :autoHide="true"
               :key="`game_${sub.game}`"
               :container="$refs.container"
+              @show="setGame(sub.game)"
             >
               <div class="item">
                 <div :class="`result ${sub.result} ${sub.group}`">
@@ -77,6 +78,7 @@
   width: 80%;
   margin: 10px 0 5px;
   outline: none;
+  font-size: 14px;
 }
 .container {
   .row {
@@ -87,6 +89,7 @@
       color: $row_color;
       text-align: center;
       flex: 1;
+      font-size: 16px;
       .item {
         cursor: pointer;
       }
@@ -216,7 +219,9 @@ export default {
   created() {},
   mounted() {},
   methods: {
-    ...mapActions({}),
+    ...mapActions({
+      setGame: 'setGame',
+    }),
   },
   computed: {
     ...mapGetters({

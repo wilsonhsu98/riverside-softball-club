@@ -25,6 +25,7 @@ const types = {
   GET_GAMELIST: 'RECORD/GET_GAMELIST',
   SET_GENSTATISTICS: 'RECORD/SET_GENSTATISTICS',
   SET_ITEMSTATS: 'RECORD/SET_ITEMSTATS',
+  SET_BOX: 'RECORD/SET_BOX',
 };
 
 const state = {
@@ -63,6 +64,7 @@ const state = {
   gameList: [],
   genStatistics: [],
   itemStats: { AVG: [], H: [], HR: [], RBI: [] },
+  box: [],
 };
 
 const getters = {
@@ -96,20 +98,6 @@ const getters = {
     return state.cols.filter(item => item.visible);
   },
   lastUpdate: state => state.lastUpdate,
-  box: state => {
-    const boxSummary =
-      state.gameList.length &&
-      state.game &&
-      state.gameList
-        .find(item => item.games.find(sub => sub.game === state.game))
-        .games.find(item => item.game === state.game);
-    return utils.displayGame(
-      state.players,
-      state.records.filter(item => item._table === state.game),
-      boxSummary.errors,
-      rootState.role,
-    );
-  },
   pa: state => {
     return state.records.find(
       item =>
@@ -140,8 +128,10 @@ const getters = {
     };
   },
   gameList: state => state.gameList,
+  game: state => state.game,
   periodGames: state => state.period.find(item => item.select).games || [],
   itemStats: state => state.itemStats,
+  box: state => state.box,
 };
 
 const actions = {
@@ -333,6 +323,7 @@ const actions = {
   },
   setGame({ commit }, gemeDate) {
     commit(types.SET_GAME, gemeDate);
+    actions.workerBox({ commit });
   },
   setOrder({ commit }, order) {
     commit(types.SET_ORDER, order);
@@ -367,6 +358,23 @@ const actions = {
       data => {
         commit(types.SET_ITEMSTATS, data);
         commit(rootTypes.LOADING, false);
+      },
+    );
+  },
+  workerBox({ commit }) {
+    // commit(rootTypes.LOADING, true);
+    workerCreater(
+      {
+        cmd: 'Box',
+        gameList: state.gameList,
+        game: state.game,
+        players: state.players,
+        records: state.records,
+        role: rootState.role,
+      },
+      data => {
+        commit(types.SET_BOX, data);
+        // commit(rootTypes.LOADING, false);
       },
     );
   },
@@ -442,12 +450,10 @@ const mutations = {
     state.records = data;
   },
   [types.SET_PERIOD](state, data) {
-    state.period = state.period.map(item => {
-      return {
-        ...item,
-        select: item.period === data,
-      };
-    });
+    state.period = state.period.map(item => ({
+      ...item,
+      select: item.period === data,
+    }));
     window.localStorage.setItem('pref_period', JSON.stringify(state.period));
   },
   [types.SET_TOP](state, value) {
@@ -463,21 +469,17 @@ const mutations = {
     window.localStorage.setItem('pref_sortby', state.sortBy);
   },
   [types.SET_CHECKALL](state, isCheckAll) {
-    state.cols
-      .filter(
-        col =>
-          col.name !== 'Rank' &&
-          col.name !== 'name' &&
-          col.name !== state.sortBy,
-      )
-      .forEach(col => {
-        col.visible = isCheckAll;
-      });
+    state.cols = state.cols.map(item => ({
+      ...item,
+      visible: ['Rank', 'name', state.sortBy].includes(item.name) || isCheckAll,
+    }));
     window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
   [types.SET_COLS](state, { col, visible }) {
-    const item = state.cols.find(i => i.name === col);
-    item.visible = visible || !item.visible;
+    state.cols = state.cols.map(item => ({
+      ...item,
+      visible: item.name === col ? visible || !item.visible : item.visible,
+    }));
     window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
   [types.SET_LASTUPDATE](state, date) {
@@ -497,6 +499,9 @@ const mutations = {
   },
   [types.SET_ITEMSTATS](state, data) {
     state.itemStats = data;
+  },
+  [types.SET_BOX](state, data) {
+    state.box = data;
   },
 };
 

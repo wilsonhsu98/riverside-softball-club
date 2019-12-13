@@ -586,7 +586,9 @@ export default {
     return {};
   },
   created() {
-    this.setGame(this.$route.params.game);
+    if (!this.game) {
+      this.setGame(this.$route.params.game);
+    }
   },
   mounted() {},
   beforeDestroy() {},
@@ -633,6 +635,7 @@ export default {
   },
   computed: {
     ...mapGetters({
+      game: 'game',
       box: 'box',
       boxSummary: 'boxSummary',
       currentTeamIcon: 'currentTeamIcon',

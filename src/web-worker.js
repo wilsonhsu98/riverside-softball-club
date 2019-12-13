@@ -1,5 +1,5 @@
 const workerCreater = function(cmdObj, callback) {
-  const worker = new Worker('async-web-worker.js');
+  let worker = new Worker('async-web-worker.js');
 
   worker.addEventListener(
     'message',
@@ -8,6 +8,7 @@ const workerCreater = function(cmdObj, callback) {
         callback(e.data);
       }
       worker.terminate();
+      worker = null;
     },
     false,
   );

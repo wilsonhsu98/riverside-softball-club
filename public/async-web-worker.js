@@ -7,6 +7,7 @@ const contentColor = content => {
   }
   return 'blue';
 };
+const innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
 
 const genStatistics = (players, records, filterPA, filterGames) => {
   // filterPA = filterPA || 10;
@@ -186,6 +187,200 @@ const genStatistics = (players, records, filterPA, filterGames) => {
   });
 };
 
+const displayGame = (players, records, errors, role) => {
+  let arr = [];
+  let startOrder = 0;
+  let innChange = 0;
+
+  records
+    .map((item, i) => {
+      const find = arr.find(sub => sub.name === item.name);
+      if (!item.order) {
+        item.order = i + 1;
+      }
+      if (!find && startOrder === 0) {
+        arr.push({
+          name: item.name,
+          data: (players.find(sub => sub.id === item.name) || { data: {} })
+            .data,
+          order: item.order,
+          content: [],
+          location: item.location,
+        });
+      } else {
+        if (startOrder === 0) {
+          startOrder = item.order - find.order;
+        }
+      }
+      return item;
+    })
+    .forEach(item => {
+      if (item.inn !== innChange) {
+        innChange = item.inn;
+        item.innChange = item.inn;
+      }
+      if (!item.content) {
+        item.content = 'new';
+      }
+      item.color = contentColor(item.content);
+
+      let index = -1;
+      const find = arr.find(sub => sub.name === item.name);
+      if (find) {
+        let middleArr = [];
+        middleArr.length =
+          Math.ceil(item.order / (startOrder || 10) - 1) - find.content.length;
+        find.content = find.content.concat(middleArr, item);
+      } else {
+        // Handle 代打
+        index = -1;
+        arr.forEach((sub, i) => {
+          if (
+            (sub.altOrder &&
+              sub.altOrder === (item.order % startOrder || startOrder)) ||
+            sub.order === (item.order % startOrder || startOrder)
+          ) {
+            index = i;
+          }
+        });
+        if (index > -1) {
+          let middleArr = [];
+          middleArr.length = Math.ceil(item.order / (startOrder || 10) - 1);
+          arr.splice(index + 1, 0, {
+            name: item.name,
+            data: (players.find(sub => sub.id === item.name) || { data: {} })
+              .data,
+            order: item.order,
+            altOrder: item.order % startOrder || startOrder,
+            content: [].concat(middleArr, item),
+          });
+        }
+      }
+      // Handle 代跑
+      index = -1;
+      arr.forEach((sub, i) => {
+        if (
+          (sub.altOrder &&
+            sub.altOrder === (item.order % startOrder || startOrder)) ||
+          sub.order === (item.order % startOrder || startOrder)
+        ) {
+          index = i;
+        }
+      });
+      if (item.r && item.r !== item.name && index > -1) {
+        let middleArr = [];
+        middleArr.length = Math.ceil(item.order / (startOrder || 10) - 1);
+        arr.splice(index + 1, 0, {
+          name: item.r,
+          data: (players.find(sub => sub.id === item.r) || { data: {} }).data,
+          order: item.order,
+          altOrder: item.order % startOrder || startOrder,
+          content: [].concat(middleArr, {
+            inn: item.inn,
+            name: item.r,
+            order: item.order,
+            r: item.r,
+            color: 'gray',
+            content: 'PR',
+          }),
+        });
+      }
+    });
+
+  if (records.length && startOrder) {
+    let insertAt = records[records.length - startOrder];
+    if (insertAt.r && insertAt.name !== insertAt.r) {
+      insertAt = insertAt.r;
+    } else {
+      insertAt = insertAt.name;
+    }
+    arr
+      .find(player => player.name === insertAt)
+      .content.push({
+        content: 'new',
+        name: insertAt,
+        inn: role === 'manager' && records[records.length - 1].inn,
+      });
+  }
+
+  const header = innArray.reduce((acc, item, i) => {
+    if (startOrder === 0) {
+      return [1];
+    }
+    if (i) {
+      return [
+        ...acc,
+        ...Array(
+          Math.ceil(
+            (records.filter(record => record.inn === i).length +
+              (i === (records[records.length - 1] || {}).inn &&
+              role === 'manager'
+                ? 1
+                : 0)) /
+              startOrder,
+          ),
+        )
+          .fill(undefined)
+          .map(() => i),
+      ];
+    }
+    return acc;
+  }, []);
+
+  let paMax = 0;
+  arr.forEach(item => {
+    if (item.content.length > paMax) paMax = item.content.length;
+  });
+  arr.forEach(item => {
+    let ab = 0;
+    let h = 0;
+    const error = errors.find(sub => sub.name === item.name);
+    item.content.forEach(sub => {
+      ab +=
+        [
+          '1H',
+          '2H',
+          '3H',
+          'HR',
+          'FO',
+          'GO',
+          'K',
+          'E',
+          'FC',
+          'DP',
+          'TP',
+        ].indexOf(sub.content) > -1
+          ? 1
+          : 0;
+      h += ['1H', '2H', '3H', 'HR'].indexOf(sub.content) > -1 ? 1 : 0;
+    });
+    item.content.length = paMax;
+    item.contentNormal = header.reduce((acc, inn, i, self) => {
+      const filter = item.content.filter(sub => sub.inn === inn);
+      const arr = [];
+      arr.length = 1;
+      if (i && self[i - 1] === inn) {
+        if (filter.length > 1) {
+          return acc;
+        } else {
+          return acc.concat(arr);
+        }
+      } else if (filter.length) {
+        return acc.concat(filter);
+      } else {
+        if (role === 'manager' && startOrder === 0) {
+          return acc.concat(item.content);
+        } else {
+          return acc.concat(arr);
+        }
+      }
+    }, []);
+    item.summary = `${ab}-${h}`;
+    item.error = error && error.count;
+  });
+  return [[...header, startOrder]].concat(arr);
+};
+
 const execGenStatistics = state => {
   return genStatistics(
     state.players,
@@ -263,6 +458,21 @@ const execItemStats = state => {
   };
 };
 
+const execBox = state => {
+  const boxSummary =
+    state.gameList.length &&
+    state.game &&
+    state.gameList
+      .find(item => item.games.find(sub => sub.game === state.game))
+      .games.find(item => item.game === state.game);
+  return displayGame(
+    state.players,
+    state.records.filter(item => item._table === state.game),
+    boxSummary.errors,
+    state.role,
+  );
+};
+
 self.addEventListener(
   'message',
   e => {
@@ -273,6 +483,9 @@ self.addEventListener(
         break;
       case 'ItemStats':
         self.postMessage(execItemStats(data));
+        break;
+      case 'Box':
+        self.postMessage(execBox(data));
         break;
     }
   },
