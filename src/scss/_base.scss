@@ -51,6 +51,9 @@ input[type=number]::-webkit-outer-spin-button {
 	margin: 0; /* Removes leftover margin */
 }
 input[type=number] { -moz-appearance: textfield; }
+input[type=search]::-webkit-search-cancel-button {
+  display: none;
+}
 
 ::-webkit-scrollbar-track {
 	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
@@ -145,7 +148,7 @@ select::-ms-expand {
 		background-color: transparent;
 		.ti-input[class] {
 			border: none;
-			min-height: 38px;
+			min-height: 36px;
 		}
 		.ti-tag,
 		.ti-tag-input[class],

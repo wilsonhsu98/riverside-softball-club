@@ -85,7 +85,7 @@
 	"ttl_current_option": "目前選擇",
 	"ttl_all_player": "所有球員",
 	"ttl_game_tag": "標籤",
-	"pla_game_tag": "請使用逗點,分隔多個標籤",
+	"pla_game_tag": "可選擇多個標籤，或直接輸入",
 	"btn_next": "下一步",
 	"msg_duplicate_game": "日期場次重覆",
 
@@ -162,5 +162,6 @@
 	"ttl_switch_team": "目前球隊(可點選切換)",
 	"ttl_current_team": "目前球隊",
 	"required": "必填欄位",
+	"msg_no_option": "目前尚無可選擇項目",
 	"vc-year": "年"
 }

@@ -53,17 +53,30 @@
         {{ gameId_err }}
       </div>
 
-      <!-- <v-select class="field-wrapper" v-model="opponent" taggable></v-select> -->
       <custom-input
-        class="field-wrapper"
+        type="select"
+        taggable
+        :options="gameOptions.opponent"
         :name="$t('ttl_opponent')"
         :error="opponent_err"
         v-model="opponent"
       />
 
-      <custom-input :name="$t('ttl_league')" v-model="league" />
+      <custom-input
+        type="select"
+        taggable
+        :options="gameOptions.league"
+        :name="$t('ttl_league')"
+        v-model="league"
+      />
 
-      <custom-input :name="$t('ttl_group')" v-model="group" />
+      <custom-input
+        type="select"
+        taggable
+        :options="gameOptions.group"
+        :name="$t('ttl_group')"
+        v-model="group"
+      />
 
       <div class="field-wrapper field-wrapper-item">
         <span>{{ $t('ttl_game_type') }}</span>
@@ -119,7 +132,10 @@
       </div>
 
       <custom-input
-        type="splitting-wording"
+        type="select"
+        taggable
+        multiple
+        :options="[]"
         :name="$t('ttl_game_tag')"
         :placeholder="$t('pla_game_tag')"
         v-model="tags"
@@ -387,6 +403,7 @@ export default {
       currentTeam: 'currentTeam',
       boxSummary: 'boxSummary',
       gameList: 'gameList',
+      gameOptions: 'gameOptions',
       period: 'period',
       teamInfo: 'teamInfo',
     }),

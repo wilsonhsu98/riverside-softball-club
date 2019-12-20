@@ -2,10 +2,36 @@
   <div
     :class="[
       'field-wrapper',
-      { focused, disabled, 'has-value': value, 'has-error': error },
+      {
+        focused,
+        disabled,
+        'has-value': value && value.length,
+        'has-error': error,
+      },
     ]"
   >
-    <div class="field-wrapper-item" @mousedown.prevent="focus">
+    <div v-if="type === 'select'" class="field-wrapper-item">
+      <v-select
+        ref="select"
+        :class="[
+          {
+            'has-value': value && value.length,
+            'has-error': error,
+          },
+        ]"
+        :taggable="taggable"
+        :multiple="multiple"
+        :placeholder="placeholder"
+        :options="options"
+        :value="value"
+        :data-label="name"
+        @input="input"
+        @search:blur="blur"
+      >
+        <div slot="no-options">{{ $t('msg_no_option') }}</div>
+      </v-select>
+    </div>
+    <div v-else class="field-wrapper-item" @mousedown.prevent="focus">
       <label>{{ name }}</label>
       <div class="field-wrapper-children">
         <template v-if="type === 'textarea'">
@@ -94,6 +120,16 @@
   &-children {
     display: flex;
   }
+  &.focused {
+    .field-wrapper-children {
+      border-color: #3b5998;
+    }
+  }
+  &.has-error {
+    .field-wrapper-children {
+      border-color: $error-color;
+    }
+  }
   label {
     position: absolute;
     line-height: 40px;
@@ -108,16 +144,6 @@
     right: 0;
     z-index: 1;
     font-size: $input_font_size;
-  }
-  &.focused {
-    .field-wrapper-children {
-      border-color: #3b5998;
-    }
-  }
-  &.has-error {
-    .field-wrapper-children {
-      border-color: $error-color;
-    }
   }
   &.focused,
   &.has-value {
@@ -156,7 +182,7 @@
     width: 100%;
   }
   input {
-    height: 38px;
+    height: 36px;
     line-height: $input_font_size + 2;
     padding: 0 10px;
   }
@@ -170,7 +196,7 @@
     box-sizing: border-box;
     font-size: $input_font_size - 2;
     box-sizing: border-box;
-    min-height: 38px;
+    min-height: 36px;
     padding-top: 8px;
   }
   .split-span {
@@ -218,6 +244,113 @@
     box-sizing: border-box;
     color: $error-color;
   }
+  &::v-deep {
+    .v-select {
+      height: auto;
+      width: 100%;
+      border: 2px solid $input_border;
+      border-radius: 4px;
+      position: relative;
+      &.vs--single .vs__selected {
+        padding: 0;
+        margin: 0;
+        color: #000;
+        line-height: 36px;
+        border: 0;
+      }
+      &.vs--open {
+        border-color: #3b5998;
+        .vs__search::placeholder {
+          visibility: visible;
+        }
+      }
+      &:after {
+        content: attr(data-label);
+        position: absolute;
+        line-height: 40px;
+        color: $input_font;
+        max-width: 90%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+        transition: all 0.1s;
+        padding: 0 10px 0 12px;
+        top: -2px;
+        left: 0;
+        right: 0;
+        z-index: -1;
+        font-size: $input_font_size;
+      }
+      &.vs--open,
+      &.has-value {
+        &:after {
+          background-color: #fff;
+          font-size: $input_font_size - 2;
+          top: -$input_font_size/2;
+          padding: 0 4px;
+          left: 8px;
+          right: auto;
+          z-index: 1;
+          line-height: $input_font_size;
+        }
+      }
+      &.has-error {
+        border-color: $error-color;
+      }
+    }
+    .vs__search {
+      padding-left: 0;
+      margin: 0;
+      font-size: 16px;
+      height: 36px;
+      line-height: $input_font_size + 2;
+      box-sizing: border-box;
+      border: none;
+      &::placeholder {
+        color: #757575;
+        visibility: hidden;
+      }
+    }
+    .vs__dropdown-toggle {
+      padding: 0;
+      border: none;
+    }
+    .vs__dropdown-menu {
+      border: none;
+      border-top: 2px solid #3b5998;
+      box-shadow: none;
+      position: relative;
+      max-height: 123px;
+    }
+    .vs__dropdown-option,
+    .vs__dropdown-option--highlight {
+      padding-left: 9px;
+    }
+    .vs__dropdown-option--highlight {
+      background-color: $active_bgcolor;
+    }
+    .vs__selected-options {
+      padding: 0 0 0 9px;
+    }
+    .vs__actions {
+      padding: 0 12px 0 3px;
+    }
+    .vs__clear {
+      box-shadow: none;
+      margin-right: 12px;
+    }
+    .vs__selected {
+      padding: 0;
+      margin: 0 5px 0 0;
+      color: #000;
+      line-height: 36px;
+      border: 0;
+      background-color: transparent;
+    }
+    .vs__deselect {
+      box-shadow: none;
+    }
+  }
 }
 </style>
 
@@ -233,6 +366,9 @@ export default {
     'limit',
     'disabled',
     'error',
+    'taggable', // v-select
+    'multiple', // v-select
+    'options', // v-select
   ],
   data() {
     return {
@@ -240,6 +376,9 @@ export default {
       showPretty: false,
       tag: '',
     };
+  },
+  mounted() {
+    // this.$refs.select.open = true;
   },
   methods: {
     focus(e) {
@@ -255,7 +394,7 @@ export default {
         } else if (this.type === 'splitting-wording') {
           this.$refs.splitInput.$refs.newTagInput.focus();
         } else {
-          this.$refs.input.focus();
+          this.$refs.input && this.$refs.input.focus();
         }
       });
     },

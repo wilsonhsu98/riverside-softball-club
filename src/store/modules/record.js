@@ -128,6 +128,36 @@ const getters = {
     };
   },
   gameList: state => state.gameList,
+  gameOptions: state =>
+    state.gameList
+      .reduce((acc, item) => acc.concat(item.games), [])
+      .reduce(
+        (acc, item, i, self) => {
+          if (i === self.length - 1) {
+            return {
+              opponent: [...new Set(acc.opponent.concat(item.opponent))].sort(
+                (a, b) => a.localeCompare(b),
+                'zh-TW',
+              ),
+              league: [...new Set(acc.league.concat(item.league))].sort(
+                (a, b) => a.localeCompare(b),
+                'zh-TW',
+              ),
+              group: [...new Set(acc.group.concat(item.group))].sort(
+                (a, b) => a.localeCompare(b),
+                'zh-TW',
+              ),
+            };
+          } else {
+            return {
+              opponent: acc.opponent.concat(item.opponent),
+              league: acc.league.concat(item.league),
+              group: acc.group.concat(item.group),
+            };
+          }
+        },
+        { opponent: [], league: [], group: [] },
+      ),
   game: state => state.game,
   periodGames: state => state.period.find(item => item.select).games || [],
   itemStats: state => state.itemStats,
