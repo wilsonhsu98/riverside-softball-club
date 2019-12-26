@@ -34,6 +34,10 @@ const state = {
 
 const getters = {
   teamInfo: state => state.teamInfo,
+  teamNames: state =>
+    [state.teamInfo.teamName].concat(
+      state.teamInfo.otherNames.split(',').sort((a, b) => a.localeCompare(b)),
+    ),
   teamList: state => state.teamList,
   requests: state => state.requests,
   teamRequests: state => state.teamRequests,

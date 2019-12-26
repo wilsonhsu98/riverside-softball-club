@@ -274,7 +274,7 @@
         white-space: nowrap;
         overflow: hidden;
         transition: all 0.1s;
-        padding: 0 10px 0 12px;
+        padding: 0 10px;
         top: -2px;
         left: 0;
         right: 0;
@@ -294,12 +294,17 @@
           line-height: $input_font_size;
         }
       }
+      &.has-value:not(.vs--open) {
+        .vs__selected-options {
+          max-width: calc(100% - 56px);
+        }
+      }
       &.has-error {
         border-color: $error-color;
       }
     }
     .vs__search {
-      padding-left: 0;
+      padding: 0;
       margin: 0;
       font-size: 16px;
       height: 36px;
@@ -321,16 +326,21 @@
       box-shadow: none;
       position: relative;
       max-height: 123px;
+      min-width: auto;
     }
     .vs__dropdown-option,
     .vs__dropdown-option--highlight {
       padding-left: 9px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .vs__dropdown-option--highlight {
       background-color: $active_bgcolor;
     }
     .vs__selected-options {
       padding: 0 0 0 9px;
+      /* max-width: calc(100% - 56px); */
     }
     .vs__actions {
       padding: 0 12px 0 3px;
@@ -346,6 +356,12 @@
       line-height: 36px;
       border: 0;
       background-color: transparent;
+
+      width: 99%;
+      display: inline;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .vs__deselect {
       box-shadow: none;

@@ -119,6 +119,19 @@ const actions = {
                   teddySummary ? teddySummary['休息區'] : '',
                 ) || '',
               group: teddySummary ? teddySummary['組別'] : '',
+              useTeam: [
+                'TrendMicro',
+                'TrendMicro',
+                'TrendMicro',
+                '趨勢科技',
+                '趨勢科技',
+                '趨勢科技',
+                '',
+              ][
+                ['B', 'C', 'D', 'E', 'F', 'G', ''].indexOf(
+                  teddySummary ? teddySummary['組別'] : '',
+                )
+              ],
               timestamp,
             },
           );
@@ -175,6 +188,19 @@ const actions = {
                 teddySummary ? teddySummary['休息區'] : '',
               ) || '',
             group: teddySummary ? teddySummary['組別'] : '',
+            useTeam: [
+              'TrendMicro',
+              'TrendMicro',
+              'TrendMicro',
+              '趨勢科技',
+              '趨勢科技',
+              '趨勢科技',
+              '',
+            ][
+              ['B', 'C', 'D', 'E', 'F', 'G', ''].indexOf(
+                teddySummary ? teddySummary['組別'] : '',
+              )
+            ],
             timestamp,
           });
       })

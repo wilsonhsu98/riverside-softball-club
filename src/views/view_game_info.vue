@@ -53,30 +53,44 @@
         {{ gameId_err }}
       </div>
 
-      <custom-input
-        type="select"
-        taggable
-        :options="gameOptions.opponent"
-        :name="$t('ttl_opponent')"
-        :error="opponent_err"
-        v-model="opponent"
-      />
+      <div class="field-wrapper">
+        <div class="two-column">
+          <custom-input
+            type="select"
+            :options="teamNames"
+            :name="$t('ttl_use_team')"
+            :error="useTeam_err"
+            v-model="useTeam"
+          />
+          <custom-input
+            type="select"
+            taggable
+            :options="gameOptions.opponent"
+            :name="$t('ttl_opponent')"
+            :error="opponent_err"
+            v-model="opponent"
+          />
+        </div>
+      </div>
 
-      <custom-input
-        type="select"
-        taggable
-        :options="gameOptions.league"
-        :name="$t('ttl_league')"
-        v-model="league"
-      />
-
-      <custom-input
-        type="select"
-        taggable
-        :options="gameOptions.group"
-        :name="$t('ttl_group')"
-        v-model="group"
-      />
+      <div class="field-wrapper">
+        <div class="two-column">
+          <custom-input
+            type="select"
+            taggable
+            :options="gameOptions.league"
+            :name="$t('ttl_league')"
+            v-model="league"
+          />
+          <custom-input
+            type="select"
+            taggable
+            :options="gameOptions.group"
+            :name="$t('ttl_group')"
+            v-model="group"
+          />
+        </div>
+      </div>
 
       <div class="field-wrapper field-wrapper-item">
         <span>{{ $t('ttl_game_type') }}</span>
@@ -255,6 +269,14 @@
       }
     }
   }
+  .two-column {
+    display: flex;
+    justify-content: space-between;
+    > div {
+      max-width: calc(50% - 5px);
+      margin: 0;
+    }
+  }
 }
 
 @media only screen and (max-width: 760px) {
@@ -285,6 +307,8 @@ export default {
       gameId_err: '',
       league: '',
       group: '',
+      useTeam: '',
+      useTeam_err: '',
       opponent: '',
       opponent_err: '',
       gameType: '',
@@ -341,12 +365,19 @@ export default {
         }
       }
 
+      this.useTeam_err = '';
+      if (!this.useTeam) {
+        this.useTeam_err = this.$t('required');
+      }
+
       this.opponent_err = '';
       if (!this.opponent) {
         this.opponent_err = this.$t('required');
       }
 
-      return ![this.gameId_err, this.opponent_err].some(str => !!str);
+      return ![this.gameId_err, this.useTeam_err, this.opponent_err].some(
+        str => !!str,
+      );
     },
     back_() {
       router.back();
@@ -357,6 +388,7 @@ export default {
         if (this.validate()) {
           const {
             prevId,
+            useTeam,
             opponent,
             league,
             group,
@@ -370,6 +402,7 @@ export default {
             teamCode: this.$route.params.team,
             prevId,
             newId: `${this.gameDate}-${this.gamePostfix}`,
+            useTeam,
             opponent,
             league,
             group,
@@ -406,6 +439,7 @@ export default {
       gameOptions: 'gameOptions',
       period: 'period',
       teamInfo: 'teamInfo',
+      teamNames: 'teamNames',
     }),
   },
   watch: {
@@ -416,6 +450,7 @@ export default {
             game,
             league,
             group,
+            useTeam,
             opponent,
             gameType,
             place,
@@ -428,6 +463,7 @@ export default {
           this.gamePostfix = game.split('-')[1];
           this.league = league;
           this.group = group;
+          this.useTeam = useTeam;
           this.opponent = opponent;
           this.gameType = gameType;
           this.place = place;

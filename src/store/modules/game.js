@@ -42,6 +42,7 @@ const actions = {
       teamCode,
       newId,
       prevId,
+      useTeam,
       opponent,
       league,
       group,
@@ -80,6 +81,7 @@ const actions = {
           refNewGameDoc,
           {
             ...(prevGameDoc ? prevGameDoc.data() : { errors: [] }),
+            useTeam,
             opponent,
             league,
             group,
