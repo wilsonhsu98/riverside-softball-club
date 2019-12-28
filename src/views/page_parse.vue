@@ -1,7 +1,25 @@
 <template>
   <div class="parse-container">
-    <button class="parse-btn" @click="importData($route.params.team)">
+    <button
+      v-if="todo.length"
+      class="parse-btn"
+      @click="importData($route.params.team)"
+    >
       Batch Upload&nbsp;<i
+        class="fa fa-cloud-upload"
+        style="vertical-align: middle;"
+      ></i>
+    </button>
+    <button
+      class="parse-btn"
+      @click="
+        migrateAll({
+          team: $route.params.team,
+          games: list.map(item => item.game),
+        })
+      "
+    >
+      Re-upload All&nbsp;<i
         class="fa fa-cloud-upload"
         style="vertical-align: middle;"
       ></i>
@@ -14,6 +32,7 @@
           :disabled="item.disabled"
           :checked="item.checked"
           @change="toggleTodo(item.game)"
+          :style="{ visibility: item.disabled ? 'hidden' : '' }"
         />
         {{ item.game }}
       </label>
@@ -28,6 +47,11 @@
           style="vertical-align: middle;"
         ></i>
       </button>
+      <i
+        :ref="item.game"
+        class="fa fa-check"
+        :style="{ visibility: done.includes(item.game) ? 'visible' : 'hidden' }"
+      ></i>
     </div>
     <loading v-if="loading"></loading>
   </div>
@@ -58,6 +82,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { scrollTo } from '../libs/utils';
 
 export default {
   created() {
@@ -69,13 +94,22 @@ export default {
       'importData',
       'importOneGame',
       'toggleTodo',
+      'migrateAll',
     ]),
   },
   computed: {
     ...mapGetters({
       list: 'getSourceList',
       loading: 'loading',
+      todo: 'todo',
+      done: 'done',
+      current_handel: 'current_handel',
     }),
+  },
+  watch: {
+    current_handel() {
+      scrollTo(this.$refs[this.current_handel][0]);
+    },
   },
 };
 </script>

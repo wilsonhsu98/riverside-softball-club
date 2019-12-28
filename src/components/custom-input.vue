@@ -257,6 +257,7 @@
         color: #000;
         line-height: 36px;
         border: 0;
+        width: 99%;
       }
       &.vs--open {
         border-color: #3b5998;
@@ -294,7 +295,7 @@
           line-height: $input_font_size;
         }
       }
-      &.has-value:not(.vs--open) {
+      &.has-value.vs--single:not(.vs--open) {
         .vs__selected-options {
           max-width: calc(100% - 56px);
         }
@@ -356,8 +357,6 @@
       line-height: 36px;
       border: 0;
       background-color: transparent;
-
-      width: 99%;
       display: inline;
       white-space: nowrap;
       overflow: hidden;

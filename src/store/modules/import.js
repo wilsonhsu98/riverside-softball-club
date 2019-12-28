@@ -13,6 +13,8 @@ const types = {
   GET_TEDDY_SHEETS: 'IMPORT/GET_TEDDY_SHEETS',
   GET_TEDDY_SUMMARY: 'IMPORT/GET_TEDDY_SUMMARY',
   SET_TODO: 'IMPORT/SET_TODO',
+  SET_DONE: 'IMPORT/SET_DONE',
+  SET_CURRENT_HANDEL: 'IMPORT/SET_CURRENT_HANDEL',
 };
 
 const state = {
@@ -20,6 +22,8 @@ const state = {
   teddy_sheets: [],
   teddy_summary: [],
   todo: [],
+  done: [],
+  current_handel: '',
 };
 
 const getters = {
@@ -31,6 +35,9 @@ const getters = {
         state.wilson_sheets.indexOf(item) > -1 || state.todo.indexOf(item) > -1,
     }));
   },
+  todo: state => state.todo,
+  done: state => state.done,
+  current_handel: state => state.current_handel,
 };
 
 const actions = {
@@ -134,6 +141,7 @@ const actions = {
               ],
               timestamp,
             },
+            { merge: true },
           );
         });
 
@@ -149,7 +157,7 @@ const actions = {
   },
   importOneGame({ commit }, { team = 'OldStar', game }) {
     commit(rootTypes.LOADING, true);
-    axios
+    return axios
       .all([
         axios.get(GET_URL({ fileId: TEDDY, sheetname: '比賽結果' })),
         axios.get(
@@ -164,53 +172,69 @@ const actions = {
           .doc(team)
           .collection('games')
           .doc(game)
-          .set({
-            version: 'import',
-            orders: parseResult.orders,
-            errors: parseResult.errors,
-            result: ['win', 'lose', 'tie', ''][
-              ['勝', '敗', '和', ''].indexOf(
-                teddySummary ? teddySummary['結果'] : '',
-              )
-            ],
-            year: teddySummary ? teddySummary['年度'] : '',
-            season: teddySummary ? teddySummary['季度'] : '',
-            gameType: teddySummary
-              ? teddySummary['季度'].indexOf('季後') > -1
-                ? 'playoff'
-                : 'regular'
-              : '',
-            opponent: teddySummary ? teddySummary['對手'] : '',
-            league: teddySummary ? teddySummary['聯盟'] : '',
-            coach: teddySummary ? teddySummary['教練'] : '',
-            place:
-              ['', '一', '二', '三'].indexOf(
-                teddySummary ? teddySummary['休息區'] : '',
-              ) || '',
-            group: teddySummary ? teddySummary['組別'] : '',
-            useTeam: [
-              'TrendMicro',
-              'TrendMicro',
-              'TrendMicro',
-              '趨勢科技',
-              '趨勢科技',
-              '趨勢科技',
-              '',
-            ][
-              ['B', 'C', 'D', 'E', 'F', 'G', ''].indexOf(
-                teddySummary ? teddySummary['組別'] : '',
-              )
-            ],
-            timestamp,
-          });
+          .set(
+            {
+              version: 'import',
+              orders: parseResult.orders,
+              errors: parseResult.errors,
+              result: ['win', 'lose', 'tie', ''][
+                ['勝', '敗', '和', ''].indexOf(
+                  teddySummary ? teddySummary['結果'] : '',
+                )
+              ],
+              year: teddySummary ? teddySummary['年度'] : '',
+              season: teddySummary ? teddySummary['季度'] : '',
+              gameType: teddySummary
+                ? teddySummary['季度'].indexOf('季後') > -1
+                  ? 'playoff'
+                  : 'regular'
+                : '',
+              opponent: teddySummary ? teddySummary['對手'] : '',
+              league: teddySummary ? teddySummary['聯盟'] : '',
+              coach: teddySummary ? teddySummary['教練'] : '',
+              place:
+                ['', '一', '二', '三'].indexOf(
+                  teddySummary ? teddySummary['休息區'] : '',
+                ) || '',
+              group: teddySummary ? teddySummary['組別'] : '',
+              useTeam: [
+                'TrendMicro',
+                'TrendMicro',
+                'TrendMicro',
+                '趨勢科技',
+                '趨勢科技',
+                '趨勢科技',
+                '',
+              ][
+                ['B', 'C', 'D', 'E', 'F', 'G', ''].indexOf(
+                  teddySummary ? teddySummary['組別'] : '',
+                )
+              ],
+              timestamp,
+            },
+            { merge: true },
+          );
       })
       .then(() => {
         commit(rootTypes.LOADING, false);
       })
       .catch(err => {
-        alert(err);
+        console.log(err);
         commit(rootTypes.LOADING, false);
       });
+  },
+  migrateAll({ commit, dispatch }, { team = 'OldStar', games = [] }) {
+    commit(types.SET_DONE);
+    games.reduce((acc, game) => {
+      return acc
+        .then(() => {
+          return dispatch('importOneGame', { team, game });
+        })
+        .then(() => {
+          commit(types.SET_CURRENT_HANDEL, game);
+          commit(types.SET_DONE, game);
+        });
+    }, Promise.resolve());
   },
 };
 
@@ -244,6 +268,23 @@ const mutations = {
     } else {
       state.todo = [];
     }
+  },
+  [types.SET_DONE](state, item) {
+    if (item) {
+      if (state.done.indexOf(item) === -1) {
+        state.done = Array.from(state.done).concat([item]);
+      } else {
+        state.done = [
+          ...state.done.slice(0, state.done.indexOf(item)),
+          ...state.done.slice(state.done.indexOf(item) + 1),
+        ];
+      }
+    } else {
+      state.done = [];
+    }
+  },
+  [types.SET_CURRENT_HANDEL](state, item) {
+    state.current_handel = item;
   },
 };
 

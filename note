@@ -4,3 +4,10 @@ https://github.com/firebase/custom-auth-samples/tree/master/instagram
 
 舊的firebase function line oauth api
 https://us-central1-riversidesoftballclub.cloudfunctions.net/api/line_oauth
+
+==deploy function
+cd functions
+n => switch node version to 10
+copy root/.env to functions
+yarn deploy
+rollback env and node version
