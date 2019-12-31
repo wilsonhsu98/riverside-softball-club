@@ -586,9 +586,7 @@ export default {
     return {};
   },
   created() {
-    if (!this.game) {
-      this.setGame(this.$route.params.game);
-    }
+    this.setGame(this.$route.params.game);
   },
   mounted() {},
   beforeDestroy() {},

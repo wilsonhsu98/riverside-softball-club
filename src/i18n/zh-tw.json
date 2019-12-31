@@ -65,6 +65,9 @@
 
 	"create_game": "新增比賽",
 	"edit_game": "修改比賽",
+	"ttl_after_game": "賽後資訊",
+	"ttl_before_game": "賽前資訊",
+	"ttl_result": "勝敗",
 	"ttl_game_time": "比賽日期",
 	"ttl_game_postfix": "當天場次",
 	"ttl_use_team": "使用隊名",

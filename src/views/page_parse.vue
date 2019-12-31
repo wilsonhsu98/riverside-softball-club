@@ -32,7 +32,7 @@
           :disabled="item.disabled"
           :checked="item.checked"
           @change="toggleTodo(item.game)"
-          :style="{ visibility: item.disabled ? 'hidden' : '' }"
+          :style="{ visibility: item.disabled ? 'hidden' : 'visible' }"
         />
         {{ item.game }}
       </label>

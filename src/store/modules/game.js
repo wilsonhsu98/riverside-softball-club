@@ -51,6 +51,7 @@ const actions = {
       topBottom = '',
       coach = '',
       tags = '',
+      result,
     } = data;
     commit(rootTypes.LOADING, true);
     const refNewGameDoc = db
@@ -90,6 +91,7 @@ const actions = {
             topBottom,
             coach,
             tags,
+            result,
             timestamp,
           },
           { merge: true },

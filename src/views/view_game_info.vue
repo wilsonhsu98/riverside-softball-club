@@ -9,6 +9,28 @@
     <div class="container">
       <h1>{{ mode === 'edit' ? $t('edit_game') : $t('create_game') }}</h1>
 
+      <div v-if="mode === 'edit'" class="field-wrapper edit">
+        <label>{{ $t('ttl_after_game') }}</label>
+
+        <div class="field-wrapper-item">
+          <span>{{ $t('ttl_result') }}</span>
+          <label>
+            <input type="radio" v-model="result" value="win" />
+            <span>{{ $t('box_win') }}</span>
+          </label>
+          <label>
+            <input type="radio" v-model="result" value="lose" />
+            <span>{{ $t('box_lose') }}</span>
+          </label>
+          <label>
+            <input type="radio" v-model="result" value="tie" />
+            <span>{{ $t('box_tie') }}</span>
+          </label>
+        </div>
+
+        <label>{{ $t('ttl_before_game') }}</label>
+      </div>
+
       <div
         :class="[
           'field-wrapper',
@@ -124,7 +146,7 @@
         </label>
       </div>
 
-      <div class="field-wrapper field-wrapper-item">
+      <div v-if="version !== 'import'" class="field-wrapper field-wrapper-item">
         <span>{{ $t('ttl_top_bot') }}</span>
         <label>
           <input type="radio" v-model="topBottom" value="top" />
@@ -187,6 +209,29 @@
       font-size: $input_font_size - 2;
       box-sizing: border-box;
       color: $error-color;
+    }
+    &.edit {
+      border: 1px solid $input_border;
+      border-width: 1px 0;
+      margin-top: 20px;
+      padding-bottom: 30px;
+      position: relative;
+      > label {
+        position: absolute;
+        background-color: #fff;
+        color: $input_font;
+        font-size: 12px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 0 4px;
+        line-height: 14px;
+        &:first-child {
+          top: -7px;
+        }
+        &:last-child {
+          bottom: -7px;
+        }
+      }
     }
   }
   .field-wrapper-item {
@@ -292,6 +337,8 @@ import router from '../router';
 export default {
   data() {
     return {
+      version: '',
+      result: '',
       mode: this.$route.params.game ? 'edit' : 'insert',
       today: [
         {
@@ -397,6 +444,7 @@ export default {
             topBottom,
             coach,
             tags,
+            result,
           } = this;
           this.editGame({
             teamCode: this.$route.params.team,
@@ -411,6 +459,7 @@ export default {
             topBottom,
             coach,
             tags,
+            result,
           });
         }
       });
@@ -447,6 +496,8 @@ export default {
       handler() {
         if (this.mode === 'edit' && this.boxSummary.game) {
           const {
+            version,
+            result,
             game,
             league,
             group,
@@ -458,6 +509,8 @@ export default {
             coach,
             tags,
           } = this.boxSummary;
+          this.version = version;
+          this.result = result;
           this.prevId = game;
           this.gameDate = game.split('-')[0];
           this.gamePostfix = game.split('-')[1];

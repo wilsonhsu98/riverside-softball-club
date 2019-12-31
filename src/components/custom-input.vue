@@ -302,6 +302,9 @@
       }
       &.has-error {
         border-color: $error-color;
+        .vs__dropdown-menu {
+          border-color: $error-color;
+        }
       }
     }
     .vs__search {
