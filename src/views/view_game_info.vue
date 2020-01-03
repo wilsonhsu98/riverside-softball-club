@@ -367,7 +367,10 @@ export default {
     };
   },
   created() {
-    if (this.mode === 'edit') {
+    if (
+      this.mode === 'edit' &&
+      this.boxSummary.game !== this.$route.params.game
+    ) {
       this.setGame(this.$route.params.game);
     }
   },

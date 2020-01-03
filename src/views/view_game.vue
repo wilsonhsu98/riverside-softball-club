@@ -586,10 +586,11 @@ export default {
     return {};
   },
   created() {
-    this.setGame(this.$route.params.game);
+    if (this.boxSummary.game !== this.$route.params.game) {
+      this.setGame(this.$route.params.game);
+    }
   },
   mounted() {},
-  beforeDestroy() {},
   methods: {
     ...mapActions({
       setGame: 'setGame',

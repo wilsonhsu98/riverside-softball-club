@@ -504,7 +504,9 @@ export default {
     };
   },
   created() {
-    this.setGame(this.$route.params.game);
+    if (this.boxSummary.game !== this.$route.params.game) {
+      this.setGame(this.$route.params.game);
+    }
     this.setOrder(this.$route.params.order);
     this.setPa();
     // console.log(this.boxSummary);

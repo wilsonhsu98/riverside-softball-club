@@ -201,6 +201,7 @@ const actions = {
       commit(types.GET_GAMELIST, period);
       actions.workerGenStatistics({ commit });
       actions.workerItemStats({ commit });
+      actions.workerBox({ commit });
       window.localStorage.setItem('period', JSON.stringify(period));
       window.localStorage.setItem('records', JSON.stringify(records));
     };
@@ -267,6 +268,7 @@ const actions = {
       );
       actions.workerGenStatistics({ commit });
       actions.workerItemStats({ commit });
+      actions.workerBox({ commit });
       if (window.localStorage.getItem('lastUpdate')) {
         commit(types.SET_LASTUPDATE, window.localStorage.getItem('lastUpdate'));
       }
@@ -393,20 +395,22 @@ const actions = {
   },
   workerBox({ commit }) {
     // commit(rootTypes.LOADING, true);
-    workerCreater(
-      {
-        cmd: 'Box',
-        gameList: state.gameList,
-        game: state.game,
-        players: state.players,
-        records: state.records,
-        role: rootState.role,
-      },
-      data => {
-        commit(types.SET_BOX, data);
-        // commit(rootTypes.LOADING, false);
-      },
-    );
+    if (state.game && state.records.some(item => item._table === state.game)) {
+      workerCreater(
+        {
+          cmd: 'Box',
+          gameList: state.gameList,
+          game: state.game,
+          players: state.players,
+          records: state.records,
+          role: rootState.role,
+        },
+        data => {
+          commit(types.SET_BOX, data);
+          // commit(rootTypes.LOADING, false);
+        },
+      );
+    }
   },
 };
 

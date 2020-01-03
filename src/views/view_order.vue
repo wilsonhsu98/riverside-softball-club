@@ -756,8 +756,12 @@ export default {
   created() {
     this.sortBy_ = this.sortBy;
   },
+  beforeDestroy() {
+    this.setGame('');
+  },
   methods: {
     ...mapActions({
+      setGame: 'setGame',
       setPeriod: 'setPeriod',
       setTop: 'setTop',
       setUnlimitedPA: 'setUnlimitedPA',
