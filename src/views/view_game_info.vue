@@ -499,10 +499,13 @@
     }
     .input-score {
       font-size: 16px;
-      border: 0px;
+      border: none;
       width: 100%;
+      height: 22px;
+      line-height: 22px;
       outline: none;
       text-align: center;
+      box-sizing: border-box;
     }
   }
 }
@@ -673,7 +676,6 @@ export default {
     },
     focusInn(name) {
       this.$refs[name][0].focus();
-      this.$refs[name][0].select();
     },
     blurInn() {
       this.isFocusInn = '';
