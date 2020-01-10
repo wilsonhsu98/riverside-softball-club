@@ -112,7 +112,6 @@ const getters = {
         .find(item => item.games.find(sub => sub.game === state.game))
         .games.find(item => item.game === state.game);
     const game = state.records.filter(item => item._table === state.game);
-
     return {
       ...boxSummary,
       result: boxSummary.result,
@@ -125,6 +124,14 @@ const getters = {
         0,
       ),
       contents: game,
+      opponentScores: boxSummary.opponentScores || [],
+      scores: game.reduce((acc, item) => {
+        if (typeof item.inn === 'number') {
+          acc.length = item.inn;
+          acc[item.inn - 1] = (acc[item.inn - 1] || 0) + (item.r ? 1 : 0);
+        }
+        return acc;
+      }, []),
     };
   },
   gameList: state => state.gameList,
@@ -353,8 +360,8 @@ const actions = {
   toggleColumn({ commit }, col) {
     commit(types.SET_COLS, { col });
   },
-  setGame({ commit }, gemeDate) {
-    commit(types.SET_GAME, gemeDate);
+  setGame({ commit }, gameDate) {
+    commit(types.SET_GAME, gameDate);
     actions.workerBox({ commit });
   },
   setOrder({ commit }, order) {

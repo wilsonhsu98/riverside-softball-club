@@ -52,6 +52,7 @@ const actions = {
       coach = '',
       tags = '',
       result,
+      opponentScores,
     } = data;
     commit(rootTypes.LOADING, true);
     const refNewGameDoc = db
@@ -92,6 +93,7 @@ const actions = {
             coach,
             tags,
             result,
+            opponentScores,
             timestamp,
           },
           { merge: true },
@@ -120,7 +122,7 @@ const actions = {
         commit(rootTypes.LOADING, false);
       });
   },
-  editGameOrder({ commit }, data) {
+  editGameOrder({ commit, dispatch }, data) {
     const { teamCode, gameId, orders } = data;
     commit(rootTypes.LOADING, true);
     const refGameDoc = db
@@ -131,6 +133,7 @@ const actions = {
     refGameDoc
       .set({ orders, timestamp }, { merge: true })
       .then(() => {
+        dispatch('setGame', gameId);
         router.push(`/main/games/${teamCode}/${gameId}`);
         commit(rootTypes.LOADING, false);
       })

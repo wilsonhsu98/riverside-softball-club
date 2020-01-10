@@ -12,6 +12,98 @@
       <div v-if="mode === 'edit'" class="field-wrapper edit">
         <label>{{ $t('ttl_after_game') }}</label>
 
+        <div v-if="version !== 'import'" class="team-versus">
+          <div class="team-name">
+            <div class="name">
+              {{ topBottom === 'top' ? useTeam : opponent }}
+            </div>
+            <div class="score">
+              {{
+                topBottom === 'top'
+                  ? sumByInn(scores, inn)
+                  : sumByInn(opponentScores, inn)
+              }}
+            </div>
+          </div>
+          <div class="versus">:</div>
+          <div class="team-name">
+            <div class="score">
+              {{
+                topBottom === 'bot'
+                  ? sumByInn(scores, inn)
+                  : sumByInn(opponentScores, inn)
+              }}
+            </div>
+            <div class="name">
+              {{ topBottom === 'bot' ? useTeam : opponent }}
+            </div>
+          </div>
+        </div>
+
+        <div v-if="version !== 'import'" class="box">
+          <div class="team">
+            <div class="cell">
+              <i
+                class="fa fa-minus-circle"
+                @click="inn = Math.max(0, inn - 1)"
+              ></i
+              ><i
+                class="fa fa-plus-circle"
+                style="margin-left: 5px;"
+                @click="inn += 1"
+              ></i>
+            </div>
+            <div class="cell">
+              {{ topBottom === 'top' ? useTeam : opponent }}
+            </div>
+            <div class="cell">
+              {{ topBottom === 'bot' ? useTeam : opponent }}
+            </div>
+          </div>
+          <div class="gap"></div>
+          <div
+            v-for="(undefined, index) in Array.apply(null, Array(inn))"
+            :key="index"
+            class="inn"
+            :class="isFocusInn === `score${index}` ? 'focus' : ''"
+            @click="focusInn(`score${index}`)"
+          >
+            <div>{{ index + 1 }}</div>
+            <template>
+              <div class="cell" v-if="topBottom === 'top'">
+                {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+              </div>
+              <input
+                v-else
+                type="number"
+                pattern="\d*"
+                min="0"
+                class="input-score cell"
+                v-model.number.lazy="opponentScores[index]"
+                :ref="`score${index}`"
+                @focus="isFocusInn = `score${index}`"
+                @blur="blurInn"
+              />
+            </template>
+            <template>
+              <div class="cell" v-if="topBottom === 'bot'">
+                {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+              </div>
+              <input
+                v-else
+                type="number"
+                pattern="\d*"
+                min="0"
+                class="input-score cell"
+                v-model.number.lazy="opponentScores[index]"
+                :ref="`score${index}`"
+                @focus="isFocusInn = `score${index}`"
+                @blur="blurInn"
+              />
+            </template>
+          </div>
+        </div>
+
         <div class="field-wrapper-item">
           <span>{{ $t('ttl_result') }}</span>
           <label>
@@ -322,6 +414,97 @@
       margin: 0;
     }
   }
+  .team-versus {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    .team-name {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      max-width: 49%;
+      &:first-child {
+        justify-content: flex-end;
+        .name {
+          text-align: right;
+        }
+      }
+      .name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .score {
+        margin: 0 10px;
+      }
+    }
+  }
+  .box {
+    margin-top: 15px;
+    border-radius: 4px;
+    border: 2px solid #ced4da;
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #000;
+    display: flex;
+    text-align: center;
+    padding: 4px 0 4px 4px;
+    position: relative;
+    > span {
+      color: $input_font;
+      background-color: #fff;
+      font-size: $input_font_size - 2;
+      position: absolute;
+      top: -$input_font_size / 2;
+      left: 8px;
+      z-index: 1;
+      padding: 0 4px;
+      line-height: 14px;
+    }
+    .team {
+      border: 2px solid transparent;
+      text-align: left;
+    }
+    .fa {
+      font-size: 28px;
+      cursor: pointer;
+      vertical-align: middle;
+    }
+    .inn {
+      flex: 1 1 50px;
+      max-width: 50px;
+      border: 2px solid transparent;
+      &.focus {
+        transform: scale(1.4, 1.4);
+        transform-origin: center center;
+        border-color: #3b5998;
+        border-radius: 4px;
+        background-color: #fff;
+        .input-score {
+          width: calc(100% - 4px);
+        }
+      }
+      > div:first-child {
+        line-height: 28px;
+        color: $input_font;
+      }
+    }
+    .gap {
+      flex: 0 1 10px;
+      max-width: 10px;
+    }
+    .cell {
+      line-height: 22px;
+      white-space: nowrap;
+    }
+    .input-score {
+      font-size: 16px;
+      border: 0px;
+      width: 100%;
+      outline: none;
+      text-align: center;
+    }
+  }
 }
 
 @media only screen and (max-width: 760px) {
@@ -364,6 +547,10 @@ export default {
       coach: '',
       currentCoach: undefined,
       tags: '',
+      inn: 0,
+      opponentScores: [],
+      scores: [],
+      isFocusInn: '',
     };
   },
   created() {
@@ -448,6 +635,8 @@ export default {
             coach,
             tags,
             result,
+            opponentScores,
+            inn,
           } = this;
           this.editGame({
             teamCode: this.$route.params.team,
@@ -463,6 +652,7 @@ export default {
             coach,
             tags,
             result,
+            opponentScores: opponentScores.slice(0, inn),
           });
         }
       });
@@ -480,6 +670,27 @@ export default {
     clearCoach() {
       this.coach = '';
       this.$modal.hide('coach');
+    },
+    focusInn(name) {
+      this.$refs[name][0].focus();
+      this.$refs[name][0].select();
+    },
+    blurInn() {
+      this.isFocusInn = '';
+    },
+    sumByInn(scores, inn) {
+      return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
+    },
+    chkResult() {
+      const score = this.sumByInn(this.scores, this.inn);
+      const opponentScore = this.sumByInn(this.opponentScores, this.inn);
+      if (score > opponentScore) {
+        this.result = 'win';
+      } else if (score < opponentScore) {
+        this.result = 'lose';
+      } else {
+        this.result = 'tie';
+      }
     },
   },
   computed: {
@@ -501,6 +712,8 @@ export default {
           const {
             version,
             result,
+            scores,
+            opponentScores,
             game,
             league,
             group,
@@ -514,6 +727,9 @@ export default {
           } = this.boxSummary;
           this.version = version;
           this.result = result;
+          this.inn = Math.max(scores.length, opponentScores.length);
+          this.scores = scores;
+          this.opponentScores = [...opponentScores];
           this.prevId = game;
           this.gameDate = game.split('-')[0];
           this.gamePostfix = game.split('-')[1];
@@ -543,6 +759,15 @@ export default {
       if (this.mode === 'edit' && this.gameDate === this.prevId.split('-')[0]) {
         this.gamePostfix = this.prevId.split('-')[1];
       }
+    },
+    inn() {
+      this.chkResult();
+    },
+    scores() {
+      this.chkResult();
+    },
+    opponentScores() {
+      this.chkResult();
     },
   },
 };
