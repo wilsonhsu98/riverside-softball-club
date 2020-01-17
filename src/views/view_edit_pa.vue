@@ -645,9 +645,9 @@ export default {
           }
         });
       } else {
-        const last = this.boxSummary.contents[
-          this.boxSummary.contents.length - 1
-        ];
+        const last = [...this.boxSummary.contents]
+          .reverse()
+          .find(item => item.content);
         const estimate = this.boxSummary.contents[
           this.boxSummary.contents.length -
             this.box.filter(item => item.altOrder === undefined).length +
