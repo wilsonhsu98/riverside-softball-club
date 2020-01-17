@@ -1,5 +1,11 @@
 <template>
-  <modal :name="name" :adaptive="true" :maxWidth="260" :maxHeight="282">
+  <modal
+    :name="name"
+    :adaptive="true"
+    :maxWidth="260"
+    :maxHeight="282"
+    class="modal-wrapper"
+  >
     <div class="player-modal">
       <div class="two-column">
         <div class="label-container current">
@@ -13,16 +19,34 @@
             ></i>
           </div>
         </div>
-        <div v-if="second" class="label-container rejoin">
+        <div v-if="second" class="label-container single">
           <label>{{ second_label }}</label>
           <player :player="second" @click="select_" />
         </div>
       </div>
-      <div class="label-container bench">
+      <div
+        v-if="Array.isArray(third) && third.length"
+        class="label-container multiple"
+        style="max-height: 101px;"
+      >
         <label>{{ third_label }}</label>
         <div class="player-list-container">
           <player
             v-for="player in third"
+            :key="player.name"
+            :player="player"
+            @click="select_"
+          />
+        </div>
+      </div>
+      <div
+        v-if="Array.isArray(fourth) && fourth.length"
+        class="label-container multiple"
+      >
+        <label>{{ fourth_label }}</label>
+        <div class="player-list-container">
+          <player
+            v-for="player in fourth"
             :key="player.name"
             :player="player"
             @click="select_"
@@ -92,10 +116,10 @@
       border-radius: 50%;
     }
   }
-  &.rejoin {
+  &.single {
     margin-left: 5px;
   }
-  &.bench {
+  &.multiple {
     flex: 1;
     display: flex;
     height: 0;
@@ -188,6 +212,19 @@
     }
   }
 }
+
+@media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
+  .modal-wrapper::v-deep .v--modal-box {
+    height: calc(100vh - 120px) !important;
+    top: 60px !important;
+  }
+}
+@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
+  .modal-wrapper::v-deep .v--modal-box {
+    height: calc(100vh - 40px) !important;
+    top: 20px !important;
+  }
+}
 </style>
 
 <script>
@@ -201,6 +238,8 @@ export default {
     'second_label',
     'third',
     'third_label',
+    'fourth',
+    'fourth_label',
     'select',
   ],
   data() {

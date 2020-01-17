@@ -404,23 +404,23 @@ export default {
             Math.pow(58.5, 2)
           ) {
             if (y - (x * 7) / 2 >= -87) {
-              return '左';
+              return 'lf';
             } else if (y + (x * 7) / 2 >= 263) {
-              return '右';
+              return 'rf';
             } else {
-              return '中';
+              return 'cf';
             }
           } else {
             if (y - (x * 7) / 2 >= -87) {
-              return '左hr';
+              return 'l_hr';
             } else if (y + (x * 7) / 2 >= 263) {
-              return '右hr';
+              return 'r_hr';
             } else {
-              return '中hr';
+              return 'c_hr';
             }
           }
         } else {
-          return '界外';
+          return 'foul';
         }
       })(x, y);
       this.xy = [

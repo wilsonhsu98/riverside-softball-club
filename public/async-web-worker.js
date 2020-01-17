@@ -287,7 +287,11 @@ const displayGame = (players, records, errors, role) => {
       }
     });
 
-  if (records.length && startOrder) {
+  if (
+    (records.length && startOrder) ||
+    (startOrder === 0 && records[records.length - 1].content !== 'new')
+  ) {
+    if (startOrder === 0) startOrder = records.length;
     let insertAt = records[records.length - startOrder];
     if (insertAt.r && insertAt.name !== insertAt.r) {
       insertAt = insertAt.r;

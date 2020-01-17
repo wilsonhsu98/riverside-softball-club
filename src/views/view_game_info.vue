@@ -281,8 +281,8 @@
       :current="currentCoach"
       :current_label="$t('ttl_current_option')"
       :clear="clearCoach"
-      :third="teamInfo.players"
-      :third_label="$t('ttl_all_player')"
+      :fourth="teamInfo.players"
+      :fourth_label="$t('ttl_all_player')"
       :select="selectCoach"
     ></player-modal>
   </div>

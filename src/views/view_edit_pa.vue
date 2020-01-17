@@ -18,18 +18,21 @@
           </div>
           <div>{{ $t('desc_order', { n: order }) }}</div>
           <div>
-            {{
-              $t(version === 'import' ? 'desc_might_out' : 'desc_out', {
-                n: out,
-              })
-            }}
+            <template v-if="version === 'import'">
+              {{
+                $t(version === 'import' ? 'desc_might_out' : 'desc_out', {
+                  n: out,
+                })
+              }}
+            </template>
           </div>
           <div>
             {{
               $t('desc_batting', {
-                n:
-                  order % box[box.length - 1].order ||
-                  box[box.length - 1].order,
+                n: box.length
+                  ? order % box[box.length - 1].order ||
+                    box[box.length - 1].order
+                  : '',
               })
             }}
           </div>
@@ -51,7 +54,7 @@
               >
                 {{ $t('R') }}
               </span>
-              <span class="name">
+              <span class="name" @click="changePlayer(b)">
                 {{ base[b].name }}
               </span>
               <span
@@ -144,7 +147,7 @@
             >
               {{ $t(item) }}
             </span>
-            <span></span>
+            <span style="cursor: auto;"></span>
             <span
               :class="
                 `rbi${rbi.value === 3 ? ' select' : ''}${
@@ -165,7 +168,8 @@
             >
               {{ $t(item) }}
             </span>
-            <span></span><span></span>
+            <span style="cursor: auto;"></span>
+            <span style="cursor: auto;"></span>
             <span
               :class="
                 `rbi${rbi.value === 4 ? ' select' : ''}${
@@ -183,7 +187,8 @@
         <div class="coordination">
           <coordination
             :values="location"
-            :disabled="['BB', 'K'].includes(content)"
+            :disabled="['BB', 'K', ''].includes(content)"
+            @change="val => (location = [].concat(val))"
           />
         </div>
       </div>
@@ -201,8 +206,10 @@
       :clear="changeMode === 'runner' ? clearRunnder : undefined"
       :second="reJoinPlayer"
       :second_label="$t('ttl_rejoin_player')"
-      :third="benchPlayers"
-      :third_label="$t('ttl_bench_player')"
+      :third="['first', 'second', 'third'].includes(changeMode) && prev5Players"
+      :third_label="$t('ttl_prev5_player')"
+      :fourth="benchPlayers"
+      :fourth_label="$t('ttl_bench_player')"
       :select="selectPlayer"
     ></player-modal>
   </div>
@@ -500,6 +507,7 @@ export default {
       changeMode: '',
       currentPlayer: undefined,
       reJoinPlayer: undefined,
+      prev5Players: [],
       benchPlayers: [],
     };
   },
@@ -549,55 +557,68 @@ export default {
     },
     edit_() {
       if (this.content) {
-        if (this.version === 'import') {
-          const r = (() => {
-            if (!this.run.disabled && this.run.value) {
-              return this.name;
-            } else if (!this.altRun.disabled && this.altRun.name) {
-              return this.altRun.name;
-            }
-            return '';
-          })();
-          const rbi = (() => {
-            if (
-              !(
-                this.rbi[['', 'one', 'two', 'three', 'four'][this.rbi.value]] ||
-                {}
-              ).disabled
-            ) {
-              return this.rbi.value;
-            }
-            return '';
-          })();
+        const rbi = (() => {
+          if (
+            !(
+              this.rbi[['', 'one', 'two', 'three', 'four'][this.rbi.value]] ||
+              {}
+            ).disabled
+          ) {
+            return this.rbi.value;
+          }
+          return '';
+        })();
+        const r = (() => {
+          if (!this.run.disabled && this.run.value) {
+            return this.name;
+          } else if (!this.altRun.disabled && this.altRun.name) {
+            return this.altRun.name;
+          }
+          return '';
+        })();
+        const onbase = Array(4).fill({});
+        ['home', 'first', 'second', 'third'].forEach((b, i) => {
+          if (this.base[b].name) {
+            onbase[i] = {
+              name: this.base[b].name,
+              run: this.base[b].run,
+              out: this.base[b].out,
+            };
+          }
+        });
 
-          const i = this.order - 1;
-          const tempRecord = this.boxSummary.contents.map(item => ({
-            content: item.content,
-            inn: item.inn,
-            name: item.name,
-            order: item.order,
-            r: item.r,
-            rbi: item.rbi,
-          }));
-          tempRecord.length = Math.max(i, tempRecord.length);
-          const orders = tempRecord.slice(0, i).concat(
-            {
-              inn: this.inn,
-              order: this.order,
-              name: this.name,
-              content: this.content,
-              r,
-              rbi,
-            },
-            tempRecord.slice(i + 1),
-          );
-
-          this.editGameOrder({
-            teamCode: this.$route.params.team,
-            gameId: this.$route.params.game,
-            orders,
-          });
-        }
+        const i = this.order - 1;
+        const tempRecord = this.boxSummary.contents.map(item => ({
+          ...(item.inn !== undefined && { inn: item.inn }),
+          ...(item.content !== undefined && { content: item.content }),
+          ...(item.name !== undefined && { name: item.name }),
+          ...(item.order !== undefined && { order: item.order }),
+          ...(item.rbi !== undefined && { rbi: item.rbi }),
+          ...(item.r !== undefined &&
+            this.version === 'import' && { r: item.r }),
+          ...(item.onbase !== undefined &&
+            this.version !== 'import' && { onbase: item.onbase }),
+        }));
+        tempRecord.length = Math.max(i, tempRecord.length);
+        const orders = tempRecord.slice(0, i).concat(
+          {
+            inn: this.inn,
+            order: this.order,
+            name: this.name,
+            content: this.content,
+            rbi,
+            ...(this.version === 'import' && { r }),
+            ...(this.version !== 'import' && { onbase }),
+            ...(this.location[0] &&
+              this.version !== 'import' && { location: this.location[0] }),
+          },
+          tempRecord.slice(i + 1),
+        );
+        this.editGameOrder({
+          teamCode: this.$route.params.team,
+          gameId: this.$route.params.game,
+          orders,
+        });
       }
     },
     setInn(val) {
@@ -616,6 +637,13 @@ export default {
           this.pa.r && this.pa.r !== this.pa.name ? this.pa.r : '';
         if (typeof this.pa.location === 'object')
           this.location = [].concat(this.pa.location);
+        ['home', 'first', 'second', 'third'].forEach((b, i) => {
+          if (Array.isArray(this.pa.onbase) && this.pa.onbase[i]) {
+            this.base[b].name = this.pa.onbase[i].name;
+            this.base[b].run = this.pa.onbase[i].run;
+            this.base[b].out = this.pa.onbase[i].out;
+          }
+        });
       } else {
         const last = this.boxSummary.contents[
           this.boxSummary.contents.length - 1
@@ -626,38 +654,47 @@ export default {
             1
         ];
         this.inn = last.inn || 1;
-        if (last.order) {
-          this.order = last.order + 1;
-        } else if (!isNaN(parseInt(this.$route.params.order, 10))) {
+        if (!isNaN(parseInt(this.$route.params.order, 10))) {
           this.order = parseInt(this.$route.params.order, 10);
+          this.base.home.name = this.name = (
+            Array.from(this.boxSummary.contents)[this.order - 1] || { name: '' }
+          ).name;
         } else {
           this.order = this.boxSummary.contents.length + 1;
-        }
-        if (estimate.name) {
-          this.base.home.name = this.name = estimate.name;
+          if (estimate && estimate.name) {
+            this.base.home.name = this.name = estimate.r || estimate.name;
+          }
         }
       }
 
-      const startOrder = this.box[0].slice(-1)[0];
-      const sameOrderPlayers = this.boxSummary.contents
-        .filter(
-          content => content.order % startOrder === this.order % startOrder,
-        )
-        .reduce((acc, player) => {
-          return player.r
-            ? [...acc, player.name, player.r]
-            : [...acc, player.name];
-        }, []);
-      if (this.checkReJoin(sameOrderPlayers)) {
-        this.reJoinPlayer = this.teamInfo.players.find(
-          player => player.name && player.name === sameOrderPlayers[0],
-        ) || { name: sameOrderPlayers[0] };
-      }
+      if (Array.isArray(this.box[0])) {
+        const startOrder = this.box[0].slice(-1)[0];
+        const sameOrderPlayers = this.boxSummary.contents
+          .filter(
+            content => content.order % startOrder === this.order % startOrder,
+          )
+          .reduce((acc, player) => {
+            return player.r
+              ? [...acc, player.name, player.r]
+              : [...acc, player.name];
+          }, []);
+        if (this.checkReJoin(sameOrderPlayers)) {
+          this.reJoinPlayer = this.teamInfo.players.find(
+            player => player.name && player.name === sameOrderPlayers[0],
+          ) || { name: sameOrderPlayers[0] };
+        }
 
-      const startPlayers = this.box.slice(1).map(player => player.name);
-      this.benchPlayers = this.teamInfo.players.filter(
-        player => player.name && !startPlayers.includes(player.name),
-      );
+        const startPlayers = this.box.slice(1).map(player => player.name);
+        this.benchPlayers = this.teamInfo.players.filter(
+          player => player.name && !startPlayers.includes(player.name),
+        );
+        // 應當尋找前五個打席 壘包記錄上 不等於出局的人
+        this.prev5Players = this.boxSummary.contents
+          .slice(Math.max(this.order - 6, 0), this.order - 1)
+          .map(player =>
+            this.teamInfo.players.find(p => p.name === player.name),
+          );
+      }
     },
     checkReJoin(sameOrderPlayers) {
       return sameOrderPlayers.reduceRight((acc, item, i, self) => {
@@ -688,15 +725,29 @@ export default {
             player => player.name && player.name === this.altRun.name,
           );
           break;
+        case 'first':
+        case 'second':
+        case 'third':
+          this.currentPlayer = this.teamInfo.players.find(
+            player =>
+              player.name && player.name === this.base[this.changeMode].name,
+          );
+          break;
       }
     },
     selectPlayer(player) {
       switch (this.changeMode) {
         case 'batter':
+        case 'home':
           this.base.home.name = this.name = player.name;
           break;
         case 'runner':
           this.altRun.name = player.name;
+          break;
+        case 'first':
+        case 'second':
+        case 'third':
+          this.base[this.changeMode].name = player.name;
           break;
       }
       this.$modal.hide('player');
@@ -731,6 +782,9 @@ export default {
       }
     },
     box() {
+      this.setPa();
+    },
+    teamInfo() {
       this.setPa();
     },
     content() {

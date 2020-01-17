@@ -118,7 +118,17 @@ const getters = {
       h: game.filter(
         item => ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1,
       ).length,
-      r: game.filter(item => item.r).length,
+      r:
+        game.filter(item => item.r).length ||
+        game
+          .filter(item => Array.isArray(item.onbase))
+          .reduce((acc, item) => {
+            if (item.onbase[0].run) acc += 1;
+            if (item.onbase[1].run) acc += 1;
+            if (item.onbase[2].run) acc += 1;
+            if (item.onbase[3].run) acc += 1;
+            return acc;
+          }, 0),
       e: (boxSummary.errors || []).reduce(
         (result, item) => result + item.count,
         0,
@@ -129,6 +139,13 @@ const getters = {
         if (typeof item.inn === 'number') {
           acc.length = item.inn;
           acc[item.inn - 1] = (acc[item.inn - 1] || 0) + (item.r ? 1 : 0);
+          if (Array.isArray(item.onbase)) {
+            acc[item.inn - 1] +=
+              (item.onbase[0].run ? 1 : 0) +
+              (item.onbase[1].run ? 1 : 0) +
+              (item.onbase[2].run ? 1 : 0) +
+              (item.onbase[3].run ? 1 : 0);
+          }
         }
         return acc;
       }, []),
@@ -188,20 +205,16 @@ const actions = {
       const records = changedData
         .filter(item => item.data.orders)
         .map(item => {
-          item.data.orders.forEach(sub => {
-            sub._table = item.id;
-          });
-          return item.data.orders;
+          return item.data.orders.map(sub => ({
+            ...sub,
+            _table: item.id,
+          }));
         })
         .reduce((a, b) => a.concat(b), []);
       const period = changedData.map(item => {
-        if (item.data.orders && item.data.orders.length) {
-          // item.data.hasOrder = true;
-          delete item.data.orders;
-        } else {
-          // item.data.hasOrder = false;
-        }
-        return { ...item.data, game: item.id };
+        const { orders, ...others } = item.data;
+        orders;
+        return { ...others, game: item.id };
       });
       commit(types.GET_PERIOD, period);
       commit(types.GET_RECORDS, records);

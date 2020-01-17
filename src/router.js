@@ -6,14 +6,18 @@ Vue.use(VueRouter);
 
 const position = {};
 const scrollBehavior = (to, from, savedPosition) => {
-  if (savedPosition) {
-    return savedPosition;
-  } else {
-    if (from.name === 'game' && to.name === 'games') {
-      return position[to.name];
-    }
-    return { x: 0, y: 0 };
-  }
+  return new Promise(resolve => {
+    setTimeout(() => {
+      if (from.name === 'game' && to.name === 'games') {
+        resolve(position[to.name]);
+      }
+      if (savedPosition) {
+        resolve(savedPosition);
+      } else {
+        resolve({ x: 0, y: 0 });
+      }
+    });
+  });
 };
 
 const router = new VueRouter({
@@ -143,6 +147,7 @@ router.beforeEach((to, from, next) => {
       y: window.pageYOffset,
     };
   }
+  window.scrollTo(0, 0);
 
   if (
     to.matched.some(route => route.meta.requiresAuth) &&
