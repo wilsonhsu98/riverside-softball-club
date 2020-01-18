@@ -88,11 +88,12 @@
                       `content editable ${record.color} ${
                         record.rbi ? 'rbi' : ''
                       } ${record.r === record.name ? 'run' : ''} ${
-                        record.content === 'new' ? 'new' : ''
-                      }`
+                        record.out ? 'out' : ''
+                      } ${record.content === 'new' ? 'new' : ''}`
                     "
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
+                    :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{ record.content === 'new' ? '＋' : $t(record.content) }}
                   </router-link>
@@ -101,10 +102,13 @@
                     :class="
                       `content ${record.rbi ? 'rbi' : ''} ${
                         record.r === record.name ? 'run' : ''
-                      } ${record.content === 'new' ? '' : record.color}`
+                      } ${record.out ? 'out' : ''} ${
+                        record.content === 'new' ? '' : record.color
+                      }`
                     "
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
+                    :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{ record.content !== 'new' ? $t(record.content) : '' }}
                   </span>
@@ -185,11 +189,12 @@
                       `content editable ${record.color} ${
                         record.rbi ? 'rbi' : ''
                       } ${record.r === record.name ? 'run' : ''} ${
-                        record.content === 'new' ? 'new' : ''
-                      }`
+                        record.out ? 'out' : ''
+                      } ${record.content === 'new' ? 'new' : ''}`
                     "
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
+                    :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{ record.content === 'new' ? '＋' : $t(record.content) }}
                   </router-link>
@@ -198,10 +203,13 @@
                     :class="
                       `content ${record.rbi ? 'rbi' : ''} ${
                         record.r === record.name ? 'run' : ''
-                      } ${record.content === 'new' ? '' : record.color}`
+                      } ${record.out ? 'out' : ''} ${
+                        record.content === 'new' ? '' : record.color
+                      }`
                     "
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
+                    :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{ record.content !== 'new' ? $t(record.content) : '' }}
                   </span>
@@ -403,8 +411,8 @@
           &.gray {
             background-color: $gray;
           }
-          &.run:before {
-            content: attr(data-run);
+          &.run:before,
+          &.out:before {
             display: inline-block;
             width: 10px;
             height: 17px;
@@ -414,7 +422,14 @@
             line-height: 17px;
             font-size: 12px;
             text-align: center;
+          }
+          &.run:before {
+            content: attr(data-run);
             background-color: $run;
+          }
+          &.out:before {
+            content: attr(data-out);
+            background-color: $out;
           }
           &.rbi:after {
             content: attr(data-rbi);
@@ -544,6 +559,7 @@
             height: 34px;
             align-self: center;
             overflow: hidden;
+            &.out:before,
             &.run:before,
             &.rbi:after {
               height: 10px;

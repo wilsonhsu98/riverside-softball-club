@@ -193,7 +193,7 @@ const displayGame = (players, records, errors, role) => {
   let innChange = 0;
 
   records
-    .map((item, i) => {
+    .map((item, i, self) => {
       const find = arr.find(sub => sub.name === item.name);
       if (!item.order) {
         item.order = i + 1;
@@ -212,7 +212,26 @@ const displayGame = (players, records, errors, role) => {
           startOrder = item.order - find.order;
         }
       }
-      return item;
+
+      const onbase = (() => {
+        const next5 = self
+          .slice(i, i + 5)
+          .map(sub => sub.onbase)
+          .reduce((acc, sub) => acc.concat(sub), []);
+        return {
+          r: next5.find(sub => sub && sub.name === item.name && sub.run)
+            ? item.name
+            : '',
+          out: next5.find(sub => sub && sub.name === item.name && sub.out)
+            ? true
+            : false,
+        };
+      })();
+      return {
+        ...item,
+        r: item.r || onbase.r,
+        out: onbase.out,
+      };
     })
     .forEach(item => {
       if (item.inn !== innChange) {
