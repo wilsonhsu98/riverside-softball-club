@@ -646,8 +646,8 @@ export default {
         ['home', 'first', 'second', 'third'].forEach((b, i) => {
           if (Array.isArray(this.pa.onbase) && this.pa.onbase[i]) {
             this.base[b].name = this.pa.onbase[i].name;
-            this.base[b].run = this.pa.onbase[i].run;
-            this.base[b].out = this.pa.onbase[i].out;
+            this.base[b].run = this.pa.onbase[i].run || false;
+            this.base[b].out = this.pa.onbase[i].out || false;
           }
         });
       } else {
@@ -694,11 +694,26 @@ export default {
         this.benchPlayers = this.teamInfo.players.filter(
           player => player.name && !startPlayers.includes(player.name),
         );
-        // 應當尋找前五個打席 壘包記錄上 不等於出局的人
+
         this.prev5Players = this.boxSummary.contents
           .slice(Math.max(this.order - 6, 0), this.order - 1)
-          .map(player =>
-            this.teamInfo.players.find(p => p.name === player.name),
+          .filter(item => {
+            const prev5 = this.boxSummary.contents
+              .slice(Math.max(this.order - 6, 0), this.order - 1)
+              .filter(item => item.inn === this.inn)
+              .map(sub => sub.onbase)
+              .reduce((acc, sub) => acc.concat(sub), [])
+              .filter(item => item.run === false && item.out === false);
+
+            return prev5.find(sub => sub && sub.name === item.name)
+              ? true
+              : false;
+          })
+          .map(
+            player =>
+              this.teamInfo.players.find(p => p.name === player.name) || {
+                name: player.name,
+              },
           )
           .reverse();
       }
@@ -729,17 +744,22 @@ export default {
           ) || { name: this.name };
           break;
         case 'runner':
-          this.currentPlayer = this.teamInfo.players.find(
-            player => player.name && player.name === this.altRun.name,
-          );
+          this.currentPlayer = this.altRun.name
+            ? this.teamInfo.players.find(
+                player => player.name && player.name === this.altRun.name,
+              ) || { name: this.altRun.name }
+            : '';
           break;
         case 'first':
         case 'second':
         case 'third':
-          this.currentPlayer = this.teamInfo.players.find(
-            player =>
-              player.name && player.name === this.base[this.changeMode].name,
-          );
+          this.currentPlayer = this.base[this.changeMode].name
+            ? this.teamInfo.players.find(
+                player =>
+                  player.name &&
+                  player.name === this.base[this.changeMode].name,
+              ) || { name: this.base[this.changeMode].name }
+            : '';
           break;
       }
     },

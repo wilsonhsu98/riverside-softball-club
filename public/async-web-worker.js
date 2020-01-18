@@ -29,7 +29,27 @@ const genStatistics = (players, records, filterPA, filterGames) => {
           : filterGames.indexOf(item._table) > -1;
       })
       .filter(item => item.name === name)
-      .slice(0, filterPA);
+      .slice(0, filterPA)
+      .map(item => {
+        const onbase = (() => {
+          const next5 = sortRecords
+            .filter(sub => sub._table === item._table)
+            .reverse()
+            .slice(item.order - 1, item.order - 1 + 5)
+            .map(sub => sub.onbase)
+            .reduce((acc, sub) => acc.concat(sub), []);
+          return {
+            r: next5.find(sub => sub && sub.name === item.name && sub.run)
+              ? item.name
+              : '',
+          };
+        })();
+
+        return {
+          ...item,
+          r: item.r || onbase.r,
+        };
+      });
 
     let limit = 1;
     const games = top

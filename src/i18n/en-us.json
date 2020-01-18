@@ -115,7 +115,7 @@
 	"ttl_current_player": "目前球員",
 	"ttl_rejoin_player": "可再上場球員",
 	"ttl_bench_player": "板凳球員",
-	"ttl_prev5_player": "前五名球員",
+	"ttl_prev5_player": "可能在壘上球員",
 	"Out": "出局",
 	"RBI_count": "%{rbi}分",
 
