@@ -12,7 +12,7 @@
       <div v-if="mode === 'edit'" class="field-wrapper edit">
         <label>{{ $t('ttl_after_game') }}</label>
 
-        <div v-if="version !== 'import'" class="team-versus">
+        <div v-if="version !== 'import' && topBottom" class="team-versus">
           <div class="team-name">
             <div class="name">
               {{ topBottom === 'top' ? useTeam : opponent }}
@@ -53,11 +53,14 @@
                 @click="inn += 1"
               ></i>
             </div>
-            <div class="cell">
+            <div v-if="topBottom" class="cell">
               {{ topBottom === 'top' ? useTeam : opponent }}
             </div>
-            <div class="cell">
+            <div v-if="topBottom" class="cell">
               {{ topBottom === 'bot' ? useTeam : opponent }}
+            </div>
+            <div v-else class="cell">
+              {{ opponent }}
             </div>
           </div>
           <div class="gap"></div>
@@ -69,7 +72,7 @@
             @click="focusInn(`score${index}`)"
           >
             <div>{{ index + 1 }}</div>
-            <template>
+            <template v-if="topBottom">
               <div class="cell" v-if="topBottom === 'top'">
                 {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
               </div>
@@ -85,12 +88,24 @@
                 @blur="blurInn"
               />
             </template>
-            <template>
+            <template v-if="topBottom">
               <div class="cell" v-if="topBottom === 'bot'">
                 {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
               </div>
               <input
                 v-else
+                type="number"
+                pattern="\d*"
+                min="0"
+                class="input-score cell"
+                v-model.number.lazy="opponentScores[index]"
+                :ref="`score${index}`"
+                @focus="isFocusInn = `score${index}`"
+                @blur="blurInn"
+              />
+            </template>
+            <template v-else>
+              <input
                 type="number"
                 pattern="\d*"
                 min="0"

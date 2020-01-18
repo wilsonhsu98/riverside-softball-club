@@ -430,6 +430,8 @@ const actions = {
           // commit(rootTypes.LOADING, false);
         },
       );
+    } else {
+      commit(types.SET_BOX, []);
     }
   },
 };

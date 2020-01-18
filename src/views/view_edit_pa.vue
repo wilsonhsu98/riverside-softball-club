@@ -203,7 +203,11 @@
       name="player"
       :current="currentPlayer"
       :current_label="$t('ttl_current_player')"
-      :clear="changeMode === 'runner' ? clearRunnder : undefined"
+      :clear="
+        ['runner', 'first', 'second', 'third'].includes(changeMode)
+          ? clearPlayer
+          : undefined
+      "
       :second="reJoinPlayer"
       :second_label="$t('ttl_rejoin_player')"
       :third="['first', 'second', 'third'].includes(changeMode) && prev5Players"
@@ -598,6 +602,8 @@ export default {
             this.version === 'import' && { r: item.r }),
           ...(item.onbase !== undefined &&
             this.version !== 'import' && { onbase: item.onbase }),
+          ...(item.location !== undefined &&
+            this.version !== 'import' && { location: item.location }),
         }));
         tempRecord.length = Math.max(i, tempRecord.length);
         const orders = tempRecord.slice(0, i).concat(
@@ -647,7 +653,7 @@ export default {
       } else {
         const last = [...this.boxSummary.contents]
           .reverse()
-          .find(item => item.content);
+          .find(item => item.content) || { inn: 1 };
         const estimate = this.boxSummary.contents[
           this.boxSummary.contents.length -
             this.box.filter(item => item.altOrder === undefined).length +
@@ -693,7 +699,8 @@ export default {
           .slice(Math.max(this.order - 6, 0), this.order - 1)
           .map(player =>
             this.teamInfo.players.find(p => p.name === player.name),
-          );
+          )
+          .reverse();
       }
     },
     checkReJoin(sameOrderPlayers) {
@@ -716,6 +723,7 @@ export default {
       this.changeMode = mode;
       switch (mode) {
         case 'batter':
+        case 'home':
           this.currentPlayer = this.teamInfo.players.find(
             player => player.name && player.name === this.name,
           ) || { name: this.name };
@@ -753,8 +761,17 @@ export default {
       this.$modal.hide('player');
       this.changeMode = '';
     },
-    clearRunnder() {
-      this.altRun.name = '';
+    clearPlayer() {
+      switch (this.changeMode) {
+        case 'runner':
+          this.altRun.name = '';
+          break;
+        case 'first':
+        case 'second':
+        case 'third':
+          this.base[this.changeMode].name = '';
+          break;
+      }
       this.$modal.hide('player');
     },
   },
