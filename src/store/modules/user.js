@@ -6,6 +6,7 @@ import {
   snapShot,
   snapShotRequest,
 } from '../root';
+import record from './record';
 import router from '../../router';
 import { db, timestamp } from '../../firebase';
 
@@ -132,6 +133,7 @@ const actions = {
                 Array.from(teams).sort((a, b) => b.name.localeCompare(a.name)),
               );
               commit(rootTypes.SET_AUTH, teams);
+              record.actions.workerBox({ commit });
               teams.forEach(team => {
                 if (typeof snapShotRequest[team.teamCode] === 'function')
                   snapShotRequest[team.teamCode]();

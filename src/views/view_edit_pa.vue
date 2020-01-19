@@ -10,7 +10,7 @@
       <h1>
         {{ $route.params.order === 'new' ? $t('add_pa') : $t('edit_pa') }}
       </h1>
-      <div :class="version !== 'import' ? 'left' : ''">
+      <div :class="[{ left: version !== 'import' }]">
         <div class="desc">
           <div>
             <minus-plus-number :value="inn" @change="setInn" />
@@ -40,17 +40,19 @@
         <infield v-if="version !== 'import'" class="infield">
           <div class="player-container">
             <div
-              :class="`on-base-player ${b}`"
+              :class="['on-base-player', b]"
               v-for="(b, bi) in ['first', 'second', 'third', 'home']"
               :key="`onbase_${bi}`"
             >
               <span
-                :class="
-                  `run${base[b].run ? ' select' : ''}${
-                    base[b].disabled ? ' disabled' : ''
-                  }`
+                :class="[
+                  'run',
+                  { select: base[b].run, disabled: base[b].disabled },
+                ]"
+                @click="
+                  base[b].disabled ||
+                    toggleBase(`base.${b}.run`, `base.${b}.out`)
                 "
-                @click="base[b].disabled || toggle(`base.${b}.run`)"
               >
                 {{ $t('R') }}
               </span>
@@ -58,12 +60,14 @@
                 {{ base[b].name }}
               </span>
               <span
-                :class="
-                  `out${base[b].out ? ' select' : ''}${
-                    base[b].disabled ? ' disabled' : ''
-                  }`
+                :class="[
+                  'out',
+                  { select: base[b].out, disabled: base[b].disabled },
+                ]"
+                @click="
+                  base[b].disabled ||
+                    toggleBase(`base.${b}.out`, `base.${b}.run`)
                 "
-                @click="base[b].disabled || toggle(`base.${b}.out`)"
               >
                 {{ $t('Out') }}
               </span>
@@ -76,20 +80,16 @@
               $t('desc_batter', { name })
             }}</span>
             <span
-              :class="
-                `run${run.value ? ' select' : ''}${
-                  run.disabled ? ' disabled' : ''
-                }`
-              "
+              :class="['run', { select: run.value, disabled: run.disabled }]"
               @click="run.disabled || toggle('run.value', true)"
               >{{ $t('R') }}</span
             >
             <span
-              :class="
-                `run alt${altRun.name ? ' select' : ''}${
-                  altRun.disabled ? ' disabled' : ''
-                }`
-              "
+              :class="[
+                'run',
+                'alt',
+                { select: altRun.name, disabled: altRun.disabled },
+              ]"
               @click="altRun.disabled || changePlayer('runner')"
               >{{
                 altRun.name
@@ -102,17 +102,16 @@
             <span
               :key="`item_${item}`"
               v-for="item in ['1H', '2H', '3H', 'HR']"
-              :class="`red${content === item ? ' select' : ''}`"
+              :class="['red', { select: content === item }]"
               @click="toggle('content', item)"
             >
               {{ $t(item) }}
             </span>
             <span
-              :class="
-                `rbi${rbi.value === 1 ? ' select' : ''}${
-                  rbi.one.disabled ? ' disabled' : ''
-                }`
-              "
+              :class="[
+                'rbi',
+                { select: rbi.value === 1, disabled: rbi.one.disabled },
+              ]"
               @click="rbi.one.disabled || toggle('rbi.value', 1)"
             >
               {{ $t('RBI_count', { rbi: 1 }) }}
@@ -122,17 +121,16 @@
             <span
               :key="`item_${item}`"
               v-for="item in ['K', 'FO', 'GO', 'E']"
-              :class="`blue${content === item ? ' select' : ''}`"
+              :class="['blue', { select: content === item }]"
               @click="toggle('content', item)"
             >
               {{ $t(item) }}
             </span>
             <span
-              :class="
-                `rbi${rbi.value === 2 ? ' select' : ''}${
-                  rbi.two.disabled ? ' disabled' : ''
-                }`
-              "
+              :class="[
+                'rbi',
+                { select: rbi.value === 2, disabled: rbi.two.disabled },
+              ]"
               @click="rbi.two.disabled || toggle('rbi.value', 2)"
             >
               {{ $t('RBI_count', { rbi: 2 }) }}
@@ -142,18 +140,17 @@
             <span
               :key="`item_${item}`"
               v-for="item in ['FC', 'DP', 'TP']"
-              :class="`blue${content === item ? ' select' : ''}`"
+              :class="['blue', { select: content === item }]"
               @click="toggle('content', item)"
             >
               {{ $t(item) }}
             </span>
             <span style="cursor: auto;"></span>
             <span
-              :class="
-                `rbi${rbi.value === 3 ? ' select' : ''}${
-                  rbi.three.disabled ? ' disabled' : ''
-                }`
-              "
+              :class="[
+                'rbi',
+                { select: rbi.value === 3, disabled: rbi.three.disabled },
+              ]"
               @click="rbi.three.disabled || toggle('rbi.value', 3)"
             >
               {{ $t('RBI_count', { rbi: 3 }) }}
@@ -163,7 +160,7 @@
             <span
               :key="`item_${item}`"
               v-for="item in ['BB', 'SF']"
-              :class="`yellow${content === item ? ' select' : ''}`"
+              :class="['yellow', { select: content === item }]"
               @click="toggle('content', item)"
             >
               {{ $t(item) }}
@@ -171,11 +168,10 @@
             <span style="cursor: auto;"></span>
             <span style="cursor: auto;"></span>
             <span
-              :class="
-                `rbi${rbi.value === 4 ? ' select' : ''}${
-                  rbi.four.disabled ? ' disabled' : ''
-                }`
-              "
+              :class="[
+                'rbi',
+                { select: rbi.value === 4, disabled: rbi.four.disabled },
+              ]"
               @click="rbi.four.disabled || toggle('rbi.value', 4)"
             >
               {{ $t('RBI_count', { rbi: 4 }) }}
@@ -544,7 +540,7 @@ export default {
         .reduce((o, p) => (o ? o[p] : value), this);
 
       if (typeof tempValue === 'boolean') {
-        setPath(path, !tempValue);
+        setPath(path, value === undefined ? !tempValue : value);
       } else {
         if (tempValue === value) {
           setPath(path, '');
@@ -552,6 +548,10 @@ export default {
           setPath(path, value);
         }
       }
+    },
+    toggleBase(path1, path2) {
+      this.toggle(path1);
+      this.toggle(path2, false);
     },
     back_() {
       // router.back();
@@ -703,11 +703,10 @@ export default {
               .filter(item => item.inn === this.inn)
               .map(sub => sub.onbase)
               .reduce((acc, sub) => acc.concat(sub), [])
-              .filter(item => item.run === false && item.out === false);
-
+              .filter(item => item.run === true || item.out === true);
             return prev5.find(sub => sub && sub.name === item.name)
-              ? true
-              : false;
+              ? false
+              : true;
           })
           .map(
             player =>
@@ -831,6 +830,7 @@ export default {
       this.rbi.four.disabled = true;
       this.altRun.disabled = true;
       this.run.disabled = true;
+      this.rbi.value = '';
       if (this.content) {
         this.base.home.disabled = false;
         this.base.first.disabled = false;
@@ -858,6 +858,16 @@ export default {
           this.altRun.disabled = true;
           this.altRun.name = '';
           this.run.value = true;
+          this.base.home.run = true;
+        }
+        if (['K', 'FO', 'GO', 'DP', 'TP', 'SF'].includes(this.content)) {
+          this.base.home.out = true;
+          this.base.home.run = false;
+        } else {
+          this.base.home.out = false;
+        }
+        if (this.content === 'SF') {
+          this.rbi.value = 1;
         }
       } else {
         this.base.home.disabled = true;
