@@ -22,7 +22,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import router from '../router';
 
 export default {
   data() {
@@ -32,7 +31,7 @@ export default {
   methods: {
     ...mapActions({}),
     back_() {
-      router.back();
+      this.$router.back();
     },
     edit_() {},
   },

@@ -722,7 +722,6 @@ i.fa {
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import router from '../router';
 import { scrollTo } from '../libs/utils';
 
 export default {
@@ -766,7 +765,7 @@ export default {
       editGameOrder: 'editGameOrder',
     }),
     back_() {
-      router.back();
+      this.$router.back();
     },
     edit() {
       const result = this.ORDER.map(

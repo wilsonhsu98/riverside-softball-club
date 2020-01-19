@@ -349,7 +349,6 @@ i.fa {
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import router from '../router';
 import defaultIcon from '../images/icon.png';
 const clickEvent = (() => {
   if ('ontouchstart' in document.documentElement === true) return 'touchstart';
@@ -388,7 +387,7 @@ export default {
     goStats(key) {
       this.setSortBy(key);
       this.setUnlimitedPA(true);
-      router.push(`/main/stats_pa/${this.$route.params.team}`);
+      this.$router.push(`/main/stats_pa/${this.$route.params.team}`);
     },
   },
   computed: {

@@ -147,6 +147,9 @@ router.beforeEach((to, from, next) => {
       y: window.pageYOffset,
     };
   }
+  if (from.name === 'game' && to.name === 'games') {
+    window.localStorage.setItem('focus_game', from.params.game);
+  }
   window.scrollTo(0, 0);
 
   if (

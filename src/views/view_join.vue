@@ -376,7 +376,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import router from '../router';
 import i18n from '../i18n';
 import defaultIcon from '../images/icon.png';
 
@@ -420,7 +419,7 @@ export default {
       handleRequest: 'handleRequest',
     }),
     back_() {
-      router.back();
+      this.$router.back();
     },
     joinTeam_() {
       const obj = {};

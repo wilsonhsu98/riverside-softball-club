@@ -451,7 +451,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import router from '../router';
 
 export default {
   data() {
@@ -555,7 +554,7 @@ export default {
     },
     back_() {
       // router.back();
-      router.push(
+      this.$router.push(
         `/main/games/${this.$route.params.team}/${this.$route.params.game}`,
       );
     },
@@ -659,7 +658,16 @@ export default {
             this.box.filter(item => item.altOrder === undefined).length +
             1
         ];
+
         this.inn = last.inn || 1;
+        const out = this.boxSummary.contents
+          .filter(item => item.inn === this.inn)
+          .map(sub => sub.onbase)
+          .reduce((acc, sub) => acc.concat(sub), [])
+          .filter(item => item.out === true);
+        if (out.length === 3) {
+          this.inn += 1;
+        }
         if (!isNaN(parseInt(this.$route.params.order, 10))) {
           this.order = parseInt(this.$route.params.order, 10);
           this.base.home.name = this.name = (
@@ -831,6 +839,7 @@ export default {
       this.altRun.disabled = true;
       this.run.disabled = true;
       this.rbi.value = '';
+      this.base.home.run = false;
       if (this.content) {
         this.base.home.disabled = false;
         this.base.first.disabled = false;

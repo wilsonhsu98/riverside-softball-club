@@ -16,6 +16,7 @@
               class="cell"
               delay="300"
               :popoverClass="`box-tip ${sub.result}`"
+              :open="sub.game === focus_game"
               :autoHide="true"
               :key="`game_${sub.game}`"
               :container="$refs.container"
@@ -212,8 +213,11 @@ import { mapGetters, mapActions } from 'vuex';
 
 export default {
   data() {
+    const focus_game = window.localStorage.getItem('focus_game');
+    window.localStorage.removeItem('focus_game');
     return {
       gameList_: [],
+      focus_game,
     };
   },
   created() {},

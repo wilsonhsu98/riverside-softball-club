@@ -533,7 +533,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import router from '../router';
 
 export default {
   data() {
@@ -635,7 +634,7 @@ export default {
       );
     },
     back_() {
-      router.back();
+      this.$router.back();
     },
     edit_() {
       // wait for tags component ready

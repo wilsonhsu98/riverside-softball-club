@@ -84,13 +84,17 @@
                         order: record.order || 'new',
                       },
                     }"
-                    :class="
-                      `content editable ${record.color} ${
-                        record.rbi ? 'rbi' : ''
-                      } ${record.r === record.name ? 'run' : ''} ${
-                        record.out ? 'out' : ''
-                      } ${record.content === 'new' ? 'new' : ''}`
-                    "
+                    :class="[
+                      'content',
+                      'editable',
+                      `${record.color}`,
+                      {
+                        rbi: record.rbi,
+                        run: record.r === record.name,
+                        out: record.out,
+                        new: record.content === 'new',
+                      },
+                    ]"
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
@@ -99,13 +103,15 @@
                   </router-link>
                   <span
                     v-else
-                    :class="
-                      `content ${record.rbi ? 'rbi' : ''} ${
-                        record.r === record.name ? 'run' : ''
-                      } ${record.out ? 'out' : ''} ${
-                        record.content === 'new' ? '' : record.color
-                      }`
-                    "
+                    :class="[
+                      'content',
+                      {
+                        rbi: record.rbi,
+                        run: record.r === record.name,
+                        out: record.out,
+                        [record.color]: record.content !== 'new',
+                      },
+                    ]"
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
@@ -185,13 +191,17 @@
                         order: record.order || 'new',
                       },
                     }"
-                    :class="
-                      `content editable ${record.color} ${
-                        record.rbi ? 'rbi' : ''
-                      } ${record.r === record.name ? 'run' : ''} ${
-                        record.out ? 'out' : ''
-                      } ${record.content === 'new' ? 'new' : ''}`
-                    "
+                    :class="[
+                      'content',
+                      'editable',
+                      `${record.color}`,
+                      {
+                        rbi: record.rbi,
+                        run: record.r === record.name,
+                        out: record.out,
+                        new: record.content === 'new',
+                      },
+                    ]"
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
@@ -200,13 +210,15 @@
                   </router-link>
                   <span
                     v-else
-                    :class="
-                      `content ${record.rbi ? 'rbi' : ''} ${
-                        record.r === record.name ? 'run' : ''
-                      } ${record.out ? 'out' : ''} ${
-                        record.content === 'new' ? '' : record.color
-                      }`
-                    "
+                    :class="[
+                      'content',
+                      {
+                        rbi: record.rbi,
+                        run: record.r === record.name,
+                        out: record.out,
+                        [record.color]: record.content !== 'new',
+                      },
+                    ]"
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
@@ -595,7 +607,6 @@ import { mapGetters, mapActions } from 'vuex';
 import html2canvas from 'html2canvas';
 import axios from 'axios';
 import config from '../../config';
-import router from '../router';
 
 export default {
   data() {
@@ -645,7 +656,7 @@ export default {
     },
     back_() {
       // router.back();
-      router.push(`/main/games/${this.$route.params.team}`);
+      this.$router.push(`/main/games/${this.$route.params.team}`);
     },
   },
   computed: {

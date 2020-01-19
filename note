@@ -11,3 +11,11 @@ n => switch node version to 10
 copy root/.env to functions
 yarn deploy
 rollback env and node version
+
+
+
+==vue widget
+https://github.com/euvl/vue-js-modal
+https://vue-select.org/
+https://vcalendar.io/changelog/v1.0.html
+https://github.com/Akryum/v-tooltip

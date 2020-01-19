@@ -521,7 +521,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import router from '../router';
 import transparentPng from '../images/transparent.png';
 
 export default {
@@ -635,7 +634,7 @@ export default {
       );
     },
     back_() {
-      router.back();
+      this.$router.back();
     },
     editTeam_() {
       // wait for tags component ready
