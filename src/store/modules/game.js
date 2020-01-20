@@ -114,6 +114,8 @@ const actions = {
         } else if (!prevId) {
           router.replace(`/main/games/${teamCode}/${newId}/edit`);
           router.push(`/main/games/${teamCode}/${newId}/order`);
+        } else {
+          router.push(`/main/games/${teamCode}/${newId}`);
         }
         commit(rootTypes.LOADING, false);
       })

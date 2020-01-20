@@ -40,6 +40,21 @@
           </div>
         </div>
 
+        <div
+          v-if="version !== 'import' && !topBottom"
+          class="field-wrapper field-wrapper-item"
+        >
+          <span>{{ $t('ttl_top_bot') }}</span>
+          <label>
+            <input type="radio" v-model="topBottom" value="top" />
+            <span>{{ $t('ttl_top') }}</span>
+          </label>
+          <label>
+            <input type="radio" v-model="topBottom" value="bot" />
+            <span>{{ $t('ttl_bot') }}</span>
+          </label>
+        </div>
+
         <div v-if="version !== 'import'" class="box">
           <div class="team">
             <div class="cell">
@@ -253,7 +268,10 @@
         </label>
       </div>
 
-      <div v-if="version !== 'import'" class="field-wrapper field-wrapper-item">
+      <div
+        v-if="version !== 'import' && (topBottom || mode !== 'edit')"
+        class="field-wrapper field-wrapper-item"
+      >
         <span>{{ $t('ttl_top_bot') }}</span>
         <label>
           <input type="radio" v-model="topBottom" value="top" />

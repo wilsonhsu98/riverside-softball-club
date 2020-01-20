@@ -123,10 +123,10 @@ const getters = {
         game
           .filter(item => Array.isArray(item.onbase))
           .reduce((acc, item) => {
-            if (item.onbase[0].run) acc += 1;
-            if (item.onbase[1].run) acc += 1;
-            if (item.onbase[2].run) acc += 1;
-            if (item.onbase[3].run) acc += 1;
+            if (item.onbase[0].result === 'run') acc += 1;
+            if (item.onbase[1].result === 'run') acc += 1;
+            if (item.onbase[2].result === 'run') acc += 1;
+            if (item.onbase[3].result === 'run') acc += 1;
             return acc;
           }, 0),
       e: (boxSummary.errors || []).reduce(
@@ -141,10 +141,10 @@ const getters = {
           acc[item.inn - 1] = (acc[item.inn - 1] || 0) + (item.r ? 1 : 0);
           if (Array.isArray(item.onbase)) {
             acc[item.inn - 1] +=
-              (item.onbase[0].run ? 1 : 0) +
-              (item.onbase[1].run ? 1 : 0) +
-              (item.onbase[2].run ? 1 : 0) +
-              (item.onbase[3].run ? 1 : 0);
+              (item.onbase[0].result === 'run' ? 1 : 0) +
+              (item.onbase[1].result === 'run' ? 1 : 0) +
+              (item.onbase[2].result === 'run' ? 1 : 0) +
+              (item.onbase[3].result === 'run' ? 1 : 0);
           }
         }
         return acc;

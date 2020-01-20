@@ -39,7 +39,9 @@ const genStatistics = (players, records, filterPA, filterGames) => {
             .map(sub => sub.onbase)
             .reduce((acc, sub) => acc.concat(sub), []);
           return {
-            r: next5.find(sub => sub && sub.name === item.name && sub.run)
+            r: next5.find(
+              sub => sub && sub.name === item.name && sub.result === 'run',
+            )
               ? item.name
               : '',
           };
@@ -239,10 +241,14 @@ const displayGame = (players, records, errors, role) => {
           .map(sub => sub.onbase)
           .reduce((acc, sub) => acc.concat(sub), []);
         return {
-          r: next5.find(sub => sub && sub.name === item.name && sub.run)
+          r: next5.find(
+            sub => sub && sub.name === item.name && sub.result === 'run',
+          )
             ? item.name
             : '',
-          out: next5.find(sub => sub && sub.name === item.name && sub.out)
+          out: next5.find(
+            sub => sub && sub.name === item.name && sub.result === 'out',
+          )
             ? true
             : false,
         };
@@ -328,7 +334,8 @@ const displayGame = (players, records, errors, role) => {
 
   if (
     (records.length && startOrder) ||
-    (startOrder === 0 && records[records.length - 1].content !== 'new')
+    (startOrder === 0 &&
+      [undefined, 'new'].indexOf(records[records.length - 1].content) === -1)
   ) {
     if (startOrder === 0) startOrder = records.length;
     let insertAt = records[records.length - startOrder];

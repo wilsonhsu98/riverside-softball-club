@@ -47,12 +47,12 @@
               <span
                 :class="[
                   'run',
-                  { select: base[b].run, disabled: base[b].disabled },
+                  {
+                    select: base[b].result === 'run',
+                    disabled: base[b].disabled,
+                  },
                 ]"
-                @click="
-                  base[b].disabled ||
-                    toggleBase(`base.${b}.run`, `base.${b}.out`)
-                "
+                @click="base[b].disabled || toggle(`base.${b}.result`, 'run')"
               >
                 {{ $t('R') }}
               </span>
@@ -62,12 +62,12 @@
               <span
                 :class="[
                   'out',
-                  { select: base[b].out, disabled: base[b].disabled },
+                  {
+                    select: base[b].result === 'out',
+                    disabled: base[b].disabled,
+                  },
                 ]"
-                @click="
-                  base[b].disabled ||
-                    toggleBase(`base.${b}.out`, `base.${b}.run`)
-                "
+                @click="base[b].disabled || toggle(`base.${b}.result`, 'out')"
               >
                 {{ $t('Out') }}
               </span>
@@ -471,30 +471,26 @@ export default {
       base: {
         home: {
           name: '',
-          run: false,
-          out: false,
+          result: '',
           disabled: true,
         },
         first: {
           name: '',
-          run: false,
-          out: false,
+          result: '',
           disabled: true,
         },
         second: {
           name: '',
-          run: false,
-          out: false,
+          result: '',
           disabled: true,
         },
         third: {
           name: '',
-          run: false,
-          out: false,
+          result: '',
           disabled: true,
         },
       },
-      content: '',
+      content: undefined,
       rbi: {
         value: '',
         one: { disabled: true },
@@ -548,10 +544,6 @@ export default {
         }
       }
     },
-    toggleBase(path1, path2) {
-      this.toggle(path1);
-      this.toggle(path2, false);
-    },
     back_() {
       // router.back();
       this.$router.push(
@@ -584,8 +576,7 @@ export default {
           if (this.base[b].name) {
             onbase[i] = {
               name: this.base[b].name,
-              run: this.base[b].run,
-              out: this.base[b].out,
+              result: this.base[b].result,
             };
           }
         });
@@ -645,8 +636,7 @@ export default {
         ['home', 'first', 'second', 'third'].forEach((b, i) => {
           if (Array.isArray(this.pa.onbase) && this.pa.onbase[i]) {
             this.base[b].name = this.pa.onbase[i].name;
-            this.base[b].run = this.pa.onbase[i].run || false;
-            this.base[b].out = this.pa.onbase[i].out || false;
+            this.base[b].result = this.pa.onbase[i].result || '';
           }
         });
       } else {
@@ -664,7 +654,7 @@ export default {
           .filter(item => item.inn === this.inn)
           .map(sub => sub.onbase)
           .reduce((acc, sub) => acc.concat(sub), [])
-          .filter(item => item.out === true);
+          .filter(item => item.result === 'out');
         if (out.length === 3) {
           this.inn += 1;
         }
@@ -711,7 +701,7 @@ export default {
               .filter(item => item.inn === this.inn)
               .map(sub => sub.onbase)
               .reduce((acc, sub) => acc.concat(sub), [])
-              .filter(item => item.run === true || item.out === true);
+              .filter(item => item.result !== '');
             return prev5.find(sub => sub && sub.name === item.name)
               ? false
               : true;
@@ -831,15 +821,17 @@ export default {
     teamInfo() {
       this.setPa();
     },
-    content() {
-      this.rbi.one.disabled = true;
-      this.rbi.two.disabled = true;
-      this.rbi.three.disabled = true;
-      this.rbi.four.disabled = true;
-      this.altRun.disabled = true;
-      this.run.disabled = true;
-      this.rbi.value = '';
-      this.base.home.run = false;
+    content(newVal, oldVal) {
+      if (oldVal && newVal) {
+        this.rbi.one.disabled = true;
+        this.rbi.two.disabled = true;
+        this.rbi.three.disabled = true;
+        this.rbi.four.disabled = true;
+        this.altRun.disabled = true;
+        this.run.disabled = true;
+        this.base.home.result = '';
+        this.rbi.value = '';
+      }
       if (this.content) {
         this.base.home.disabled = false;
         this.base.first.disabled = false;
@@ -867,13 +859,10 @@ export default {
           this.altRun.disabled = true;
           this.altRun.name = '';
           this.run.value = true;
-          this.base.home.run = true;
+          this.base.home.result = 'run';
         }
         if (['K', 'FO', 'GO', 'DP', 'TP', 'SF'].includes(this.content)) {
-          this.base.home.out = true;
-          this.base.home.run = false;
-        } else {
-          this.base.home.out = false;
+          this.base.home.result = 'out';
         }
         if (this.content === 'SF') {
           this.rbi.value = 1;
