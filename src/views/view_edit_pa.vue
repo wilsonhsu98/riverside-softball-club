@@ -18,7 +18,7 @@
           </div>
           <div>{{ $t('desc_order', { n: order }) }}</div>
           <div>
-            <template v-if="version === 'import'">
+            <template>
               {{
                 $t(version === 'import' ? 'desc_might_out' : 'desc_out', {
                   n: out,
@@ -81,7 +81,7 @@
             }}</span>
             <span
               :class="['run', { select: run.value, disabled: run.disabled }]"
-              @click="run.disabled || toggle('run.value', true)"
+              @click="run.disabled || toggle('run.value')"
               >{{ $t('R') }}</span
             >
             <span
@@ -650,14 +650,6 @@ export default {
         ];
 
         this.inn = last.inn || 1;
-        const out = this.boxSummary.contents
-          .filter(item => item.inn === this.inn)
-          .map(sub => sub.onbase)
-          .reduce((acc, sub) => acc.concat(sub), [])
-          .filter(item => item.result === 'out');
-        if (out.length === 3) {
-          this.inn += 1;
-        }
         if (!isNaN(parseInt(this.$route.params.order, 10))) {
           this.order = parseInt(this.$route.params.order, 10);
           this.base.home.name = this.name = (
@@ -669,6 +661,16 @@ export default {
             this.base.home.name = this.name = estimate.r || estimate.name;
           }
         }
+      }
+      const out = this.boxSummary.contents
+        .slice(Math.max(this.order - 6, 0), this.order - 1)
+        .filter(item => item.inn === this.inn)
+        .map(sub => sub.onbase)
+        .reduce((acc, sub) => acc.concat(sub), [])
+        .filter(item => item && item.result === 'out');
+      this.out = out.length;
+      if (out.length === 3) {
+        this.inn += 1;
       }
 
       if (Array.isArray(this.box[0])) {
@@ -701,7 +703,7 @@ export default {
               .filter(item => item.inn === this.inn)
               .map(sub => sub.onbase)
               .reduce((acc, sub) => acc.concat(sub), [])
-              .filter(item => item.result !== '');
+              .filter(item => item && item.result !== '');
             return prev5.find(sub => sub && sub.name === item.name)
               ? false
               : true;
