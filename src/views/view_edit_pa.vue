@@ -77,7 +77,7 @@
         <div class="content">
           <div v-if="version === 'import'">
             <span class="gray" @click="changePlayer('batter')">{{
-              $t('desc_batter', { name })
+              $t('desc_batter', { name: base.home.name })
             }}</span>
             <span
               :class="['run', { select: run.value, disabled: run.disabled }]"
@@ -565,7 +565,7 @@ export default {
         })();
         const r = (() => {
           if (!this.run.disabled && this.run.value) {
-            return this.name;
+            return this.base.home.name;
           } else if (!this.altRun.disabled && this.altRun.name) {
             return this.altRun.name;
           }
@@ -600,7 +600,7 @@ export default {
           {
             inn: this.inn,
             order: this.order,
-            name: this.name,
+            name: this.base.home.name, // this.name,
             content: this.content,
             rbi,
             ...(this.version === 'import' && { r }),
@@ -671,6 +671,7 @@ export default {
       this.out = out.length;
       if (out.length === 3) {
         this.inn += 1;
+        this.out = 0;
       }
 
       if (Array.isArray(this.box[0])) {
@@ -692,29 +693,10 @@ export default {
 
         const startPlayers = this.box.slice(1).map(player => player.name);
         this.benchPlayers = this.teamInfo.players.filter(
-          player => player.name && !startPlayers.includes(player.name),
+          player =>
+            (player.name && !startPlayers.includes(player.name)) ||
+            player.name === this.name,
         );
-
-        this.prev5Players = this.boxSummary.contents
-          .slice(Math.max(this.order - 6, 0), this.order - 1)
-          .filter(item => {
-            const prev5 = this.boxSummary.contents
-              .slice(Math.max(this.order - 6, 0), this.order - 1)
-              .filter(item => item.inn === this.inn)
-              .map(sub => sub.onbase)
-              .reduce((acc, sub) => acc.concat(sub), [])
-              .filter(item => item && item.result !== '');
-            return prev5.find(sub => sub && sub.name === item.name)
-              ? false
-              : true;
-          })
-          .map(
-            player =>
-              this.teamInfo.players.find(p => p.name === player.name) || {
-                name: player.name,
-              },
-          )
-          .reverse();
       }
     },
     checkReJoin(sameOrderPlayers) {
@@ -733,14 +715,39 @@ export default {
       }, undefined);
     },
     changePlayer(mode) {
-      this.$modal.show('player');
+      this.prev5Players = this.boxSummary.contents
+        .slice(Math.max(this.order - 6, 0), this.order - 1)
+        .filter(item => item.inn === this.inn)
+        .filter(item => {
+          const prev5 = this.boxSummary.contents
+            .slice(Math.max(this.order - 6, 0), this.order - 1)
+            .filter(item => item.inn === this.inn)
+            .map(sub => sub.onbase)
+            .reduce((acc, sub) => acc.concat(sub), [])
+            .filter(item => item && item.result !== '' && item.name)
+            .concat([
+              { name: this.base.first.name },
+              { name: this.base.second.name },
+              { name: this.base.third.name },
+            ]);
+          return prev5.find(sub => sub && sub.name === item.name)
+            ? false
+            : true;
+        })
+        .map(
+          player =>
+            this.teamInfo.players.find(p => p.name === player.name) || {
+              name: player.name,
+            },
+        )
+        .reverse();
       this.changeMode = mode;
       switch (mode) {
         case 'batter':
         case 'home':
           this.currentPlayer = this.teamInfo.players.find(
-            player => player.name && player.name === this.name,
-          ) || { name: this.name };
+            player => player.name && player.name === this.base.home.name,
+          ) || { name: this.base.home.name };
           break;
         case 'runner':
           this.currentPlayer = this.altRun.name
@@ -761,12 +768,13 @@ export default {
             : '';
           break;
       }
+      this.$modal.show('player');
     },
     selectPlayer(player) {
       switch (this.changeMode) {
         case 'batter':
         case 'home':
-          this.base.home.name = this.name = player.name;
+          this.base.home.name = player.name;
           break;
         case 'runner':
           this.altRun.name = player.name;

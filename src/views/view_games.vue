@@ -14,7 +14,7 @@
               trigger="click"
               offset="0"
               class="cell"
-              delay="300"
+              delay="100"
               :popoverClass="`box-tip ${sub.result}`"
               :open="sub.game === focus_game"
               :autoHide="true"

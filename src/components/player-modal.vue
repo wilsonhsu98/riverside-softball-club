@@ -19,7 +19,10 @@
             ></i>
           </div>
         </div>
-        <div v-if="second" class="label-container single">
+        <div
+          v-if="second && second.name !== (current || {}).name"
+          class="label-container single"
+        >
           <label>{{ second_label }}</label>
           <player :player="second" @click="select_" />
         </div>
@@ -32,7 +35,9 @@
         <label>{{ third_label }}</label>
         <div class="player-list-container">
           <player
-            v-for="player in third"
+            v-for="player in third.filter(
+              player => player.name !== (current || {}).name,
+            )"
             :key="player.name"
             :player="player"
             @click="select_"
@@ -46,7 +51,9 @@
         <label>{{ fourth_label }}</label>
         <div class="player-list-container">
           <player
-            v-for="player in fourth"
+            v-for="player in fourth.filter(
+              player => player.name !== (current || {}).name,
+            )"
             :key="player.name"
             :player="player"
             @click="select_"
@@ -215,14 +222,18 @@
 
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .modal-wrapper::v-deep .v--modal-box {
-    height: calc(100vh - 120px) !important;
+    position: fixed;
     top: 60px !important;
+    bottom: 60px !important;
+    height: auto !important;
   }
 }
 @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
   .modal-wrapper::v-deep .v--modal-box {
-    height: calc(100vh - 40px) !important;
+    position: fixed;
     top: 20px !important;
+    bottom: 20px !important;
+    height: auto !important;
   }
 }
 </style>
