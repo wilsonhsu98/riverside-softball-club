@@ -10,8 +10,8 @@
   position: relative;
 }
 canvas {
-  width: 500px;
-  height: 500px;
+  width: 400px;
+  height: 400px;
   &[disabled] {
     cursor: not-allowed;
   }
@@ -20,8 +20,8 @@ img {
   position: absolute;
   top: 0;
   left: 0;
-  width: 500px;
-  height: 500px;
+  width: 400px;
+  height: 400px;
 }
 @media only screen and (max-width: 760px) {
   canvas,

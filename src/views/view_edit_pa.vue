@@ -10,7 +10,10 @@
       <h1>
         {{ $route.params.order === 'new' ? $t('add_pa') : $t('edit_pa') }}
       </h1>
-      <div :class="[{ left: version !== 'import' }]">
+      <div v-if="version === 'import'" class="single">
+        <div class="separater">
+          <label>{{ $t('ttl_current_pa') }}</label>
+        </div>
         <div class="desc">
           <div>
             <minus-plus-number :value="inn" @change="setInn" />
@@ -37,45 +40,11 @@
             }}
           </div>
         </div>
-        <infield v-if="version !== 'import'" class="infield">
-          <div class="player-container">
-            <div
-              :class="['on-base-player', b]"
-              v-for="(b, bi) in ['first', 'second', 'third', 'home']"
-              :key="`onbase_${bi}`"
-            >
-              <span
-                :class="[
-                  'run',
-                  {
-                    select: base[b].result === 'run',
-                    disabled: base[b].disabled,
-                  },
-                ]"
-                @click="base[b].disabled || toggle(`base.${b}.result`, 'run')"
-              >
-                {{ $t('R') }}
-              </span>
-              <span class="name" @click="changePlayer(b)">
-                {{ base[b].name }}
-              </span>
-              <span
-                :class="[
-                  'out',
-                  {
-                    select: base[b].result === 'out',
-                    disabled: base[b].disabled,
-                  },
-                ]"
-                @click="base[b].disabled || toggle(`base.${b}.result`, 'out')"
-              >
-                {{ $t('Out') }}
-              </span>
-            </div>
-          </div>
-        </infield>
+        <div class="separater">
+          <label>{{ $t('desc_step_2') }}</label>
+        </div>
         <div class="content">
-          <div v-if="version === 'import'">
+          <div>
             <span class="gray" @click="changePlayer('batter')">{{
               $t('desc_batter', { name: base.home.name })
             }}</span>
@@ -179,15 +148,418 @@
           </div>
         </div>
       </div>
-      <div v-if="version !== 'import'" class="right">
-        <div class="coordination">
-          <coordination
-            :values="location"
-            :disabled="['BB', 'K', ''].includes(content)"
-            @change="val => (location = [].concat(val))"
-          />
-        </div>
-      </div>
+      <template v-else>
+        <template v-if="pa">
+          <div class="left">
+            <div class="separater">
+              <label>{{ $t('ttl_current_pa') }}</label>
+            </div>
+            <div class="desc">
+              <div>
+                <minus-plus-number :value="inn" @change="setInn" />
+                {{ $t('desc_inn') }}
+              </div>
+              <div>{{ $t('desc_order', { n: order }) }}</div>
+              <div>
+                <template>
+                  {{
+                    $t('desc_out', {
+                      n: out,
+                    })
+                  }}
+                </template>
+              </div>
+              <div>
+                {{
+                  $t('desc_batting', {
+                    n: box.length
+                      ? order % box[box.length - 1].order ||
+                        box[box.length - 1].order
+                      : '',
+                  })
+                }}
+              </div>
+            </div>
+            <div class="separater">
+              <label>{{ $t('ttl_onbase') }}</label>
+            </div>
+            <infield class="infield">
+              <div class="player-container">
+                <div
+                  :class="['on-base-player', b]"
+                  v-for="(b, bi) in ['first', 'second', 'third', 'home']"
+                  :key="`onbase_${bi}`"
+                >
+                  <span
+                    :class="[
+                      'run',
+                      {
+                        select: base[b].result === 'run',
+                        disabled: base[b].disabled,
+                      },
+                    ]"
+                    @click="
+                      base[b].disabled || toggle(`base.${b}.result`, 'run')
+                    "
+                  >
+                    {{ $t('R') }}
+                  </span>
+                  <span class="name" @click="changePlayer(b)">
+                    {{ base[b].name }}
+                  </span>
+                  <span
+                    :class="[
+                      'out',
+                      {
+                        select: base[b].result === 'out',
+                        disabled: base[b].disabled,
+                      },
+                    ]"
+                    @click="
+                      base[b].disabled || toggle(`base.${b}.result`, 'out')
+                    "
+                  >
+                    {{ $t('Out') }}
+                  </span>
+                </div>
+              </div>
+            </infield>
+            <div class="separater">
+              <label>{{ $t('ttl_content') }}</label>
+            </div>
+            <div class="content">
+              <div>
+                <span
+                  :key="`item_${item}`"
+                  v-for="item in ['1H', '2H', '3H', 'HR']"
+                  :class="['red', { select: content === item }]"
+                  @click="toggle('content', item)"
+                >
+                  {{ $t(item) }}
+                </span>
+                <span
+                  :class="[
+                    'rbi',
+                    { select: rbi.value === 1, disabled: rbi.one.disabled },
+                  ]"
+                  @click="rbi.one.disabled || toggle('rbi.value', 1)"
+                >
+                  {{ $t('RBI_count', { rbi: 1 }) }}
+                </span>
+              </div>
+              <div>
+                <span
+                  :key="`item_${item}`"
+                  v-for="item in ['K', 'FO', 'GO', 'E']"
+                  :class="['blue', { select: content === item }]"
+                  @click="toggle('content', item)"
+                >
+                  {{ $t(item) }}
+                </span>
+                <span
+                  :class="[
+                    'rbi',
+                    { select: rbi.value === 2, disabled: rbi.two.disabled },
+                  ]"
+                  @click="rbi.two.disabled || toggle('rbi.value', 2)"
+                >
+                  {{ $t('RBI_count', { rbi: 2 }) }}
+                </span>
+              </div>
+              <div>
+                <span
+                  :key="`item_${item}`"
+                  v-for="item in ['FC', 'DP', 'TP']"
+                  :class="['blue', { select: content === item }]"
+                  @click="toggle('content', item)"
+                >
+                  {{ $t(item) }}
+                </span>
+                <span style="cursor: auto;"></span>
+                <span
+                  :class="[
+                    'rbi',
+                    { select: rbi.value === 3, disabled: rbi.three.disabled },
+                  ]"
+                  @click="rbi.three.disabled || toggle('rbi.value', 3)"
+                >
+                  {{ $t('RBI_count', { rbi: 3 }) }}
+                </span>
+              </div>
+              <div>
+                <span
+                  :key="`item_${item}`"
+                  v-for="item in ['BB', 'SF']"
+                  :class="['yellow', { select: content === item }]"
+                  @click="toggle('content', item)"
+                >
+                  {{ $t(item) }}
+                </span>
+                <span style="cursor: auto;"></span>
+                <span style="cursor: auto;"></span>
+                <span
+                  :class="[
+                    'rbi',
+                    { select: rbi.value === 4, disabled: rbi.four.disabled },
+                  ]"
+                  @click="rbi.four.disabled || toggle('rbi.value', 4)"
+                >
+                  {{ $t('RBI_count', { rbi: 4 }) }}
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="right">
+            <div class="separater">
+              <label>{{ $t('ttl_location') }}</label>
+            </div>
+            <div class="coordination">
+              <coordination
+                :values="location"
+                :disabled="['BB', 'K', ''].includes(content)"
+                @change="val => (location = [].concat(val))"
+              />
+            </div>
+          </div>
+        </template>
+        <template v-else>
+          <div class="single">
+            <div class="separater">
+              <label>{{ $t('ttl_current_pa') }}</label>
+            </div>
+            <div class="desc">
+              <div>
+                <minus-plus-number :value="inn" @change="setInn" />
+                {{ $t('desc_inn') }}
+              </div>
+              <div>{{ $t('desc_order', { n: order }) }}</div>
+              <div>
+                <template>
+                  {{
+                    $t('desc_out', {
+                      n: out,
+                    })
+                  }}
+                </template>
+              </div>
+              <div>
+                {{
+                  $t('desc_batting', {
+                    n: box.length
+                      ? order % box[box.length - 1].order ||
+                        box[box.length - 1].order
+                      : '',
+                  })
+                }}
+              </div>
+            </div>
+            <div class="separater">
+              <label>{{ $t('ttl_step') }}</label>
+            </div>
+            <div class="step-bar">
+              <span
+                v-for="i in [1, 2, 3, 4]"
+                :key="`step${i}`"
+                :class="{ current: step === i }"
+                :data-step="i"
+                @click="step = i"
+                >{{ $t(`desc_step_${i}`) }}</span
+              >
+            </div>
+            <div v-if="step === 1">
+              <infield class="infield">
+                <div class="player-container">
+                  <div
+                    :class="['on-base-player', 'only', b]"
+                    v-for="(b, bi) in ['first', 'second', 'third', 'home']"
+                    :key="`onbase_${bi}`"
+                  >
+                    <span
+                      :class="[
+                        'name',
+                        { disabled: !(prev5Players.length || base[b].name) },
+                      ]"
+                      @click="
+                        (prev5Players.length || base[b].name) && changePlayer(b)
+                      "
+                    >
+                      {{ base[b].name }}
+                    </span>
+                  </div>
+                  <button
+                    v-if="prev5Players.length === 0"
+                    class="btn"
+                    @click="step = 2"
+                  >
+                    {{ $t('btn_next') }}
+                  </button>
+                </div>
+              </infield>
+              <div v-if="prev5Players.length" style="margin-top: -10px;">
+                {{
+                  $t('desc_possible_players', {
+                    players: prev5Players.map(player => player.name).join(', '),
+                  })
+                }}
+              </div>
+            </div>
+            <div v-if="step === 2">
+              <div class="content wide">
+                <div>
+                  <span
+                    :key="`item_${item}`"
+                    v-for="item in ['1H', '2H', '3H', 'HR']"
+                    :class="['red', { select: content === item }]"
+                    @click="toggle('content', item)"
+                  >
+                    {{ $t(item) }}
+                  </span>
+                </div>
+                <div>
+                  <span
+                    :key="`item_${item}`"
+                    v-for="item in ['K', 'FO', 'GO', 'E']"
+                    :class="['blue', { select: content === item }]"
+                    @click="toggle('content', item)"
+                  >
+                    {{ $t(item) }}
+                  </span>
+                </div>
+                <div>
+                  <span
+                    :key="`item_${item}`"
+                    v-for="item in ['FC', 'DP', 'TP']"
+                    :class="['blue', { select: content === item }]"
+                    @click="toggle('content', item)"
+                  >
+                    {{ $t(item) }}
+                  </span>
+                  <span style="cursor: auto;"></span>
+                </div>
+                <div>
+                  <span
+                    :key="`item_${item}`"
+                    v-for="item in ['BB', 'SF']"
+                    :class="['yellow', { select: content === item }]"
+                    @click="toggle('content', item)"
+                  >
+                    {{ $t(item) }}
+                  </span>
+                  <span style="cursor: auto;"></span>
+                  <span style="cursor: auto;"></span>
+                </div>
+              </div>
+            </div>
+            <div v-if="step === 3" class="coordination-step">
+              <div class="coordination">
+                <coordination
+                  :values="location"
+                  :disabled="['BB', 'K', ''].includes(content)"
+                  @change="val => (location = [].concat(val))"
+                />
+              </div>
+            </div>
+            <div v-if="step === 4">
+              <infield class="infield">
+                <div class="player-container">
+                  <div
+                    :class="['on-base-player', b]"
+                    v-for="(b, bi) in ['first', 'second', 'third', 'home']"
+                    :key="`onbase_${bi}`"
+                  >
+                    <span
+                      :class="[
+                        'run',
+                        {
+                          select: base[b].result === 'run',
+                          disabled:
+                            base[b].disabled ||
+                            !(prev5Players.length || base[b].name),
+                        },
+                      ]"
+                      @click="
+                        base[b].disabled || toggle(`base.${b}.result`, 'run')
+                      "
+                    >
+                      {{ $t('R') }}
+                    </span>
+                    <span
+                      :class="[
+                        'name',
+                        { disabled: !(prev5Players.length || base[b].name) },
+                      ]"
+                      @click="
+                        (prev5Players.length || base[b].name) && changePlayer(b)
+                      "
+                    >
+                      {{ base[b].name }}
+                    </span>
+                    <span
+                      :class="[
+                        'out',
+                        {
+                          select: base[b].result === 'out',
+                          disabled:
+                            base[b].disabled ||
+                            !(prev5Players.length || base[b].name),
+                        },
+                      ]"
+                      @click="
+                        base[b].disabled || toggle(`base.${b}.result`, 'out')
+                      "
+                    >
+                      {{ $t('Out') }}
+                    </span>
+                  </div>
+                </div>
+              </infield>
+              <div class="separater">
+                <label>{{ $t('RBI') }}</label>
+              </div>
+              <div class="content wide">
+                <div>
+                  <span
+                    :class="[
+                      'rbi',
+                      { select: rbi.value === 1, disabled: rbi.one.disabled },
+                    ]"
+                    @click="rbi.one.disabled || toggle('rbi.value', 1)"
+                  >
+                    {{ $t('RBI_count', { rbi: 1 }) }}
+                  </span>
+                  <span
+                    :class="[
+                      'rbi',
+                      { select: rbi.value === 2, disabled: rbi.two.disabled },
+                    ]"
+                    @click="rbi.two.disabled || toggle('rbi.value', 2)"
+                  >
+                    {{ $t('RBI_count', { rbi: 2 }) }}
+                  </span>
+                  <span
+                    :class="[
+                      'rbi',
+                      { select: rbi.value === 3, disabled: rbi.three.disabled },
+                    ]"
+                    @click="rbi.three.disabled || toggle('rbi.value', 3)"
+                  >
+                    {{ $t('RBI_count', { rbi: 3 }) }}
+                  </span>
+                  <span
+                    :class="[
+                      'rbi',
+                      { select: rbi.value === 4, disabled: rbi.four.disabled },
+                    ]"
+                    @click="rbi.four.disabled || toggle('rbi.value', 4)"
+                  >
+                    {{ $t('RBI_count', { rbi: 4 }) }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </template>
+      </template>
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
         <button class="btn" @click="edit_" :disabled="content ? false : true">
@@ -225,7 +597,6 @@
   align-content: flex-start;
   h1 {
     flex-basis: 100%;
-    margin-bottom: 15px;
   }
   .desc {
     width: 300px;
@@ -233,6 +604,7 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    margin: 0 auto;
     > div {
       display: inline-block;
       line-height: 30px;
@@ -247,9 +619,67 @@
       }
     }
   }
+  .step-bar {
+    display: flex;
+    justify-content: space-around;
+    margin: 0 auto 10px;
+    > span {
+      text-align: center;
+      color: $row_color;
+      font-size: 14px;
+      position: relative;
+      flex: 1;
+      &.current {
+        color: $active_bgcolor;
+        &:before {
+          border-color: $active_bgcolor;
+        }
+        ~ span {
+          color: $input_font;
+
+          &:before {
+            border-color: $input_font;
+          }
+          &:after {
+            background-color: $input_font;
+          }
+        }
+      }
+      &:before {
+        content: attr(data-step);
+        display: block;
+        margin: 0 auto 10px;
+        width: 20px;
+        line-height: 16px;
+        height: 20px;
+        border: 2px solid $row_color;
+        box-sizing: border-box;
+        border-radius: 50%;
+        font-size: 16px;
+        background-color: #fff;
+      }
+      &:after {
+        content: '';
+        display: block;
+        height: 2px;
+        background-color: $row_color;
+        position: absolute;
+        top: 9px;
+        width: 100%;
+        right: 50%;
+        z-index: -1;
+      }
+      &:first-child:after {
+        content: none;
+      }
+    }
+  }
+  .coordination-step {
+    height: 400px;
+  }
   .infield {
     display: block;
-    margin-bottom: 20px;
+    margin: 0 auto;
     .player-container {
       position: absolute;
       top: 0;
@@ -268,7 +698,7 @@
           line-height: 28px;
           height: 34px;
           border: 3px solid transparent;
-          background-color: rgba(248, 248, 248, 0.5);
+          background-color: rgba(248, 248, 248, 0.6);
           box-sizing: border-box;
           cursor: pointer;
           &.run {
@@ -325,20 +755,29 @@
           left: 50%;
           transform: translateX(-50%);
         }
+        &.only > span {
+          border-radius: 5px;
+        }
+      }
+      .btn {
+        position: absolute;
+        top: 66px;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        display: block;
       }
     }
   }
   .content {
-    margin: 20px 0;
+    margin: 0;
     display: block;
-    width: 300px;
     div {
       display: flex;
       justify-content: center;
       margin-bottom: 3px;
     }
     span {
-      // color: #fff;
       text-align: center;
       white-space: nowrap;
       overflow: hidden;
@@ -392,14 +831,14 @@
           background-color: $run;
         }
         &.alt {
-          width: 117px;
+          width: 123px;
           &.select {
             font-size: 12px;
           }
         }
       }
       &.gray {
-        width: 117px;
+        width: 123px;
         color: $gray;
         border: 3px solid $gray;
         &.select {
@@ -412,25 +851,66 @@
         cursor: not-allowed;
       }
     }
+    &.wide span {
+      width: 72px;
+    }
   }
   .coordination {
     margin: 0;
     text-align: center;
   }
-  .left {
-    margin-right: 20px;
+  .left,
+  .right {
+    margin: 0 auto;
+    width: 400px;
+  }
+  .single {
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .separater {
+    border: 1px solid $input_border;
+    border-width: 1px 0 0;
+    margin: 20px auto 0;
+    padding-bottom: 15px;
+    position: relative;
+    > label {
+      position: absolute;
+      background-color: #fff;
+      color: $input_font;
+      font-size: 12px;
+      top: -7px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0 4px;
+      line-height: 14px;
+    }
   }
 }
 
 @media only screen and (max-width: 760px) {
   .container {
-    /* background-color: transparent; */
+    .step-bar {
+      width: 100%;
+    }
+    .coordination-step {
+      height: 300px;
+    }
     .content {
+      width: 100%;
+      &.wide span {
+        width: calc((100vw - 50px - 9px) / 4);
+      }
       span {
         font-size: 12px;
       }
     }
     .infield {
+      margin: 0;
+      left: 50%;
+      transform: translateX(-50%);
+
       .player-container {
         .on-base-player {
           > span {
@@ -439,11 +919,18 @@
         }
       }
     }
+
+    .single .coordination {
+      margin: 0;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+    }
     .btn-container {
       display: none;
     }
     .left {
-      margin-right: 0;
+      /* margin-right: 0; */
     }
   }
 }
@@ -504,6 +991,7 @@ export default {
       reJoinPlayer: undefined,
       prev5Players: [],
       benchPlayers: [],
+      step: 1,
     };
   },
   created() {
@@ -697,6 +1185,8 @@ export default {
             (player.name && !startPlayers.includes(player.name)) ||
             player.name === this.name,
         );
+
+        this.checkPrev5();
       }
     },
     checkReJoin(sameOrderPlayers) {
@@ -714,7 +1204,7 @@ export default {
         if (i === 0 && acc === undefined) return true;
       }, undefined);
     },
-    changePlayer(mode) {
+    checkPrev5() {
       this.prev5Players = this.boxSummary.contents
         .slice(Math.max(this.order - 6, 0), this.order - 1)
         .filter(item => item.inn === this.inn)
@@ -739,8 +1229,10 @@ export default {
             this.teamInfo.players.find(p => p.name === player.name) || {
               name: player.name,
             },
-        )
-        .reverse();
+        );
+      // .reverse();
+    },
+    changePlayer(mode) {
       this.changeMode = mode;
       switch (mode) {
         case 'batter':
@@ -787,6 +1279,10 @@ export default {
       }
       this.$modal.hide('player');
       this.changeMode = '';
+      this.checkPrev5();
+      if (this.prev5Players.length === 0) {
+        this.step = 2;
+      }
     },
     clearPlayer() {
       switch (this.changeMode) {
@@ -800,6 +1296,7 @@ export default {
           break;
       }
       this.$modal.hide('player');
+      this.checkPrev5();
     },
   },
   watch: {
@@ -877,12 +1374,20 @@ export default {
         if (this.content === 'SF') {
           this.rbi.value = 1;
         }
+        if (['BB', 'K'].includes(this.content)) {
+          this.step = 4;
+        } else {
+          this.step = 3;
+        }
       } else {
         this.base.home.disabled = true;
         this.base.first.disabled = true;
         this.base.second.disabled = true;
         this.base.third.disabled = true;
       }
+    },
+    location() {
+      this.step = 4;
     },
     run: {
       handler() {
