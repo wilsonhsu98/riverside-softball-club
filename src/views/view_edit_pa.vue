@@ -395,7 +395,10 @@
                   </button>
                 </div>
               </infield>
-              <div v-if="prev5Players.length" style="margin-top: -10px;">
+              <div
+                v-if="prev5Players.length"
+                style="margin-top: 5px; text-align: center;"
+              >
                 {{
                   $t('desc_possible_players', {
                     players: prev5Players.map(player => player.name).join(', '),
