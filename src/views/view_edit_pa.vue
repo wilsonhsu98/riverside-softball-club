@@ -607,18 +607,18 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
-    margin: 0 auto;
+    margin: 0;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
     > div {
       display: inline-block;
       line-height: 30px;
       height: 30px;
       vertical-align: middle;
+      width: 125px;
       &:nth-child(odd) {
         text-align: right;
-        width: 140px;
-      }
-      &:nth-child(even) {
-        width: 120px;
       }
     }
   }
