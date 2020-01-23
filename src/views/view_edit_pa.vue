@@ -481,7 +481,9 @@
                         },
                       ]"
                       @click="
-                        base[b].disabled || toggle(`base.${b}.result`, 'run')
+                        base[b].disabled ||
+                          !(prev5Players.length || base[b].name) ||
+                          toggle(`base.${b}.result`, 'run')
                       "
                     >
                       {{ $t('R') }}
@@ -508,7 +510,9 @@
                         },
                       ]"
                       @click="
-                        base[b].disabled || toggle(`base.${b}.result`, 'out')
+                        base[b].disabled ||
+                          !(prev5Players.length || base[b].name) ||
+                          toggle(`base.${b}.result`, 'out')
                       "
                     >
                       {{ $t('Out') }}
@@ -1153,7 +1157,7 @@ export default {
         }
       }
       const out = this.boxSummary.contents
-        .slice(Math.max(this.order - 6, 0), this.order - 1)
+        .slice(0, this.order - 1)
         .filter(item => item.inn === this.inn)
         .map(sub => sub.onbase)
         .reduce((acc, sub) => acc.concat(sub), [])
