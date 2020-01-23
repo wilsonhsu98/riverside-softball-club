@@ -831,6 +831,7 @@
         }
         &.alt {
           width: 123px;
+          max-width: unset;
           &.select {
             font-size: 12px;
           }
@@ -838,6 +839,7 @@
       }
       &.gray {
         width: 123px;
+        max-width: unset;
         color: $gray;
         border: 3px solid $gray;
         &.select {
