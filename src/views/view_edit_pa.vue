@@ -831,7 +831,6 @@
         }
         &.alt {
           width: 123px;
-          max-width: unset;
           &.select {
             font-size: 12px;
           }
@@ -839,7 +838,6 @@
       }
       &.gray {
         width: 123px;
-        max-width: unset;
         color: $gray;
         border: 3px solid $gray;
         &.select {
@@ -908,6 +906,11 @@
         font-size: 12px;
         width: calc((100vw - 30px - 12px) / 5);
         max-width: 58px;
+        &.gray,
+        &.run.alt {
+          width: calc((100vw - 30px - 6px) / 5 * 2);
+          max-width: 119px;
+        }
       }
     }
     .infield {
