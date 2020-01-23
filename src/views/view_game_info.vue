@@ -492,17 +492,6 @@
     text-align: center;
     padding: 4px 0 4px 4px;
     position: relative;
-    > span {
-      color: $input_font;
-      background-color: #fff;
-      font-size: $input_font_size - 2;
-      position: absolute;
-      top: -$input_font_size / 2;
-      left: 8px;
-      z-index: 1;
-      padding: 0 4px;
-      line-height: 14px;
-    }
     .team {
       border: 2px solid transparent;
       text-align: left;

@@ -14,7 +14,7 @@
               trigger="click"
               offset="0"
               class="cell"
-              delay="100"
+              :delay="{ show: 100, hide: 0 }"
               :popoverClass="`box-tip ${sub.result}`"
               :open="sub.game === focus_game"
               :autoHide="true"
@@ -29,20 +29,80 @@
                 <div class="name">{{ sub.opponent || sub.game }}</div>
               </div>
               <template slot="popover">
-                <div v-if="sub.league && sub.group">
-                  {{ `${sub.league} ${$t('box_group', { g: sub.group })}` }}
-                  <template v-if="sub.year && sub.season">
-                    {{ `(${sub.year} ${sub.season})` }}
-                  </template>
-                  <div>{{ sub.game }}</div>
-                  <div>
-                    {{
-                      sub.opponent
-                        ? $t('box_opponent', { opponent: sub.opponent })
-                        : $t('box_forgot_opponent')
-                    }}
+                <div v-if="version !== 'import' && topBottom" class="box">
+                  <div class="team">
+                    <div class="cell">&nbsp;</div>
+                    <div class="cell">
+                      {{ topBottom === 'top' ? useTeam : opponent }}
+                    </div>
+                    <div class="cell">
+                      {{ topBottom === 'bot' ? useTeam : opponent }}
+                    </div>
+                  </div>
+                  <div class="gap"></div>
+                  <div
+                    v-for="(undefined, index) in Array.apply(null, Array(inn))"
+                    :key="index"
+                    class="inn"
+                  >
+                    <div>{{ index + 1 }}</div>
+                    <div class="cell" v-if="topBottom === 'top'">
+                      {{
+                        scores[index] !== undefined ? scores[index] : '&nbsp;'
+                      }}
+                    </div>
+                    <div class="cell">
+                      {{
+                        opponentScores[index] !== undefined
+                          ? opponentScores[index]
+                          : '&nbsp;'
+                      }}
+                    </div>
+                    <div class="cell" v-if="topBottom === 'bot'">
+                      {{
+                        scores[index] !== undefined ? scores[index] : '&nbsp;'
+                      }}
+                    </div>
+                  </div>
+                  <div class="inn">
+                    <div class="cell">R</div>
+                    <div class="cell" v-if="topBottom === 'top'">
+                      {{ score }}
+                    </div>
+                    <div class="cell">
+                      {{ opponentScore }}
+                    </div>
+                    <div class="cell" v-if="topBottom === 'bot'">
+                      {{ score }}
+                    </div>
+                  </div>
+                  <div class="inn">
+                    <div class="cell">H</div>
+                    <div class="cell" v-if="topBottom === 'top'">
+                      {{ hit }}
+                    </div>
+                    <div class="cell">?</div>
+                    <div class="cell" v-if="topBottom === 'bot'">
+                      {{ hit }}
+                    </div>
                   </div>
                 </div>
+                <template v-else>
+                  <div v-if="sub.league && sub.group">
+                    {{ `${sub.league} ${$t('box_group', { g: sub.group })}` }}
+                    <template v-if="sub.year && sub.season">
+                      {{ `(${sub.year} ${sub.season})` }}
+                    </template>
+                    <div>{{ sub.game }}</div>
+                    <div>
+                      {{
+                        sub.opponent
+                          ? $t('box_opponent', { opponent: sub.opponent })
+                          : $t('box_forgot_opponent')
+                      }}
+                    </div>
+                  </div>
+                </template>
                 <router-link
                   :to="{
                     name: 'game',
@@ -176,6 +236,42 @@
       margin-top: 0;
     }
   }
+  .box {
+    margin-top: 3px;
+    border-radius: 4px;
+    border: 2px solid #fff;
+    box-sizing: border-box;
+    font-size: 16px;
+    color: #fff;
+    display: flex;
+    text-align: center;
+    padding: 4px 0 4px 4px;
+    position: relative;
+    .team {
+      border: 2px solid transparent;
+      text-align: left;
+    }
+    .inn {
+      flex: 1 1 50px;
+      max-width: 50px;
+      border: 2px solid transparent;
+    }
+    .team,
+    .inn {
+      > div:first-child {
+        line-height: 28px;
+        color: #fff;
+      }
+    }
+    .gap {
+      flex: 0 1 10px;
+      max-width: 10px;
+    }
+    .cell {
+      line-height: 22px;
+      white-space: nowrap;
+    }
+  }
 }
 @media only screen and (max-width: 760px) {
   .container {
@@ -218,6 +314,16 @@ export default {
     return {
       gameList_: [],
       focus_game,
+      version: '',
+      inn: 0,
+      scores: [],
+      opponentScores: [],
+      useTeam: '',
+      opponent: '',
+      topBottom: '',
+      score: 0,
+      opponentScore: 0,
+      hit: 0,
     };
   },
   created() {},
@@ -229,6 +335,7 @@ export default {
   },
   computed: {
     ...mapGetters({
+      boxSummary: 'boxSummary',
       gameList: 'gameList',
       currentTeamIcon: 'currentTeamIcon',
       role: 'role',
@@ -240,6 +347,36 @@ export default {
         this.$nextTick(() => {
           this.gameList_ = this.gameList;
         });
+      },
+      immediate: true,
+    },
+    boxSummary: {
+      handler() {
+        if (this.boxSummary.game) {
+          const {
+            version,
+            scores,
+            opponentScores,
+            useTeam,
+            opponent,
+            topBottom,
+            r,
+            h,
+          } = this.boxSummary;
+          this.version = version;
+          this.inn = Math.max(scores.length, opponentScores.length);
+          this.scores = scores;
+          this.opponentScores = [...opponentScores];
+          this.useTeam = useTeam;
+          this.opponent = opponent;
+          this.topBottom = topBottom;
+          this.score = r;
+          this.opponentScore = this.opponentScores.reduce(
+            (acc, num) => (acc += num || 0),
+            0,
+          );
+          this.hit = h;
+        }
       },
       immediate: true,
     },
