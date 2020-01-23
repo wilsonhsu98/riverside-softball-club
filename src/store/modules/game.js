@@ -144,6 +144,49 @@ const actions = {
         commit(rootTypes.LOADING, false);
       });
   },
+  deleteGame({ commit }, data) {
+    const { teamCode, gameId } = data;
+    commit(rootTypes.LOADING, true);
+    db.collection('teams')
+      .doc(teamCode)
+      .collection('games')
+      .doc(gameId)
+      .delete()
+      .then(() => {
+        router.push(`/main/games/${teamCode}`);
+        commit(rootTypes.LOADING, false);
+      })
+      .catch(error => {
+        console.log('Error editing document:', error);
+        commit(rootTypes.LOADING, false);
+      });
+  },
+  deleteLastPa({ commit }, data) {
+    const { teamCode, gameId } = data;
+    const refGameDoc = db
+      .collection('teams')
+      .doc(teamCode)
+      .collection('games')
+      .doc(gameId);
+    commit(rootTypes.LOADING, true);
+    refGameDoc
+      .get()
+      .then(gameDoc => {
+        const { orders } = gameDoc.data();
+        return refGameDoc.set(
+          { orders: orders.slice(0, -1), timestamp },
+          { merge: true },
+        );
+      })
+      .then(() => {
+        router.push(`/main/games/${teamCode}/${gameId}`);
+        commit(rootTypes.LOADING, false);
+      })
+      .catch(error => {
+        console.log('Error editing document:', error);
+        commit(rootTypes.LOADING, false);
+      });
+  },
 };
 
 const mutations = {

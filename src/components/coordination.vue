@@ -467,7 +467,8 @@ export default {
   },
   watch: {
     xy() {
-      this.$emit('change', this.xy[0]);
+      const { x, y, location } = this.xy[0];
+      this.$emit('change', { x, y, location });
     },
     disabled() {
       if (this.disabled) {

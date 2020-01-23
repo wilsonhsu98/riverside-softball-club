@@ -302,8 +302,17 @@
         v-model="tags"
       />
 
+      <div class="field-wrapper delete-btn-container">
+        <button class="btn danger" @click="delete_">
+          {{ $t('btn_delete_game') }}
+        </button>
+      </div>
+
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
+        <button class="btn danger" @click="delete_">
+          {{ $t('btn_delete_game') }}
+        </button>
         <button class="btn" @click="edit_">
           {{ mode === 'edit' ? $t('btn_update') : $t('btn_next') }}
         </button>
@@ -541,10 +550,22 @@
       box-sizing: border-box;
     }
   }
+  .delete-btn-container {
+    display: none;
+  }
 }
 
 @media only screen and (max-width: 760px) {
   .container {
+    .delete-btn-container {
+      display: block;
+      margin-top: 15px;
+      .btn {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
+    }
   }
 }
 </style>
@@ -600,6 +621,7 @@ export default {
     ...mapActions({
       setGame: 'setGame',
       editGame: 'editGame',
+      deleteGame: 'deleteGame',
     }),
     checkNumber(e) {
       if (!e.target.validity.valid) {
@@ -691,6 +713,14 @@ export default {
           });
         }
       });
+    },
+    delete_() {
+      if (confirm(this.$t('msg_delete_warning'))) {
+        this.deleteGame({
+          teamCode: this.$route.params.team,
+          gameId: this.prevId,
+        });
+      }
     },
     changeCoach() {
       this.$modal.show('coach');

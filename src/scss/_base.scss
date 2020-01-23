@@ -207,6 +207,9 @@ select::-ms-expand {
 		padding: 10px 15px;
 		width: 100px;
 		outline: none;
+		&.danger {
+			background-color: $error_color;
+		}
 	}
 }
 

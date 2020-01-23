@@ -567,8 +567,24 @@
           </div>
         </template>
       </template>
+      <div style="width: 0;"></div>
+      <div
+        v-if="pa && boxSummary.contents.length === order"
+        class="delete-btn-container"
+      >
+        <button class="btn danger" @click="delete_">
+          {{ $t('btn_delete_pa') }}
+        </button>
+      </div>
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
+        <button
+          v-if="pa && boxSummary.contents.length === order"
+          class="btn danger"
+          @click="delete_"
+        >
+          {{ $t('btn_delete_pa') }}
+        </button>
         <button class="btn" @click="edit_" :disabled="content ? false : true">
           {{ $t('btn_update') }}
         </button>
@@ -890,6 +906,9 @@
       line-height: 14px;
     }
   }
+  .delete-btn-container {
+    display: none;
+  }
 }
 
 @media only screen and (max-width: 760px) {
@@ -937,6 +956,17 @@
     }
     .btn-container {
       display: none;
+    }
+    .delete-btn-container {
+      display: block;
+      margin-top: 15px;
+      max-width: 300px;
+      width: 100%;
+      .btn {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
     }
   }
 }
@@ -1015,6 +1045,7 @@ export default {
       setGame: 'setGame',
       setOrder: 'setOrder',
       editGameOrder: 'editGameOrder',
+      deleteLastPa: 'deleteLastPa',
     }),
     toggle(path, value) {
       const setPath = (path, value) =>
@@ -1108,6 +1139,14 @@ export default {
           teamCode: this.$route.params.team,
           gameId: this.$route.params.game,
           orders,
+        });
+      }
+    },
+    delete_() {
+      if (confirm(this.$t('msg_delete_warning'))) {
+        this.deleteLastPa({
+          teamCode: this.$route.params.team,
+          gameId: this.$route.params.game,
         });
       }
     },
