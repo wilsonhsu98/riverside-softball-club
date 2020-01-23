@@ -599,7 +599,7 @@
   justify-content: space-evenly;
   align-content: flex-start;
   h1 {
-    flex-basis: 100%;
+    width: 100%;
   }
   .desc {
     width: 300px;
@@ -639,7 +639,6 @@
         }
         ~ span {
           color: $input_font;
-
           &:before {
             border-color: $input_font;
           }
@@ -727,9 +726,6 @@
             color: #fff;
             &.run {
               background-color: $run;
-            }
-            &.name {
-              // background-color: $run;
             }
             &.out {
               background-color: $out;
@@ -904,16 +900,18 @@
       width: 100%;
       &.wide span {
         width: calc((100vw - 50px - 9px) / 4);
+        max-width: unset;
       }
       span {
         font-size: 12px;
+        width: calc((100vw - 30px - 12px) / 5);
+        max-width: 58px;
       }
     }
     .infield {
       margin: 0;
       left: 50%;
       transform: translateX(-50%);
-
       .player-container {
         .on-base-player {
           > span {
@@ -922,7 +920,6 @@
         }
       }
     }
-
     .single .coordination {
       margin: 0;
       position: absolute;
@@ -931,9 +928,6 @@
     }
     .btn-container {
       display: none;
-    }
-    .left {
-      /* margin-right: 0; */
     }
   }
 }
@@ -1390,7 +1384,9 @@ export default {
       }
     },
     location() {
-      this.step = 4;
+      setTimeout(() => {
+        this.step = 4;
+      }, 500);
     },
     run: {
       handler() {

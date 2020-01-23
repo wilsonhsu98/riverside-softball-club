@@ -33,6 +33,7 @@ img {
 </style>
 
 <script>
+import ballIcon from '../images/icon_100.png';
 export default {
   props: ['values', 'disabled', 'no_track', 'fixedSize'],
   data() {
@@ -40,10 +41,17 @@ export default {
       xy: this.values || [],
       isImage: Array.isArray(this.values) && this.values.length > 1,
       imgSrc: '',
+      ballImage: '',
     };
   },
   mounted() {
-    this.draw();
+    const img = new Image();
+    img.onload = () => {
+      this.ballImage = img;
+      this.draw();
+    };
+    img.src = ballIcon;
+
     if (!this.fixedSize) {
       window.addEventListener('resize', this.draw);
     }
@@ -331,28 +339,51 @@ export default {
       ctx.fillRect(0, 0, rotateBase, rotateBase);
       ctx.restore();
 
-      this.xy.forEach(item => {
+      if (this.xy.length === 1 && this.xy[0].click) {
+        const drawingDot = this.xy[0];
+
+        // draw direction line
         ctx.beginPath();
-        ctx.arc(
-          (item.x / 100) * base,
-          (item.y / 100) * base,
-          base * 0.01,
-          0,
-          2 * Math.PI,
-        );
-        ctx.fillStyle = item.color || 'yellow';
-        ctx.fill();
-        ctx.arc(
-          (item.x / 100) * base,
-          (item.y / 100) * base,
-          base * 0.01,
-          0,
-          2 * Math.PI,
-        );
-        ctx.lineWidth = base * 0.001;
+        ctx.moveTo(c.x, c.y);
+        ctx.lineTo((drawingDot.x / 100) * base, (drawingDot.y / 100) * base);
+        ctx.lineWidth = base * 0.002;
         ctx.strokeStyle = 'black';
         ctx.stroke();
-      });
+
+        // draw clicking ball
+        ctx.beginPath();
+        const ballWidth = base * 0.1;
+        ctx.drawImage(
+          this.ballImage,
+          (drawingDot.x / 100) * base - ballWidth * 0.5,
+          (drawingDot.y / 100) * base - ballWidth * 0.5,
+          ballWidth,
+          ballWidth,
+        );
+      } else {
+        this.xy.forEach(item => {
+          ctx.beginPath();
+          ctx.arc(
+            (item.x / 100) * base,
+            (item.y / 100) * base,
+            base * 0.02,
+            0,
+            2 * Math.PI,
+          );
+          ctx.fillStyle = item.color || 'yellow';
+          ctx.fill();
+          ctx.arc(
+            (item.x / 100) * base,
+            (item.y / 100) * base,
+            base * 0.02,
+            0,
+            2 * Math.PI,
+          );
+          ctx.lineWidth = base * 0.001;
+          ctx.strokeStyle = 'black';
+          ctx.stroke();
+        });
+      }
 
       if (this.disabled) {
         ctx.beginPath();
@@ -428,6 +459,7 @@ export default {
           x,
           y,
           location,
+          click: true,
         },
       ];
       this.draw();
