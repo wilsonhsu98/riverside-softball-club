@@ -261,6 +261,8 @@ const actions = {
             };
           });
           commit(types.GET_PLAYERS, accounts);
+          actions.workerGenStatistics({ commit });
+          actions.workerItemStats({ commit });
           window.localStorage.setItem('players', JSON.stringify(accounts));
         });
     };

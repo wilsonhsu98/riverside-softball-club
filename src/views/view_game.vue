@@ -29,6 +29,7 @@
             }}
           </template>
           <router-link
+            v-if="role === 'manager'"
             :to="{
               name: 'edit_game_info',
               params: { team: $route.params.team, game: $route.params.game },
