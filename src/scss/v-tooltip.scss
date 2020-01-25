@@ -133,7 +133,7 @@
       color: white;
       padding: 10px;
       box-shadow: 0 5px 30px rgba(black, .1);
-      min-width: 200px;
+      min-width: 300px;
       max-width: calc(100vw - 40px);
       background: $color;
     }
@@ -150,5 +150,6 @@
 @media only screen and (max-width: 420px) and (max-aspect-ratio: 13/9) {
   .tooltip.box-tip .tooltip-inner {
     width: calc(100vw - 40px);
+    min-width: auto;;
   }
 }

@@ -464,17 +464,18 @@
       flex: 1;
       display: flex;
       align-items: center;
-      max-width: 49%;
+      max-width: 50%;
       &:first-child {
         justify-content: flex-end;
         .name {
           text-align: right;
         }
       }
+      &:last-child .name {
+        text-align: left;
+      }
       .name {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        word-break: break-all;
       }
       .score {
         margin: 0 10px;

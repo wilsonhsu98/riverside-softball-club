@@ -3,41 +3,160 @@
     <mobile-header :back="back_" :icon="currentTeamIcon" />
     <div class="gamebox-container">
       <div class="box-summary">
-        <template v-if="boxSummary.league && boxSummary.group">
-          {{
-            `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}`
-          }}
+        <template v-if="version !== 'import' && topBottom">
+          <div class="team-versus">
+            <div class="team-name">
+              <div class="name">
+                {{ topBottom === 'top' ? useTeam : opponent }}
+              </div>
+              <div class="score">
+                {{
+                  topBottom === 'top'
+                    ? sumByInn(scores, inn)
+                    : sumByInn(opponentScores, inn)
+                }}
+              </div>
+            </div>
+            <div class="versus">:</div>
+            <div class="team-name">
+              <div class="score">
+                {{
+                  topBottom === 'bot'
+                    ? sumByInn(scores, inn)
+                    : sumByInn(opponentScores, inn)
+                }}
+              </div>
+              <div class="name">
+                {{ topBottom === 'bot' ? useTeam : opponent }}
+              </div>
+            </div>
+          </div>
+          <div class="box">
+            <div class="team">
+              <div class="cell">
+                &nbsp;
+                <div :class="`result-icon ${result}`">
+                  {{ (result && result.substr(0, 1)) || '?' }}
+                </div>
+              </div>
+              <div class="cell">
+                {{ topBottom === 'top' ? useTeam : opponent }}
+              </div>
+              <div class="cell">
+                {{ topBottom === 'bot' ? useTeam : opponent }}
+              </div>
+            </div>
+            <div class="gap"></div>
+            <div
+              v-for="(undefined, index) in Array.apply(null, Array(inn))"
+              :key="index"
+              class="inn"
+            >
+              <div>{{ index + 1 }}</div>
+              <div class="cell" v-if="topBottom === 'top'">
+                {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+              </div>
+              <div class="cell">
+                {{
+                  opponentScores[index] !== undefined
+                    ? opponentScores[index]
+                    : '&nbsp;'
+                }}
+              </div>
+              <div class="cell" v-if="topBottom === 'bot'">
+                {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+              </div>
+            </div>
+            <div class="inn" style="margin-left: auto;">
+              <div class="cell">R</div>
+              <div class="cell" v-if="topBottom === 'top'">
+                {{ score }}
+              </div>
+              <div class="cell">
+                {{ opponentScore }}
+              </div>
+              <div class="cell" v-if="topBottom === 'bot'">
+                {{ score }}
+              </div>
+            </div>
+            <div class="inn">
+              <div class="cell">H</div>
+              <div class="cell" v-if="topBottom === 'top'">
+                {{ hit }}
+              </div>
+              <div class="cell">?</div>
+              <div class="cell" v-if="topBottom === 'bot'">
+                {{ hit }}
+              </div>
+            </div>
+          </div>
+          <div class="tags">
+            <div v-if="league" class="tag">{{ league }}</div>
+            <div v-if="group" class="tag">
+              {{ $t('box_group', { g: group }) }}
+            </div>
+            <div v-if="gameType" class="tag">{{ gameType }}</div>
+            <div v-if="place" class="tag">{{ place }}</div>
+            <div v-if="coach" class="tag">
+              {{ $t('box_coach', { name: coach }) }}
+            </div>
+            <div v-if="pitcher && result === 'win'" class="tag">
+              {{ $t('box_pitcher_w', { name: pitcher }) }}
+            </div>
+            <div v-if="pitcher && result === 'lose'" class="tag">
+              {{ $t('box_pitcher_l', { name: pitcher }) }}
+            </div>
+            <div class="tag" v-for="other in tags" :key="other">
+              {{ other }}
+            </div>
+            <router-link
+              v-if="role === 'manager'"
+              :to="{
+                name: 'edit_game_info',
+                params: { team: $route.params.team, game: $route.params.game },
+              }"
+              class="fa fa-pencil"
+              tag="i"
+            />
+          </div>
         </template>
-        <template v-if="boxSummary.year && boxSummary.season">
-          {{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
-        </template>
-        <div>
-          {{
-            boxSummary.opponent
-              ? $t('box_opponent', { opponent: boxSummary.opponent })
-              : $t('box_forgot_opponent')
-          }}
-        </div>
-        <div class="result">
-          <template v-if="boxSummary.result">
+        <template v-else>
+          <template v-if="boxSummary.league && boxSummary.group">
             {{
-              $t('box_summary', {
-                h: boxSummary.h,
-                r: boxSummary.r,
-                result: $t(`box_${boxSummary.result}`),
-              })
+              `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}`
             }}
           </template>
-          <router-link
-            v-if="role === 'manager'"
-            :to="{
-              name: 'edit_game_info',
-              params: { team: $route.params.team, game: $route.params.game },
-            }"
-            class="fa fa-pencil"
-            tag="i"
-          />
-        </div>
+          <template v-if="boxSummary.year && boxSummary.season">
+            {{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
+          </template>
+          <div>
+            {{
+              boxSummary.opponent
+                ? $t('box_opponent', { opponent: boxSummary.opponent })
+                : $t('box_forgot_opponent')
+            }}
+          </div>
+          <div class="result">
+            <template v-if="boxSummary.result">
+              {{
+                $t('box_summary', {
+                  h: boxSummary.h,
+                  r: boxSummary.r,
+                  result: $t(`box_${boxSummary.result}`),
+                })
+              }}
+            </template>
+            <router-link
+              v-if="role === 'manager'"
+              :to="{
+                name: 'edit_game_info',
+                params: { team: $route.params.team, game: $route.params.game },
+              }"
+              class="fa fa-pencil"
+              tag="i"
+            />
+          </div>
+        </template>
       </div>
       <div class="box-table simple">
         <div
@@ -481,6 +600,126 @@
       width: 1px;
     }
   }
+  .team-versus {
+    margin: 3px 0 10px;
+    display: flex;
+    align-items: center;
+    .team-name {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      max-width: 50%;
+      &:first-child {
+        justify-content: flex-end;
+        .name {
+          text-align: right;
+        }
+      }
+      &:last-child .name {
+        text-align: left;
+      }
+      .name {
+        word-break: break-all;
+      }
+      .score {
+        margin: 0 10px;
+      }
+    }
+  }
+  .box {
+    border-radius: 4px;
+    border: 2px solid #000;
+    box-sizing: border-box;
+    color: #000;
+    display: flex;
+    text-align: center;
+    padding: 4px 0 4px 4px;
+    position: relative;
+    .team {
+      border: 2px solid transparent;
+      text-align: left;
+    }
+    .inn {
+      flex: 1 1 50px;
+      max-width: 50px;
+      border: 2px solid transparent;
+    }
+    .team,
+    .inn {
+      > div:first-child {
+        line-height: 28px;
+        color: #000;
+      }
+    }
+    .gap {
+      flex: 0 1 10px;
+      max-width: 10px;
+    }
+    .cell {
+      line-height: 22px;
+      white-space: nowrap;
+    }
+  }
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: left;
+    .tag {
+      white-space: nowrap;
+      display: inline-block;
+      border-radius: 4px;
+      border: 2px solid #000;
+      box-sizing: border-box;
+      color: #000;
+      padding: 4px 8px;
+      margin: 10px 10px 0 0;
+    }
+    .fa.fa-pencil {
+      position: inherit;
+      margin: auto 0 0 auto;
+    }
+  }
+  .result-icon {
+    position: absolute;
+    top: -10px;
+    left: -5px;
+    border-radius: 50%;
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 30px;
+    text-transform: uppercase;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+    text-align: center;
+    color: $gray;
+    box-sizing: border-box;
+    border: 5px solid;
+    border-color: $row_odd_bgcolor;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+      0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    &.win,
+    &.tie,
+    &.lose {
+      color: #fff;
+    }
+    &.win {
+      background-color: $hit;
+    }
+    &.tie {
+      background-color: $nonpa;
+    }
+    &.lose {
+      background-color: $ng;
+    }
+    // &.C { border-color: $header_bgcolor; }
+    // &.G { border-color: $row_odd_bgcolor; }
+    // &.no-order {
+    //  opacity: .5;
+    //  cursor: not-allowed;
+    // }
+  }
 }
 .share-btn {
   border-radius: 5px;
@@ -587,6 +826,23 @@
         padding: 0 5px;
       }
     }
+    .box {
+      color: $row_color;
+      border-color: $row_color;
+      margin: 0 10px;
+      .inn > div:first-child {
+        color: $row_color;
+      }
+    }
+    .tags {
+      margin: 0 10px;
+      .tag {
+        color: $row_color;
+        border-color: $row_color;
+        font-size: 12px;
+        padding: 2px 4px;
+      }
+    }
   }
 }
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
@@ -597,6 +853,11 @@
       }
       &.normal {
         display: none;
+      }
+    }
+    .tags {
+      .fa.fa-pencil {
+        margin: 10px 0 0 auto;
       }
     }
   }
@@ -611,7 +872,26 @@ import config from '../../config';
 
 export default {
   data() {
-    return {};
+    return {
+      version: '',
+      inn: 0,
+      scores: [],
+      opponentScores: [],
+      useTeam: '',
+      opponent: '',
+      topBottom: '',
+      score: 0,
+      opponentScore: 0,
+      hit: 0,
+      league: '',
+      group: '',
+      gameType: '',
+      place: '',
+      coach: '',
+      pitcher: '',
+      result: '',
+      tags: [],
+    };
   },
   created() {
     if (this.boxSummary.game !== this.$route.params.game) {
@@ -659,6 +939,9 @@ export default {
       // router.back();
       this.$router.push(`/main/games/${this.$route.params.team}`);
     },
+    sumByInn(scores, inn) {
+      return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
+    },
   },
   computed: {
     ...mapGetters({
@@ -668,6 +951,67 @@ export default {
       currentTeamIcon: 'currentTeamIcon',
       role: 'role',
     }),
+  },
+  watch: {
+    boxSummary: {
+      handler() {
+        if (this.boxSummary.game) {
+          const {
+            version,
+            scores,
+            opponentScores,
+            useTeam,
+            opponent,
+            topBottom,
+            r,
+            h,
+            league,
+            group,
+            gameType,
+            place,
+            coach,
+            pitcher,
+            result,
+            tags,
+          } = this.boxSummary;
+          this.version = version;
+          this.inn = Math.max(scores.length, opponentScores.length);
+          this.scores = scores;
+          this.opponentScores = [...opponentScores];
+          this.useTeam = useTeam;
+          this.opponent = opponent;
+          this.topBottom = topBottom;
+          this.score = r;
+          this.opponentScore = this.opponentScores.reduce(
+            (acc, num) => (acc += num || 0),
+            0,
+          );
+          this.hit = h;
+          this.league = league;
+          this.group = group;
+          this.gameType = [
+            this.$t('ttl_fun'),
+            this.$t('ttl_regular'),
+            this.$t('ttl_playoff'),
+            '',
+          ][['fun', 'regular', 'playoff', ''].indexOf(gameType)];
+          this.place = [
+            this.$t('ttl_1st'),
+            this.$t('ttl_3rd'),
+            this.$t('ttl_home'),
+            '',
+          ][['1', '3', '4', ''].indexOf(place)];
+          this.coach = coach;
+          this.pitcher = pitcher;
+          this.result = result;
+          this.tags = (tags || '')
+            .split(',')
+            .map(item => item.trim())
+            .filter(item => !!item);
+        }
+      },
+      immediate: true,
+    },
   },
 };
 </script>
