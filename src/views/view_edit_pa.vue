@@ -916,10 +916,9 @@
       line-height: 14px;
     }
     .fa-info-circle {
-      font-size: 16px;
-      line-height: 13px;
+      font-size: 24px;
       vertical-align: top;
-      margin-left: 2px;
+      margin: -7px 0 0 2px;
     }
   }
   .delete-btn-container {
