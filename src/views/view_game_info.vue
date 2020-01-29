@@ -150,6 +150,32 @@
           </label>
         </div>
 
+        <div
+          v-if="
+            mode === 'edit' &&
+              version !== 'import' &&
+              ['win', 'lose'].includes(result)
+          "
+          class="field-wrapper field-wrapper-item"
+          :class="pitcher ? '' : 'empty'"
+          @click="changePlayer('pitcher')"
+        >
+          <span>{{ $t(`ttl_pitcher_${result}`) }}</span>
+          <label v-if="pitcher">{{ pitcher }}</label>
+        </div>
+
+        <div
+          v-if="mode === 'edit' && version !== 'import' && result"
+          class="field-wrapper field-wrapper-item"
+          :class="mvp ? '' : 'empty'"
+          @click="changePlayer('mvp')"
+        >
+          <span>{{
+            result === 'win' ? $t(`ttl_mvp`) : $t('ttl_best_player')
+          }}</span>
+          <label v-if="mvp">{{ mvp }}</label>
+        </div>
+
         <label>{{ $t('ttl_before_game') }}</label>
       </div>
 
@@ -286,7 +312,7 @@
       <div
         class="field-wrapper field-wrapper-item"
         :class="coach ? '' : 'empty'"
-        @click="changeCoach"
+        @click="changePlayer('coach')"
       >
         <span>{{ $t('ttl_coach') }}</span>
         <label v-if="coach">{{ coach }}</label>
@@ -319,13 +345,13 @@
       </div>
     </div>
     <player-modal
-      name="coach"
-      :current="currentCoach"
+      name="player"
+      :current="currentPlayer"
       :current_label="$t('ttl_current_option')"
-      :clear="clearCoach"
+      :clear="clearPlayer"
       :fourth="teamInfo.players"
       :fourth_label="$t('ttl_all_player')"
-      :select="selectCoach"
+      :select="selectPlayer"
     ></player-modal>
   </div>
 </template>
@@ -590,13 +616,16 @@ export default {
       gameType: '',
       place: '',
       topBottom: '',
-      coach: '',
-      currentCoach: undefined,
       tags: '',
       inn: 0,
       opponentScores: [],
       scores: [],
       isFocusInn: '',
+      changeMode: '',
+      currentPlayer: undefined,
+      pitcher: '',
+      mvp: '',
+      coach: '',
     };
   },
   created() {
@@ -684,6 +713,8 @@ export default {
             result,
             opponentScores,
             inn,
+            pitcher,
+            mvp,
           } = this;
           this.editGame({
             teamCode: this.$route.params.team,
@@ -700,6 +731,8 @@ export default {
             tags,
             result,
             opponentScores: opponentScores.slice(0, inn),
+            pitcher,
+            mvp,
           });
         }
       });
@@ -712,19 +745,56 @@ export default {
         });
       }
     },
-    changeCoach() {
-      this.$modal.show('coach');
-      this.currentCoach = this.teamInfo.players.find(
-        player => player.name && player.name === this.coach,
-      );
+    changePlayer(mode) {
+      this.changeMode = mode;
+      switch (mode) {
+        case 'coach':
+          this.currentPlayer = this.teamInfo.players.find(
+            player => player.name && player.name === this.coach,
+          );
+          break;
+        case 'pitcher':
+          this.currentPlayer = this.teamInfo.players.find(
+            player => player.name && player.name === this.pitcher,
+          );
+          break;
+        case 'mvp':
+          this.currentPlayer = this.teamInfo.players.find(
+            player => player.name && player.name === this.mvp,
+          );
+          break;
+      }
+      this.$modal.show('player');
     },
-    selectCoach(player) {
-      this.coach = player.name;
-      this.$modal.hide('coach');
+    selectPlayer(player) {
+      switch (this.changeMode) {
+        case 'coach':
+          this.coach = player.name;
+          break;
+        case 'pitcher':
+          this.pitcher = player.name;
+          break;
+        case 'mvp':
+          this.mvp = player.name;
+          break;
+      }
+      this.$modal.hide('player');
+      this.changeMode = '';
     },
-    clearCoach() {
-      this.coach = '';
-      this.$modal.hide('coach');
+    clearPlayer() {
+      switch (this.changeMode) {
+        case 'coach':
+          this.coach = '';
+          break;
+        case 'pitcher':
+          this.pitcher = '';
+          break;
+        case 'mvp':
+          this.mvp = '';
+          break;
+      }
+      this.$modal.hide('player');
+      this.changeMode = '';
     },
     focusInn(name) {
       this.$refs[name][0].focus();
@@ -778,6 +848,8 @@ export default {
             topBottom,
             coach,
             tags,
+            pitcher,
+            mvp,
           } = this.boxSummary;
           this.version = version;
           this.result = result;
@@ -796,6 +868,8 @@ export default {
           this.topBottom = topBottom;
           this.coach = coach;
           this.tags = tags;
+          this.pitcher = pitcher;
+          this.mvp = mvp;
         }
       },
       immediate: true,

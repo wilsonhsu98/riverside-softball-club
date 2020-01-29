@@ -6,7 +6,7 @@
       :save="edit_"
       :disabled="content ? false : true"
     />
-    <div class="container">
+    <div class="container" ref="container">
       <h1>
         {{ $route.params.order === 'new' ? $t('add_pa') : $t('edit_pa') }}
       </h1>
@@ -354,7 +354,17 @@
               </div>
             </div>
             <div class="separater">
-              <label>{{ $t('ttl_step') }}</label>
+              <label
+                >{{ $t('ttl_step')
+                }}<i
+                  class="fa fa-info-circle"
+                  v-tooltip="{
+                    content: $t('tip_step'),
+                    classes: ['info'],
+                    container: $refs.container,
+                  }"
+                ></i
+              ></label>
             </div>
             <div class="step-bar">
               <span
@@ -905,6 +915,12 @@
       padding: 0 4px;
       line-height: 14px;
     }
+    .fa-info-circle {
+      font-size: 16px;
+      line-height: 13px;
+      vertical-align: top;
+      margin-left: 2px;
+    }
   }
   .delete-btn-container {
     display: none;
@@ -1341,6 +1357,7 @@ export default {
           break;
       }
       this.$modal.hide('player');
+      this.changeMode = '';
       this.checkPrev5();
     },
   },

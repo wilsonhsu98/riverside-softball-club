@@ -97,14 +97,20 @@
             </div>
             <div v-if="gameType" class="tag">{{ gameType }}</div>
             <div v-if="place" class="tag">{{ place }}</div>
-            <div v-if="coach" class="tag">
-              {{ $t('box_coach', { name: coach }) }}
-            </div>
             <div v-if="pitcher && result === 'win'" class="tag">
               {{ $t('box_pitcher_w', { name: pitcher }) }}
             </div>
             <div v-if="pitcher && result === 'lose'" class="tag">
               {{ $t('box_pitcher_l', { name: pitcher }) }}
+            </div>
+            <div v-if="mvp && result === 'win'" class="tag">
+              {{ $t('box_mvp', { name: mvp }) }}
+            </div>
+            <div v-if="mvp && result !== 'win'" class="tag">
+              {{ $t('box_best_player', { name: mvp }) }}
+            </div>
+            <div v-if="coach" class="tag">
+              {{ $t('box_coach', { name: coach }) }}
             </div>
             <div class="tag" v-for="other in tags" :key="other">
               {{ other }}
@@ -956,6 +962,7 @@ export default {
       place: '',
       coach: '',
       pitcher: '',
+      mvp: '',
       result: '',
       tags: [],
       coordinate: undefined,
@@ -1044,6 +1051,7 @@ export default {
             place,
             coach,
             pitcher,
+            mvp,
             result,
             tags,
           } = this.boxSummary;
@@ -1076,6 +1084,7 @@ export default {
           ][['1', '3', '4', ''].indexOf(place)];
           this.coach = coach;
           this.pitcher = pitcher;
+          this.mvp = mvp;
           this.result = result;
           this.tags = (tags || '')
             .split(',')

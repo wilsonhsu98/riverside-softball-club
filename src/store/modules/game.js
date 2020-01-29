@@ -53,6 +53,8 @@ const actions = {
       tags = '',
       result,
       opponentScores,
+      pitcher = '',
+      mvp = '',
     } = data;
     commit(rootTypes.LOADING, true);
     const refNewGameDoc = db
@@ -94,6 +96,8 @@ const actions = {
             tags,
             result,
             opponentScores,
+            pitcher,
+            mvp,
             timestamp,
           },
           { merge: true },
