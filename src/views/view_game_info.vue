@@ -328,7 +328,7 @@
         v-model="tags"
       />
 
-      <div class="field-wrapper delete-btn-container">
+      <div v-if="mode === 'edit'" class="field-wrapper delete-btn-container">
         <button class="btn danger" @click="delete_">
           {{ $t('btn_delete_game') }}
         </button>
@@ -336,7 +336,7 @@
 
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
-        <button class="btn danger" @click="delete_">
+        <button v-if="mode === 'edit'" class="btn danger" @click="delete_">
           {{ $t('btn_delete_game') }}
         </button>
         <button class="btn" @click="edit_">

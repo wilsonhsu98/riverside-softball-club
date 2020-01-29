@@ -220,6 +220,10 @@
   }
 }
 
+.modal-wrapper {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .modal-wrapper::v-deep .v--modal-box {
     position: fixed;

@@ -793,12 +793,12 @@
 }
 .location-modal {
   position: fixed;
-  z-index: 1;
-  top: 70px;
+  z-index: 2;
+  top: 0;
   right: 0;
   bottom: 0;
   left: 0;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(0, 0, 0, 0.5);
   &::v-deep .root-container {
     top: 50%;
     transform: translateY(-50%);
@@ -905,11 +905,6 @@
       transform: scale(0.8);
     }
   }
-  .location-modal {
-    z-index: 0;
-    top: 50px;
-    bottom: 50px;
-  }
 }
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .gamebox-container {
@@ -926,13 +921,6 @@
         margin: 10px 0 0 auto;
       }
     }
-  }
-}
-@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
-  .location-modal {
-    z-index: 2;
-    top: 0;
-    bottom: 0;
   }
 }
 </style>
