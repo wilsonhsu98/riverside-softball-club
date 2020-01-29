@@ -179,6 +179,7 @@
 	"ttl_switch_team": "Current teams (tap to switch)",
 	"ttl_current_team": "Current team",
 	"required": "Required column",
+	"msg_required": "%{col}為必填欄位",
 	"msg_no_option": "Sorry, no matching options",
 	"vc-year": ""
 }

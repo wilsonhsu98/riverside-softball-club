@@ -466,6 +466,12 @@ export default {
     },
   },
   watch: {
+    values() {
+      if (this.no_track) {
+        this.xy = this.values;
+        this.draw();
+      }
+    },
     xy() {
       const { x, y, location } = this.xy[0];
       this.$emit('change', { x, y, location });

@@ -650,6 +650,21 @@ export default {
             icon: this.icon,
             isNew: !this.$route.params.team,
           });
+        } else {
+          setTimeout(() => {
+            const alertStr = [
+              this.teamCode_err &&
+                this.$t('msg_required', { col: this.$t('ttl_team_code') }),
+              this.teamName_err &&
+                this.$t('msg_required', { col: this.$t('ttl_team_name') }),
+            ]
+              .concat(this.players_err.split('<br>'))
+              .filter(str => !!str)
+              .join('\n');
+            if (alertStr) {
+              alert(alertStr);
+            }
+          }, 10);
         }
       });
     },

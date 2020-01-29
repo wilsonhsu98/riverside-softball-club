@@ -183,6 +183,7 @@
 	"ttl_switch_team": "目前球隊(可點選切換)",
 	"ttl_current_team": "目前球隊",
 	"required": "必填欄位",
+	"msg_required": "%{col}為必填欄位",
 	"msg_no_option": "目前尚無可選擇項目",
 	"vc-year": "年"
 }

@@ -1,7 +1,7 @@
 <template>
   <div>
     <mobile-header :back="back_" :icon="currentTeamIcon" />
-    <div class="gamebox-container">
+    <div class="gamebox-container" ref="container">
       <div class="box-summary">
         <template v-if="version !== 'import' && topBottom">
           <div class="team-versus">
@@ -220,6 +220,9 @@
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{ record.content === 'new' ? '＋' : $t(record.content) }}
+                    <div v-if="record.location" class="location-trigger">
+                      <i class="fa fa-map-marker"></i>
+                    </div>
                   </router-link>
                   <span
                     v-else
@@ -237,6 +240,13 @@
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{ record.content !== 'new' ? $t(record.content) : '' }}
+                    <div
+                      v-if="record.location"
+                      class="location-trigger"
+                      @click="coordinate = record.location"
+                    >
+                      <i class="fa fa-map-marker"></i>
+                    </div>
                   </span>
                 </div>
               </template>
@@ -327,6 +337,9 @@
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{ record.content === 'new' ? '＋' : $t(record.content) }}
+                    <div v-if="record.location" class="location-trigger">
+                      <i class="fa fa-map-marker"></i>
+                    </div>
                   </router-link>
                   <span
                     v-else
@@ -344,6 +357,13 @@
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{ record.content !== 'new' ? $t(record.content) : '' }}
+                    <div
+                      v-if="record.location"
+                      class="location-trigger"
+                      @click="coordinate = record.location"
+                    >
+                      <i class="fa fa-map-marker"></i>
+                    </div>
                   </span>
                 </div>
               </template>
@@ -368,6 +388,9 @@
         tag="button"
         >{{ $t('btn_fill_order') }}</router-link
       >
+    </div>
+    <div v-if="coordinate" class="location-modal" @click="closeLocation">
+      <coordination :values="[coordinate]" :no_track="true" />
     </div>
   </div>
 </template>
@@ -720,6 +743,21 @@
     //  cursor: not-allowed;
     // }
   }
+  .location-trigger {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    cursor: pointer;
+    .fa-map-marker {
+      position: absolute;
+      left: 1px;
+      bottom: 1px;
+      transform-origin: bottom left;
+      transform: scale(0.7);
+    }
+  }
 }
 .share-btn {
   border-radius: 5px;
@@ -746,6 +784,20 @@
   padding: 10px 15px;
   width: 100px;
   outline: none;
+}
+.location-modal {
+  position: fixed;
+  z-index: 1;
+  top: 70px;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(255, 255, 255, 0.5);
+  &::v-deep .root-container {
+    top: 50%;
+    transform: translateY(-50%);
+    text-align: center;
+  }
 }
 @media only screen and (max-width: 760px) {
   .gamebox-container {
@@ -843,6 +895,14 @@
         padding: 2px 4px;
       }
     }
+    .location-trigger .fa-map-marker {
+      transform: scale(0.8);
+    }
+  }
+  .location-modal {
+    z-index: 0;
+    top: 50px;
+    bottom: 50px;
   }
 }
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
@@ -860,6 +920,13 @@
         margin: 10px 0 0 auto;
       }
     }
+  }
+}
+@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
+  .location-modal {
+    z-index: 2;
+    top: 0;
+    bottom: 0;
   }
 }
 </style>
@@ -891,6 +958,7 @@ export default {
       pitcher: '',
       result: '',
       tags: [],
+      coordinate: undefined,
     };
   },
   created() {
@@ -941,6 +1009,11 @@ export default {
     },
     sumByInn(scores, inn) {
       return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
+    },
+    closeLocation(e) {
+      if (e.target.tagName !== 'CANVAS') {
+        this.coordinate = undefined;
+      }
     },
   },
   computed: {
