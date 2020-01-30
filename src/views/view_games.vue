@@ -122,8 +122,8 @@
                 <template v-else>
                   <div v-if="sub.league && sub.group">
                     {{ `${sub.league} ${$t('box_group', { g: sub.group })}` }}
-                    <template v-if="sub.year && sub.season">
-                      {{ `(${sub.year} ${sub.season})` }}
+                    <template v-if="sub.period">
+                      {{ `(${sub.period})` }}
                     </template>
                     <div>{{ sub.game }}</div>
                     <div>

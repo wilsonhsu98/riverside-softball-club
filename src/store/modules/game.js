@@ -55,6 +55,7 @@ const actions = {
       opponentScores,
       pitcher = '',
       mvp = '',
+      period = '',
     } = data;
     commit(rootTypes.LOADING, true);
     const refNewGameDoc = db
@@ -98,6 +99,7 @@ const actions = {
             opponentScores,
             pitcher,
             mvp,
+            period,
             timestamp,
           },
           { merge: true },

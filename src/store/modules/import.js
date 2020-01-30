@@ -111,8 +111,9 @@ const actions = {
                   teddySummary ? teddySummary['結果'] : '',
                 )
               ],
-              year: teddySummary ? teddySummary['年度'] : '',
-              season: teddySummary ? teddySummary['季度'] : '',
+              period: teddySummary
+                ? `${teddySummary['年度']}${teddySummary['季度']}`
+                : '',
               gameType: teddySummary
                 ? teddySummary['季度'].indexOf('季後') > -1
                   ? 'playoff'
@@ -182,8 +183,9 @@ const actions = {
                   teddySummary ? teddySummary['結果'] : '',
                 )
               ],
-              year: teddySummary ? teddySummary['年度'] : '',
-              season: teddySummary ? teddySummary['季度'] : '',
+              period: teddySummary
+                ? `${teddySummary['年度']}${teddySummary['季度']}`
+                : '',
               gameType: teddySummary
                 ? teddySummary['季度'].indexOf('季後') > -1
                   ? 'playoff'

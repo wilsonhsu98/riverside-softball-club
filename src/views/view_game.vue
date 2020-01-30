@@ -91,6 +91,7 @@
             </div>
           </div>
           <div class="tags">
+            <div v-if="period" class="tag">{{ period }}</div>
             <div v-if="league" class="tag">{{ league }}</div>
             <div v-if="group" class="tag">
               {{ $t('box_group', { g: group }) }}
@@ -132,8 +133,8 @@
               `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}`
             }}
           </template>
-          <template v-if="boxSummary.year && boxSummary.season">
-            {{ `(${boxSummary.year} ${boxSummary.season}) ${boxSummary.game}` }}
+          <template v-if="boxSummary.period">
+            {{ `(${boxSummary.period}) ${boxSummary.game}` }}
           </template>
           <div>
             {{
@@ -947,6 +948,7 @@ export default {
       score: 0,
       opponentScore: 0,
       hit: 0,
+      period: '',
       league: '',
       group: '',
       gameType: '',
@@ -1036,6 +1038,7 @@ export default {
             topBottom,
             r,
             h,
+            period,
             league,
             group,
             gameType,
@@ -1059,6 +1062,7 @@ export default {
             0,
           );
           this.hit = h;
+          this.period = period;
           this.league = league;
           this.group = group;
           this.gameType = [

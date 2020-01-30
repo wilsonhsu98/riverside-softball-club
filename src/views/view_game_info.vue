@@ -223,6 +223,15 @@
         {{ gameId_err }}
       </div>
 
+      <custom-input
+        type="select"
+        taggable
+        :options="gameOptions.period"
+        :name="$t('ttl_period')"
+        :placeholder="$t('pla_period')"
+        v-model="period"
+      />
+
       <div class="field-wrapper">
         <div class="two-column">
           <custom-input
@@ -626,6 +635,7 @@ export default {
       pitcher: '',
       mvp: '',
       coach: '',
+      period: '',
     };
   },
   created() {
@@ -669,7 +679,7 @@ export default {
             `${this.gameDate}-${this.gamePostfix}` !== this.prevId)
         ) {
           if (
-            this.period
+            this.period_
               .find(item => item.period === 'period_all')
               .games.includes(`${this.gameDate}-${this.gamePostfix}`)
           ) {
@@ -715,6 +725,7 @@ export default {
             inn,
             pitcher,
             mvp,
+            period,
           } = this;
           this.editGame({
             teamCode: this.$route.params.team,
@@ -733,6 +744,7 @@ export default {
             opponentScores: opponentScores.slice(0, inn),
             pitcher,
             mvp,
+            period,
           });
         }
       });
@@ -824,7 +836,7 @@ export default {
       boxSummary: 'boxSummary',
       gameList: 'gameList',
       gameOptions: 'gameOptions',
-      period: 'period',
+      period_: 'period',
       teamInfo: 'teamInfo',
       teamNames: 'teamNames',
     }),
@@ -850,6 +862,7 @@ export default {
             tags,
             pitcher,
             mvp,
+            period,
           } = this.boxSummary;
           this.version = version;
           this.result = result;
@@ -870,6 +883,7 @@ export default {
           this.tags = tags;
           this.pitcher = pitcher;
           this.mvp = mvp;
+          this.period = period;
         }
       },
       immediate: true,

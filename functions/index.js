@@ -24,8 +24,9 @@ exports.import_game = functions.https.onRequest((req, res) => {
       result: ['win', 'lose', 'tie', ''][
         ['勝', '敗', '和', ''].indexOf(teddySummary ? teddySummary['結果'] : 3)
       ],
-      year: teddySummary ? teddySummary['年度'] : '',
-      season: teddySummary ? teddySummary['季度'] : '',
+      period: teddySummary
+        ? `${teddySummary['年度']}${teddySummary['季度']}`
+        : '',
       gameType: teddySummary
         ? teddySummary['季度'].indexOf('季後') > -1
           ? 'playoff'

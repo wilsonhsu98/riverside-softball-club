@@ -98,6 +98,8 @@
 	"ttl_pitcher_lose": "敗投",
 	"ttl_mvp": "MVP",
 	"ttl_best_player": "優秀球員",
+	"ttl_period": "查詢區間",
+	"pla_period": "可以輸入 XXXX年上半季 之類的",
 	"pla_game_tag": "可選擇多個標籤，或直接輸入",
 	"btn_next": "下一步",
 	"msg_duplicate_game": "日期場次重覆",

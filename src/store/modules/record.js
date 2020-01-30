@@ -171,16 +171,21 @@ const getters = {
                 (a, b) => a.localeCompare(b),
                 'zh-TW',
               ),
+              period: [...new Set(acc.period.concat(item.period))].sort(
+                (a, b) => b.localeCompare(a),
+                'zh-TW',
+              ),
             };
           } else {
             return {
               opponent: acc.opponent.concat(item.opponent),
               league: acc.league.concat(item.league),
               group: acc.group.concat(item.group),
+              period: acc.period.concat(item.period),
             };
           }
         },
-        { opponent: [], league: [], group: [] },
+        { opponent: [], league: [], group: [], period: [] },
       ),
   game: state => state.game,
   periodGames: state => state.period.find(item => item.select).games || [],
@@ -468,21 +473,24 @@ const mutations = {
     );
 
     data
-      .map(item => item.year + item.season)
+      .map(item => item.period)
       .filter((value, index, self) => self.indexOf(value) === index)
       .map(item => ({
         period: item,
-        games: data
-          .filter(sub => sub.year + sub.season === item)
-          .map(sub => sub.game),
+        games: data.filter(sub => sub.period === item).map(sub => sub.game),
       }))
       .concat(
         data
-          .map(item => item.year)
-          .filter((value, index, self) => self.indexOf(value) === index)
+          .map(item => parseInt(item.period))
+          .filter(
+            (value, index, self) =>
+              self.indexOf(value) === index && !isNaN(value),
+          )
           .map(item => ({
             period: `${item}`,
-            games: data.filter(sub => sub.year === item).map(sub => sub.game),
+            games: data
+              .filter(sub => parseInt(sub.period) === item)
+              .map(sub => sub.game),
           })),
       )
       .forEach(item => {
