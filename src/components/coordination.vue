@@ -39,7 +39,8 @@ export default {
   data() {
     return {
       xy: this.values || [],
-      isImage: Array.isArray(this.values) && this.values.length > 1,
+      isImage:
+        (Array.isArray(this.values) && this.values.length > 1) || this.no_track,
       imgSrc: '',
       ballImage: '',
     };

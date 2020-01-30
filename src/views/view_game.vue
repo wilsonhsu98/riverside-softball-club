@@ -799,10 +799,16 @@
   bottom: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  &::v-deep .root-container {
-    top: 50%;
-    transform: translateY(-50%);
-    text-align: center;
+  &::v-deep {
+    .root-container {
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
+    }
+    img {
+      left: 50%;
+      transform: translateX(-50%);
+    }
   }
 }
 @media only screen and (max-width: 760px) {
@@ -1006,7 +1012,7 @@ export default {
       return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
     },
     closeLocation(e) {
-      if (e.target.tagName !== 'CANVAS') {
+      if (!['CANVAS', 'IMG'].includes(e.target.tagName)) {
         this.coordinate = undefined;
       }
     },
