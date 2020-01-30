@@ -385,7 +385,7 @@
         {{ $t('fb_share') }}
       </button>
       <router-link
-        v-else
+        v-if="box.slice(1).length === 0 && role === 'manager'"
         :to="{
           name: 'game_order',
           params: { team: $route.params.team, game: $route.params.game },
@@ -728,11 +728,8 @@
     border-color: $row_odd_bgcolor;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-    &.win,
-    &.tie,
-    &.lose {
-      color: #fff;
-    }
+    background-color: #ccc;
+    color: #fff;
     &.win {
       background-color: $hit;
     }
