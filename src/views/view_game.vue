@@ -230,6 +230,18 @@
                     <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
                     </div>
+                    <div
+                      v-if="
+                        record.onbase &&
+                          record.onbase.filter(onbase => onbase.name).length - 1
+                      "
+                      :class="[
+                        'onbase',
+                        ['one', 'two', 'three'][
+                          record.onbase.filter(onbase => onbase.name).length - 2
+                        ],
+                      ]"
+                    ></div>
                   </router-link>
                   <span
                     v-else
@@ -254,6 +266,18 @@
                     >
                       <i class="fa fa-map-marker"></i>
                     </div>
+                    <div
+                      v-if="
+                        record.onbase &&
+                          record.onbase.filter(onbase => onbase.name).length - 1
+                      "
+                      :class="[
+                        'onbase',
+                        ['one', 'two', 'three'][
+                          record.onbase.filter(onbase => onbase.name).length - 2
+                        ],
+                      ]"
+                    ></div>
                   </span>
                 </div>
               </template>
@@ -347,6 +371,18 @@
                     <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
                     </div>
+                    <div
+                      v-if="
+                        record.onbase &&
+                          record.onbase.filter(onbase => onbase.name).length - 1
+                      "
+                      :class="[
+                        'onbase',
+                        ['one', 'two', 'three'][
+                          record.onbase.filter(onbase => onbase.name).length - 2
+                        ],
+                      ]"
+                    ></div>
                   </router-link>
                   <span
                     v-else
@@ -371,6 +407,18 @@
                     >
                       <i class="fa fa-map-marker"></i>
                     </div>
+                    <div
+                      v-if="
+                        record.onbase &&
+                          record.onbase.filter(onbase => onbase.name).length - 1
+                      "
+                      :class="[
+                        'onbase',
+                        ['one', 'two', 'three'][
+                          record.onbase.filter(onbase => onbase.name).length - 2
+                        ],
+                      ]"
+                    ></div>
                   </span>
                 </div>
               </template>
@@ -452,7 +500,7 @@
           z-index: 1;
         }
         .records .record {
-          max-width: 75px;
+          max-width: 85px;
           width: auto;
           flex: 1;
           justify-content: center;
@@ -556,7 +604,7 @@
           width: 20px;
         }
         .content {
-          width: 60px;
+          width: 70px;
           color: #fff;
           line-height: 34px;
           height: 34px;
@@ -762,6 +810,40 @@
       transform: scale(0.7);
     }
   }
+  .onbase {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    position: absolute;
+    top: 0;
+    right: 0;
+    border: 0 white solid;
+    transform: skewX(-35deg);
+    transform-origin: right top;
+    &:before {
+      display: inline-block;
+      width: 2px;
+      background-color: white;
+      height: 100%;
+      margin: 0 auto;
+      vertical-align: top;
+    }
+    &.one {
+      border-width: 0 2px 0 0;
+    }
+    &.two {
+      border-width: 0 2px 0 0;
+      &:before {
+        content: '';
+      }
+    }
+    &.three {
+      border-width: 0 2px;
+      &:before {
+        content: '';
+      }
+    }
+  }
 }
 .share-btn {
   border-radius: 5px;
@@ -907,6 +989,9 @@
     }
     .location-trigger .fa-map-marker {
       transform: scale(0.8);
+    }
+    .onbase {
+      height: 8px;
     }
   }
 }
