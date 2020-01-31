@@ -95,7 +95,7 @@
                         }}
                       </div>
                     </div>
-                    <div class="inn">
+                    <div class="inn" style="margin-left: auto;">
                       <div class="cell">R</div>
                       <div class="cell" v-if="topBottom === 'top'">
                         {{ score }}

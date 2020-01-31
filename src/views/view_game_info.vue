@@ -176,6 +176,21 @@
           <label v-if="mvp">{{ mvp }}</label>
         </div>
 
+        <custom-input
+          v-if="mode === 'edit' && version !== 'import'"
+          type="textarea"
+          rows="3"
+          :name="$t('ttl_game_note')"
+          v-model="gameNote"
+        />
+
+        <custom-input
+          type="splitting-wording"
+          :name="$t('ttl_youtube_videos')"
+          :placeholder="$t('pla_split_youtube_videos')"
+          v-model="youtubeVideos"
+        />
+
         <label>{{ $t('ttl_before_game') }}</label>
       </div>
 
@@ -636,6 +651,8 @@ export default {
       mvp: '',
       coach: '',
       period: '',
+      gameNote: '',
+      youtubeVideos: '',
     };
   },
   created() {
@@ -726,6 +743,8 @@ export default {
             pitcher,
             mvp,
             period,
+            gameNote,
+            youtubeVideos,
           } = this;
           this.editGame({
             teamCode: this.$route.params.team,
@@ -745,6 +764,8 @@ export default {
             pitcher,
             mvp,
             period,
+            gameNote,
+            youtubeVideos,
           });
         }
       });
@@ -863,6 +884,8 @@ export default {
             pitcher,
             mvp,
             period,
+            gameNote,
+            youtubeVideos,
           } = this.boxSummary;
           this.version = version;
           this.result = result;
@@ -884,6 +907,8 @@ export default {
           this.pitcher = pitcher;
           this.mvp = mvp;
           this.period = period;
+          this.gameNote = gameNote;
+          this.youtubeVideos = youtubeVideos;
         }
       },
       immediate: true,

@@ -444,6 +444,12 @@
         >{{ $t('btn_fill_order') }}</router-link
       >
     </div>
+    <div class="video-container" v-for="video_id in videoIDs" :key="video_id">
+      <iframe
+        :src="`https://www.youtube.com/embed/${video_id}`"
+        allowfullscreen
+      ></iframe>
+    </div>
     <div v-if="coordinate" class="location-modal" @click="closeLocation">
       <coordination :values="[coordinate]" :no_track="true" />
     </div>
@@ -891,6 +897,21 @@
     }
   }
 }
+.video-container {
+  position: relative;
+  padding-bottom: 56.25%;
+  padding-top: 30px;
+  height: 0;
+  overflow: hidden;
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: 0 none;
+  }
+}
 @media only screen and (max-width: 760px) {
   .gamebox-container {
     font-size: 14px;
@@ -1044,6 +1065,7 @@ export default {
       result: '',
       tags: [],
       coordinate: undefined,
+      videoIDs: [],
     };
   },
   created() {
@@ -1133,6 +1155,7 @@ export default {
             mvp,
             result,
             tags,
+            youtubeVideos,
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -1167,6 +1190,10 @@ export default {
           this.mvp = mvp;
           this.result = result;
           this.tags = (tags || '')
+            .split(',')
+            .map(item => item.trim())
+            .filter(item => !!item);
+          this.videoIDs = (youtubeVideos || '')
             .split(',')
             .map(item => item.trim())
             .filter(item => !!item);

@@ -56,6 +56,8 @@ const actions = {
       pitcher = '',
       mvp = '',
       period = '',
+      gameNote = '',
+      youtubeVideos = '',
     } = data;
     commit(rootTypes.LOADING, true);
     const refNewGameDoc = db
@@ -100,6 +102,8 @@ const actions = {
             pitcher,
             mvp,
             period,
+            gameNote,
+            youtubeVideos,
             timestamp,
           },
           { merge: true },
