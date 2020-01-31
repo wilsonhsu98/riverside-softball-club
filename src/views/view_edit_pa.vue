@@ -1239,14 +1239,7 @@ export default {
           ) || { name: sameOrderPlayers[0] };
         }
 
-        const startPlayers = this.box.slice(1).map(player => player.name);
-        this.benchPlayers = this.teamInfo.players.filter(
-          player =>
-            (player.name && !startPlayers.includes(player.name)) ||
-            player.name === this.name,
-        );
-
-        this.checkPrev5();
+        this.checkModalPlayer();
       }
     },
     checkReJoin(sameOrderPlayers) {
@@ -1264,7 +1257,23 @@ export default {
         if (i === 0 && acc === undefined) return true;
       }, undefined);
     },
-    checkPrev5() {
+    checkModalPlayer() {
+      const onbasePlayers = [
+        { name: this.base.home.name },
+        { name: this.base.first.name },
+        { name: this.base.second.name },
+        { name: this.base.third.name },
+      ];
+      const startPlayers = this.box.slice(1).map(player => player.name);
+      this.benchPlayers = this.teamInfo.players
+        .filter(
+          player =>
+            (player.name && !startPlayers.includes(player.name)) ||
+            player.name === this.name,
+        )
+        .filter(
+          player => !onbasePlayers.find(sub => sub && sub.name === player.name),
+        );
       this.prev5Players = this.boxSummary.contents
         .slice(Math.max(this.order - 6, 0), this.order - 1)
         .filter(item => item.inn === this.inn)
@@ -1275,11 +1284,7 @@ export default {
             .map(sub => sub.onbase)
             .reduce((acc, sub) => acc.concat(sub), [])
             .filter(item => item && item.result !== '' && item.name)
-            .concat([
-              { name: this.base.first.name },
-              { name: this.base.second.name },
-              { name: this.base.third.name },
-            ]);
+            .concat(onbasePlayers);
           return prev5.find(sub => sub && sub.name === item.name)
             ? false
             : true;
@@ -1339,7 +1344,7 @@ export default {
       }
       this.$modal.hide('player');
       this.changeMode = '';
-      this.checkPrev5();
+      this.checkModalPlayer();
       if (this.prev5Players.length === 0) {
         this.step = 2;
       }
@@ -1357,7 +1362,7 @@ export default {
       }
       this.$modal.hide('player');
       this.changeMode = '';
-      this.checkPrev5();
+      this.checkModalPlayer();
     },
   },
   watch: {
