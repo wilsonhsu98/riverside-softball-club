@@ -346,7 +346,7 @@
         type="select"
         taggable
         multiple
-        :options="[]"
+        :options="gameOptions.tags"
         :name="$t('ttl_game_tag')"
         :placeholder="$t('pla_game_tag')"
         v-model="tags"
@@ -855,7 +855,7 @@ export default {
       currentTeamIcon: 'currentTeamIcon',
       currentTeam: 'currentTeam',
       boxSummary: 'boxSummary',
-      gameList: 'gameList',
+      games: 'games',
       gameOptions: 'gameOptions',
       period_: 'period',
       teamInfo: 'teamInfo',
@@ -916,11 +916,8 @@ export default {
     date() {
       this.gameDate = this.formatDate(this.date);
       this.gamePostfix =
-        (
-          this.gameList.find(item => item.date === this.gameDate) || {
-            games: [],
-          }
-        ).games
+        this.games
+          .filter(item => item.game.indexOf(this.gameDate) > -1)
           .map(item => item.game.split('-')[1])
           .reduce((a, b) => Math.max(a, b), 0) + 1;
       if (this.mode === 'edit' && this.gameDate === this.prevId.split('-')[0]) {

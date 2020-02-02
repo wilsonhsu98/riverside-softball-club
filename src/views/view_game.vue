@@ -444,6 +444,11 @@
         >{{ $t('btn_fill_order') }}</router-link
       >
     </div>
+    <div v-if="gameNote" class="gamebox-container">
+      <div class="box-summary game-note" :data-column="$t('ttl_game_note')">
+        <pre>{{ gameNote }}</pre>
+      </div>
+    </div>
     <div class="video-container" v-for="video_id in videoIDs" :key="video_id">
       <iframe
         :src="`https://www.youtube.com/embed/${video_id}`"
@@ -488,6 +493,17 @@
       cursor: pointer;
       text-align: center;
       vertical-align: middle;
+    }
+    &.game-note {
+      min-height: auto;
+      &:before {
+        content: attr(data-column) ':';
+        display: block;
+      }
+      > pre {
+        font-family: auto;
+        margin: 0;
+      }
     }
   }
   .box-table {
@@ -757,6 +773,7 @@
       color: #000;
       padding: 4px 8px;
       margin: 10px 10px 0 0;
+      line-height: 20px;
     }
     .fa.fa-pencil {
       position: inherit;
@@ -934,6 +951,23 @@
         right: 10px;
         bottom: 10px;
       }
+      &.game-note {
+        text-align: left;
+        margin: 0 10px;
+        border: 2px solid;
+        border-radius: 4px;
+        margin-bottom: 10px;
+        padding: 10px;
+        position: relative;
+        &:before {
+          content: attr(data-column);
+          position: absolute;
+          top: -12px;
+          left: 12px;
+          background-color: #ccc;
+          padding: 0 4px;
+        }
+      }
     }
     .box-table {
       border-radius: 0;
@@ -1066,6 +1100,7 @@ export default {
       tags: [],
       coordinate: undefined,
       videoIDs: [],
+      gameNote: '',
     };
   },
   created() {
@@ -1081,7 +1116,7 @@ export default {
     }),
     screenshot() {
       this.toggleLoading(true);
-      html2canvas(document.querySelector('.gamebox-container'), {
+      html2canvas(this.$refs.container, {
         useCORS: true,
         logging: false,
       })
@@ -1156,6 +1191,7 @@ export default {
             result,
             tags,
             youtubeVideos,
+            gameNote,
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -1189,14 +1225,12 @@ export default {
           this.pitcher = pitcher;
           this.mvp = mvp;
           this.result = result;
-          this.tags = (tags || '')
-            .split(',')
-            .map(item => item.trim())
-            .filter(item => !!item);
+          this.tags = tags || [];
           this.videoIDs = (youtubeVideos || '')
             .split(',')
             .map(item => item.trim())
             .filter(item => !!item);
+          this.gameNote = gameNote;
         }
       },
       immediate: true,

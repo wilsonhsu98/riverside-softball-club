@@ -84,8 +84,9 @@ const parseGame = arr => {
   };
 };
 
-const genGameList = games => {
+const genGameList = (games, filterGames = []) => {
   const temp = games
+    .filter(item => filterGames.includes(item.game))
     .map(item => item.game.substr(0, 8))
     .filter((v, i, self) => self.indexOf(v) === i)
     .sort((a, b) => {

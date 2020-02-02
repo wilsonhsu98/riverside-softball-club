@@ -510,11 +510,9 @@ const execItemStats = state => {
 
 const execBox = state => {
   const boxSummary =
-    state.gameList.length &&
+    state.games.length &&
     state.game &&
-    state.gameList
-      .find(item => item.games.find(sub => sub.game === state.game))
-      .games.find(item => item.game === state.game);
+    state.games.find(item => item.game === state.game);
   return displayGame(
     state.players,
     state.records.filter(item => item._table === state.game),

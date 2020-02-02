@@ -61,7 +61,7 @@ const state = {
   ],
   game: '',
   order: 0,
-  gameList: [],
+  games: [],
   genStatistics: [],
   itemStats: { AVG: [], H: [], HR: [], RBI: [] },
   box: [],
@@ -106,11 +106,9 @@ const getters = {
   },
   boxSummary: state => {
     const boxSummary =
-      state.gameList.length &&
+      state.games.length &&
       state.game &&
-      state.gameList
-        .find(item => item.games.find(sub => sub.game === state.game))
-        .games.find(item => item.game === state.game);
+      state.games.find(item => item.game === state.game);
     const game = state.records.filter(item => item._table === state.game);
     return {
       ...boxSummary,
@@ -151,42 +149,49 @@ const getters = {
       }, []),
     };
   },
-  gameList: state => state.gameList,
+  games: state => state.games,
+  groupGames: state =>
+    utils.genGameList(
+      state.games,
+      (state.period.find(item => item.select) || { games: [] }).games,
+    ),
   gameOptions: state =>
-    state.gameList
-      .reduce((acc, item) => acc.concat(item.games), [])
-      .reduce(
-        (acc, item, i, self) => {
-          if (i === self.length - 1) {
-            return {
-              opponent: [...new Set(acc.opponent.concat(item.opponent))].sort(
-                (a, b) => a.localeCompare(b),
-                'zh-TW',
-              ),
-              league: [...new Set(acc.league.concat(item.league))].sort(
-                (a, b) => a.localeCompare(b),
-                'zh-TW',
-              ),
-              group: [...new Set(acc.group.concat(item.group))].sort(
-                (a, b) => a.localeCompare(b),
-                'zh-TW',
-              ),
-              period: [...new Set(acc.period.concat(item.period))].sort(
-                (a, b) => b.localeCompare(a),
-                'zh-TW',
-              ),
-            };
-          } else {
-            return {
-              opponent: acc.opponent.concat(item.opponent),
-              league: acc.league.concat(item.league),
-              group: acc.group.concat(item.group),
-              period: acc.period.concat(item.period),
-            };
-          }
-        },
-        { opponent: [], league: [], group: [], period: [] },
-      ),
+    state.games.reduce(
+      (acc, item, i, self) => {
+        if (i === self.length - 1) {
+          return {
+            opponent: [...new Set(acc.opponent.concat(item.opponent))].sort(
+              (a, b) => a.localeCompare(b),
+              'zh-TW',
+            ),
+            league: [...new Set(acc.league.concat(item.league))].sort(
+              (a, b) => a.localeCompare(b),
+              'zh-TW',
+            ),
+            group: [...new Set(acc.group.concat(item.group))].sort(
+              (a, b) => a.localeCompare(b),
+              'zh-TW',
+            ),
+            period: [...new Set(acc.period.concat(item.period))].sort(
+              (a, b) => b.localeCompare(a),
+              'zh-TW',
+            ),
+            tags: [...new Set(acc.tags.concat(item.tags))]
+              .filter(item => !!item)
+              .sort((a, b) => b.localeCompare(a), 'zh-TW'),
+          };
+        } else {
+          return {
+            opponent: acc.opponent.concat(item.opponent),
+            league: acc.league.concat(item.league),
+            group: acc.group.concat(item.group),
+            period: acc.period.concat(item.period),
+            tags: acc.tags.concat(item.tags),
+          };
+        }
+      },
+      { opponent: [], league: [], group: [], period: [], tags: [] },
+    ),
   game: state => state.game,
   periodGames: state => state.period.find(item => item.select).games || [],
   itemStats: state => state.itemStats,
@@ -426,7 +431,7 @@ const actions = {
       workerCreater(
         {
           cmd: 'Box',
-          gameList: state.gameList,
+          games: state.games,
           game: state.game,
           players: state.players,
           records: state.records,
@@ -558,7 +563,7 @@ const mutations = {
     state.order = data;
   },
   [types.GET_GAMELIST](state, data) {
-    state.gameList = utils.genGameList(data);
+    state.games = data;
   },
   [types.SET_GENSTATISTICS](state, data) {
     state.genStatistics = data;
