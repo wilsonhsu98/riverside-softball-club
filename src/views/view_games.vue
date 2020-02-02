@@ -54,8 +54,12 @@
       ref="container"
       :class="{ empty: role === 'manager' && gameList_.length === 0 }"
     >
-      <template v-for="item in gameList_">
-        <div class="row" :data-date="item.date" :key="`date_${item.date}`">
+      <template v-for="(item, i) in gameList_">
+        <div
+          :class="['row', { last: i === gameList_.length - 1 }]"
+          :data-date="item.date"
+          :key="`date_${item.date}`"
+        >
           <template v-for="sub in item.games">
             <v-popover
               placement="bottom"
@@ -222,10 +226,15 @@
   font-size: 14px;
 }
 .container {
+  display: flex;
+  flex-direction: column;
   .row {
     padding-bottom: 20px;
     display: flex;
     position: relative;
+    &.last {
+      margin-bottom: auto;
+    }
     .cell {
       color: $row_color;
       text-align: center;
