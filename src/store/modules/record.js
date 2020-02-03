@@ -26,6 +26,7 @@ const types = {
   SET_GENSTATISTICS: 'RECORD/SET_GENSTATISTICS',
   SET_ITEMSTATS: 'RECORD/SET_ITEMSTATS',
   SET_BOX: 'RECORD/SET_BOX',
+  RESET_PERIOD: 'RECORD/RESET_PERIOD',
 };
 
 const state = {
@@ -462,6 +463,9 @@ const mutations = {
     const pref_cols = window.localStorage.getItem('pref_cols');
     if (pref_cols) state.cols = JSON.parse(pref_cols);
   },
+  [types.RESET_PERIOD](state) {
+    state.period = [{ period: 'period_all', select: true }];
+  },
   [types.GET_PERIOD](state, data) {
     state.period.find(item => item.period === 'period_all').games = data
       .map(item => item.game)
@@ -576,6 +580,7 @@ const mutations = {
   },
 };
 
+export { types };
 export default {
   state,
   getters,

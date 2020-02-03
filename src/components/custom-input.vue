@@ -162,7 +162,7 @@
     background: transparent;
   }
   @media (hover: hover) and (pointer: fine) {
-    &:hover:not(.disabled) .field-wrapper-children {
+    .field-wrapper:hover:not(.disabled) .field-wrapper-children {
       border-color: #3b5998;
     }
   }

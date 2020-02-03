@@ -6,6 +6,7 @@ import {
   snapShot,
   snapShotRequest,
 } from '../root';
+import { types as recordTypes } from './record';
 import record from './record';
 import router from '../../router';
 import { db, timestamp } from '../../firebase';
@@ -135,6 +136,7 @@ const actions = {
               commit(rootTypes.SET_AUTH, teams);
               record.actions.workerBox({ commit });
               teams.forEach(team => {
+                if (team.role !== 'manager') return;
                 if (typeof snapShotRequest[team.teamCode] === 'function')
                   snapShotRequest[team.teamCode]();
                 snapShotRequest[team.teamCode] = db
@@ -159,7 +161,12 @@ const actions = {
   },
   switchTeam({ commit, state }, teamCode) {
     window.localStorage.setItem('currentTeam', teamCode);
+    window.localStorage.removeItem('players');
+    window.localStorage.removeItem('period');
+    window.localStorage.removeItem('records');
+    window.localStorage.removeItem('lastUpdate');
     commit(rootTypes.SET_AUTH, state.teams);
+    commit(recordTypes.RESET_PERIOD);
   },
 };
 
