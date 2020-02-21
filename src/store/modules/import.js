@@ -238,6 +238,112 @@ const actions = {
         });
     }, Promise.resolve());
   },
+
+  migrateGamesTimeToTeamDoc(undefined, team = 'OldStar') {
+    db.collection(`teams/${team}/games`)
+      .get()
+      .then(collection =>
+        Promise.all(
+          collection.docs.map(doc => ({
+            id: doc.id,
+            data: doc.data(),
+          })),
+        ),
+      )
+      .then(arr => {
+        const games = arr.reduce((acc, item) => {
+          acc[item.id] = item.data.timestamp;
+          return acc;
+        }, {});
+        db.collection('teams')
+          .doc(team)
+          .set({ games }, { merge: true });
+      });
+  },
+  migratePlayersToTeamDoc(undefined, team = 'OldStar') {
+    db.collection(`teams/${team}/players`)
+      .get()
+      .then(collection =>
+        Promise.all(
+          collection.docs.map(doc => ({
+            id: doc.id,
+            data: doc.data(),
+          })),
+        ),
+      )
+      .then(arr => {
+        const players = arr.reduce((acc, item) => {
+          acc[item.id] = { ...item.data };
+          return acc;
+        }, {});
+        db.collection('teams')
+          .doc(team)
+          .set({ players }, { merge: true });
+      });
+  },
+  migrateBenchesToTeamDoc(undefined, team = 'OldStar') {
+    db.collection(`teams/${team}/benches`)
+      .get()
+      .then(collection =>
+        Promise.all(
+          collection.docs.map(doc => ({
+            id: doc.id,
+            data: doc.data(),
+          })),
+        ),
+      )
+      .then(arr => {
+        const benches = arr.reduce((acc, item) => {
+          acc[item.id] = { ...item.data };
+          return acc;
+        }, {});
+        db.collection('teams')
+          .doc(team)
+          .set({ benches }, { merge: true });
+      });
+  },
+  migrateTeamRoleToAccountDoc() {
+    db.collection('accounts')
+      .get()
+      .then(accounts => {
+        return Promise.all(
+          accounts.docs.map(account =>
+            db.collection(`accounts/${account.id}/teams`).get(),
+          ),
+        );
+      })
+      .then(accountTeams => {
+        return Promise.all(
+          accountTeams
+            .filter(accountTeam => {
+              return accountTeam.docs.length;
+            })
+            .map(accountTeam => {
+              return accountTeam.docs.map(doc => {
+                return {
+                  uid: accountTeam.docs[0].ref.parent.parent.id,
+                  id: doc.id,
+                  ...doc.data(),
+                };
+              });
+            }),
+        );
+      })
+      .then(accounts => {
+        accounts.forEach(accountTeams => {
+          const teamObj = accountTeams.reduce((acc, team) => {
+            acc[team.id] = team.role;
+            return acc;
+          }, {});
+          db.collection('accounts')
+            .doc(accountTeams[0].uid)
+            .set(
+              { teams: Object.keys(teamObj), teamRoles: teamObj },
+              { merge: true },
+            );
+        });
+      });
+  },
 };
 
 const mutations = {

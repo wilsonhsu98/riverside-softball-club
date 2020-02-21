@@ -108,6 +108,7 @@ const actions = {
         refPlayerDoc
           .get()
           .then(doc => {
+            window.trackRead('lineLoginRedirect', 1);
             const data = doc.exists ? doc.data() : {};
 
             return {
@@ -119,47 +120,22 @@ const actions = {
           })
           .then(res => {
             const { accessToken, ...other } = res;
-            return Promise.all([
-              refPlayerDoc.set(
-                {
-                  accessToken,
-                  name: res.name,
-                  photo: res.photo,
-                  line_photo: user.photoURL,
-                },
-                {
-                  merge: true,
-                },
-              ),
-              refPlayerDoc.collection('teams').get(),
-              other,
-            ]);
-          })
-          .then(res => {
-            const [, snapshot, other] = res; //setAction
-            if (snapshot.docs.length) {
-              Promise.all(
-                snapshot.docs.map(doc => {
-                  return new Promise(resolve => {
-                    db.collection('teams')
-                      .doc(doc.id)
-                      .get()
-                      .then(teamDoc => {
-                        resolve({
-                          teamCode: doc.id,
-                          role: doc.data().role,
-                          ...teamDoc.data(),
-                        });
-                      });
-                  });
-                }),
-              ).then(teams => {
-                commit(types.SET_AUTH, teams);
-              });
-            } else {
-              commit(types.SET_AUTH);
-            }
             commit(types.SET_ACCOUNT_INFO, { ...other });
+            return refPlayerDoc.set(
+              {
+                accessToken,
+                name: res.name,
+                photo: res.photo,
+                line_photo: user.photoURL,
+              },
+              {
+                merge: true,
+              },
+            );
+          })
+          .then(() => refPlayerDoc.get())
+          .then(() => {
+            window.trackRead('lineLoginRedirect: dummy get', 1);
             // commit(types.SET_USERNAME, snapshot.docs[0].id);
             router.push('/main/user');
             commit(types.LOADING, false);
@@ -285,6 +261,7 @@ const actions = {
                 : providerData.photoURL;
 
             return refPlayerDoc.get().then(doc => {
+              window.trackRead('chkLoginStatus', 1);
               const data = doc.exists ? doc.data() : {};
 
               return {
@@ -310,42 +287,17 @@ const actions = {
               photo: res.photo,
               [`${providerData.providerId.split('.')[0]}_photo`]: providerPhoto,
             };
-            commit(types.SET_USERNAME, res.name);
-            return Promise.all([
-              refPlayerDoc.set(data, { merge: true }),
-              refPlayerDoc.collection('teams').get(),
-              data,
-            ]);
-          })
-          .then(res => {
-            const [, snapshot, data] = res; //setAction
-            const { accessToken, ...other } = data;
+            const { accessToken, ...otherInfo } = data;
             accessToken;
-            if (snapshot.docs.length) {
-              Promise.all(
-                snapshot.docs.map(doc => {
-                  return new Promise(resolve => {
-                    db.collection('teams')
-                      .doc(doc.id)
-                      .get()
-                      .then(teamDoc => {
-                        resolve({
-                          teamCode: doc.id,
-                          role: doc.data().role,
-                          ...teamDoc.data(),
-                        });
-                      });
-                  });
-                }),
-              ).then(teams => {
-                commit(types.SET_AUTH, teams);
-              });
-            } else {
-              commit(types.SET_AUTH);
-            }
             commit(types.SET_USERID, user.uid);
-            commit(types.SET_ACCOUNT_INFO, { ...other });
+            commit(types.SET_USERNAME, res.name);
+            commit(types.SET_ACCOUNT_INFO, { ...otherInfo });
             commit(types.SET_ANONYMOUS, false);
+            return refPlayerDoc.set(data, { merge: true });
+          })
+          .then(() => refPlayerDoc.get())
+          .then(() => {
+            window.trackRead('chkLoginStatus: dummy get', 1);
             if (router.history.current.path === '/login') {
               router.push('/main/user');
             }
@@ -409,6 +361,9 @@ const actions = {
         commit(types.LOADING, false);
       });
   },
+  forceLogin({ commit }, version) {
+    commit(types.CLEAN_TOKEN, version);
+  },
 };
 
 const mutations = {
@@ -436,9 +391,10 @@ const mutations = {
     window.localStorage.setItem('accountInfo', JSON.stringify(accountInfo));
     state.accountInfo = accountInfo;
   },
-  [types.CLEAN_TOKEN](state) {
+  [types.CLEAN_TOKEN](state, forceVersion) {
     const version = window.localStorage.getItem('version');
     const currentTeam = window.localStorage.getItem('currentTeam');
+    const idb = window.localStorage.getItem('idb');
     window.localStorage.clear();
     state.token = '';
     state.userId = '';
@@ -447,8 +403,9 @@ const mutations = {
     state.currentTeamIcon = '';
     state.isAnonymous = undefined;
     user.state.teams = null;
-    window.localStorage.setItem('version', version);
+    window.localStorage.setItem('version', forceVersion || version);
     if (currentTeam) window.localStorage.setItem('currentTeam', currentTeam);
+    if (idb) window.localStorage.setItem('idb', idb);
     router.push('/login');
   },
   [types.SET_AUTH](state, auth = []) {
@@ -479,7 +436,9 @@ const mutations = {
   },
   [types.SET_ANONYMOUS](state, isAnonymous) {
     state.isAnonymous = isAnonymous;
-    state.currentTeam = window.localStorage.getItem('currentTeam');
+    if (isAnonymous) {
+      state.currentTeam = window.localStorage.getItem('currentTeam');
+    }
   },
 };
 

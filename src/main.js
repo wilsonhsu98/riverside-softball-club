@@ -59,6 +59,12 @@ Vue.use({
 });
 Vue.config.productionTip = false;
 
+const version = 7;
+if (window.localStorage.getItem('version') !== version.toString()) {
+  store.dispatch('forceLogin', version);
+  window.indexedDB.deleteDatabase(process.env.VUE_APP_PROJECTNAME);
+}
+
 new Promise(resolve => {
   resolve(
     new Vue({
@@ -71,12 +77,6 @@ new Promise(resolve => {
 }).then(() => {
   store.dispatch('chkLoginStatus');
 });
-
-const version = 6;
-if (window.localStorage.getItem('version') !== version.toString()) {
-  window.localStorage.clear();
-  window.localStorage.setItem('version', version.toString());
-}
 
 const resetVH = () => {
   const vh = window.innerHeight * 0.01;
@@ -95,3 +95,13 @@ link.type = 'image/png';
 link.rel = 'shortcut icon';
 link.href = require('./images/icon.png');
 document.getElementsByTagName('head')[0].appendChild(link);
+
+let reads = 0;
+window.trackRead = function(title, count) {
+  reads += count;
+  if (process.env.NODE_ENV === 'production') {
+    window.reads = reads;
+  } else {
+    console.log(`====${title}====\nadd: ${count}\ncurrent: ${reads}`);
+  }
+};

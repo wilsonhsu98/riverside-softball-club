@@ -68,9 +68,9 @@
           class="team"
           @click="switchTeam_(team.teamCode)"
           :data-requests="
-            team.requests === 0 || team.teamCode === currentTeam
+            (team.requests || []).length === 0 || team.teamCode === currentTeam
               ? undefined
-              : team.requests
+              : team.requests.length
           "
           :key="`team_${team.teamCode}`"
         >
@@ -266,15 +266,11 @@ export default {
     ...mapActions({
       logout: 'logout',
       switchTeam: 'switchTeam',
-      fetchTable: 'fetchTable',
-      fetchTeamRequests: 'fetchTeamRequests',
       searchTeams: 'searchTeams',
     }),
     switchTeam_(teamCode) {
       if (this.currentTeam !== teamCode) {
         this.switchTeam(teamCode);
-        this.fetchTable(teamCode);
-        this.fetchTeamRequests(teamCode);
       }
     },
   },

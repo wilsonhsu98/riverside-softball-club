@@ -7,14 +7,75 @@ import {
   snapShot,
 } from '../root';
 import { types as userTypes } from './user';
-import { db, auth, timestamp } from '../../firebase';
+import { actions as recordActions } from './record';
+import { db, auth, fieldValue, timestamp } from '../../firebase';
+import { openDB } from 'idb';
+
+const dbInit = teamCode => {
+  const tableName = `${teamCode}_games`;
+  const version = window.localStorage.getItem('idb') || 1;
+  const dbPromise = new Promise(resolve => {
+    openDB(process.env.VUE_APP_PROJECTNAME, parseInt(version, 10), {
+      blocking(e) {
+        // https://stackoverflow.com/questions/43215199/indexeddb-onupgradeneeded-event-never-finishes
+        e.target.close();
+      },
+    })
+      .then(db => {
+        db.close();
+        if (db.objectStoreNames.contains(tableName)) {
+          return db.version;
+        } else {
+          return db.version + 1;
+        }
+      })
+      .then(v => {
+        openDB(process.env.VUE_APP_PROJECTNAME, v, {
+          upgrade(db, undefined, newVersion) {
+            if (!db.objectStoreNames.contains(tableName)) {
+              window.localStorage.setItem('idb', newVersion);
+              db.createObjectStore(tableName);
+            }
+          },
+          blocking(e) {
+            // https://stackoverflow.com/questions/43215199/indexeddb-onupgradeneeded-event-never-finishes
+            e.target.close();
+          },
+        }).then(db => {
+          resolve(db);
+        });
+      });
+  });
+
+  return {
+    async get(key) {
+      return (await dbPromise).get(tableName, key);
+    },
+    async getAll() {
+      return (await dbPromise).getAll(tableName);
+    },
+    async set(key, val) {
+      return (await dbPromise).put(tableName, val, key);
+    },
+    async delete(key) {
+      return (await dbPromise).delete(tableName, key);
+    },
+    async clear() {
+      return (await dbPromise).clear(tableName);
+    },
+    async keys() {
+      return (await dbPromise).getAllKeys(tableName);
+    },
+  };
+};
 
 const types = {
   FETCH_TEAM: 'TEAM/FETCH_TEAM',
   CLEAR_TEAM: 'TEAM/CLEAR_TEAM',
   SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
   FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
-  FETCH_TEAM_REQUESTS: 'TEAM/FETCH_TEAM_REQUESTS',
+  FETCH_PHOTO: 'TEAM/FETCH_PHOTO',
+  ADD_PHOTO: 'TEAM/ADD_PHOTO',
 };
 
 const state = {
@@ -29,45 +90,178 @@ const state = {
   },
   teamList: [],
   requests: [],
-  teamRequests: [],
+  accountPhotos: {},
 };
 
 const getters = {
-  teamInfo: state => state.teamInfo,
+  teamInfo: state => ({
+    ...state.teamInfo,
+    players: state.teamInfo.players.map(player => ({
+      ...player,
+      photo: state.accountPhotos[player.uid],
+    })),
+    benches: state.teamInfo.benches.map(player => ({
+      ...player,
+      photo: state.accountPhotos[player.uid],
+    })),
+  }),
   teamNames: state =>
     [state.teamInfo.teamName].concat(
       state.teamInfo.otherNames.split(',').sort((a, b) => a.localeCompare(b)),
     ),
   teamList: state => state.teamList,
   requests: state => state.requests,
-  teamRequests: state => state.teamRequests,
 };
 
 const actions = {
-  editTeam({ commit, dispatch }, data) {
+  editTeam({ commit }, data) {
     commit(rootTypes.LOADING, true);
     const refTeamDoc = db.collection('teams').doc(data.code);
     const refPlayerDoc = db.collection('accounts').doc(auth.currentUser.uid);
     Promise.all([
       promiseImage(data.icon, 'icon'),
       refTeamDoc.get(),
-      refTeamDoc.collection('players').get(),
-      refTeamDoc.collection('benches').get(),
       refPlayerDoc.get(),
     ])
       .then(res => {
-        const [
-          url,
-          teamDoc,
-          teamPlayerCollection,
-          teamBenchesCollection,
-          playerDoc,
-        ] = res;
+        const [url, teamDoc, playerDoc] = res;
+        window.trackRead('editTeam: team doc', 1);
+        window.trackRead('editTeam: current player doc', 1);
         if (teamDoc.exists && data.isNew) {
           alert(i18n.t('msg_duplicate_team'));
           return true;
         } else {
           const batch = db.batch();
+          data.players.forEach(player => {
+            if (player.uid) {
+              batch.set(
+                db.collection('accounts').doc(player.uid),
+                {
+                  teamRoles: {
+                    [data.code]: player.manager ? 'manager' : 'player',
+                  },
+                },
+                { merge: true },
+              );
+            } else if (player.self) {
+              batch.set(
+                refPlayerDoc,
+                { teamRoles: { [data.code]: 'manager' } },
+                { merge: true },
+              );
+            }
+          });
+          const players2benches = data.prePlayers
+            .filter(prePlayer => {
+              if (
+                !data.players
+                  .map(player => player.name)
+                  .includes(prePlayer.name)
+              ) {
+                if (
+                  prePlayer.uid &&
+                  !data.players
+                    .map(player => player.uid)
+                    .includes(prePlayer.uid)
+                ) {
+                  batch.set(
+                    db.collection('accounts').doc(prePlayer.uid),
+                    {
+                      teamRoles: {
+                        [data.code]: 'bench',
+                      },
+                    },
+                    { merge: true },
+                  );
+                  batch.set(
+                    refTeamDoc,
+                    {
+                      players: {
+                        [prePlayer.name]: fieldValue.delete(),
+                      },
+                    },
+                    { merge: true },
+                  );
+                  return true;
+                }
+              }
+            })
+            .map(prePlayer => {
+              return {
+                uid: prePlayer.uid,
+                msg: prePlayer.name,
+              };
+            });
+          const brenches2players = data.preBenches
+            .filter(prePlayer => {
+              if (
+                !data.benches.map(player => player.uid).includes(prePlayer.uid)
+              ) {
+                batch.set(
+                  db.collection('accounts').doc(prePlayer.uid),
+                  {
+                    teams: fieldValue.arrayRemove(data.code),
+                    teamRoles: {
+                      [data.code]: fieldValue.delete(),
+                    },
+                  },
+                  { merge: true },
+                );
+              } else {
+                batch.set(
+                  db.collection('accounts').doc(prePlayer.uid),
+                  {
+                    teamRoles: {
+                      [data.code]: 'player',
+                    },
+                  },
+                  { merge: true },
+                );
+                batch.set(
+                  refTeamDoc,
+                  {
+                    benches: {
+                      [prePlayer.uid]: fieldValue.delete(),
+                    },
+                  },
+                  { merge: true },
+                );
+                return data.benches.find(
+                  player => player.name && player.uid === prePlayer.uid,
+                );
+              }
+            })
+            .map(prePlayer => {
+              const find = data.benches.find(
+                player => player.uid === prePlayer.uid,
+              );
+              return {
+                manager: false,
+                number: find.number || '',
+                uid: find.uid,
+                name: find.name,
+              };
+            });
+          const players = [...data.players, ...brenches2players].reduce(
+            (acc, player) => {
+              const { name, number, manager, uid } = player;
+              acc[name] = {
+                number,
+                manager,
+                ...(uid && { uid: player.self ? playerDoc.id : uid }),
+              };
+              return acc;
+            },
+            {},
+          );
+          const benches = [
+            ...data.benches.filter(player => !player.name),
+            ...players2benches,
+          ].reduce((acc, player) => {
+            const { msg, uid } = player;
+            acc[uid] = { msg, uid };
+            return acc;
+          }, {});
           batch.set(
             refTeamDoc,
             {
@@ -75,126 +269,17 @@ const actions = {
               subNames: data.subNames,
               intro: data.intro,
               icon: url,
+              players,
+              benches,
               timestamp,
             },
             { merge: true },
           );
-          data.players.forEach(item => {
-            if (item.uid) {
-              batch.set(
-                db
-                  .collection('accounts')
-                  .doc(item.uid)
-                  .collection('teams')
-                  .doc(data.code),
-                { role: item.manager ? 'manager' : 'player' },
-                { merge: true },
-              );
-              // batch.set(
-              //   db.collection('accounts').doc(item.uid),
-              //   { teams: fieldValue.arrayUnion(data.code) },
-              //   { merge: true },
-              // );
-            } else if (item.self) {
-              batch.set(
-                refPlayerDoc.collection('teams').doc(data.code),
-                { role: 'manager' },
-                { merge: true },
-              );
-              // batch.set(
-              //   refPlayerDoc,
-              //   { teams: fieldValue.arrayUnion(data.code) },
-              //   { merge: true },
-              // );
-            }
-            batch.set(
-              refTeamDoc.collection('players').doc(item.name),
-              {
-                number: item.number,
-                manager: item.manager,
-                ...(item.uid
-                  ? { uid: item.uid }
-                  : item.self
-                  ? { uid: playerDoc.id }
-                  : {}),
-              },
-              {
-                merge: true,
-              },
-            );
-          });
-          teamPlayerCollection.docs.forEach(doc => {
-            if (!data.players.map(player => player.name).includes(doc.id)) {
-              batch.delete(refTeamDoc.collection('players').doc(doc.id));
-              const { uid } = doc.data();
-              if (
-                uid &&
-                !data.players.map(player => player.uid).includes(uid)
-              ) {
-                batch.set(
-                  db
-                    .collection('accounts')
-                    .doc(uid)
-                    .collection('teams')
-                    .doc(data.code),
-                  { role: 'bench' },
-                  { merge: true },
-                );
-                batch.set(
-                  refTeamDoc.collection('benches').doc(uid),
-                  { uid, msg: doc.id },
-                  { merge: true },
-                );
-              }
-            }
-          });
-          data.benches
-            .filter(item => item.name)
-            .forEach(item => {
-              batch.set(
-                db
-                  .collection('accounts')
-                  .doc(item.uid)
-                  .collection('teams')
-                  .doc(data.code),
-                { role: 'player' },
-                { merge: true },
-              );
-              // batch.set(
-              //   db.collection('accounts').doc(item.uid),
-              //   { teams: fieldValue.arrayUnion(data.code) },
-              //   { merge: true },
-              // );
-              batch.set(
-                refTeamDoc.collection('players').doc(item.name),
-                { manager: false, number: item.number || '', uid: item.uid },
-                { merge: true },
-              );
-              batch.delete(refTeamDoc.collection('benches').doc(item.uid));
-            });
-          teamBenchesCollection.docs.forEach(doc => {
-            if (!data.benches.map(player => player.uid).includes(doc.id)) {
-              batch.delete(refTeamDoc.collection('benches').doc(doc.id));
-              batch.delete(
-                db
-                  .collection('accounts')
-                  .doc(doc.id)
-                  .collection('teams')
-                  .doc(data.code),
-              );
-              // batch.set(
-              //   db.collection('accounts').doc(doc.id),
-              //   { teams: fieldValue.arrayRemove(data.code) },
-              //   { merge: true },
-              // );
-            }
-          });
           return batch.commit();
         }
       })
       .then(() => {
         commit(rootTypes.LOADING, false);
-        dispatch('fetchTeamInfo', data.code);
       })
       .catch(error => {
         console.log('Error getting document:', error);
@@ -203,101 +288,156 @@ const actions = {
   fetchTeamInfo({ commit }, teamCode) {
     commit(types.CLEAR_TEAM);
     commit(rootTypes.LOADING, true);
-    const refTeamDoc = db.collection('teams').doc(teamCode);
     Promise.all([
-      refTeamDoc.get(),
-      refTeamDoc.collection('players').get(),
-      refTeamDoc.collection('benches').get(),
+      db
+        .collection('teams')
+        .doc(teamCode)
+        .get(),
       db
         .collection('accounts')
-        .get()
-        .then(accounts => {
-          return Promise.all(
-            accounts.docs.map(account =>
-              db.collection(`accounts/${account.id}/teams`).get(),
-            ),
-          );
-        })
-        .then(accountTeams => {
-          return Promise.all(
-            accountTeams
-              .filter(accountTeam => {
-                return accountTeam.docs.map(doc => doc.id).includes(teamCode);
-              })
-              .map(accountTeam => {
-                return db.doc(accountTeam.docs[0].ref.parent.parent.path).get();
-              }),
-          );
-        })
-        .then(res => ({ docs: res })),
+        .where('teams', 'array-contains', teamCode)
+        .get(),
     ]).then(res => {
-      const [
-        teamDoc,
-        playerCollection,
-        benchCollection,
-        accountCollection,
-      ] = res;
+      const [teamDoc, accountCollection] = res;
+      window.trackRead('fetchTeamInfo: team', 1);
+      window.trackRead(
+        'fetchTeamInfo: accounts in the team',
+        accountCollection.docs.length || 1,
+      );
       if (teamDoc.exists) {
-        const players = playerCollection.docs.map(doc => {
-          const data = doc.data();
-          const find = accountCollection.docs.find(
-            account => account.id === data.uid,
-          );
-          return {
-            name: doc.id,
-            photo: find && find.data().photo,
-            ...data,
-          };
-        });
-        const benches = benchCollection.docs.map(doc => {
-          const data = doc.data();
-          const find = accountCollection.docs.find(
-            account => account.id === data.uid,
-          );
-          return {
-            photo: find && find.data().photo,
-            ...data,
-          };
-        });
+        const {
+          benches: benches_,
+          players: players_,
+          ...others
+        } = teamDoc.data();
+        const players = Object.keys(players_).map(name => ({
+          name,
+          manager: players_[name].manager,
+          number: players_[name].number,
+          uid: players_[name].uid,
+        }));
+        const benches = Object.keys(benches_).map(uid => ({
+          uid,
+          msg: benches_[uid].msg,
+        }));
         commit(types.FETCH_TEAM, {
           id: teamDoc.id,
-          ...teamDoc.data(),
           players,
           benches,
+          ...others,
         });
+        commit(types.FETCH_PHOTO, accountCollection);
       }
       commit(rootTypes.LOADING, false);
     });
   },
-  fetchTeamIcon({ commit }, teamCode) {
+  listenTeamChange({ commit }, teamCode) {
+    let prePlayersContext = '';
     if (teamCode) {
-      commit(rootTypes.LOADING, true);
-
-      const refTeamDoc = db.collection('teams').doc(teamCode);
-      let queryCount = 0;
-      const realtimeCount = 1;
+      const idbKeyval = dbInit(teamCode);
       if (typeof snapShot.team === 'function') snapShot.team();
-      snapShot.team = refTeamDoc.onSnapshot(doc => {
-        queryCount += 1;
-        if (queryCount > realtimeCount) {
-          // realtime
-          commit(rootTypes.LOADING, { text: 'New data is coming' });
-          setTimeout(() => {
-            if (doc.exists) {
-              commit(rootTypes.SET_TEAMICON, doc.data().icon);
+      snapShot.team = db
+        .collection('teams')
+        .doc(teamCode)
+        .onSnapshot(teamDoc => {
+          if (teamDoc.exists && !teamDoc.metadata.hasPendingWrites) {
+            window.trackRead('listenTeamChange: team', 1);
+            const {
+              icon,
+              games,
+              benches: benches_,
+              players: players_,
+              ...others
+            } = teamDoc.data();
+            commit(rootTypes.SET_TEAMICON, icon);
+            commit(rootTypes.LOADING, true);
+
+            // prevent reload players if players not changed
+            const currentPlayersContext = JSON.stringify(players_);
+            if (currentPlayersContext !== prePlayersContext) {
+              prePlayersContext = currentPlayersContext;
+              recordActions.operatePlayers(
+                { commit },
+                {
+                  teamCode,
+                  players: Object.keys(players_).map(name => ({
+                    id: name,
+                    data: players_[name],
+                  })),
+                },
+              );
             }
-            commit(rootTypes.LOADING, false);
-          }, 1000);
-        } else {
-          // first time
-          if (doc.exists) {
-            commit(rootTypes.SET_TEAMICON, doc.data().icon);
+
+            idbKeyval.getAll().then(localGames => {
+              const localIds = localGames.map(game => game.id);
+              const gameShouldUpdates = localGames
+                .filter(
+                  game =>
+                    games[game.id] && !games[game.id].isEqual(game.timestamp),
+                )
+                .map(game => game.id)
+                .concat(
+                  Object.keys(games).filter(game => !localIds.includes(game)),
+                );
+
+              // delete
+              const gameShouldDeletes = localGames
+                .filter(game => !Object.keys(games).includes(game.id))
+                .map(game => game.id);
+
+              // update if needed
+              Promise.all(
+                gameShouldUpdates.map(game =>
+                  db.doc(`teams/${teamCode}/games/${game}`).get(),
+                ),
+              ).then(gameDocs => {
+                window.trackRead(
+                  'listenTeamChange: games need to update',
+                  gameDocs.length,
+                );
+                const setGames = gameDocs.map(gameDoc => {
+                  return idbKeyval.set(gameDoc.id, {
+                    id: gameDoc.id,
+                    ...gameDoc.data(),
+                  });
+                });
+                const delGames = gameShouldDeletes.map(gameId => {
+                  return idbKeyval.delete(gameId);
+                });
+                Promise.all([...setGames, ...delGames])
+                  .then(() => idbKeyval.getAll())
+                  .then(records => {
+                    recordActions.operateGames(
+                      { commit },
+                      records.map(({ id, ...data }) => ({
+                        id,
+                        data: { ...data },
+                      })),
+                    );
+                  });
+              });
+            });
+
+            const players = Object.keys(players_).map(name => ({
+              name,
+              manager: players_[name].manager,
+              number: players_[name].number,
+              uid: players_[name].uid,
+            }));
+            const benches = Object.keys(benches_).map(uid => ({
+              uid,
+              msg: benches_[uid].msg,
+            }));
+            commit(types.FETCH_TEAM, {
+              id: teamDoc.id,
+              icon,
+              players,
+              benches,
+              games,
+              ...others,
+            });
           }
-          if (queryCount === realtimeCount) {
-            commit(rootTypes.LOADING, false);
-          }
-        }
-      });
+        });
     } else {
       commit(rootTypes.SET_TEAMICON, '');
     }
@@ -318,6 +458,7 @@ const actions = {
     db.collection('teams')
       .get()
       .then(teamCollection => {
+        window.trackRead('searchTeams', teamCollection.docs.length || 1);
         const filterTeams = teamCollection.docs
           .map(doc => {
             const data = doc.data();
@@ -332,7 +473,7 @@ const actions = {
             };
           })
           .filter(team => {
-            if (keyword === '*') return true;
+            if (['*', '＊'].includes(keyword)) return true;
             return keyword
               ? team.keyword.match(
                   new RegExp(
@@ -373,7 +514,7 @@ const actions = {
         console.log('Error getting document:', error);
       });
   },
-  fetchRequests({ commit }, uid) {
+  fetchPersonalRequests({ commit }, uid) {
     commit(rootTypes.LOADING, true);
     if (typeof snapShot.request === 'function') snapShot.request();
     snapShot.request = db
@@ -381,6 +522,10 @@ const actions = {
       .where('uid', '==', uid)
       .onSnapshot(querySnapshot => {
         if (!querySnapshot.metadata.hasPendingWrites) {
+          window.trackRead(
+            'fetchPersonalRequests',
+            querySnapshot.docs.length || 1,
+          );
           const requests = querySnapshot.docs
             .map(doc => {
               const { timestamp, ...data } = doc.data();
@@ -396,57 +541,10 @@ const actions = {
         }
       });
   },
-  disconnectRequests() {
+  disconnectPersonalRequests() {
     if (typeof snapShot.request === 'function') snapShot.request();
   },
-  fetchTeamRequests({ commit }, teamCode) {
-    if (teamCode) {
-      commit(rootTypes.LOADING, true);
-      const operateRequests = requests => {
-        Promise.all(
-          requests
-            .filter(request => request.status !== 'denied')
-            .map(request => {
-              return db
-                .collection('accounts')
-                .doc(request.uid)
-                .get()
-                .then(doc => {
-                  return {
-                    ...request,
-                    photo: doc.data().photo,
-                  };
-                });
-            }),
-        ).then(res => {
-          commit(types.FETCH_TEAM_REQUESTS, res);
-        });
-      };
-
-      if (typeof snapShot.teamRequest === 'function') snapShot.teamRequest();
-      snapShot.teamRequest = db
-        .collection('requests')
-        .where('teamCode', '==', teamCode)
-        .onSnapshot(querySnapshot => {
-          if (!querySnapshot.metadata.hasPendingWrites) {
-            const requests = querySnapshot.docs
-              .map(doc => {
-                const { timestamp, ...data } = doc.data();
-                return {
-                  timestamp: timestamp.toDate(),
-                  ...data,
-                  id: doc.id,
-                };
-              })
-              .sort((a, b) => b.timestamp - a.timestamp);
-
-            operateRequests(requests);
-            commit(rootTypes.LOADING, false);
-          }
-        });
-    }
-  },
-  handleRequest({ dispatch }, { requestId, action }) {
+  handleRequest({ commit }, { requestId, action }) {
     const refRequestDoc = db.collection('requests').doc(requestId);
     switch (action) {
       case 'denied':
@@ -457,61 +555,61 @@ const actions = {
         break;
       case 'accept':
         refRequestDoc.get().then(request => {
+          window.trackRead('handleRequest: accept', 1);
           const data = request.data();
           const batch = db.batch();
           if (data.name) {
             batch.set(
-              db
-                .collection('accounts')
-                .doc(data.uid)
-                .collection('teams')
-                .doc(data.teamCode),
-              { role: 'player' },
+              db.collection('accounts').doc(data.uid),
+              {
+                teamRoles: {
+                  [data.teamCode]: 'player',
+                },
+                teams: fieldValue.arrayUnion(data.teamCode),
+              },
               { merge: true },
             );
-            // batch.set(
-            //   db.collection('accounts').doc(data.uid),
-            //   { teams: fieldValue.arrayUnion(data.teamCode) },
-            //   { merge: true },
-            // );
             batch.set(
-              db
-                .collection('teams')
-                .doc(data.teamCode)
-                .collection('players')
-                .doc(data.name),
-              { uid: data.uid },
+              db.collection('teams').doc(data.teamCode),
+              {
+                players: {
+                  [data.name]: {
+                    uid: data.uid,
+                  },
+                },
+              },
               { merge: true },
             );
           } else {
             batch.set(
-              db
-                .collection('accounts')
-                .doc(data.uid)
-                .collection('teams')
-                .doc(data.teamCode),
-              { role: 'bench' },
+              db.collection('accounts').doc(data.uid),
+              {
+                teamRoles: {
+                  [data.teamCode]: 'bench',
+                },
+                teams: fieldValue.arrayUnion(data.teamCode),
+              },
               { merge: true },
             );
-            // batch.set(
-            //   db.collection('accounts').doc(data.uid),
-            //   { teams: fieldValue.arrayUnion(data.teamCode) },
-            //   { merge: true },
-            // );
             batch.set(
-              db
-                .collection('teams')
-                .doc(data.teamCode)
-                .collection('benches')
-                .doc(data.uid),
-              { uid: data.uid, msg: data.msg },
+              db.collection('teams').doc(data.teamCode),
+              {
+                benches: {
+                  [data.uid]: {
+                    uid: data.uid,
+                    msg: data.msg,
+                  },
+                },
+              },
               { merge: true },
             );
           }
-          batch.delete(refRequestDoc);
-          batch.commit().then(() => {
-            dispatch('fetchTeamInfo', data.teamCode);
+          commit(types.ADD_PHOTO, {
+            uid: data.uid,
+            photo: data.photo,
           });
+          batch.delete(refRequestDoc);
+          batch.commit();
         });
         break;
     }
@@ -536,9 +634,24 @@ const mutations = {
       teamName: data.name,
       teamIntro: data.intro,
       otherNames: data.subNames,
-      players: Array.from(data.players).sort((a, b) => a.number - b.number),
-      benches: Array.from(data.benches).sort((a, b) => a.number - b.number),
+      players: [...data.players].sort((a, b) => a.number - b.number),
+      benches: [...data.benches].sort((a, b) => a.number - b.number),
       icon: data.icon,
+    };
+  },
+  [types.FETCH_PHOTO](state, accountCollection) {
+    state.accountPhotos = accountCollection.docs.reduce(
+      (acc, doc) => {
+        acc[doc.id] = doc.data().photo;
+        return acc;
+      },
+      { ...state.accountPhotos },
+    );
+  },
+  [types.ADD_PHOTO](state, { uid, photo }) {
+    state.accountPhotos = {
+      ...state.accountPhotos,
+      [uid]: photo,
     };
   },
   [types.SEARCH_TEAM](state, data) {
@@ -547,11 +660,9 @@ const mutations = {
   [types.FETCH_REQUESTS](state, data) {
     state.requests = data;
   },
-  [types.FETCH_TEAM_REQUESTS](state, data) {
-    state.teamRequests = data;
-  },
 };
 
+export { types };
 export default {
   state,
   getters,

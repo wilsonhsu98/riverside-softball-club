@@ -86,7 +86,11 @@ import { scrollTo } from '../libs/utils';
 
 export default {
   created() {
-    this.fetchTwoOrigin(this.$route.params.team);
+    // this.fetchTwoOrigin(this.$route.params.team);
+    // this.migrateGamesTimeToTeamDoc(this.$route.params.team);
+    // this.migratePlayersToTeamDoc(this.$route.params.team);
+    // this.migrateBenchesToTeamDoc(this.$route.params.team);
+    // this.migrateTeamRoleToAccountDoc();
   },
   methods: {
     ...mapActions([
@@ -95,6 +99,11 @@ export default {
       'importOneGame',
       'toggleTodo',
       'migrateAll',
+
+      'migrateGamesTimeToTeamDoc',
+      'migratePlayersToTeamDoc',
+      'migrateBenchesToTeamDoc',
+      'migrateTeamRoleToAccountDoc',
     ]),
   },
   computed: {

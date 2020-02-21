@@ -274,22 +274,12 @@ export default {
   created() {
     this.initFromLS();
     this.fetchUser();
-    if (this.$route.params.team) {
-      this.fetchTable(this.$route.params.team);
-      this.fetchTeamInfo(this.$route.params.team);
-    } else if (this.currentTeam) {
-      this.fetchTable(this.currentTeam);
-      this.fetchTeamInfo(this.currentTeam);
-    }
   },
   methods: {
     ...mapActions({
       initFromLS: 'initFromLS',
-      fetchTable: 'fetchTable',
       fetchUser: 'fetchUser',
-      fetchTeamInfo: 'fetchTeamInfo',
-      fetchTeamIcon: 'fetchTeamIcon',
-      fetchTeamRequests: 'fetchTeamRequests',
+      listenTeamChange: 'listenTeamChange',
       logout: 'logout',
     }),
   },
@@ -306,34 +296,26 @@ export default {
   watch: {
     $route(to, from) {
       if (to.params.team && to.params.team !== this.currentTeam) {
-        this.fetchTable(to.params.team);
-        this.fetchTeamInfo(to.params.team);
+        console.log('route1');
+        this.listenTeamChange(to.params.team);
       }
       if (from.params.team && from.params.team !== this.currentTeam) {
-        this.fetchTable(this.currentTeam);
-        this.fetchTeamInfo(this.currentTeam);
+        console.log('route2');
+        this.listenTeamChange(this.currentTeam);
       }
     },
-    currentTeam() {
-      if (this.currentTeam) {
-        this.fetchTeamIcon(this.currentTeam);
-        this.fetchTeamInfo(this.currentTeam);
-      }
-      if (!this.$route.params.team && this.currentTeam) {
-        this.fetchTable(this.currentTeam);
-      }
-      if (this.role === 'manager' && Array.isArray(this.teams)) {
-        this.teamRequest = this.teams
-          .filter(team => team.teamCode !== this.currentTeam)
-          .reduce((acc, team) => {
-            return acc + (team.requests || 0);
-          }, 0);
-      }
-    },
-    role() {
-      if (this.role === 'manager') {
-        this.fetchTeamRequests(this.currentTeam);
-      }
+    currentTeam: {
+      handler() {
+        if (this.currentTeam) {
+          this.listenTeamChange(this.currentTeam);
+          this.teamRequest = (this.teams || [])
+            .filter(team => team.teamCode !== this.currentTeam)
+            .reduce((acc, team) => {
+              return acc + ((team.requests || []).length || 0);
+            }, 0);
+        }
+      },
+      immediate: true,
     },
   },
 };

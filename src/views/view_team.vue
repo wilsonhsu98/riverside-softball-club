@@ -647,6 +647,8 @@ export default {
             intro: this.teamIntro,
             players: this.players,
             benches: this.benches,
+            prePlayers: this.teamInfo.players,
+            preBenches: this.teamInfo.benches,
             icon: this.icon,
             isNew: !this.$route.params.team,
           });

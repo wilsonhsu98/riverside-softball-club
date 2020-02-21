@@ -399,7 +399,7 @@ export default {
     };
   },
   created() {
-    this.fetchRequests(this.userId);
+    this.fetchPersonalRequests(this.userId);
   },
   mounted() {},
   beforeDestroy() {
@@ -407,15 +407,15 @@ export default {
       this.fetchTeamInfo(this.currentTeam);
     }
     this.searchTeams({ keyword: '', type: 'join' });
-    this.disconnectRequests();
+    this.disconnectPersonalRequests();
   },
   methods: {
     ...mapActions({
       fetchTeamInfo: 'fetchTeamInfo',
       searchTeams: 'searchTeams',
       requestJoin: 'requestJoin',
-      disconnectRequests: 'disconnectRequests',
-      fetchRequests: 'fetchRequests',
+      disconnectPersonalRequests: 'disconnectPersonalRequests',
+      fetchPersonalRequests: 'fetchPersonalRequests',
       handleRequest: 'handleRequest',
     }),
     back_() {
@@ -434,6 +434,7 @@ export default {
         teamCode: this.teamCode,
         teamName: this.teamName,
         uid: this.userId,
+        photo: this.accountInfo.photo,
       });
     },
     searchTeam_(teamCode) {

@@ -5,7 +5,7 @@ import {
   // state as rootState,
   // promiseImage,
 } from '../root';
-import { db, timestamp } from '../../firebase';
+import { db, fieldValue, timestamp } from '../../firebase';
 import router from '../../router';
 
 // const types = {
@@ -60,11 +60,7 @@ const actions = {
       youtubeVideos = '',
     } = data;
     commit(rootTypes.LOADING, true);
-    const refNewGameDoc = db
-      .collection('teams')
-      .doc(teamCode)
-      .collection('games')
-      .doc(newId);
+    const refNewGameDoc = db.doc(`teams/${teamCode}/games/${newId}`);
     refNewGameDoc
       .get()
       .then(newGameDoc => {
@@ -74,12 +70,7 @@ const actions = {
           throw error;
         }
         return prevId && prevId !== newId
-          ? db
-              .collection('teams')
-              .doc(teamCode)
-              .collection('games')
-              .doc(prevId)
-              .get()
+          ? db.doc(`teams/${teamCode}/games/${prevId}`).get()
           : undefined;
       })
       .then(prevGameDoc => {
@@ -108,12 +99,13 @@ const actions = {
           },
           { merge: true },
         );
+        batch.set(
+          db.doc(`teams/${teamCode}`),
+          { games: { [newId]: timestamp }, timestamp },
+          { merge: true },
+        );
         if (prevGameDoc) {
-          const refPrevGameDoc = db
-            .collection('teams')
-            .doc(teamCode)
-            .collection('games')
-            .doc(prevId);
+          const refPrevGameDoc = db.doc(`teams/${teamCode}/games/${prevId}`);
           batch.delete(refPrevGameDoc);
         }
         return batch.commit();
@@ -137,13 +129,19 @@ const actions = {
   editGameOrder({ commit, dispatch }, data) {
     const { teamCode, gameId, orders } = data;
     commit(rootTypes.LOADING, true);
-    const refGameDoc = db
-      .collection('teams')
-      .doc(teamCode)
-      .collection('games')
-      .doc(gameId);
-    refGameDoc
-      .set({ orders, timestamp }, { merge: true })
+    const batch = db.batch();
+    batch.set(
+      db.doc(`teams/${teamCode}/games/${gameId}`),
+      { orders, timestamp },
+      { merge: true },
+    );
+    batch.set(
+      db.doc(`teams/${teamCode}`),
+      { games: { [gameId]: timestamp }, timestamp },
+      { merge: true },
+    );
+    batch
+      .commit()
       .then(() => {
         dispatch('setGame', gameId);
         router.push(`/main/games/${teamCode}/${gameId}`);
@@ -157,11 +155,15 @@ const actions = {
   deleteGame({ commit }, data) {
     const { teamCode, gameId } = data;
     commit(rootTypes.LOADING, true);
-    db.collection('teams')
-      .doc(teamCode)
-      .collection('games')
-      .doc(gameId)
-      .delete()
+    const batch = db.batch();
+    batch.delete(db.doc(`teams/${teamCode}/games/${gameId}`));
+    batch.set(
+      db.doc(`teams/${teamCode}`),
+      { games: { [gameId]: fieldValue.delete() }, timestamp },
+      { merge: true },
+    );
+    batch
+      .commit()
       .then(() => {
         router.push(`/main/games/${teamCode}`);
         commit(rootTypes.LOADING, false);
@@ -173,20 +175,24 @@ const actions = {
   },
   deleteLastPa({ commit }, data) {
     const { teamCode, gameId } = data;
-    const refGameDoc = db
-      .collection('teams')
-      .doc(teamCode)
-      .collection('games')
-      .doc(gameId);
+    const refGameDoc = db.doc(`teams/${teamCode}/games/${gameId}`);
     commit(rootTypes.LOADING, true);
     refGameDoc
       .get()
       .then(gameDoc => {
         const { orders } = gameDoc.data();
-        return refGameDoc.set(
+        const batch = db.batch();
+        batch.set(
+          refGameDoc,
           { orders: orders.slice(0, -1), timestamp },
           { merge: true },
         );
+        batch.set(
+          db.doc(`teams/${teamCode}`),
+          { games: { [gameId]: timestamp }, timestamp },
+          { merge: true },
+        );
+        return batch.commit();
       })
       .then(() => {
         router.push(`/main/games/${teamCode}/${gameId}`);

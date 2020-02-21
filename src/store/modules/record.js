@@ -2,8 +2,8 @@ import {
   types as rootTypes,
   // getters as rootGetters,
   state as rootState,
-  snapShot,
 } from '../root';
+import { types as teamTypes } from './team';
 import utils from '../../libs/utils';
 import { db } from '../../firebase';
 import workerCreater from '../../web-worker';
@@ -107,9 +107,10 @@ const getters = {
   },
   boxSummary: state => {
     const boxSummary =
-      state.games.length &&
-      state.game &&
-      state.games.find(item => item.game === state.game);
+      (state.games.length &&
+        state.game &&
+        state.games.find(item => item.game === state.game)) ||
+      {};
     const game = state.records.filter(item => item._table === state.game);
     return {
       ...boxSummary,
@@ -203,163 +204,58 @@ const actions = {
   initFromLS({ commit }) {
     commit(types.INIT_FROM_LS);
   },
-  fetchTable({ commit }, team) {
-    const operateGames = changedData => {
-      const dates = changedData
-        .filter(item => item.data.timestamp)
-        .map(item => item.data.timestamp.toDate());
-      if (dates.length) {
-        const lastDate = new Date(Math.max.apply(null, dates));
-        commit(types.SET_LASTUPDATE, lastDate);
-        window.localStorage.setItem('lastUpdate', lastDate);
-      }
-      const records = changedData
-        .filter(item => item.data.orders)
-        .map(item => {
-          return item.data.orders.map(sub => ({
-            ...sub,
-            _table: item.id,
-          }));
-        })
-        .reduce((a, b) => a.concat(b), []);
-      const period = changedData.map(item => {
-        const { orders, ...others } = item.data;
-        orders;
-        return { ...others, game: item.id };
-      });
-      commit(types.GET_PERIOD, period);
-      commit(types.GET_RECORDS, records);
-      commit(types.GET_GAMELIST, period);
-      actions.workerGenStatistics({ commit });
-      actions.workerItemStats({ commit });
-      actions.workerBox({ commit });
-      window.localStorage.setItem('period', JSON.stringify(period));
-      window.localStorage.setItem('records', JSON.stringify(records));
-    };
-    const operatePlayers = players => {
-      db.collection('accounts')
-        .get()
-        .then(accounts => {
-          return Promise.all(
-            accounts.docs.map(account =>
-              db.collection(`accounts/${account.id}/teams`).get(),
-            ),
-          );
-        })
-        .then(accountTeams => {
-          return Promise.all(
-            accountTeams
-              .filter(accountTeam => {
-                return accountTeam.docs.map(doc => doc.id).includes(team);
-              })
-              .map(accountTeam => {
-                return db.doc(accountTeam.docs[0].ref.parent.parent.path).get();
-              }),
-          );
-        })
-        .then(res => ({ docs: res }))
-        .then(accountCollection => {
-          const accounts = players.map(player => {
-            const find = accountCollection.docs.find(
-              account => account.id === player.data.uid,
-            );
-            return {
-              id: player.id,
-              data: {
-                ...player.data,
-                photo: find && find.data().photo,
-              },
-            };
-          });
-          commit(types.GET_PLAYERS, accounts);
-          actions.workerGenStatistics({ commit });
-          actions.workerItemStats({ commit });
-          window.localStorage.setItem('players', JSON.stringify(accounts));
-        });
-    };
-
-    if (
-      window.localStorage.getItem('players') &&
-      window.localStorage.getItem('period') &&
-      window.localStorage.getItem('records')
-    ) {
-      commit(
-        types.GET_PLAYERS,
-        JSON.parse(window.localStorage.getItem('players')),
-      );
-      commit(
-        types.GET_PERIOD,
-        JSON.parse(window.localStorage.getItem('period')),
-      );
-      commit(
-        types.GET_RECORDS,
-        JSON.parse(window.localStorage.getItem('records')),
-      );
-      commit(
-        types.GET_GAMELIST,
-        JSON.parse(window.localStorage.getItem('period')),
-      );
-      actions.workerGenStatistics({ commit });
-      actions.workerItemStats({ commit });
-      actions.workerBox({ commit });
-      if (window.localStorage.getItem('lastUpdate')) {
-        commit(types.SET_LASTUPDATE, window.localStorage.getItem('lastUpdate'));
-      }
+  operateGames({ commit }, changedData) {
+    const dates = changedData
+      .filter(item => item.data.timestamp)
+      .map(item => new Date(item.data.timestamp.seconds * 1000));
+    if (dates.length) {
+      const lastDate = new Date(Math.max.apply(null, dates));
+      commit(types.SET_LASTUPDATE, lastDate);
     }
-    commit(rootTypes.LOADING, true);
-    let queryCount = 0;
-    const realtimeCount = 2;
-    if (typeof snapShot.games === 'function') snapShot.games();
-    snapShot.games = db
-      .collection('teams')
-      .doc(team)
-      .collection('games')
-      .onSnapshot(snapshot => {
-        queryCount += 1;
-        if (queryCount > realtimeCount) {
-          // realtime
-          commit(rootTypes.LOADING, { text: 'New data is coming' });
-          setTimeout(() => {
-            operateGames(
-              snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })),
-            );
-            commit(rootTypes.LOADING, false);
-          }, 1000);
-        } else {
-          // first time
-          operateGames(
-            snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })),
+    const records = changedData
+      .filter(item => item.data.orders)
+      .map(item => {
+        return item.data.orders.map(sub => ({
+          ...sub,
+          _table: item.id,
+        }));
+      })
+      .reduce((a, b) => a.concat(b), []);
+    const period = changedData.map(item => {
+      const { orders, ...others } = item.data;
+      orders;
+      return { ...others, game: item.id };
+    });
+    commit(types.GET_PERIOD, period);
+    commit(types.GET_RECORDS, records);
+    commit(types.GET_GAMELIST, period);
+    actions.workerGenStatistics({ commit });
+    actions.workerItemStats({ commit });
+    actions.workerBox({ commit });
+  },
+  operatePlayers({ commit }, { players, teamCode }) {
+    db.collection('accounts')
+      .where('teams', 'array-contains', teamCode)
+      .get()
+      .then(accountCollection => {
+        window.trackRead('operatePlayers', accountCollection.docs.length || 1);
+        const accounts = players.map(player => {
+          const find = accountCollection.docs.find(
+            account => account.id === player.data.uid,
           );
-          if (queryCount === realtimeCount) {
-            commit(rootTypes.LOADING, false);
-          }
-        }
-      });
-    if (typeof snapShot.players === 'function') snapShot.players();
-    snapShot.players = db
-      .collection('teams')
-      .doc(team)
-      .collection('players')
-      .onSnapshot(snapshot => {
-        queryCount += 1;
-        if (queryCount > realtimeCount) {
-          // realtime
-          commit(rootTypes.LOADING, { text: 'New data is coming' });
-          setTimeout(() => {
-            operatePlayers(
-              snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })),
-            );
-            commit(rootTypes.LOADING, false);
-          }, 1000);
-        } else {
-          // first time
-          operatePlayers(
-            snapshot.docs.map(doc => ({ id: doc.id, data: doc.data() })),
-          );
-          if (queryCount === realtimeCount) {
-            commit(rootTypes.LOADING, false);
-          }
-        }
+          return {
+            id: player.id,
+            data: {
+              ...player.data,
+              photo: find && find.data().photo,
+            },
+          };
+        });
+
+        commit(teamTypes.FETCH_PHOTO, accountCollection);
+        commit(types.GET_PLAYERS, accounts);
+        actions.workerGenStatistics({ commit });
+        actions.workerItemStats({ commit });
       });
   },
   setPeriod({ commit }, value) {
@@ -580,7 +476,7 @@ const mutations = {
   },
 };
 
-export { types };
+export { types, actions };
 export default {
   state,
   getters,
