@@ -67,7 +67,9 @@
               offset="0"
               class="cell"
               :delay="{ show: 100, hide: 0 }"
-              :popoverClass="`box-tip ${sub.result}`"
+              :popoverClass="
+                `box-tip ${sub.status !== 'unlock' ? sub.result : ''}`
+              "
               :open="sub.game === focus_game"
               :autoHide="true"
               :key="`game_${sub.game}`"
@@ -75,7 +77,8 @@
               @show="setGame(sub.game)"
             >
               <div class="item">
-                <div :class="`result ${sub.result} ${sub.group}`">
+                <div v-if="sub.status === 'unlock'" class="result">?</div>
+                <div v-else="" :class="`result ${sub.result} ${sub.group}`">
                   {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
                 </div>
                 <div class="name">{{ sub.opponent || sub.game }}</div>

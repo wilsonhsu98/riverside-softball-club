@@ -162,22 +162,18 @@ const getters = {
       (acc, item, i, self) => {
         if (i === self.length - 1) {
           return {
-            opponent: [...new Set(acc.opponent.concat(item.opponent))].sort(
-              (a, b) => a.localeCompare(b),
-              'zh-TW',
-            ),
-            league: [...new Set(acc.league.concat(item.league))].sort(
-              (a, b) => a.localeCompare(b),
-              'zh-TW',
-            ),
-            group: [...new Set(acc.group.concat(item.group))].sort(
-              (a, b) => a.localeCompare(b),
-              'zh-TW',
-            ),
-            period: [...new Set(acc.period.concat(item.period))].sort(
-              (a, b) => b.localeCompare(a),
-              'zh-TW',
-            ),
+            opponent: [...new Set(acc.opponent.concat(item.opponent))]
+              .filter(item => !!item)
+              .sort((a, b) => a.localeCompare(b), 'zh-TW'),
+            league: [...new Set(acc.league.concat(item.league))]
+              .filter(item => !!item)
+              .sort((a, b) => a.localeCompare(b), 'zh-TW'),
+            group: [...new Set(acc.group.concat(item.group))]
+              .filter(item => !!item)
+              .sort((a, b) => a.localeCompare(b), 'zh-TW'),
+            period: [...new Set(acc.period.concat(item.period))]
+              .filter(item => !!item)
+              .sort((a, b) => b.localeCompare(a), 'zh-TW'),
             tags: [...new Set(acc.tags.concat(item.tags))]
               .filter(item => !!item)
               .sort((a, b) => b.localeCompare(a), 'zh-TW'),

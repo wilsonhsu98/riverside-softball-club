@@ -79,6 +79,7 @@ const actions = {
           refNewGameDoc,
           {
             ...(prevGameDoc ? prevGameDoc.data() : { errors: [] }),
+            ...(prevGameDoc ? {} : { status: 'unlock' }),
             useTeam,
             opponent,
             league,
@@ -119,6 +120,29 @@ const actions = {
         } else {
           router.push(`/main/games/${teamCode}/${newId}`);
         }
+        commit(rootTypes.LOADING, false);
+      })
+      .catch(error => {
+        console.log('Error editing document:', error);
+        commit(rootTypes.LOADING, false);
+      });
+  },
+  toggleGameStatus({ commit }, { teamCode, gameId, value }) {
+    commit(rootTypes.LOADING, true);
+    const batch = db.batch();
+    batch.set(
+      db.doc(`teams/${teamCode}/games/${gameId}`),
+      { status: value === 'lock' ? 'unlock' : 'lock', timestamp },
+      { merge: true },
+    );
+    batch.set(
+      db.doc(`teams/${teamCode}`),
+      { games: { [gameId]: timestamp }, timestamp },
+      { merge: true },
+    );
+    batch
+      .commit()
+      .then(() => {
         commit(rootTypes.LOADING, false);
       })
       .catch(error => {

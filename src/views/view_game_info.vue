@@ -6,11 +6,26 @@
       :save="edit_"
       :save_label="mode === 'edit' ? undefined : $t('btn_fill_order')"
     />
-    <div class="container">
+    <div class="container" ref="container">
       <h1>{{ mode === 'edit' ? $t('edit_game') : $t('create_game') }}</h1>
 
       <div v-if="mode === 'edit'" class="field-wrapper edit">
         <label>{{ $t('ttl_after_game') }}</label>
+
+        <i
+          class="fa"
+          :class="`fa-${status}`"
+          @click="toggleGameStatus_(status)"
+        ></i>
+
+        <i
+          class="fa fa-info-circle"
+          v-tooltip="{
+            content: $t('tip_lock_game'),
+            classes: ['info'],
+            container: $refs.container,
+          }"
+        ></i>
 
         <div v-if="version !== 'import' && topBottom" class="team-versus">
           <div class="team-name">
@@ -547,11 +562,6 @@
       border: 2px solid transparent;
       text-align: left;
     }
-    .fa {
-      font-size: 28px;
-      cursor: pointer;
-      vertical-align: middle;
-    }
     .inn {
       flex: 1 1 50px;
       max-width: 50px;
@@ -592,6 +602,29 @@
   }
   .delete-btn-container {
     display: none;
+  }
+  .fa {
+    cursor: pointer;
+    vertical-align: middle;
+    &.fa-lock,
+    &.fa-unlock,
+    &.fa-minus-circle,
+    &.fa-plus-circle,
+    &.fa-info-circle {
+      font-size: 28px;
+    }
+  }
+  .fa-lock,
+  .fa-unlock {
+    position: relative;
+    top: -47px;
+    left: 10px;
+  }
+  .fa-info-circle {
+    position: relative;
+    top: -47px;
+    left: 15px;
+    color: $input_font;
   }
 }
 
@@ -653,6 +686,7 @@ export default {
       period: '',
       gameNote: '',
       youtubeVideos: '',
+      status: 'lock',
     };
   },
   created() {
@@ -668,6 +702,7 @@ export default {
       setGame: 'setGame',
       editGame: 'editGame',
       deleteGame: 'deleteGame',
+      toggleGameStatus: 'toggleGameStatus',
     }),
     checkNumber(e) {
       if (!e.target.validity.valid) {
@@ -723,6 +758,10 @@ export default {
       this.$router.back();
     },
     edit_() {
+      if (this.status === 'lock' && this.mode === 'edit') {
+        alert(this.$t('msg_lock_warning'));
+        return;
+      }
       // wait for tags component ready
       setTimeout(() => {
         if (this.validate()) {
@@ -771,6 +810,10 @@ export default {
       });
     },
     delete_() {
+      if (this.status === 'lock') {
+        alert(this.$t('msg_lock_warning'));
+        return;
+      }
       if (confirm(this.$t('msg_delete_warning'))) {
         this.deleteGame({
           teamCode: this.$route.params.team,
@@ -849,6 +892,13 @@ export default {
         this.result = 'tie';
       }
     },
+    toggleGameStatus_(value) {
+      this.toggleGameStatus({
+        teamCode: this.$route.params.team,
+        gameId: this.prevId,
+        value,
+      });
+    },
   },
   computed: {
     ...mapGetters({
@@ -886,6 +936,7 @@ export default {
             period,
             gameNote,
             youtubeVideos,
+            status = 'lock',
           } = this.boxSummary;
           this.version = version;
           this.result = result;
@@ -909,6 +960,7 @@ export default {
           this.period = period;
           this.gameNote = gameNote;
           this.youtubeVideos = youtubeVideos;
+          this.status = status;
         }
       },
       immediate: true,

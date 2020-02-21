@@ -35,9 +35,10 @@
             <div class="team">
               <div class="cell">
                 &nbsp;
-                <div :class="`result-icon ${result}`">
+                <div v-if="status === 'lock'" :class="`result-icon ${result}`">
                   {{ (result && result.substr(0, 1)) || '?' }}
                 </div>
+                <div v-else class="result-icon">?</div>
               </div>
               <div class="cell">
                 {{ topBottom === 'top' ? useTeam : opponent }}
@@ -201,7 +202,7 @@
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <span class="inn">{{ record.innChange }}</span>
                   <router-link
-                    v-if="role === 'manager'"
+                    v-if="role === 'manager' && status === 'unlock'"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -342,7 +343,7 @@
                 ></div>
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <router-link
-                    v-if="role === 'manager'"
+                    v-if="role === 'manager' && status === 'unlock'"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -428,11 +429,11 @@
         </div>
       </div>
     </div>
-    <div style="text-align: center; margin: 10px;">
-      <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
+    <div style="text-align: center; margin: 14px;">
+      <!-- <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
         <i class="fa fa-facebook-square"></i>
         {{ $t('fb_share') }}
-      </button>
+      </button> -->
       <router-link
         v-if="box.slice(1).length === 0 && role === 'manager'"
         :to="{
@@ -1101,6 +1102,7 @@ export default {
       coordinate: undefined,
       videoIDs: [],
       gameNote: '',
+      status: 'lock',
     };
   },
   created() {
@@ -1192,6 +1194,7 @@ export default {
             tags,
             youtubeVideos,
             gameNote,
+            status = 'lock',
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -1231,6 +1234,7 @@ export default {
             .map(item => item.trim())
             .filter(item => !!item);
           this.gameNote = gameNote;
+          this.status = status;
         }
       },
       immediate: true,
