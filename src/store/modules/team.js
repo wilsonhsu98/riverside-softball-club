@@ -87,6 +87,7 @@ const state = {
     players: [{}],
     benches: [{}],
     icon: '',
+    unlockGames: [],
   },
   teamList: [],
   requests: [],
@@ -333,6 +334,7 @@ const actions = {
   },
   listenTeamChange({ commit }, teamCode) {
     let prePlayersContext = '';
+    let preUnlockGames;
     if (teamCode) {
       const idbKeyval = dbInit(teamCode);
       if (typeof snapShot.team === 'function') snapShot.team();
@@ -347,77 +349,82 @@ const actions = {
               games,
               benches: benches_,
               players: players_,
+              unlockGames = [],
               ...others
             } = teamDoc.data();
             commit(rootTypes.SET_TEAMICON, icon);
-            commit(rootTypes.LOADING, true);
 
-            // prevent reload players if players not changed
-            const currentPlayersContext = JSON.stringify(players_);
-            if (currentPlayersContext !== prePlayersContext) {
-              prePlayersContext = currentPlayersContext;
-              recordActions.operatePlayers(
-                { commit },
-                {
-                  teamCode,
-                  players: Object.keys(players_).map(name => ({
-                    id: name,
-                    data: players_[name],
-                  })),
-                },
-              );
-            }
-
-            idbKeyval.getAll().then(localGames => {
-              const localIds = localGames.map(game => game.id);
-              const gameShouldUpdates = localGames
-                .filter(
-                  game =>
-                    games[game.id] && !games[game.id].isEqual(game.timestamp),
-                )
-                .map(game => game.id)
-                .concat(
-                  Object.keys(games).filter(game => !localIds.includes(game)),
+            if (
+              preUnlockGames === undefined ||
+              JSON.stringify(preUnlockGames) === JSON.stringify(unlockGames)
+            ) {
+              // prevent reload players if players not changed
+              const currentPlayersContext = JSON.stringify(players_);
+              if (currentPlayersContext !== prePlayersContext) {
+                prePlayersContext = currentPlayersContext;
+                recordActions.operatePlayers(
+                  { commit },
+                  {
+                    teamCode,
+                    players: Object.keys(players_).map(name => ({
+                      id: name,
+                      data: players_[name],
+                    })),
+                  },
                 );
+              }
 
-              // delete
-              const gameShouldDeletes = localGames
-                .filter(game => !Object.keys(games).includes(game.id))
-                .map(game => game.id);
+              idbKeyval.getAll().then(localGames => {
+                const localIds = localGames.map(game => game.id);
+                const gameShouldUpdates = localGames
+                  .filter(
+                    game =>
+                      games[game.id] && !games[game.id].isEqual(game.timestamp),
+                  )
+                  .map(game => game.id)
+                  .concat(
+                    Object.keys(games).filter(game => !localIds.includes(game)),
+                  );
 
-              // update if needed
-              Promise.all(
-                gameShouldUpdates.map(game =>
-                  db.doc(`teams/${teamCode}/games/${game}`).get(),
-                ),
-              ).then(gameDocs => {
-                window.trackRead(
-                  'listenTeamChange: games need to update',
-                  gameDocs.length,
-                );
-                const setGames = gameDocs.map(gameDoc => {
-                  return idbKeyval.set(gameDoc.id, {
-                    id: gameDoc.id,
-                    ...gameDoc.data(),
+                // delete
+                const gameShouldDeletes = localGames
+                  .filter(game => !Object.keys(games).includes(game.id))
+                  .map(game => game.id);
+
+                // update if needed
+                Promise.all(
+                  gameShouldUpdates.map(game =>
+                    db.doc(`teams/${teamCode}/games/${game}`).get(),
+                  ),
+                ).then(gameDocs => {
+                  window.trackRead(
+                    'listenTeamChange: games need to update',
+                    gameDocs.length,
+                  );
+                  const setGames = gameDocs.map(gameDoc => {
+                    return idbKeyval.set(gameDoc.id, {
+                      id: gameDoc.id,
+                      ...gameDoc.data(),
+                    });
                   });
-                });
-                const delGames = gameShouldDeletes.map(gameId => {
-                  return idbKeyval.delete(gameId);
-                });
-                Promise.all([...setGames, ...delGames])
-                  .then(() => idbKeyval.getAll())
-                  .then(records => {
-                    recordActions.operateGames(
-                      { commit },
-                      records.map(({ id, ...data }) => ({
-                        id,
-                        data: { ...data },
-                      })),
-                    );
+                  const delGames = gameShouldDeletes.map(gameId => {
+                    return idbKeyval.delete(gameId);
                   });
+                  Promise.all([...setGames, ...delGames])
+                    .then(() => idbKeyval.getAll())
+                    .then(records => {
+                      recordActions.operateGames(
+                        { commit },
+                        records.map(({ id, ...data }) => ({
+                          id,
+                          data: { ...data },
+                        })),
+                      );
+                    });
+                });
               });
-            });
-
+            }
+            preUnlockGames = unlockGames;
             const players = Object.keys(players_).map(name => ({
               name,
               manager: players_[name].manager,
@@ -434,6 +441,7 @@ const actions = {
               players,
               benches,
               games,
+              unlockGames,
               ...others,
             });
           }
@@ -637,6 +645,7 @@ const mutations = {
       players: [...data.players].sort((a, b) => a.number - b.number),
       benches: [...data.benches].sort((a, b) => a.number - b.number),
       icon: data.icon,
+      unlockGames: [...(data.unlockGames || [])],
     };
   },
   [types.FETCH_PHOTO](state, accountCollection) {

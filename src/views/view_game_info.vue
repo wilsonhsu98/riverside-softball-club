@@ -14,8 +14,8 @@
 
         <i
           class="fa"
-          :class="`fa-${status}`"
-          @click="toggleGameStatus_(status)"
+          :class="`fa-${gameStatus}`"
+          @click="toggleGameStatus_(gameStatus)"
         ></i>
 
         <i
@@ -621,9 +621,9 @@
     left: 10px;
   }
   .fa-info-circle {
-    position: relative;
+    position: absolute;
     top: -47px;
-    left: 15px;
+    left: 42px;
     color: $input_font;
   }
 }
@@ -686,7 +686,7 @@ export default {
       period: '',
       gameNote: '',
       youtubeVideos: '',
-      status: 'lock',
+      gameStatus: 'lock',
     };
   },
   created() {
@@ -758,7 +758,7 @@ export default {
       this.$router.back();
     },
     edit_() {
-      if (this.status === 'lock' && this.mode === 'edit') {
+      if (this.gameStatus === 'lock' && this.mode === 'edit') {
         alert(this.$t('msg_lock_warning'));
         return;
       }
@@ -810,7 +810,7 @@ export default {
       });
     },
     delete_() {
-      if (this.status === 'lock') {
+      if (this.gameStatus === 'lock') {
         alert(this.$t('msg_lock_warning'));
         return;
       }
@@ -936,7 +936,6 @@ export default {
             period,
             gameNote,
             youtubeVideos,
-            status = 'lock',
           } = this.boxSummary;
           this.version = version;
           this.result = result;
@@ -960,8 +959,17 @@ export default {
           this.period = period;
           this.gameNote = gameNote;
           this.youtubeVideos = youtubeVideos;
-          this.status = status;
         }
+      },
+      immediate: true,
+    },
+    teamInfo: {
+      handler() {
+        this.gameStatus = this.teamInfo.unlockGames.includes(
+          this.$route.params.game,
+        )
+          ? 'unlock'
+          : 'lock';
       },
       immediate: true,
     },

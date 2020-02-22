@@ -68,7 +68,7 @@
               class="cell"
               :delay="{ show: 100, hide: 0 }"
               :popoverClass="
-                `box-tip ${sub.status !== 'unlock' ? sub.result : ''}`
+                `box-tip ${unlockGames.includes(sub.game) ? '' : sub.result}`
               "
               :open="sub.game === focus_game"
               :autoHide="true"
@@ -77,7 +77,9 @@
               @show="setGame(sub.game)"
             >
               <div class="item">
-                <div v-if="sub.status === 'unlock'" class="result">?</div>
+                <div v-if="unlockGames.includes(sub.game)" class="result">
+                  ?
+                </div>
                 <div v-else="" :class="`result ${sub.result} ${sub.group}`">
                   {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
                 </div>
@@ -603,6 +605,7 @@ export default {
       hit: 0,
       toggleSearch: false,
       defaultIcon,
+      unlockGames: [],
     };
   },
   created() {},
@@ -643,6 +646,7 @@ export default {
       period: 'period',
       periodSelect: 'periodSelect',
       lastUpdate: 'lastUpdate',
+      teamInfo: 'teamInfo',
     }),
   },
   watch: {
@@ -681,6 +685,12 @@ export default {
           );
           this.hit = h;
         }
+      },
+      immediate: true,
+    },
+    teamInfo: {
+      handler() {
+        this.unlockGames = this.teamInfo.unlockGames;
       },
       immediate: true,
     },

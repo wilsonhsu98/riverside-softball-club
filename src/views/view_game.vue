@@ -35,7 +35,10 @@
             <div class="team">
               <div class="cell">
                 &nbsp;
-                <div v-if="status === 'lock'" :class="`result-icon ${result}`">
+                <div
+                  v-if="gameStatus === 'lock'"
+                  :class="`result-icon ${result}`"
+                >
                   {{ (result && result.substr(0, 1)) || '?' }}
                 </div>
                 <div v-else class="result-icon">?</div>
@@ -202,7 +205,7 @@
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <span class="inn">{{ record.innChange }}</span>
                   <router-link
-                    v-if="role === 'manager' && status === 'unlock'"
+                    v-if="role === 'manager' && gameStatus === 'unlock'"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -343,7 +346,7 @@
                 ></div>
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <router-link
-                    v-if="role === 'manager' && status === 'unlock'"
+                    v-if="role === 'manager' && gameStatus === 'unlock'"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -1102,7 +1105,7 @@ export default {
       coordinate: undefined,
       videoIDs: [],
       gameNote: '',
-      status: 'lock',
+      gameStatus: 'lock',
     };
   },
   created() {
@@ -1167,6 +1170,7 @@ export default {
       boxSummary: 'boxSummary',
       currentTeamIcon: 'currentTeamIcon',
       role: 'role',
+      teamInfo: 'teamInfo',
     }),
   },
   watch: {
@@ -1194,7 +1198,6 @@ export default {
             tags,
             youtubeVideos,
             gameNote,
-            status = 'lock',
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -1234,8 +1237,17 @@ export default {
             .map(item => item.trim())
             .filter(item => !!item);
           this.gameNote = gameNote;
-          this.status = status;
         }
+      },
+      immediate: true,
+    },
+    teamInfo: {
+      handler() {
+        this.gameStatus = this.teamInfo.unlockGames.includes(
+          this.$route.params.game,
+        )
+          ? 'unlock'
+          : 'lock';
       },
       immediate: true,
     },

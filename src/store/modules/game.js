@@ -79,7 +79,6 @@ const actions = {
           refNewGameDoc,
           {
             ...(prevGameDoc ? prevGameDoc.data() : { errors: [] }),
-            ...(prevGameDoc ? {} : { status: 'unlock' }),
             useTeam,
             opponent,
             league,
@@ -102,7 +101,13 @@ const actions = {
         );
         batch.set(
           db.doc(`teams/${teamCode}`),
-          { games: { [newId]: timestamp }, timestamp },
+          {
+            games: { [newId]: timestamp },
+            ...(prevGameDoc
+              ? {}
+              : { unlockGames: fieldValue.arrayUnion(newId) }),
+            timestamp,
+          },
           { merge: true },
         );
         if (prevGameDoc) {
@@ -131,13 +136,14 @@ const actions = {
     commit(rootTypes.LOADING, true);
     const batch = db.batch();
     batch.set(
-      db.doc(`teams/${teamCode}/games/${gameId}`),
-      { status: value === 'lock' ? 'unlock' : 'lock', timestamp },
-      { merge: true },
-    );
-    batch.set(
       db.doc(`teams/${teamCode}`),
-      { games: { [gameId]: timestamp }, timestamp },
+      {
+        unlockGames:
+          value === 'lock'
+            ? fieldValue.arrayUnion(gameId)
+            : fieldValue.arrayRemove(gameId),
+        timestamp,
+      },
       { merge: true },
     );
     batch
@@ -183,7 +189,11 @@ const actions = {
     batch.delete(db.doc(`teams/${teamCode}/games/${gameId}`));
     batch.set(
       db.doc(`teams/${teamCode}`),
-      { games: { [gameId]: fieldValue.delete() }, timestamp },
+      {
+        games: { [gameId]: fieldValue.delete() },
+        unlockGames: fieldValue.arrayRemove(gameId),
+        timestamp,
+      },
       { merge: true },
     );
     batch
