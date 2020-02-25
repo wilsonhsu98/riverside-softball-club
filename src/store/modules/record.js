@@ -27,6 +27,7 @@ const types = {
   SET_ITEMSTATS: 'RECORD/SET_ITEMSTATS',
   SET_BOX: 'RECORD/SET_BOX',
   RESET_PERIOD: 'RECORD/RESET_PERIOD',
+  SET_BOX_DISPLAY: 'RECORD/SET_BOX_DISPLAY',
 };
 
 const state = {
@@ -66,6 +67,7 @@ const state = {
   genStatistics: [],
   itemStats: { AVG: [], H: [], HR: [], RBI: [] },
   box: [],
+  boxDisplay: 'content',
 };
 
 const getters = {
@@ -194,6 +196,7 @@ const getters = {
   periodGames: state => state.period.find(item => item.select).games || [],
   itemStats: state => state.itemStats,
   box: state => state.box,
+  boxDisplay: state => state.boxDisplay,
 };
 
 const actions = {
@@ -339,6 +342,9 @@ const actions = {
       commit(types.SET_BOX, []);
     }
   },
+  setBoxDisplay({ commit }, value) {
+    commit(types.SET_BOX_DISPLAY, value);
+  },
 };
 
 const mutations = {
@@ -349,6 +355,8 @@ const mutations = {
       window.localStorage.getItem('pref_unlimited_pa') === 'true' ||
       state.unlimitedPA;
     state.sortBy = window.localStorage.getItem('pref_sortby') || state.sortBy;
+    state.boxDisplay =
+      window.localStorage.getItem('pref_box_display') || state.boxDisplay;
 
     const pref_period = window.localStorage.getItem('pref_period');
     if (pref_period) state.period = JSON.parse(pref_period);
@@ -469,6 +477,10 @@ const mutations = {
   },
   [types.SET_BOX](state, data) {
     state.box = data;
+  },
+  [types.SET_BOX_DISPLAY](state, value) {
+    state.boxDisplay = value;
+    window.localStorage.setItem('pref_box_display', state.boxDisplay);
   },
 };
 

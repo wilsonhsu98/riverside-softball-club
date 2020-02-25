@@ -79,7 +79,7 @@ header {
   top: 0;
   left: 0;
   right: 0;
-  /* z-index: 2; */
+  z-index: 2;
   background-color: $header_bgcolor;
   height: $header_menu_height;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.13), 0 0 2px 0 rgba(0, 0, 0, 0.2);

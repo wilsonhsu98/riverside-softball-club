@@ -104,6 +104,62 @@ const genGameList = (games, filterGames = []) => {
   return temp;
 };
 
+const locationMapping = {
+  P: { code: '1', content: '投' },
+  '1B': { code: '3', content: '一' },
+  '2B': { code: '4', content: '二' },
+  '3B': { code: '5', content: '三' },
+  ss: { code: '6', content: '游' },
+  lf: { code: '7', content: '左' },
+  cf: { code: '8', content: '中' },
+  rf: { code: '9', content: '右' },
+  l_hr: { code: '7', content: '左' },
+  c_hr: { code: '8', content: '中' },
+  r_hr: { code: '9', content: '右' },
+};
+const contentMappingForBox = {
+  '1H': 'H',
+  FO: 'F',
+  GO: 'G',
+  一安: '安',
+  二安: '2',
+  三安: '3',
+  全壘打: '全',
+  犧飛: '犧',
+  飛球: '飛',
+  滾地: '滾',
+  失誤: '失',
+  野選: '選',
+};
+
+const formatContent = (mode, content, location) => {
+  if (locationMapping[location]) {
+    const short = contentMappingForBox[content] || content;
+    if (mode === 'content') {
+      return `${locationMapping[location][mode]}${short.replace(/[0-9]/g, s =>
+        String.fromCharCode(s.charCodeAt(0) + 0xfee0),
+      )}`;
+    }
+    if (mode === 'code') {
+      const result = `${short}${locationMapping[location][mode]}`;
+      if (result.length === 2) {
+        return result.replace(/[a-zA-Z0-9]/g, s =>
+          String.fromCharCode(s.charCodeAt(0) + 0xfee0),
+        );
+      } else {
+        return result;
+        // return `${result[0]}${result[1]}${result[2].replace(/[a-zA-Z0-9]/g, s =>
+        //   String.fromCharCode(s.charCodeAt(0) + 0xfee0),
+        // )}`;
+      }
+    }
+  } else {
+    return content.replace(/[a-zA-Z0-9]/g, s =>
+      String.fromCharCode(s.charCodeAt(0) + 0xfee0),
+    );
+  }
+};
+
 function toDataURL(src, callback, outputFormat) {
   const img = new Image();
   img.crossOrigin = 'Anonymous';
@@ -154,4 +210,4 @@ export default {
   genGameList,
 };
 
-export { cacheImg, scrollTo };
+export { cacheImg, scrollTo, formatContent };

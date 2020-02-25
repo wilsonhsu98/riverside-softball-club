@@ -169,6 +169,14 @@
           </div>
         </template>
       </div>
+      <div class="sticky-display-btn">
+        <span
+          v-for="item in ['content', 'code']"
+          :class="{ selected: boxDisplay === item }"
+          @click="setBoxDisplay(item)"
+          >{{ $t(`box_display_${item}`) }}</span
+        >
+      </div>
       <div class="box-table simple">
         <div
           class="player-records"
@@ -230,7 +238,11 @@
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
-                    {{ record.content === 'new' ? '＋' : $t(record.content) }}
+                    {{
+                      record.content === 'new'
+                        ? '＋'
+                        : formatContent_(record.content, record.location)
+                    }}
                     <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
                     </div>
@@ -262,7 +274,11 @@
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
-                    {{ record.content !== 'new' ? $t(record.content) : '' }}
+                    {{
+                      record.content !== 'new'
+                        ? formatContent_(record.content, record.location)
+                        : ''
+                    }}
                     <div
                       v-if="record.location"
                       class="location-trigger"
@@ -371,7 +387,11 @@
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
-                    {{ record.content === 'new' ? '＋' : $t(record.content) }}
+                    {{
+                      record.content === 'new'
+                        ? '＋'
+                        : formatContent_(record.content, record.location)
+                    }}
                     <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
                     </div>
@@ -403,7 +423,11 @@
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
-                    {{ record.content !== 'new' ? $t(record.content) : '' }}
+                    {{
+                      record.content !== 'new'
+                        ? formatContent_(record.content, record.location)
+                        : ''
+                    }}
                     <div
                       v-if="record.location"
                       class="location-trigger"
@@ -470,6 +494,30 @@
 
 .gamebox-container {
   text-align: left;
+  .sticky-display-btn {
+    position: sticky;
+    z-index: 1;
+    top: 106px;
+    width: 100px;
+    > span {
+      display: inline-block;
+      vertical-align: top;
+      width: 50px;
+      line-height: 28px;
+      height: 32px;
+      box-sizing: border-box;
+      text-align: center;
+      border: 2px solid $header_bgcolor;
+      color: $header_bgcolor;
+      background-color: #fff;
+      &.selected {
+        line-height: 32px;
+        border: none;
+        background-color: $header_bgcolor;
+        color: #fff;
+      }
+    }
+  }
   .box-summary {
     background-color: #fff;
     border-radius: 10px;
@@ -936,6 +984,9 @@
 @media only screen and (max-width: 760px) {
   .gamebox-container {
     font-size: 14px;
+    .sticky-display-btn {
+      top: 50px;
+    }
     .box-summary {
       background-color: transparent;
       border-radius: 0;
@@ -1056,6 +1107,9 @@
 }
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .gamebox-container {
+    .sticky-display-btn {
+      top: 50px;
+    }
     .box-table {
       &.simple {
         display: table;
@@ -1071,6 +1125,13 @@
     }
   }
 }
+@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
+  .gamebox-container {
+    .sticky-display-btn {
+      top: 86px;
+    }
+  }
+}
 </style>
 
 <script>
@@ -1078,6 +1139,7 @@ import { mapGetters, mapActions } from 'vuex';
 import html2canvas from 'html2canvas';
 import axios from 'axios';
 import config from '../../config';
+import { formatContent } from '../libs/utils';
 
 export default {
   data() {
@@ -1118,6 +1180,7 @@ export default {
     ...mapActions({
       setGame: 'setGame',
       toggleLoading: 'toggleLoading',
+      setBoxDisplay: 'setBoxDisplay',
     }),
     screenshot() {
       this.toggleLoading(true);
@@ -1162,6 +1225,18 @@ export default {
         this.coordinate = undefined;
       }
     },
+    formatContent_(content, location = {}) {
+      switch (this.boxDisplay) {
+        case 'code':
+          return formatContent(this.boxDisplay, content, location.location);
+        case 'content':
+          return formatContent(
+            this.boxDisplay,
+            this.$t(content),
+            location.location,
+          );
+      }
+    },
   },
   computed: {
     ...mapGetters({
@@ -1171,6 +1246,7 @@ export default {
       currentTeamIcon: 'currentTeamIcon',
       role: 'role',
       teamInfo: 'teamInfo',
+      boxDisplay: 'boxDisplay',
     }),
   },
   watch: {
