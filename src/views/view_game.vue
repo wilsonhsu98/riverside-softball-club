@@ -510,7 +510,7 @@
       text-align: center;
       border: 2px solid $header_bgcolor;
       color: $header_bgcolor;
-      background-color: #fff;
+      background-color: rgba(255, 255, 255, 0.9);
       &.selected {
         line-height: 32px;
         border: none;

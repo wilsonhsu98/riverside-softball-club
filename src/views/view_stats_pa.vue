@@ -197,6 +197,14 @@
             :style="{ top: `${(itemIndex + 2) * 36}px` }"
             :id="`row_${item.name}`"
           >
+            <coordination
+              v-if="item.locations.length"
+              :values="item.locations"
+              :no_track="true"
+              fixedSize="130"
+              style="align-self: flex-end; cursor: pointer;"
+              @click.native="coordinates = item.locations"
+            />
             <div class="chart-inner">
               <div
                 class="bar"
@@ -224,6 +232,13 @@
           </div>
         </div>
       </template>
+    </div>
+    <div
+      v-if="coordinates.length > 0"
+      class="location-modal"
+      @click="closeLocation"
+    >
+      <coordination :values="coordinates" :no_track="true" />
     </div>
   </div>
 </template>
@@ -393,7 +408,6 @@ i.fa {
 
       font-size: 12px;
       margin-bottom: 20px;
-      padding-top: 5px;
       border-top: 0;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       border-radius: 0 0 10px 10px;
@@ -482,6 +496,27 @@ i.fa {
 .search-bar__container,
 .toggle-search {
   display: none;
+}
+
+.location-modal {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  &::v-deep {
+    .root-container {
+      top: 50%;
+      transform: translateY(-50%);
+      text-align: center;
+    }
+    img {
+      left: 50%;
+      transform: translateX(-50%);
+    }
+  }
 }
 @media only screen and (max-width: 760px) {
   .search-bar {
@@ -667,6 +702,7 @@ i.fa {
         box-shadow: none;
         background-color: transparent;
         display: flex;
+        border-radius: 0;
       }
     }
     .toggle-row:checked + .row-grid {
@@ -805,6 +841,7 @@ export default {
       toggleSearch: false,
       toggleTarget: null,
       defaultIcon,
+      coordinates: [],
     };
   },
   created() {},
@@ -875,6 +912,11 @@ export default {
     toggleColumn_(column) {
       this.toggleTarget = null;
       this.toggleColumn(column);
+    },
+    closeLocation(e) {
+      if (!['CANVAS', 'IMG'].includes(e.target.tagName)) {
+        this.coordinates = [];
+      }
     },
   },
   computed: {

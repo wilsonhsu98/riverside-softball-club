@@ -167,6 +167,13 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       SLG: '-',
       OPS: '-',
       listByGame: games,
+      locations: top
+        .filter(item => item.location && item.location.x)
+        .map(item => ({
+          x: item.location.x,
+          y: item.location.y,
+          color: item.content === 'HR' ? 'white' : contentColor(item.content),
+        })),
     };
     if (pa === 0) {
       return obj;

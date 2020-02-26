@@ -1,13 +1,14 @@
 <template>
   <div class="root-container">
     <canvas ref="canvas" @mousedown="trackXY" :disabled="disabled"></canvas>
-    <img v-if="isImage" :src="imgSrc" />
+    <img ref="img" v-if="isImage" :src="imgSrc" />
   </div>
 </template>
 
 <style lang="scss" scoped>
 .root-container {
   position: relative;
+  line-height: 0;
 }
 canvas {
   width: 400px;
@@ -34,6 +35,12 @@ img {
 
 <script>
 import ballIcon from '../images/icon_100.png';
+const colorMappging = {
+  red: '#ef1010',
+  blue: '#4d9de5',
+  yellow: '#efaf34',
+};
+
 export default {
   props: ['values', 'disabled', 'no_track', 'fixedSize'],
   data() {
@@ -65,6 +72,7 @@ export default {
   methods: {
     draw() {
       const canvas = this.$refs.canvas;
+      const img = this.$refs.img;
       const { width } = canvas.getBoundingClientRect();
 
       if (this.fixedSize) {
@@ -72,12 +80,15 @@ export default {
         canvas.style.height = `${this.fixedSize}px`;
         canvas.width = this.fixedSize;
         canvas.height = this.fixedSize;
+        img.style.width = `${this.fixedSize}px`;
+        img.style.height = `${this.fixedSize}px`;
       } else {
         canvas.width = width;
         canvas.height = width;
       }
 
-      const { width: base } = canvas.getBoundingClientRect();
+      const { width: temp } = canvas.getBoundingClientRect();
+      const base = this.fixedSize ? this.fixedSize : temp || width;
       const ctx = canvas.getContext('2d');
 
       const green = '#6aa253';
@@ -371,7 +382,7 @@ export default {
             0,
             2 * Math.PI,
           );
-          ctx.fillStyle = item.color || 'yellow';
+          ctx.fillStyle = colorMappging[item.color] || item.color || 'yellow';
           ctx.fill();
           ctx.arc(
             (item.x / 100) * base,
@@ -474,8 +485,10 @@ export default {
       }
     },
     xy() {
-      const { x, y, location } = this.xy[0];
-      this.$emit('change', { x, y, location });
+      if (this.xy.length) {
+        const { x, y, location } = this.xy[0];
+        this.$emit('change', { x, y, location });
+      }
     },
     disabled() {
       if (this.disabled) {
