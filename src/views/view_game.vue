@@ -169,15 +169,16 @@
           </div>
         </template>
       </div>
-      <div class="sticky-display-btn">
+      <div class="sticky-display-btn" v-if="box.slice(1).length">
         <span
           v-for="item in ['content', 'code']"
+          :key="item"
           :class="{ selected: boxDisplay === item }"
           @click="setBoxDisplay(item)"
           >{{ $t(`box_display_${item}`) }}</span
         >
       </div>
-      <div class="box-table simple">
+      <div class="box-table simple" v-if="box.slice(1).length">
         <div
           class="player-records"
           v-for="(item, i) in box.slice(1)"
@@ -514,7 +515,7 @@
         line-height: 32px;
         border: none;
         background-color: $header_bgcolor;
-        color: #fff;
+        color: rgba(255, 255, 255, 0.9);
       }
     }
   }
