@@ -80,8 +80,10 @@ export default {
         canvas.style.height = `${this.fixedSize}px`;
         canvas.width = this.fixedSize;
         canvas.height = this.fixedSize;
-        img.style.width = `${this.fixedSize}px`;
-        img.style.height = `${this.fixedSize}px`;
+        if (this.isImage) {
+          img.style.width = `${this.fixedSize}px`;
+          img.style.height = `${this.fixedSize}px`;
+        }
       } else {
         canvas.width = width;
         canvas.height = width;
