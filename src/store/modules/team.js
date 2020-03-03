@@ -318,8 +318,8 @@ const actions = {
       );
       if (teamDoc.exists) {
         const {
-          benches: benches_,
-          players: players_,
+          benches: benches_ = {},
+          players: players_ = {},
           ...others
         } = teamDoc.data();
         const players = Object.keys(players_).map(name => ({
@@ -358,8 +358,8 @@ const actions = {
             const {
               icon,
               games = {},
-              benches: benches_,
-              players: players_,
+              benches: benches_ = {},
+              players: players_ = {},
               unlockGames = [],
               ...others
             } = teamDoc.data();
