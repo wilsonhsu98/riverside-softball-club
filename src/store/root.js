@@ -8,7 +8,7 @@ import {
 } from '../firebase';
 import router from '../router';
 import config from '../../config';
-import user from './modules/user';
+import { state as userState, actions as userActions } from './modules/user';
 // const lineLoginUrl = config.line.loginUrl;
 const lineLoginUrl =
   process.env.NODE_ENV === 'production'
@@ -133,9 +133,8 @@ const actions = {
               },
             );
           })
-          .then(() => refPlayerDoc.get())
           .then(() => {
-            window.trackRead('lineLoginRedirect: dummy get', 1);
+            userActions.fetchUser({ commit });
             // commit(types.SET_USERNAME, snapshot.docs[0].id);
             router.push('/main/user');
             commit(types.LOADING, false);
@@ -295,9 +294,8 @@ const actions = {
             commit(types.SET_ANONYMOUS, false);
             return refPlayerDoc.set(data, { merge: true });
           })
-          .then(() => refPlayerDoc.get())
           .then(() => {
-            window.trackRead('chkLoginStatus: dummy get', 1);
+            userActions.fetchUser({ commit });
             if (router.history.current.path === '/login') {
               router.push('/main/user');
             }
@@ -402,7 +400,7 @@ const mutations = {
     state.currentTeam = '';
     state.currentTeamIcon = '';
     state.isAnonymous = undefined;
-    user.state.teams = null;
+    userState.teams = null;
     window.localStorage.setItem('version', forceVersion || version);
     if (currentTeam) window.localStorage.setItem('currentTeam', currentTeam);
     if (idb) window.localStorage.setItem('idb', idb);

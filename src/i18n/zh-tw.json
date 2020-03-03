@@ -171,6 +171,7 @@
 	"msg_duplicate_number": "號碼重覆",
 	"btn_accept": "允許",
 	"btn_denied": "拒絕",
+	"desc_gen_opacity": "建議上傳去背圖片做為球隊LOGO<br>可以使用免費線上服務 <a target='blank' href='https://burner.bonanza.com'>https://burner.bonanza.com</a>",
 	"tip_player": "<ul><li>將未綁定球員刪除，僅會移除球員名單，不影響過往記錄</li><li>將已綁定球員刪除，該球員會被移到非正式球員名單</li></ul>",
 	"tip_bench": "<ul><li>若給予非正式球員名字，便成為正式球員</li><li>將非正式球員刪除，該球員等同於被請出球隊</li></ul>",
 

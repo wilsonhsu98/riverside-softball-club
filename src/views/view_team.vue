@@ -56,6 +56,7 @@
         v-model="teamIntro"
       />
 
+      <h2 v-html="$t('desc_gen_opacity')"></h2>
       <div
         v-if="!iconEdit"
         class="icon-container"
@@ -487,6 +488,7 @@
       flex: 1;
       background-color: $header_bgcolor;
       padding: 10px;
+      margin: 0;
     }
   }
 }
@@ -647,8 +649,8 @@ export default {
             intro: this.teamIntro,
             players: this.players,
             benches: this.benches,
-            prePlayers: this.teamInfo.players,
-            preBenches: this.teamInfo.benches,
+            prePlayers: !this.$route.params.team ? [] : this.teamInfo.players,
+            preBenches: !this.$route.params.team ? [] : this.teamInfo.benches,
             icon: this.icon,
             isNew: !this.$route.params.team,
           });

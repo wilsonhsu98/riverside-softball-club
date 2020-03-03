@@ -9,6 +9,7 @@ import {
 import { types as userTypes } from './user';
 import { actions as recordActions } from './record';
 import { db, auth, fieldValue, timestamp } from '../../firebase';
+import router from '../../router';
 import { openDB } from 'idb';
 
 const dbInit = teamCode => {
@@ -141,13 +142,17 @@ const actions = {
                   teamRoles: {
                     [data.code]: player.manager ? 'manager' : 'player',
                   },
+                  teams: fieldValue.arrayUnion(data.code),
                 },
                 { merge: true },
               );
             } else if (player.self) {
               batch.set(
                 refPlayerDoc,
-                { teamRoles: { [data.code]: 'manager' } },
+                {
+                  teamRoles: { [data.code]: 'manager' },
+                  teams: fieldValue.arrayUnion(data.code),
+                },
                 { merge: true },
               );
             }
@@ -171,6 +176,7 @@ const actions = {
                       teamRoles: {
                         [data.code]: 'bench',
                       },
+                      teams: fieldValue.arrayUnion(data.code),
                     },
                     { merge: true },
                   );
@@ -249,7 +255,9 @@ const actions = {
               acc[name] = {
                 number,
                 manager,
-                ...(uid && { uid: player.self ? playerDoc.id : uid }),
+                ...((uid || player.self) && {
+                  uid: player.self ? playerDoc.id : uid,
+                }),
               };
               return acc;
             },
@@ -280,6 +288,9 @@ const actions = {
         }
       })
       .then(() => {
+        if (data.isNew) {
+          router.push('/main/user');
+        }
         commit(rootTypes.LOADING, false);
       })
       .catch(error => {
@@ -342,11 +353,11 @@ const actions = {
         .collection('teams')
         .doc(teamCode)
         .onSnapshot(teamDoc => {
-          if (teamDoc.exists && !teamDoc.metadata.hasPendingWrites) {
+          if (teamDoc.exists) {
             window.trackRead('listenTeamChange: team', 1);
             const {
               icon,
-              games,
+              games = {},
               benches: benches_,
               players: players_,
               unlockGames = [],
@@ -529,24 +540,22 @@ const actions = {
       .collection('requests')
       .where('uid', '==', uid)
       .onSnapshot(querySnapshot => {
-        if (!querySnapshot.metadata.hasPendingWrites) {
-          window.trackRead(
-            'fetchPersonalRequests',
-            querySnapshot.docs.length || 1,
-          );
-          const requests = querySnapshot.docs
-            .map(doc => {
-              const { timestamp, ...data } = doc.data();
-              return {
-                timestamp: timestamp.toDate(),
-                ...data,
-                id: doc.id,
-              };
-            })
-            .sort((a, b) => b.timestamp - a.timestamp);
-          commit(types.FETCH_REQUESTS, requests);
-          commit(rootTypes.LOADING, false);
-        }
+        window.trackRead(
+          'fetchPersonalRequests',
+          querySnapshot.docs.length || 1,
+        );
+        const requests = querySnapshot.docs
+          .map(doc => {
+            const { timestamp, ...data } = doc.data();
+            return {
+              timestamp: timestamp.toDate(),
+              ...data,
+              id: doc.id,
+            };
+          })
+          .sort((a, b) => b.timestamp - a.timestamp);
+        commit(types.FETCH_REQUESTS, requests);
+        commit(rootTypes.LOADING, false);
       });
   },
   disconnectPersonalRequests() {

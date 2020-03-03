@@ -273,12 +273,10 @@ export default {
   },
   created() {
     this.initFromLS();
-    this.fetchUser();
   },
   methods: {
     ...mapActions({
       initFromLS: 'initFromLS',
-      fetchUser: 'fetchUser',
       listenTeamChange: 'listenTeamChange',
       logout: 'logout',
     }),

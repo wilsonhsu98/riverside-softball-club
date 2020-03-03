@@ -59,6 +59,7 @@ const actions = {
       });
   },
   fetchUser({ commit }) {
+    let preTeamsContext = '';
     const userId = rootGetters.userId(rootState);
     if (userId) {
       if (typeof snapShot.account === 'function') snapShot.account();
@@ -66,14 +67,18 @@ const actions = {
         .collection('accounts')
         .doc(userId)
         .onSnapshot(snapshot => {
-          if (!snapshot.metadata.hasPendingWrites) {
-            window.trackRead('fetchUser: accounts', 1);
-            const data = snapshot.data();
-            if (data) {
-              const { accessToken, teams, teamRoles, ...other } = data;
-              accessToken;
-              teams;
-              commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
+          window.trackRead('fetchUser: accounts', 1);
+          const data = snapshot.data();
+          if (data) {
+            const { accessToken, teams, teamRoles, ...other } = data;
+            accessToken;
+            teams;
+            commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
+
+            // prevent reload teams if teams not changed
+            const currentTeamsContext = JSON.stringify(teamRoles);
+            if (currentTeamsContext !== preTeamsContext) {
+              preTeamsContext = currentTeamsContext;
               if (Object.keys(teamRoles).length) {
                 Promise.all(
                   Object.keys(teamRoles).map(teamCode => {
@@ -104,33 +109,31 @@ const actions = {
                   commit(rootTypes.SET_AUTH, teams);
                   record.actions.workerBox({ commit });
                   teams.forEach(team => {
-                    if (team.role !== 'manager') return;
                     if (typeof snapShotRequest[team.teamCode] === 'function')
                       snapShotRequest[team.teamCode]();
+                    if (team.role !== 'manager') return;
                     snapShotRequest[team.teamCode] = db
                       .collection('requests')
                       .where('teamCode', '==', team.teamCode)
                       .onSnapshot(requestsCollection => {
-                        if (!requestsCollection.metadata.hasPendingWrites) {
-                          window.trackRead(
-                            `fetchUser: listen ${team.teamCode} request`,
-                            requestsCollection.docs.length || 1,
-                          );
-                          commit(types.SET_TEAM_REQUEST, {
-                            teamCode: team.teamCode,
-                            requests: requestsCollection.docs
-                              .map(doc => {
-                                const { timestamp, ...data } = doc.data();
-                                return {
-                                  timestamp: timestamp.toDate(),
-                                  ...data,
-                                  id: doc.id,
-                                };
-                              })
-                              .filter(request => request.status !== 'denied')
-                              .sort((a, b) => b.timestamp - a.timestamp),
-                          });
-                        }
+                        window.trackRead(
+                          `fetchUser: listen ${team.teamCode} request`,
+                          requestsCollection.docs.length || 1,
+                        );
+                        commit(types.SET_TEAM_REQUEST, {
+                          teamCode: team.teamCode,
+                          requests: requestsCollection.docs
+                            .map(doc => {
+                              const { timestamp, ...data } = doc.data();
+                              return {
+                                timestamp: timestamp.toDate(),
+                                ...data,
+                                id: doc.id,
+                              };
+                            })
+                            .filter(request => request.status !== 'denied')
+                            .sort((a, b) => b.timestamp - a.timestamp),
+                        });
                       });
                   });
                 });
@@ -164,7 +167,7 @@ const mutations = {
     });
   },
 };
-export { types };
+export { types, actions, state };
 export default {
   state,
   getters,
