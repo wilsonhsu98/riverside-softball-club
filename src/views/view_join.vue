@@ -399,6 +399,7 @@ export default {
       otherPlayer: '',
       choice: '',
       defaultIcon,
+      selected: '',
     };
   },
   created() {
@@ -441,6 +442,7 @@ export default {
       });
     },
     searchTeam_(teamCode) {
+      this.selected = teamCode;
       this.fetchTeamInfo(teamCode);
       this.bindPlayer = undefined;
       this.choice = '';
@@ -474,17 +476,19 @@ export default {
   },
   watch: {
     teamInfo() {
-      this.teamCode = this.teamInfo.teamCode;
-      this.teamName = this.teamInfo.teamName;
-      this.teamIntro = this.teamInfo.teamIntro;
-      this.otherNames = this.teamInfo.otherNames;
-      this.icon = this.teamInfo.icon;
-      this.players = Array.from(this.teamInfo.players);
-      this.benches = Array.from(this.teamInfo.benches);
+      if (this.selected === this.teamInfo.teamCode) {
+        this.teamCode = this.teamInfo.teamCode;
+        this.teamName = this.teamInfo.teamName;
+        this.teamIntro = this.teamInfo.teamIntro;
+        this.otherNames = this.teamInfo.otherNames;
+        this.icon = this.teamInfo.icon;
+        this.players = Array.from(this.teamInfo.players);
+        this.benches = Array.from(this.teamInfo.benches);
 
-      this.joined =
-        this.players.some(player => player.uid === this.userId) ||
-        this.benches.some(player => player.uid === this.userId);
+        this.joined =
+          this.players.some(player => player.uid === this.userId) ||
+          this.benches.some(player => player.uid === this.userId);
+      }
     },
   },
 };
