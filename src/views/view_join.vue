@@ -292,6 +292,8 @@
     border-top: 1px solid $input_border;
     position: relative;
     padding: 10px 0;
+    display: flex;
+    flex-wrap: wrap;
     input[type='text'] {
       display: inline-block;
       resize: none;
@@ -311,18 +313,19 @@
     }
   }
   .team-player-item {
-    font-size: 12px;
-    position: relative;
-    padding-left: 26px;
-    margin-right: 12px;
-    text-align: left;
-    line-height: 26px;
     display: inline-block;
     box-sizing: border-box;
+    padding-left: 26px;
+    margin: 0 auto 0 12px;
+    min-width: 80px;
+    line-height: 26px;
+    height: 26px;
+    text-align: left;
+    font-size: 12px;
     color: $row_color;
     cursor: pointer;
-    height: 26px;
     vertical-align: middle;
+    position: relative;
     &__number {
       display: inline-block;
       width: 12px;
