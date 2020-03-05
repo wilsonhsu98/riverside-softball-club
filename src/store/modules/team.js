@@ -252,14 +252,14 @@ const actions = {
               );
               return {
                 manager: false,
-                number: find.number || '',
+                number: find.number,
                 uid: find.uid,
                 name: find.name,
               };
             });
           const players = [...data.players, ...benches2players].reduce(
             (acc, player) => {
-              const { name, number, manager, uid } = player;
+              const { name, number = '', manager, uid } = player;
               acc[name] = {
                 number,
                 manager,
