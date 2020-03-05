@@ -136,6 +136,7 @@ const actions = {
           const batch = db.batch();
           data.players.forEach(player => {
             if (player.uid) {
+              // set player role
               batch.set(
                 db.collection('accounts').doc(player.uid),
                 {
@@ -147,6 +148,7 @@ const actions = {
                 { merge: true },
               );
             } else if (player.self) {
+              // forced set self role to manager
               batch.set(
                 refPlayerDoc,
                 {
@@ -164,12 +166,23 @@ const actions = {
                   .map(player => player.name)
                   .includes(prePlayer.name)
               ) {
+                // remove from player
+                batch.set(
+                  refTeamDoc,
+                  {
+                    players: {
+                      [prePlayer.name]: fieldValue.delete(),
+                    },
+                  },
+                  { merge: true },
+                );
                 if (
                   prePlayer.uid &&
                   !data.players
                     .map(player => player.uid)
                     .includes(prePlayer.uid)
                 ) {
+                  // change player role to bench
                   batch.set(
                     db.collection('accounts').doc(prePlayer.uid),
                     {
@@ -177,15 +190,6 @@ const actions = {
                         [data.code]: 'bench',
                       },
                       teams: fieldValue.arrayUnion(data.code),
-                    },
-                    { merge: true },
-                  );
-                  batch.set(
-                    refTeamDoc,
-                    {
-                      players: {
-                        [prePlayer.name]: fieldValue.delete(),
-                      },
                     },
                     { merge: true },
                   );
@@ -199,31 +203,35 @@ const actions = {
                 msg: prePlayer.name,
               };
             });
-          const brenches2players = data.preBenches
+          const benches2players = data.preBenches
             .filter(prePlayer => {
               if (
                 !data.benches.map(player => player.uid).includes(prePlayer.uid)
               ) {
+                // change player role to bench
                 batch.set(
                   db.collection('accounts').doc(prePlayer.uid),
                   {
-                    teams: fieldValue.arrayRemove(data.code),
                     teamRoles: {
                       [data.code]: fieldValue.delete(),
                     },
+                    teams: fieldValue.arrayRemove(data.code),
                   },
                   { merge: true },
                 );
               } else {
+                // change player role to player
                 batch.set(
                   db.collection('accounts').doc(prePlayer.uid),
                   {
                     teamRoles: {
                       [data.code]: 'player',
                     },
+                    teams: fieldValue.arrayUnion(data.code),
                   },
                   { merge: true },
                 );
+                // remove from bench
                 batch.set(
                   refTeamDoc,
                   {
@@ -249,7 +257,7 @@ const actions = {
                 name: find.name,
               };
             });
-          const players = [...data.players, ...brenches2players].reduce(
+          const players = [...data.players, ...benches2players].reduce(
             (acc, player) => {
               const { name, number, manager, uid } = player;
               acc[name] = {
