@@ -49,7 +49,7 @@
               :to="{ name: 'user' }"
               active-class="active"
               :data-label="$t('menu_profile')"
-              :data-requests="teamRequest || undefined"
+              :data-requests="totalRequest || undefined"
             >
               <i class="fa fa-user"></i>
             </router-link>
@@ -268,7 +268,7 @@ export default {
   data() {
     return {
       defaultIcon,
-      teamRequest: 0,
+      totalRequest: 0,
     };
   },
   created() {
@@ -306,12 +306,22 @@ export default {
       handler() {
         if (this.currentTeam) {
           this.listenTeamChange(this.currentTeam);
-          this.teamRequest = (this.teams || [])
+          this.totalRequest = (this.teams || [])
             .filter(team => team.teamCode !== this.currentTeam)
             .reduce((acc, team) => {
               return acc + ((team.requests || []).length || 0);
             }, 0);
         }
+      },
+      immediate: true,
+    },
+    teams: {
+      handler() {
+        this.totalRequest = (this.teams || [])
+          .filter(team => team.teamCode !== this.currentTeam)
+          .reduce((acc, team) => {
+            return acc + ((team.requests || []).length || 0);
+          }, 0);
       },
       immediate: true,
     },

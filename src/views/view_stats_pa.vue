@@ -197,36 +197,41 @@
             :style="{ top: `${(itemIndex + 2) * 36}px` }"
             :id="`row_${item.name}`"
           >
-            <coordination
-              v-if="item.locations.length"
-              :values="item.locations"
-              :no_track="true"
-              fixedSize="130"
-              style="align-self: flex-end; cursor: pointer;"
-              @click.native="coordinates = item.locations"
-            />
-            <div class="chart-inner">
+            <div class="chart-wrapper">
+              <coordination
+                v-if="item.locations.length"
+                :values="item.locations"
+                :no_track="true"
+                fixedSize="133"
+                style="cursor: pointer; position: absolute; right: 0; bottom: 0;"
+                @click.native="coordinates = item.locations"
+              />
               <div
-                class="bar"
-                v-for="(cube, cubeIndex) in item.listByGame"
-                :key="`bar_${encodeURI(item.name)}_${cubeIndex}`"
+                class="chart-inner"
+                :class="{ 'has-coordination': item.locations.length }"
               >
-                <template v-for="(cell, cellIndex) in cube">
-                  <span
-                    v-if="cellIndex === cube.length - 1"
-                    class="game"
-                    :key="`${cubeIndex}${cellIndex}`"
-                    >{{ cell }}</span
-                  >
-                  <span
-                    v-else
-                    :class="
-                      `item ${cell.color} ${cell.exclude ? 'exclude' : ''}`
-                    "
-                    :key="`${cubeIndex}${cellIndex}`"
-                    >{{ $t(cell.content) }}</span
-                  >
-                </template>
+                <div
+                  class="bar"
+                  v-for="(cube, cubeIndex) in item.listByGame"
+                  :key="`bar_${encodeURI(item.name)}_${cubeIndex}`"
+                >
+                  <template v-for="(cell, cellIndex) in cube">
+                    <span
+                      v-if="cellIndex === cube.length - 1"
+                      class="game"
+                      :key="`${cubeIndex}${cellIndex}`"
+                      >{{ cell }}</span
+                    >
+                    <span
+                      v-else
+                      :class="
+                        `item ${cell.color} ${cell.exclude ? 'exclude' : ''}`
+                      "
+                      :key="`${cubeIndex}${cellIndex}`"
+                      >{{ $t(cell.content) }}</span
+                    >
+                  </template>
+                </div>
               </div>
             </div>
           </div>
@@ -354,7 +359,7 @@ i.fa {
         border-bottom-right-radius: 0;
       }
       & + .row-grid .cell.chart {
-        display: flex;
+        display: block;
       }
     }
   }
@@ -400,9 +405,8 @@ i.fa {
       left: 145px;
       right: 0;
       z-index: 2;
-      overflow-x: auto;
-      overflow-y: hidden;
-      direction: rtl;
+      overflow: hidden;
+      height: 133px;
 
       display: none;
 
@@ -411,10 +415,22 @@ i.fa {
       border-top: 0;
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       border-radius: 0 0 10px 10px;
+      .chart-wrapper {
+        position: absolute;
+        right: 0;
+        left: 0;
+        height: 133px;
+        display: flex;
+      }
       .chart-inner {
         display: flex;
         align-items: flex-end;
+        direction: rtl;
+        overflow-x: auto;
         width: 100%;
+        &.has-coordination {
+          width: calc(100% - 133px);
+        }
       }
       .bar {
         flex-grow: 1;

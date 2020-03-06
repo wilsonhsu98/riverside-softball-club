@@ -305,6 +305,63 @@ const actions = {
         console.log('Error getting document:', error);
       });
   },
+  deleteTeam({ commit }, teamCode) {
+    // remove role & team (player bench manager), remove team, deny team request
+    commit(rootTypes.LOADING, true);
+    Promise.all([
+      db
+        .collection('accounts')
+        .where('teams', 'array-contains', teamCode)
+        .get(),
+      db
+        .collection('requests')
+        .where('teamCode', '==', teamCode)
+        .get(),
+    ])
+      .then(res => {
+        const [accountCollection, requestCollection] = res;
+        window.trackRead(
+          'fetchTeamInfo: accounts in the team',
+          accountCollection.docs.length || 1,
+        );
+        window.trackRead(
+          'fetchTeamInfo: request join the team',
+          requestCollection.docs.length || 1,
+        );
+        const batch = db.batch();
+        accountCollection.docs.forEach(doc => {
+          batch.set(
+            doc.ref,
+            {
+              teamRoles: {
+                [teamCode]: fieldValue.delete(),
+              },
+              teams: fieldValue.arrayRemove(teamCode),
+            },
+            { merge: true },
+          );
+        });
+        requestCollection.docs.forEach(doc => {
+          batch.set(
+            doc.ref,
+            {
+              status: 'denied',
+              timestamp,
+            },
+            { merge: true },
+          );
+        });
+        batch.delete(db.collection('teams').doc(teamCode));
+        return batch.commit();
+      })
+      .then(() => {
+        router.push('/main/user');
+        commit(rootTypes.LOADING, false);
+      })
+      .catch(error => {
+        console.log('Error getting document:', error);
+      });
+  },
   fetchTeamInfo({ commit }, teamCode) {
     commit(types.CLEAR_TEAM);
     commit(rootTypes.LOADING, true);

@@ -1,7 +1,7 @@
 <template>
   <div>
     <mobile-header
-      :back="!$route.params.team ? back_ : undefined"
+      :back="back_"
       :icon="$route.params.team ? currentTeamIcon : undefined"
       :save="editTeam_"
     />
@@ -227,9 +227,18 @@
 
       <div v-if="players_err" class="error" v-html="players_err"></div>
 
+      <div v-if="$route.params.team" class="field-wrapper delete-btn-container">
+        <button class="btn danger" @click="delete_">
+          {{ $t('btn_delete_team') }}
+        </button>
+      </div>
+
       <div class="btn-container">
-        <button v-if="!$route.params.team" class="btn" @click="back_">
+        <button class="btn" @click="back_">
           {{ $t('btn_cancel') }}
+        </button>
+        <button v-if="$route.params.team" class="btn danger" @click="delete_">
+          {{ $t('btn_delete_team') }}
         </button>
         <button class="btn" @click="editTeam_">
           {{ $route.params.team ? $t('btn_update') : $t('btn_insert') }}
@@ -377,6 +386,12 @@
       display: inline-block;
     }
   }
+  .delete-btn-container {
+    display: none;
+  }
+  .btn.danger {
+    width: auto;
+  }
   .error {
     max-width: $max_width;
     width: 100%;
@@ -494,6 +509,17 @@
 }
 
 @media only screen and (max-width: 760px) {
+  .container {
+    .delete-btn-container {
+      display: block;
+      margin-top: 15px;
+      .btn {
+        display: block;
+        width: 100%;
+        margin: 0;
+      }
+    }
+  }
   .icon-container {
     width: 200px;
     height: 200px;
@@ -549,6 +575,7 @@ export default {
     ...mapActions({
       editTeam: 'editTeam',
       handleRequest: 'handleRequest',
+      deleteTeam: 'deleteTeam',
     }),
     checkNumber(e) {
       if (!e.target.validity.valid) {
@@ -706,6 +733,23 @@ export default {
         requestId,
         action: 'denied',
       });
+    },
+    delete_() {
+      if (
+        this.teamInfo.players.find(
+          player => player.uid === this.userId && player.manager,
+        )
+      ) {
+        if (this.teamInfo.players.filter(player => player.manager).length > 1) {
+          alert(this.$t('msg_delete_team_condition'));
+          return;
+        }
+        if (confirm(this.$t('msg_delete_warning'))) {
+          this.deleteTeam(this.teamCode);
+        }
+      } else {
+        alert(this.$t('msg_not_manager'));
+      }
     },
   },
   computed: {
