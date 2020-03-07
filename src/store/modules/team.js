@@ -131,7 +131,7 @@ const actions = {
         window.trackRead('editTeam: current player doc', 1);
         if (teamDoc.exists && data.isNew) {
           alert(i18n.t('msg_duplicate_team'));
-          return true;
+          return false;
         } else {
           const batch = db.batch();
           data.players.forEach(player => {
@@ -295,8 +295,8 @@ const actions = {
           return batch.commit();
         }
       })
-      .then(() => {
-        if (data.isNew) {
+      .then(res => {
+        if (res !== false && data.isNew) {
           router.push('/main/user');
         }
         commit(rootTypes.LOADING, false);
@@ -317,16 +317,37 @@ const actions = {
         .collection('requests')
         .where('teamCode', '==', teamCode)
         .get(),
+      db.collection(`teams/${teamCode}/players`).get(),
+      db.collection(`teams/${teamCode}/benches`).get(),
+      db.collection(`teams/${teamCode}/games`).get(),
     ])
       .then(res => {
-        const [accountCollection, requestCollection] = res;
+        const [
+          accountCollection,
+          requestCollection,
+          playerCollection,
+          benchCollection,
+          gameCollection,
+        ] = res;
         window.trackRead(
-          'fetchTeamInfo: accounts in the team',
+          'deleteTeam: accounts in the team',
           accountCollection.docs.length || 1,
         );
         window.trackRead(
-          'fetchTeamInfo: request join the team',
+          'deleteTeam: request join the team',
           requestCollection.docs.length || 1,
+        );
+        window.trackRead(
+          'deleteTeam: players in the team',
+          playerCollection.docs.length || 1,
+        );
+        window.trackRead(
+          'deleteTeam: benches in the team',
+          benchCollection.docs.length || 1,
+        );
+        window.trackRead(
+          'deleteTeam: games in the team',
+          gameCollection.docs.length || 1,
         );
         const batch = db.batch();
         accountCollection.docs.forEach(doc => {
@@ -350,6 +371,15 @@ const actions = {
             },
             { merge: true },
           );
+        });
+        playerCollection.docs.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        benchCollection.docs.forEach(doc => {
+          batch.delete(doc.ref);
+        });
+        gameCollection.docs.forEach(doc => {
+          batch.delete(doc.ref);
         });
         batch.delete(db.collection('teams').doc(teamCode));
         return batch.commit();
