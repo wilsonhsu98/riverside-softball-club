@@ -1158,12 +1158,12 @@ export default {
       }
     },
     delete_() {
-      if (confirm(this.$t('msg_delete_warning'))) {
+      this.confirm(this.$t('msg_delete_warning')).then(() => {
         this.deleteLastPa({
           teamCode: this.$route.params.team,
           gameId: this.$route.params.game,
         });
-      }
+      });
     },
     setInn(val) {
       this.inn = val;

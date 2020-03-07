@@ -1,6 +1,7 @@
 import i18n from '../../i18n';
 import {
   types as rootTypes,
+  actions as rootActions,
   // getters as rootGetters,
   // state as rootState,
   // promiseImage,
@@ -66,7 +67,7 @@ const actions = {
       .then(newGameDoc => {
         if (newGameDoc.exists && prevId !== newId) {
           const error = i18n.t('msg_duplicate_game');
-          alert(error);
+          rootActions.alert({ commit }, error);
           throw error;
         }
         return prevId && prevId !== newId

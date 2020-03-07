@@ -1,6 +1,7 @@
 import i18n from '../../i18n';
 import {
   types as rootTypes,
+  actions as rootActions,
   // getters as rootGetters,
   // state as rootState,
   promiseImage,
@@ -130,7 +131,7 @@ const actions = {
         window.trackRead('editTeam: team doc', 1);
         window.trackRead('editTeam: current player doc', 1);
         if (teamDoc.exists && data.isNew) {
-          alert(i18n.t('msg_duplicate_team'));
+          rootActions.alert({ commit }, i18n.t('msg_duplicate_team'));
           return false;
         } else {
           const batch = db.batch();

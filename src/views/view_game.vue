@@ -511,6 +511,7 @@
       border: 2px solid $header_bgcolor;
       color: $header_bgcolor;
       background-color: rgba(255, 255, 255, 0.9);
+      cursor: pointer;
       &.selected {
         line-height: 32px;
         border: none;

@@ -576,6 +576,7 @@ export default {
       editTeam: 'editTeam',
       handleRequest: 'handleRequest',
       deleteTeam: 'deleteTeam',
+      alert: 'alert',
     }),
     checkNumber(e) {
       if (!e.target.validity.valid) {
@@ -693,7 +694,7 @@ export default {
               .filter(str => !!str)
               .join('\n');
             if (alertStr) {
-              alert(alertStr);
+              this.alert(alertStr);
             }
           }, 10);
         }
@@ -713,7 +714,7 @@ export default {
     },
     releaseSelfManager($event, player) {
       if ($event.target.checked === false && player.uid === this.userId) {
-        alert(this.$t('msg_self_release'));
+        this.alert(this.$t('msg_self_release'));
       }
     },
     genImage(img) {
@@ -741,14 +742,14 @@ export default {
         )
       ) {
         if (this.teamInfo.players.filter(player => player.manager).length > 1) {
-          alert(this.$t('msg_delete_team_condition'));
+          this.alert(this.$t('msg_delete_team_condition'));
           return;
         }
-        if (confirm(this.$t('msg_delete_warning'))) {
+        this.confirm(this.$t('msg_delete_warning')).then(() => {
           this.deleteTeam(this.teamCode);
-        }
+        });
       } else {
-        alert(this.$t('msg_not_manager'));
+        this.alert(this.$t('msg_not_manager'));
       }
     },
   },

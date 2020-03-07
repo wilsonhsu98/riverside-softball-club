@@ -703,6 +703,8 @@ export default {
       editGame: 'editGame',
       deleteGame: 'deleteGame',
       toggleGameStatus: 'toggleGameStatus',
+      alert: 'alert',
+      confirm: 'confirm',
     }),
     checkNumber(e) {
       if (!e.target.validity.valid) {
@@ -759,7 +761,7 @@ export default {
     },
     edit_() {
       if (this.gameStatus === 'lock' && this.mode === 'edit') {
-        alert(this.$t('msg_lock_warning'));
+        this.alert(this.$t('msg_lock_warning'));
         return;
       }
       // wait for tags component ready
@@ -811,15 +813,15 @@ export default {
     },
     delete_() {
       if (this.gameStatus === 'lock') {
-        alert(this.$t('msg_lock_warning'));
+        this.alert(this.$t('msg_lock_warning'));
         return;
       }
-      if (confirm(this.$t('msg_delete_warning'))) {
+      this.confirm(this.$t('msg_delete_warning')).then(() => {
         this.deleteGame({
           teamCode: this.$route.params.team,
           gameId: this.prevId,
         });
-      }
+      });
     },
     changePlayer(mode) {
       this.changeMode = mode;

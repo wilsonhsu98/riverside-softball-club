@@ -763,6 +763,7 @@ export default {
       setUnlimitedPA: 'setUnlimitedPA',
       setSortBy: 'setSortBy',
       editGameOrder: 'editGameOrder',
+      alert: 'alert',
     }),
     back_() {
       this.$router.back();
@@ -797,7 +798,7 @@ export default {
         .join('\n');
 
       if (errorStr) {
-        alert(errorStr);
+        this.alert(errorStr);
         return;
       }
 

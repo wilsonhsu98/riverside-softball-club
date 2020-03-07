@@ -30,6 +30,8 @@ const types = {
   SET_TEAMICON: 'SET_TEAMICON',
   SET_PROVIDERID: 'SET_PROVIDERID',
   SET_ANONYMOUS: 'SET_ANONYMOUS',
+  ALERT: 'ALERT',
+  CONFIRM: 'CONFIRM',
 };
 
 const state = {
@@ -45,6 +47,9 @@ const state = {
   providerId: '',
   accessToken: '',
   currentTeamIcon: '',
+  alertMsg: '',
+  confirmMsg: '',
+  confirmPromiseResolve: () => {},
 };
 
 const getters = {
@@ -69,6 +74,9 @@ const getters = {
     }
     return state.isAnonymous;
   },
+  alertMsg: state => state.alertMsg,
+  confirmMsg: state => state.confirmMsg,
+  confirmPromiseResolve: state => state.confirmPromiseResolve,
 };
 
 const actions = {
@@ -362,6 +370,18 @@ const actions = {
   forceLogin({ commit }, version) {
     commit(types.CLEAN_TOKEN, version);
   },
+  alert({ commit }, msg) {
+    commit(types.ALERT, msg);
+  },
+  confirm({ commit }, msg) {
+    if (msg) {
+      return new Promise(resolve => {
+        commit(types.CONFIRM, { msg, resolve });
+      });
+    } else {
+      commit(types.CONFIRM, { msg });
+    }
+  },
 };
 
 const mutations = {
@@ -437,6 +457,13 @@ const mutations = {
     if (isAnonymous) {
       state.currentTeam = window.localStorage.getItem('currentTeam');
     }
+  },
+  [types.ALERT](state, msg = '') {
+    state.alertMsg = msg;
+  },
+  [types.CONFIRM](state, { msg = '', resolve = () => {} }) {
+    state.confirmMsg = msg;
+    state.confirmPromiseResolve = resolve;
   },
 };
 

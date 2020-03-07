@@ -106,9 +106,9 @@ const genGameList = (games, filterGames = []) => {
 
 const locationMapping = {
   P: { code: '1', content: '投' },
-  '1B': { code: '3', content: '一' },
-  '2B': { code: '4', content: '二' },
-  '3B': { code: '5', content: '三' },
+  '1B': { code: '3', content: '壹' },
+  '2B': { code: '4', content: '貳' },
+  '3B': { code: '5', content: '參' },
   ss: { code: '6', content: '游' },
   lf: { code: '7', content: '左' },
   cf: { code: '8', content: '中' },

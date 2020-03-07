@@ -243,17 +243,17 @@ const displayGame = (players, records, errors, role) => {
       }
 
       const onbase = (() => {
-        const next5 = self
-          .slice(i, i + 5)
+        const selfAndNext5 = self
+          .slice(i, i + 6)
           .map(sub => sub.onbase)
           .reduce((acc, sub) => acc.concat(sub), []);
         return {
-          r: next5.find(
+          r: selfAndNext5.find(
             sub => sub && sub.name === item.name && sub.result === 'run',
           )
             ? item.name
             : '',
-          out: next5.find(
+          out: selfAndNext5.find(
             sub => sub && sub.name === item.name && sub.result === 'out',
           )
             ? true
