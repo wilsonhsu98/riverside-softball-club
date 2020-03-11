@@ -1061,6 +1061,7 @@ export default {
       setOrder: 'setOrder',
       editGameOrder: 'editGameOrder',
       deleteLastPa: 'deleteLastPa',
+      confirm: 'confirm',
     }),
     toggle(path, value) {
       const setPath = (path, value) =>

@@ -577,6 +577,7 @@ export default {
       handleRequest: 'handleRequest',
       deleteTeam: 'deleteTeam',
       alert: 'alert',
+      confirm: 'confirm',
     }),
     checkNumber(e) {
       if (!e.target.validity.valid) {

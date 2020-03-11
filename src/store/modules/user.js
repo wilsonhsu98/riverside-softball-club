@@ -44,11 +44,17 @@ const actions = {
           data.current === 'custom'
             ? url
             : data.accountInfo[`${data.current}_photo`];
-        return refPlayerDoc.set({
-          photo,
-          custom_photo: url,
-          timestamp,
-        });
+        const batch = db.batch();
+        batch.set(
+          refPlayerDoc,
+          {
+            photo,
+            custom_photo: url,
+            timestamp,
+          },
+          { merge: true },
+        );
+        return batch.commit();
       })
       .then(() => {
         commit(rootTypes.LOADING, false);
