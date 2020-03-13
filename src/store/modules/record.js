@@ -3,9 +3,7 @@ import {
   // getters as rootGetters,
   state as rootState,
 } from '../root';
-import { types as teamTypes } from './team';
 import utils from '../../libs/utils';
-import { db } from '../../firebase';
 import workerCreater from '../../web-worker';
 
 const types = {
@@ -232,30 +230,10 @@ const actions = {
     actions.workerItemStats({ commit });
     actions.workerBox({ commit });
   },
-  operatePlayers({ commit }, { players, teamCode }) {
-    db.collection('accounts')
-      .where('teams', 'array-contains', teamCode)
-      .get()
-      .then(accountCollection => {
-        window.trackRead('operatePlayers', accountCollection.docs.length || 1);
-        const accounts = players.map(player => {
-          const find = accountCollection.docs.find(
-            account => account.id === player.data.uid,
-          );
-          return {
-            id: player.id,
-            data: {
-              ...player.data,
-              photo: find && find.data().photo,
-            },
-          };
-        });
-
-        commit(teamTypes.FETCH_PHOTO, accountCollection);
-        commit(types.GET_PLAYERS, accounts);
-        actions.workerGenStatistics({ commit });
-        actions.workerItemStats({ commit });
-      });
+  operatePlayers({ commit }, { players }) {
+    commit(types.GET_PLAYERS, players);
+    actions.workerGenStatistics({ commit });
+    actions.workerItemStats({ commit });
   },
   setPeriod({ commit }, value) {
     commit(types.SET_PERIOD, value);

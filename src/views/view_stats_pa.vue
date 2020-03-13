@@ -198,14 +198,6 @@
             :id="`row_${item.name}`"
           >
             <div class="chart-wrapper">
-              <coordination
-                v-if="item.locations.length"
-                :values="item.locations"
-                :no_track="true"
-                fixedSize="133"
-                style="cursor: pointer; position: absolute; right: 0; bottom: 0;"
-                @click.native="coordinates = item.locations"
-              />
               <div
                 class="chart-inner"
                 :class="{ 'has-coordination': item.locations.length }"
@@ -233,6 +225,14 @@
                   </template>
                 </div>
               </div>
+              <coordination
+                v-if="item.locations.length"
+                :values="item.locations"
+                :no_track="true"
+                fixedSize="133"
+                style="cursor: pointer;"
+                @click.native="coordinates = item.locations"
+              />
             </div>
           </div>
         </div>
@@ -416,10 +416,6 @@ i.fa {
       box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
       border-radius: 0 0 10px 10px;
       .chart-wrapper {
-        position: absolute;
-        right: 0;
-        left: 0;
-        height: 133px;
         display: flex;
       }
       .chart-inner {

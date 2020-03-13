@@ -344,6 +344,86 @@ const actions = {
         });
       });
   },
+  migrateAccountPhotoToTeamDoc() {
+    Promise.all([db.collection('accounts').get(), db.collection('teams').get()])
+      .then(([accounts, teams]) => {
+        const users = accounts.docs.map(account => ({
+          uid: account.id,
+          photo: account.data().photo,
+        }));
+        return teams.docs.map(team => {
+          const { players, benches } = team.data();
+          return {
+            id: team.id,
+            players: Object.keys(players).reduce((acc, name) => {
+              const find = users.find(user => user.uid === players[name].uid);
+              if (find) {
+                acc[name] = {
+                  ...players[name],
+                  photo: find.photo,
+                };
+              }
+              return acc;
+            }, {}),
+            benches: Object.keys(benches).reduce((acc, name) => {
+              const find = users.find(user => user.uid === players[name].uid);
+              if (find) {
+                acc[name] = {
+                  ...benches[name],
+                  photo: find.photo,
+                };
+              }
+              return acc;
+            }, {}),
+          };
+        });
+      })
+      .then(teams => {
+        const batch = db.batch();
+        teams.forEach(({ id, players, benches }) => {
+          batch.set(
+            db.doc(`teams/${id}`),
+            {
+              players,
+              benches,
+            },
+            { merge: true },
+          );
+        });
+        batch.commit();
+      });
+  },
+  deleteCollection() {
+    Promise.all([db.collection('accounts').get(), db.collection('teams').get()])
+      .then(([accounts, teams]) => {
+        // const batch = db.batch();
+        return Promise.all([
+          ...accounts.docs.map(account =>
+            db.collection(`accounts/${account.id}/teams`).get(),
+          ),
+          ...teams.docs.map(team =>
+            db.collection(`teams/${team.id}/players`).get(),
+          ),
+          ...teams.docs.map(team =>
+            db.collection(`teams/${team.id}/benches`).get(),
+          ),
+        ]);
+      })
+      .then(datas => {
+        const collection = datas.filter(data => data.docs.length > 0);
+        const paths = collection.reduce((acc, d) => {
+          return [...acc, ...d.docs.map(doc => doc.ref.path)];
+        }, []);
+        return paths;
+      })
+      .then(paths => {
+        const batch = db.batch();
+        paths.forEach(path => {
+          batch.delete(db.doc(path));
+        });
+        batch.commit();
+      });
+  },
 };
 
 const mutations = {

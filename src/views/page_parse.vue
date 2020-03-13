@@ -91,6 +91,8 @@ export default {
     // this.migratePlayersToTeamDoc(this.$route.params.team);
     // this.migrateBenchesToTeamDoc(this.$route.params.team);
     // this.migrateTeamRoleToAccountDoc();
+    // this.migrateAccountPhotoToTeamDoc();
+    // this.deleteCollection();
   },
   methods: {
     ...mapActions([
@@ -104,6 +106,8 @@ export default {
       'migratePlayersToTeamDoc',
       'migrateBenchesToTeamDoc',
       'migrateTeamRoleToAccountDoc',
+      'migrateAccountPhotoToTeamDoc',
+      'deleteCollection',
     ]),
   },
   computed: {

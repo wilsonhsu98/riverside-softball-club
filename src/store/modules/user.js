@@ -38,8 +38,31 @@ const actions = {
     commit(rootTypes.LOADING, true);
     const refPlayerDoc = db.collection('accounts').doc(data.userId);
 
-    promiseImage(data.custom, 'avatar')
-      .then(url => {
+    Promise.all([promiseImage(data.custom, 'avatar'), refPlayerDoc.get()])
+      .then(([url, playerDoc]) => {
+        const { teamRoles } = playerDoc.data();
+        return Promise.all([
+          url,
+          playerDoc,
+          ...Object.keys(teamRoles).map(team => db.doc(`teams/${team}`).get()),
+        ]);
+      })
+      .then(([url, playerDoc, ...teams]) => {
+        const uid = playerDoc.id;
+        const { teamRoles } = playerDoc.data();
+        const nameObj = teams
+          .map(team => team.data())
+          .reduce((acc, team) => {
+            acc[team.name] = (
+              Object.keys(team.players)
+                .map(name => ({
+                  name,
+                  uid: team.players[name].uid,
+                }))
+                .find(player => player.uid === uid) || {}
+            ).name;
+            return acc;
+          }, {});
         const photo =
           data.current === 'custom'
             ? url
@@ -54,6 +77,34 @@ const actions = {
           },
           { merge: true },
         );
+        Object.keys(teamRoles).forEach(team => {
+          if (['manager', 'player'].includes(teamRoles[team])) {
+            batch.set(
+              db.doc(`teams/${team}`),
+              {
+                players: {
+                  [nameObj[team]]: {
+                    photo,
+                  },
+                },
+              },
+              { merge: true },
+            );
+          }
+          if (teamRoles[team] === 'bench') {
+            batch.set(
+              db.doc(`teams/${team}`),
+              {
+                benches: {
+                  [uid]: {
+                    photo,
+                  },
+                },
+              },
+              { merge: true },
+            );
+          }
+        });
         return batch.commit();
       })
       .then(() => {

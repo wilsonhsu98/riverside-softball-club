@@ -76,8 +76,6 @@ const types = {
   CLEAR_TEAM: 'TEAM/CLEAR_TEAM',
   SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
   FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
-  FETCH_PHOTO: 'TEAM/FETCH_PHOTO',
-  ADD_PHOTO: 'TEAM/ADD_PHOTO',
 };
 
 const state = {
@@ -93,21 +91,10 @@ const state = {
   },
   teamList: [],
   requests: [],
-  accountPhotos: {},
 };
 
 const getters = {
-  teamInfo: state => ({
-    ...state.teamInfo,
-    players: state.teamInfo.players.map(player => ({
-      ...player,
-      photo: state.accountPhotos[player.uid],
-    })),
-    benches: state.teamInfo.benches.map(player => ({
-      ...player,
-      photo: state.accountPhotos[player.uid],
-    })),
-  }),
+  teamInfo: state => state.teamInfo,
   teamNames: state =>
     [state.teamInfo.teamName].concat(
       state.teamInfo.otherNames.split(',').sort((a, b) => a.localeCompare(b)),
@@ -202,6 +189,7 @@ const actions = {
               return {
                 uid: prePlayer.uid,
                 msg: prePlayer.name,
+                photo: prePlayer.photo,
               };
             });
           const benches2players = data.preBenches
@@ -256,16 +244,18 @@ const actions = {
                 number: find.number,
                 uid: find.uid,
                 name: find.name,
+                photo: find.photo,
               };
             });
           const players = [...data.players, ...benches2players].reduce(
             (acc, player) => {
-              const { name, number = '', manager, uid } = player;
+              const { name, number = '', manager, photo, uid } = player;
               acc[name] = {
                 number,
                 manager,
                 ...((uid || player.self) && {
                   uid: player.self ? playerDoc.id : uid,
+                  photo: player.self ? playerDoc.data().photo : photo,
                 }),
               };
               return acc;
@@ -276,8 +266,8 @@ const actions = {
             ...data.benches.filter(player => !player.name),
             ...players2benches,
           ].reduce((acc, player) => {
-            const { msg, uid } = player;
-            acc[uid] = { msg, uid };
+            const { msg, uid, photo } = player;
+            acc[uid] = { msg, uid, photo };
             return acc;
           }, {});
           batch.set(
@@ -396,48 +386,38 @@ const actions = {
   fetchTeamInfo({ commit }, teamCode) {
     commit(types.CLEAR_TEAM);
     commit(rootTypes.LOADING, true);
-    Promise.all([
-      db
-        .collection('teams')
-        .doc(teamCode)
-        .get(),
-      db
-        .collection('accounts')
-        .where('teams', 'array-contains', teamCode)
-        .get(),
-    ]).then(res => {
-      const [teamDoc, accountCollection] = res;
-      window.trackRead('fetchTeamInfo: team', 1);
-      window.trackRead(
-        'fetchTeamInfo: accounts in the team',
-        accountCollection.docs.length || 1,
-      );
-      if (teamDoc.exists) {
-        const {
-          benches: benches_ = {},
-          players: players_ = {},
-          ...others
-        } = teamDoc.data();
-        const players = Object.keys(players_).map(name => ({
-          name,
-          manager: players_[name].manager,
-          number: players_[name].number,
-          uid: players_[name].uid,
-        }));
-        const benches = Object.keys(benches_).map(uid => ({
-          uid,
-          msg: benches_[uid].msg,
-        }));
-        commit(types.FETCH_TEAM, {
-          id: teamDoc.id,
-          players,
-          benches,
-          ...others,
-        });
-        commit(types.FETCH_PHOTO, accountCollection);
-      }
-      commit(rootTypes.LOADING, false);
-    });
+    db.collection('teams')
+      .doc(teamCode)
+      .get()
+      .then(teamDoc => {
+        window.trackRead('fetchTeamInfo: team', 1);
+        if (teamDoc.exists) {
+          const {
+            benches: benches_ = {},
+            players: players_ = {},
+            ...others
+          } = teamDoc.data();
+          const players = Object.keys(players_).map(name => ({
+            name,
+            manager: players_[name].manager,
+            number: players_[name].number,
+            uid: players_[name].uid,
+            photo: players_[name].photo,
+          }));
+          const benches = Object.keys(benches_).map(uid => ({
+            uid,
+            msg: benches_[uid].msg,
+            photo: benches_[uid].photo,
+          }));
+          commit(types.FETCH_TEAM, {
+            id: teamDoc.id,
+            players,
+            benches,
+            ...others,
+          });
+        }
+        commit(rootTypes.LOADING, false);
+      });
   },
   listenTeamChange({ commit }, teamCode) {
     let prePlayersContext = '';
@@ -472,7 +452,6 @@ const actions = {
                 recordActions.operatePlayers(
                   { commit },
                   {
-                    teamCode,
                     players: Object.keys(players_).map(name => ({
                       id: name,
                       data: players_[name],
@@ -537,10 +516,12 @@ const actions = {
               manager: players_[name].manager,
               number: players_[name].number,
               uid: players_[name].uid,
+              photo: players_[name].photo,
             }));
             const benches = Object.keys(benches_).map(uid => ({
               uid,
               msg: benches_[uid].msg,
+              photo: benches_[uid].photo,
             }));
             commit(types.FETCH_TEAM, {
               id: teamDoc.id,
@@ -657,7 +638,7 @@ const actions = {
   disconnectPersonalRequests() {
     if (typeof snapShot.request === 'function') snapShot.request();
   },
-  handleRequest({ commit }, { requestId, action }) {
+  handleRequest(undefined, { requestId, action }) {
     const refRequestDoc = db.collection('requests').doc(requestId);
     switch (action) {
       case 'denied':
@@ -688,6 +669,7 @@ const actions = {
                 players: {
                   [data.name]: {
                     uid: data.uid,
+                    photo: data.photo,
                   },
                 },
               },
@@ -711,16 +693,13 @@ const actions = {
                   [data.uid]: {
                     uid: data.uid,
                     msg: data.msg,
+                    photo: data.photo,
                   },
                 },
               },
               { merge: true },
             );
           }
-          commit(types.ADD_PHOTO, {
-            uid: data.uid,
-            photo: data.photo,
-          });
           batch.delete(refRequestDoc);
           batch.commit();
         });
@@ -751,21 +730,6 @@ const mutations = {
       benches: [...data.benches].sort((a, b) => a.number - b.number),
       icon: data.icon,
       unlockGames: [...(data.unlockGames || [])],
-    };
-  },
-  [types.FETCH_PHOTO](state, accountCollection) {
-    state.accountPhotos = accountCollection.docs.reduce(
-      (acc, doc) => {
-        acc[doc.id] = doc.data().photo;
-        return acc;
-      },
-      { ...state.accountPhotos },
-    );
-  },
-  [types.ADD_PHOTO](state, { uid, photo }) {
-    state.accountPhotos = {
-      ...state.accountPhotos,
-      [uid]: photo,
     };
   },
   [types.SEARCH_TEAM](state, data) {
