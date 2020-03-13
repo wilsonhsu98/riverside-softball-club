@@ -417,6 +417,7 @@ i.fa {
       border-radius: 0 0 10px 10px;
       .chart-wrapper {
         display: flex;
+        width: 100%;
       }
       .chart-inner {
         display: flex;
