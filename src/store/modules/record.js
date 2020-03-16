@@ -230,11 +230,6 @@ const actions = {
     actions.workerItemStats({ commit });
     actions.workerBox({ commit });
   },
-  operatePlayers({ commit }, { players }) {
-    commit(types.GET_PLAYERS, players);
-    actions.workerGenStatistics({ commit });
-    actions.workerItemStats({ commit });
-  },
   setPeriod({ commit }, value) {
     commit(types.SET_PERIOD, value);
     actions.workerGenStatistics({ commit });

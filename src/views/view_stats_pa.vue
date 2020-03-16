@@ -406,7 +406,6 @@ i.fa {
       right: 0;
       z-index: 2;
       overflow: hidden;
-      height: 133px;
 
       display: none;
 

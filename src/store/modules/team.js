@@ -8,7 +8,7 @@ import {
   snapShot,
 } from '../root';
 import { types as userTypes } from './user';
-import { actions as recordActions } from './record';
+import { actions as recordActions, types as recordTypes } from './record';
 import { db, auth, fieldValue, timestamp } from '../../firebase';
 import router from '../../router';
 import { openDB } from 'idb';
@@ -420,7 +420,6 @@ const actions = {
       });
   },
   listenTeamChange({ commit }, teamCode) {
-    let prePlayersContext = '';
     let preUnlockGames;
     if (teamCode) {
       const idbKeyval = dbInit(teamCode);
@@ -440,26 +439,18 @@ const actions = {
               ...others
             } = teamDoc.data();
             commit(rootTypes.SET_TEAMICON, icon);
+            commit(
+              recordTypes.GET_PLAYERS,
+              Object.keys(players_).map(name => ({
+                id: name,
+                data: players_[name],
+              })),
+            );
 
             if (
               preUnlockGames === undefined ||
               JSON.stringify(preUnlockGames) === JSON.stringify(unlockGames)
             ) {
-              // prevent reload players if players not changed
-              const currentPlayersContext = JSON.stringify(players_);
-              if (currentPlayersContext !== prePlayersContext) {
-                prePlayersContext = currentPlayersContext;
-                recordActions.operatePlayers(
-                  { commit },
-                  {
-                    players: Object.keys(players_).map(name => ({
-                      id: name,
-                      data: players_[name],
-                    })),
-                  },
-                );
-              }
-
               idbKeyval.getAll().then(localGames => {
                 const localIds = localGames.map(game => game.id);
                 const gameShouldUpdates = localGames
@@ -511,6 +502,7 @@ const actions = {
               });
             }
             preUnlockGames = unlockGames;
+
             const players = Object.keys(players_).map(name => ({
               name,
               manager: players_[name].manager,
