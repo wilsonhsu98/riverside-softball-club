@@ -340,56 +340,54 @@ const mutations = {
     state.period = [{ period: 'period_all', select: true }];
   },
   [types.GET_PERIOD](state, data) {
-    state.period.find(item => item.period === 'period_all').games = data
-      .map(item => item.game)
+    const period = [
+      { period: 'period_all' },
+      ...data.map(item => ({ period: item.period })),
+      ...data.map(item => ({ period: `${parseInt(item.period)}` })),
+    ]
+      .filter((value, index, self) => {
+        return self.map(item => item.period).indexOf(value.period) === index;
+      })
       .sort((a, b) => {
-        return (
-          parseInt(b.match(/\d/g).join(''), 10) -
-          parseInt(a.match(/\d/g).join(''), 10)
-        );
-      });
-
-    state.period = state.period.filter(
-      (value, index, self) =>
-        self.map(item => item.period).indexOf(value.period) === index,
-    );
-
-    data
-      .map(item => item.period)
-      .filter((value, index, self) => self.indexOf(value) === index)
-      .map(item => ({
-        period: item,
-        games: data.filter(sub => sub.period === item).map(sub => sub.game),
-      }))
-      .concat(
-        data
-          .map(item => parseInt(item.period))
-          .filter(
-            (value, index, self) =>
-              self.indexOf(value) === index && !isNaN(value),
-          )
-          .map(item => ({
-            period: `${item}`,
+        return b.period.localeCompare(a.period);
+      })
+      .map(item => {
+        if (item.period === 'period_all') {
+          return {
+            ...item,
             games: data
-              .filter(sub => parseInt(sub.period) === item)
+              .map(sub => sub.game)
+              .sort((a, b) => {
+                return (
+                  parseInt(b.match(/\d/g).join(''), 10) -
+                  parseInt(a.match(/\d/g).join(''), 10)
+                );
+              }),
+          };
+        } else if (!isNaN(item.period)) {
+          return {
+            ...item,
+            games: data
+              .filter(sub => `${parseInt(sub.period)}` === item.period)
               .map(sub => sub.game),
-          })),
-      )
-      .forEach(item => {
-        const find = state.period.find(sub => sub.period === item.period);
-        if (!find) {
-          state.period = Array.from(state.period).concat([item]);
+          };
         } else {
-          find.games = item.games;
+          return {
+            ...item,
+            games: data
+              .filter(sub => sub.period === item.period)
+              .map(sub => sub.game),
+          };
         }
       });
-
-    state.period = Array.from(state.period).sort((a, b) =>
-      b.period.localeCompare(a.period),
-    );
-    if (!state.period.find(item => item.select)) {
-      state.period.find(item => item.period === 'period_all').select = true;
-    }
+    const prevSelect = (state.period.find(item => item.select) || {}).period;
+    const select = period.map(item => item.period).includes(prevSelect)
+      ? prevSelect
+      : 'period_all';
+    state.period = period.map(item => ({
+      ...item,
+      select: item.period === select,
+    }));
   },
   [types.GET_PLAYERS](state, data) {
     state.players = data;
