@@ -58,6 +58,10 @@ Vue.use({
   },
 });
 Vue.config.productionTip = false;
+// Vue.config.devtools = false;
+Vue.config.errorHandler = function(err, vm, info) {
+  alert(`Error: ${err.toString()}\nInfo: ${info}`);
+};
 
 const version = 8;
 if (window.localStorage.getItem('version') !== version.toString()) {
