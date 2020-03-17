@@ -430,6 +430,7 @@ const actions = {
         .onSnapshot(teamDoc => {
           if (teamDoc.exists) {
             window.trackRead('listenTeamChange: team', 1);
+            test2
             const {
               icon,
               games = {},
