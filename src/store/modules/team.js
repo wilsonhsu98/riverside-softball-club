@@ -453,12 +453,9 @@ const actions = {
             ) {
               //M3VzysUPmDbsXX5gLgHsvZt8MEw1
               //6CMMLMg6adPL3CyUWkWbPzIAYN62
-              if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                alert(457);
-              }
               idbKeyval.getAll().then(localGames => {
                 if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                  alert(460);
+                  alert(458);
                 }
                 const localIds = localGames.map(game => game.id);
                 const gameShouldUpdates = localGames
@@ -475,7 +472,9 @@ const actions = {
                 const gameShouldDeletes = localGames
                   .filter(game => !Object.keys(games).includes(game.id))
                   .map(game => game.id);
-
+                  if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
+                    alert(JSON.stringify(gameShouldUpdates));
+                  }
                 // update if needed
                 Promise.all(
                   gameShouldUpdates.map(game =>
@@ -483,7 +482,7 @@ const actions = {
                   ),
                 ).then(gameDocs => {
                   if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                    alert(485);
+                    alert(JSON.stringify(gameDocs));
                   }
                   window.trackRead(
                     'listenTeamChange: games need to update',
