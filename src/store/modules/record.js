@@ -202,6 +202,9 @@ const actions = {
     commit(types.INIT_FROM_LS);
   },
   operateGames({ commit }, changedData) {
+    if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
+      alert('record line 206');
+    }
     const dates = changedData
       .filter(item => item.data.timestamp)
       .map(item => new Date(item.data.timestamp.seconds * 1000));
@@ -226,6 +229,9 @@ const actions = {
     commit(types.GET_PERIOD, period);
     commit(types.GET_RECORDS, records);
     commit(types.GET_GAMELIST, period);
+    if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
+      alert('record line 233');
+    }
     actions.workerGenStatistics({ commit });
     actions.workerItemStats({ commit });
     actions.workerBox({ commit });
