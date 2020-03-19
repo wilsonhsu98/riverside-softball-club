@@ -470,13 +470,15 @@ const actions = {
                   .concat(
                     Object.keys(games).filter(game => !localIds.includes(game)),
                   );
-
+                  if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
+                    alert(JSON.stringify(gameShouldUpdates));
+                  }
                 // delete
                 const gameShouldDeletes = localGames
                   .filter(game => !Object.keys(games).includes(game.id))
                   .map(game => game.id);
                   if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                    alert(JSON.stringify(gameShouldUpdates));
+                    alert(JSON.stringify(gameShouldDeletes));
                   }
                 // update if needed
                 Promise.all(
