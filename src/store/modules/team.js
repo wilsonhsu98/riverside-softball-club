@@ -458,18 +458,18 @@ const actions = {
                   alert(458);
                 }
                 const localIds = localGames.map(game => game.id);
-                if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                  alert(JSON.stringify(localGames.filter(game => games[game.id] && !games[game.id].isEqual(game.timestamp))));
-                }
-                const gameShouldUpdates = localGames
-                  .filter(
-                    game =>
-                      games[game.id] && !games[game.id].isEqual(game.timestamp),
-                  )
-                  .map(game => game.id)
-                  .concat(
-                    Object.keys(games).filter(game => !localIds.includes(game)),
-                  );
+                // if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
+                //   alert(JSON.stringify(localGames.filter(game => games[game.id] && !games[game.id].isEqual(game.timestamp))));
+                // }
+                const gameShouldUpdates = [];//localGames
+                  // .filter(
+                  //   game =>
+                  //     games[game.id] && !games[game.id].isEqual(game.timestamp),
+                  // )
+                  // .map(game => game.id)
+                  // .concat(
+                  //   Object.keys(games).filter(game => !localIds.includes(game)),
+                  // );
                   if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
                     alert(JSON.stringify(gameShouldUpdates));
                   }
