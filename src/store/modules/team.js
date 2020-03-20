@@ -483,9 +483,9 @@ const actions = {
                     db.doc(`teams/${teamCode}/games/${game}`).get(),
                   ),
                 ).then(gameDocs => {
-                  if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                    alert(JSON.stringify(gameDocs));
-                  }
+                  // if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
+                  //   alert(JSON.stringify(gameDocs));
+                  // }
                   window.trackRead(
                     'listenTeamChange: games need to update',
                     gameDocs.length,
