@@ -458,16 +458,10 @@ const actions = {
                   alert(458);
                 }
                 const localIds = localGames.map(game => game.id);
-                if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                  localGames.forEach(game => {
-                    alert(`game: ${game.id}, timestamp: ${JSON.stringify(game.timestamp)}`);
-                  });
-                  // alert(JSON.stringify(localIds));
-                }
                 const gameShouldUpdates = localGames
                   .filter(
                     game =>
-                      games[game.id] && !games[game.id].isEqual(game.timestamp),
+                    !game.timestamp || (games[game.id] && game.timestamp && !games[game.id].isEqual(game.timestamp)),
                   )
                   .map(game => game.id)
                   .concat(
