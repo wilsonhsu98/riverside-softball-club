@@ -3,7 +3,7 @@ import {
   types as rootTypes,
   actions as rootActions,
   // getters as rootGetters,
-  state as rootState,
+  // state as rootState,
   promiseImage,
   snapShot,
 } from '../root';
@@ -451,41 +451,33 @@ const actions = {
               preUnlockGames === undefined ||
               JSON.stringify(preUnlockGames) === JSON.stringify(unlockGames)
             ) {
-              //M3VzysUPmDbsXX5gLgHsvZt8MEw1
-              //6CMMLMg6adPL3CyUWkWbPzIAYN62
               idbKeyval.getAll().then(localGames => {
-                if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                  alert(458);
-                }
+                // if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
+                //   alert(458);
+                // }
                 const localIds = localGames.map(game => game.id);
                 const gameShouldUpdates = localGames
                   .filter(
                     game =>
-                    !game.timestamp || (games[game.id] && game.timestamp && !games[game.id].isEqual(game.timestamp)),
+                      !game.timestamp ||
+                      (games[game.id] &&
+                        game.timestamp &&
+                        !games[game.id].isEqual(game.timestamp)),
                   )
                   .map(game => game.id)
                   .concat(
                     Object.keys(games).filter(game => !localIds.includes(game)),
                   );
-                  if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                    alert(JSON.stringify(gameShouldUpdates));
-                  }
                 // delete
                 const gameShouldDeletes = localGames
                   .filter(game => !Object.keys(games).includes(game.id))
                   .map(game => game.id);
-                  if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                    alert(JSON.stringify(gameShouldDeletes));
-                  }
                 // update if needed
                 Promise.all(
                   gameShouldUpdates.map(game =>
                     db.doc(`teams/${teamCode}/games/${game}`).get(),
                   ),
                 ).then(gameDocs => {
-                  // if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                  //   alert(JSON.stringify(gameDocs));
-                  // }
                   window.trackRead(
                     'listenTeamChange: games need to update',
                     gameDocs.length,
@@ -502,9 +494,6 @@ const actions = {
                   Promise.all([...setGames, ...delGames])
                     .then(() => idbKeyval.getAll())
                     .then(records => {
-                      if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                        alert(504);
-                      }
                       recordActions.operateGames(
                         { commit },
                         records.map(({ id, ...data }) => ({

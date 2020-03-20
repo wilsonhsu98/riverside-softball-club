@@ -62,10 +62,20 @@ Vue.config.productionTip = false;
 Vue.config.errorHandler = function(err, vm, info) {
   alert(`Error: ${err.toString()}\nInfo: ${info}`);
 };
-window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
-  alert('Error: ' + errorMsg + '\nScript: ' + url + '\nLine: ' + lineNumber
-  + '\nColumn: ' + column + '\nStackTrace: ' +  errorObj);
-}
+window.onerror = function(errorMsg, url, lineNumber, column, errorObj) {
+  alert(
+    'Error: ' +
+      errorMsg +
+      '\nScript: ' +
+      url +
+      '\nLine: ' +
+      lineNumber +
+      '\nColumn: ' +
+      column +
+      '\nStackTrace: ' +
+      errorObj,
+  );
+};
 
 const version = 8;
 if (window.localStorage.getItem('version') !== version.toString()) {
