@@ -98,7 +98,10 @@ const genGameList = (games, filterGames = []) => {
     .map(item => {
       return {
         date: item,
-        games: games.filter(sub => sub.game.substr(0, 8) === item),
+        games: games.filter(
+          sub =>
+            sub.game.substr(0, 8) === item && filterGames.includes(sub.game),
+        ),
       };
     });
   return temp;

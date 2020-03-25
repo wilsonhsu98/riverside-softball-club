@@ -33,7 +33,7 @@ const state = {
   records: [],
   period: [{ period: 'period_all', select: true }],
   top: 10,
-  unlimitedPA: false,
+  unlimitedPA: true,
   sortBy: 'OPS',
   lastUpdate: '',
   cols: [
