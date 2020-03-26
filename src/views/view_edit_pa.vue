@@ -39,6 +39,10 @@
               })
             }}
           </div>
+          <player
+            @click="changePlayer('home')"
+            :player="getPlayer(base['home'].name)"
+          />
         </div>
         <div class="separater">
           <label>{{ $t('desc_step_2') }}</label>
@@ -179,6 +183,10 @@
                   })
                 }}
               </div>
+              <player
+                @click="changePlayer('home')"
+                :player="getPlayer(base['home'].name)"
+              />
             </div>
             <div class="separater">
               <label>{{ $t('ttl_onbase') }}</label>
@@ -205,7 +213,9 @@
                     {{ $t('R') }}
                   </span>
                   <span class="name" @click="changePlayer(b)">
-                    {{ base[b].name }}
+                    {{
+                      `${getPlayerNumber(base[b].name)}${base[b].name || ''}`
+                    }}
                   </span>
                   <span
                     :class="[
@@ -352,6 +362,10 @@
                   })
                 }}
               </div>
+              <player
+                @click="changePlayer('home')"
+                :player="getPlayer(base['home'].name)"
+              />
             </div>
             <div class="separater">
               <label
@@ -368,10 +382,10 @@
             </div>
             <div class="step-bar">
               <span
-                v-for="i in [1, 2, 3, 4]"
+                v-for="(i, index) in steps"
                 :key="`step${i}`"
                 :class="{ current: step === i }"
-                :data-step="i"
+                :data-step="index + 1"
                 @click="step = i"
                 >{{ $t(`desc_step_${i}`) }}</span
               >
@@ -393,7 +407,9 @@
                         (prev5Players.length || base[b].name) && changePlayer(b)
                       "
                     >
-                      {{ base[b].name }}
+                      {{
+                        `${getPlayerNumber(base[b].name)}${base[b].name || ''}`
+                      }}
                     </span>
                   </div>
                   <button
@@ -507,7 +523,9 @@
                         (prev5Players.length || base[b].name) && changePlayer(b)
                       "
                     >
-                      {{ base[b].name }}
+                      {{
+                        `${getPlayerNumber(base[b].name)}${base[b].name || ''}`
+                      }}
                     </span>
                     <span
                       :class="[
@@ -650,6 +668,10 @@
       &:nth-child(odd) {
         text-align: right;
       }
+      &.player {
+        line-height: 40px;
+        height: 40px;
+      }
     }
   }
   .step-bar {
@@ -724,6 +746,7 @@
         width: 142px;
         justify-content: center;
         > span {
+          font-size: 12px;
           text-align: center;
           white-space: nowrap;
           overflow: hidden;
@@ -807,6 +830,7 @@
       margin-bottom: 3px;
     }
     span {
+      font-size: 12px;
       text-align: center;
       white-space: nowrap;
       overflow: hidden;
@@ -941,7 +965,6 @@
         max-width: unset;
       }
       span {
-        font-size: 12px;
         width: calc((100vw - 30px - 12px) / 5);
         max-width: 58px;
         &.gray,
@@ -955,13 +978,6 @@
       margin: 0;
       left: 50%;
       transform: translateX(-50%);
-      .player-container {
-        .on-base-player {
-          > span {
-            font-size: 12px;
-          }
-        }
-      }
     }
     .single .coordination {
       margin: 0;
@@ -1043,6 +1059,7 @@ export default {
       prev5Players: [],
       benchPlayers: [],
       step: 1,
+      steps: [1, 2, 3, 4],
     };
   },
   created() {
@@ -1051,6 +1068,11 @@ export default {
     }
     this.setOrder(this.$route.params.order);
     this.setPa();
+
+    if (['MOMOCAT'].includes(this.$route.params.team)) {
+      this.step = 2;
+      this.steps = [2, 3, 4];
+    }
     // console.log(this.boxSummary);
     // console.log(this.box);
     // console.log(this.teamInfo);
@@ -1364,6 +1386,18 @@ export default {
       this.$modal.hide('player');
       this.changeMode = '';
       this.checkModalPlayer();
+    },
+    getPlayerNumber(name) {
+      return (
+        this.teamInfo.players.find(
+          player => player.name && player.name === name,
+        ) || { number: '' }
+      ).number;
+    },
+    getPlayer(name) {
+      return this.teamInfo.players.find(
+        player => player.name && player.name === name,
+      );
     },
   },
   watch: {

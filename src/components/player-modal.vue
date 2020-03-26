@@ -2,8 +2,8 @@
   <modal
     :name="name"
     :adaptive="true"
-    :maxWidth="260"
-    :maxHeight="282"
+    :maxWidth="400"
+    :minHeight="400"
     class="modal-wrapper"
   >
     <div class="player-modal">
@@ -30,7 +30,7 @@
       <div
         v-if="Array.isArray(third) && third.length"
         class="label-container multiple"
-        style="max-height: 101px;"
+        style="max-height: 146px;"
       >
         <label>{{ third_label }}</label>
         <div class="player-list-container">
@@ -145,7 +145,10 @@
       );
     }
     .player {
-      flex: 0 1 calc(50% - 4px);
+      flex: 0 1 calc(33% - 4px);
+      &:nth-child(3n) {
+        margin-right: 0;
+      }
     }
   }
 }
@@ -158,68 +161,6 @@
   overflow-y: auto;
 }
 
-.player {
-  cursor: pointer;
-  box-sizing: border-box;
-  position: relative;
-  height: 40px;
-  line-height: 40px;
-  width: 100%;
-  background-color: $row_odd_bgcolor;
-  color: $row_color;
-  border: 2px solid $row_color;
-  border-radius: 5px;
-  margin: 0 5px 5px 0;
-  white-space: nowrap;
-  overflow: hidden;
-  display: inline-block;
-  &:nth-child(even) {
-    margin-right: 0;
-  }
-  &::v-deep {
-    .name {
-      margin-left: 5px;
-      text-align: left;
-      line-height: 36px;
-      box-sizing: border-box;
-      display: flex;
-      .avatar {
-        position: relative;
-        display: inline-block;
-        height: 32px;
-        vertical-align: top;
-        margin-right: 4px;
-        flex: 0 0 32px;
-      }
-      .img {
-        display: inline-block;
-        width: 32px;
-        height: 32px;
-        border: 0 solid $row_color;
-        box-sizing: border-box;
-        border-radius: 50%;
-        background: 50% 50% no-repeat;
-        background-size: 32px auto;
-        position: absolute;
-        top: 2px;
-        left: 0;
-        text-align: center;
-        line-height: 26px;
-        .fa-user-o {
-          font-size: 20px;
-          vertical-align: middle;
-        }
-      }
-      .number {
-        display: inline-block;
-        width: 16px;
-        text-align: center;
-        flex: 0 0 16px;
-      }
-    }
-  }
-}
-
 .modal-wrapper {
   background-color: rgba(0, 0, 0, 0.5);
 }
@@ -230,6 +171,21 @@
     top: 60px !important;
     bottom: 60px !important;
     height: auto !important;
+    left: 20px !important;
+    right: 20px !important;
+    width: auto !important;
+  }
+  .label-container.multiple .player {
+    flex: 0 1 calc(50% - 4px);
+    &:nth-child(3n) {
+      margin-right: 0;
+    }
+    &:nth-child(even) {
+      margin-right: 0;
+    }
+    &:nth-child(odd) {
+      margin-right: 5px;
+    }
   }
 }
 @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
@@ -238,6 +194,9 @@
     top: 20px !important;
     bottom: 20px !important;
     height: auto !important;
+    left: 60px !important;
+    right: 60px !important;
+    width: auto !important;
   }
 }
 </style>
@@ -270,32 +229,6 @@ export default {
       if (typeof this.select === 'function') {
         this.select(player);
       }
-    },
-  },
-  components: {
-    player: {
-      template: `<div class="player" @click="select">
-            <span class="name">
-              <span class="avatar">
-                <span class="img" style="border-width: 1px">
-                  <i class="fa fa-user-o"></i>
-                </span>
-                <img
-                  v-if="player.photo"
-                  class="img"
-                  :src="$cacheImg(player.photo)"
-                />
-              </span>
-              <span class="number">{{ player.number || '?' }}</span>
-              <span>{{ player.name }}</span>
-            </span>
-          </div>`,
-      props: ['player'],
-      methods: {
-        select() {
-          this.$emit('click', this.player);
-        },
-      },
     },
   },
 };

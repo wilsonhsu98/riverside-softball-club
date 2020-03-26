@@ -185,11 +185,7 @@
             </span>
           </template>
           <div class="cell level">
-            {{
-              `${Math.floor((item.AVG * 1000) / 100)}/${Math.floor(
-                (item.OBP * 1000) / 100,
-              )}/${Math.floor((item.SLG * 1000) / 100)}`
-            }}
+            {{ item.LEVEL }}
           </div>
           <div
             v-if="item.listByGame.length"

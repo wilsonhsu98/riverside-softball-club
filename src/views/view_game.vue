@@ -98,7 +98,7 @@
             <div v-if="period" class="tag">{{ period }}</div>
             <div v-if="league" class="tag">{{ league }}</div>
             <div v-if="group" class="tag">
-              {{ $t('box_group', { g: group }) }}
+              {{ $t('box_group', { g: group.replace(/group|組/gi, '') }) }}
             </div>
             <div v-if="gameType" class="tag">{{ gameType }}</div>
             <div v-if="place" class="tag">{{ place }}</div>
@@ -134,7 +134,9 @@
         <template v-else>
           <template v-if="boxSummary.league && boxSummary.group">
             {{
-              `${boxSummary.league} ${$t('box_group', { g: boxSummary.group })}`
+              `${boxSummary.league} ${$t('box_group', {
+                g: boxSummary.group.replace(/group|組/gi, ''),
+              })}`
             }}
           </template>
           <template v-if="boxSummary.period">
@@ -232,6 +234,11 @@
                         rbi: record.rbi,
                         run: record.r === record.name,
                         out: record.out,
+                        badout:
+                          record.out &&
+                          !['GO', 'FO', 'SF', 'K', 'SF', 'DP', 'TP'].includes(
+                            record.content,
+                          ),
                         new: record.content === 'new',
                       },
                     ]"
@@ -268,6 +275,11 @@
                         rbi: record.rbi,
                         run: record.r === record.name,
                         out: record.out,
+                        badout:
+                          record.out &&
+                          !['GO', 'FO', 'SF', 'K', 'SF', 'DP', 'TP'].includes(
+                            record.content,
+                          ),
                         [record.color]: record.content !== 'new',
                       },
                     ]"
@@ -381,6 +393,11 @@
                         rbi: record.rbi,
                         run: record.r === record.name,
                         out: record.out,
+                        badout:
+                          record.out &&
+                          !['GO', 'FO', 'SF', 'K', 'SF', 'DP', 'TP'].includes(
+                            record.content,
+                          ),
                         new: record.content === 'new',
                       },
                     ]"
@@ -417,6 +434,11 @@
                         rbi: record.rbi,
                         run: record.r === record.name,
                         out: record.out,
+                        badout:
+                          record.out &&
+                          !['GO', 'FO', 'SF', 'K', 'SF', 'DP', 'TP'].includes(
+                            record.content,
+                          ),
                         [record.color]: record.content !== 'new',
                       },
                     ]"
@@ -716,6 +738,9 @@
           &.out:before {
             content: attr(data-out);
             background-color: $out;
+          }
+          &.badout:before {
+            background-color: black;
           }
           &.rbi:after {
             content: attr(data-rbi);

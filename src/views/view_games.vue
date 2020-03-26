@@ -178,7 +178,11 @@
                 </template>
                 <template v-else>
                   <div v-if="sub.league && sub.group">
-                    {{ `${sub.league} ${$t('box_group', { g: sub.group })}` }}
+                    {{
+                      `${sub.league} ${$t('box_group', {
+                        g: sub.group.replace(/group|組/gi, ''),
+                      })}`
+                    }}
                     <template v-if="sub.period">
                       {{ `(${sub.period})` }}
                     </template>

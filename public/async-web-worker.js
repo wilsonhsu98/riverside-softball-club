@@ -166,6 +166,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       OBP: '-',
       SLG: '-',
       OPS: '-',
+      LEVLE: '-/-/-',
       listByGame: games,
       locations: top
         .filter(item => item.location && item.location.x)
@@ -188,6 +189,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         RBI: rbi > 0 ? rbi : '-',
         OBP: Math.round((tob / pa) * 1000) / 1000,
         OPS: Math.round((tob / pa) * 1000) / 1000,
+        LEVEL: `-/${Math.floor(Math.round((tob / pa) * 1000) / 100)}/-`,
       };
     } else {
       return {
@@ -211,6 +213,9 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         OBP: Math.round((tob / pa) * 1000) / 1000,
         SLG: Math.round((tb / ab) * 1000) / 1000,
         OPS: Math.round((tob / pa + tb / ab) * 1000) / 1000,
+        LEVEL: `${Math.floor(Math.round((h / ab) * 1000) / 100)}/${Math.floor(
+          Math.round((tob / pa) * 1000) / 100,
+        )}/${Math.floor(Math.round((tb / ab) * 1000) / 100)}`,
       };
     }
   });
