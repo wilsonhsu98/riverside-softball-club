@@ -20,6 +20,7 @@
     "firebase-functions": "^3.2.0",
     "generate-json-webpack-plugin": "^0.3.1",
     "html2canvas": "^1.0.0-alpha.12",
+    "http2": "^3.3.7",
     "idb": "^5.0.1",
     "request-promise": "^4.2.4",
     "serverless-http": "^2.3.0",

@@ -1397,7 +1397,7 @@ export default {
     getPlayer(name) {
       return this.teamInfo.players.find(
         player => player.name && player.name === name,
-      );
+      ) || {};
     },
   },
   watch: {
