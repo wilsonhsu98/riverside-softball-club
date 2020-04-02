@@ -525,7 +525,24 @@
                   >
                     {{ $t(item) }}
                   </span>
-                  <span style="cursor: auto;"></span>
+                  <span
+                    :class="[
+                      'out',
+                      {
+                        select: base.home.result === 'out',
+                        disabled:
+                          base.home.disabled ||
+                          !(prev5Players.length || base.home.name),
+                      },
+                    ]"
+                    @click="
+                      base.home.disabled ||
+                        !(prev5Players.length || base.home.name) ||
+                        toggle(`base.home.result`, 'out')
+                    "
+                  >
+                    {{ $t('Out') }}
+                  </span>
                 </div>
                 <div>
                   <span
@@ -536,8 +553,34 @@
                   >
                     {{ $t(item) }}
                   </span>
-                  <span style="cursor: auto;"></span>
-                  <span style="cursor: auto;"></span>
+                  <span
+                    :class="[
+                      'run',
+                      {
+                        select: base.home.result === 'run',
+                        disabled:
+                          base.home.disabled ||
+                          !(prev5Players.length || base.home.name),
+                      },
+                    ]"
+                    @click="
+                      base.home.disabled ||
+                        !(prev5Players.length || base.home.name) ||
+                        toggle(`base.home.result`, 'run')
+                    "
+                  >
+                    {{ $t('R') }}
+                  </span>
+                  <span
+                    :class="[
+                      'btn-next',
+                      {
+                        disabled: !content,
+                      },
+                    ]"
+                    @click="content && goto3or4()"
+                    >{{ $t('btn_next') }}</span
+                  >
                 </div>
               </div>
             </div>
@@ -755,7 +798,7 @@
       .inn {
         display: flex;
         flex-direction: column;
-        justify-content: space-around;
+        justify-content: space-evenly;
       }
       .cell {
         white-space: nowrap;
@@ -885,6 +928,7 @@
           width: 33px;
           text-align: center;
           margin-right: 2px;
+          font-size: 12px;
           &.red {
             background-color: $hit;
           }
@@ -1138,6 +1182,18 @@
             font-size: 12px;
           }
         }
+      }
+      &.out {
+        color: $out;
+        border: 3px solid $out;
+        &.select {
+          color: #fff;
+          background-color: $out;
+        }
+      }
+      &.btn-next {
+        color: #fff;
+        background-color: $header_bgcolor;
       }
       &.gray {
         width: 123px;
@@ -1741,6 +1797,13 @@ export default {
         this.showSetInn = false;
       }
     },
+    goto3or4() {
+      if (['BB', 'K'].includes(this.content)) {
+        this.step = 4;
+      } else {
+        this.step = 3;
+      }
+    },
   },
   watch: {
     // $route() {
@@ -1817,11 +1880,11 @@ export default {
         if (this.content === 'SF') {
           this.rbi.value = 1;
         }
-        if (['BB', 'K'].includes(this.content)) {
-          this.step = 4;
-        } else {
-          this.step = 3;
-        }
+        // if (['BB', 'K'].includes(this.content)) {
+        //   this.step = 4;
+        // } else {
+        //   this.step = 3;
+        // }
       } else {
         this.base.home.disabled = true;
         this.base.first.disabled = true;
