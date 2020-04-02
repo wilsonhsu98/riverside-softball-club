@@ -100,11 +100,11 @@
   }
   &.current .player {
     cursor: initial;
-    color: #777;
-    border-color: #777;
+    color: $dark_gray;
+    border-color: $dark_gray;
     background-color: transparent;
     &::v-deep .img {
-      border-color: #777;
+      border-color: $dark_gray;
     }
   }
   .delete-wrapper {

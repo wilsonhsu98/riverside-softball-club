@@ -984,12 +984,9 @@
   &::v-deep {
     .root-container {
       top: 50%;
-      transform: translateY(-50%);
-      text-align: center;
-    }
-    img {
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateY(-50%) translateX(-50%);
+      display: inline-block;
     }
   }
 }
@@ -1248,7 +1245,7 @@ export default {
       return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
     },
     closeLocation(e) {
-      if (!['CANVAS', 'IMG'].includes(e.target.tagName)) {
+      if (e.currentTarget === e.target) {
         this.coordinate = undefined;
       }
     },

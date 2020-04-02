@@ -163,6 +163,16 @@ const formatContent = (mode, content, location) => {
   }
 };
 
+const formatColor = content => {
+  if (['1H', '2H', '3H', 'HR'].indexOf(content) > -1) {
+    return 'red';
+  }
+  if (['BB', 'SF'].indexOf(content) > -1) {
+    return 'yellow';
+  }
+  return 'blue';
+};
+
 function toDataURL(src, callback, outputFormat) {
   const img = new Image();
   img.crossOrigin = 'Anonymous';
@@ -213,4 +223,4 @@ export default {
   genGameList,
 };
 
-export { cacheImg, scrollTo, formatContent };
+export { cacheImg, scrollTo, formatContent, formatColor };

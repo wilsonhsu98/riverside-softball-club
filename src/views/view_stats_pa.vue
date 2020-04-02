@@ -517,12 +517,9 @@ i.fa {
   &::v-deep {
     .root-container {
       top: 50%;
-      transform: translateY(-50%);
-      text-align: center;
-    }
-    img {
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateY(-50%) translateX(-50%);
+      display: inline-block;
     }
   }
 }
@@ -922,7 +919,7 @@ export default {
       this.toggleColumn(column);
     },
     closeLocation(e) {
-      if (!['CANVAS', 'IMG'].includes(e.target.tagName)) {
+      if (e.currentTarget === e.target) {
         this.coordinates = [];
       }
     },

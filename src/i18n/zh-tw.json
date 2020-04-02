@@ -128,6 +128,8 @@
 	"desc_out": "目前 %{n} 出局",
 	"desc_might_out": "目前可能 %{n} 出局",
 	"desc_batting": "輪到第 %{n} 棒",
+	"desc_next_3": "NEXT 3",
+	"desc_batting_num": "%{n}番",
 	"desc_batter": "打者: %{name}",
 	"desc_run": "代跑得分",
 	"desc_run_player": "代跑得分: %{name}",

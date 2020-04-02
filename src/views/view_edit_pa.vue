@@ -337,35 +337,97 @@
             <div class="separater">
               <label>{{ $t('ttl_current_pa') }}</label>
             </div>
-            <div class="desc">
-              <div>
-                <minus-plus-number :value="inn" @change="setInn" />
-                {{ $t('desc_inn') }}
+            <div :class="['current-desc', { show: base['home'].name }]">
+              <div class="summary">
+                <div class="box">
+                  <div class="team">
+                    <div class="cell">
+                      {{ topBottom === 'top' ? useTeam : opponent }}
+                    </div>
+                    <div class="cell">
+                      {{ topBottom === 'bot' ? useTeam : opponent }}
+                    </div>
+                  </div>
+                  <div class="inn">
+                    <div class="cell" v-if="topBottom === 'top'">
+                      {{ score }}
+                    </div>
+                    <div class="cell">
+                      {{ opponentScore }}
+                    </div>
+                    <div class="cell" v-if="topBottom === 'bot'">
+                      {{ score }}
+                    </div>
+                  </div>
+                </div>
+                <div class="inn-out-onbase">
+                  <div class="onbase">
+                    <div
+                      v-for="(b, bi) in ['second', 'first', 'third']"
+                      :key="`onbase_${bi}`"
+                      :class="[
+                        'base',
+                        {
+                          'has-player': base[b].name,
+                          disabled: !(prev5Players.length || base[b].name),
+                        },
+                      ]"
+                      @click="
+                        (prev5Players.length || base[b].name) && changePlayer(b)
+                      "
+                    ></div>
+                  </div>
+                  <div class="inn-out">
+                    <div class="inn" @click="showSetInn = true">
+                      <span>{{ inn }}</span>
+                      <div
+                        class="top-bottom"
+                        :class="{
+                          top: topBottom === 'top',
+                          bottom: topBottom === 'bot',
+                        }"
+                      ></div>
+                    </div>
+                    <div :class="['out', { selected: out > 0 }]"></div>
+                    <div :class="['out', { selected: out > 1 }]"></div>
+                  </div>
+                </div>
+                <div class="next3">
+                  <div class="next3-title">{{ $t('desc_next_3') }}</div>
+                  <div :key="`next_${i}`" v-for="(record, i) in next3">
+                    <span class="next3-order">{{
+                      $t('desc_batting_num', { n: record.nextOrder })
+                    }}</span>
+                    <span class="next3-num">{{
+                      getPlayerNumber(record.name)
+                    }}</span>
+                    <span>{{ record.name }}</span>
+                  </div>
+                </div>
               </div>
-              <div>{{ $t('desc_order', { n: order }) }}</div>
-              <div>
-                <template>
-                  {{
-                    $t('desc_out', {
-                      n: out,
-                    })
-                  }}
-                </template>
-              </div>
-              <div>
-                {{
-                  $t('desc_batting', {
+              <div class="batter">
+                <span class="order">{{
+                  $t('desc_batting_num', {
                     n: box.length
                       ? order % box[box.length - 1].order ||
                         box[box.length - 1].order
                       : '',
                   })
-                }}
+                }}</span>
+                <player
+                  @click="changePlayer('home')"
+                  :player="getPlayer(base['home'].name)"
+                />
+                <div class="contents">
+                  <span
+                    :key="`content_${i}`"
+                    v-for="(record, i) in preContents"
+                    :class="['content', `${formatColor_(record.content)}`]"
+                  >
+                    {{ formatContent_(record.content, record.location) }}
+                  </span>
+                </div>
               </div>
-              <player
-                @click="changePlayer('home')"
-                :player="getPlayer(base['home'].name)"
-              />
             </div>
             <div class="separater">
               <label
@@ -595,7 +657,7 @@
           </div>
         </template>
       </template>
-      <div style="width: 0;"></div>
+      <div style="width: 100%;"></div>
       <div
         v-if="pa && boxSummary.contents.length === order"
         class="delete-btn-container"
@@ -635,6 +697,9 @@
       :fourth_label="$t('ttl_bench_player')"
       :select="selectPlayer"
     ></player-modal>
+    <div class="modal" v-if="showSetInn" @click="closeSetInn">
+      <minus-plus-number :value="inn" @change="setInn" />
+    </div>
   </div>
 </template>
 
@@ -648,6 +713,190 @@
   align-content: flex-start;
   h1 {
     width: 100%;
+  }
+  .current-desc {
+    width: 280px;
+    min-height: 113px;
+    text-align: left;
+    margin: 0;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: $dark_gray;
+    visibility: hidden;
+    &.show {
+      visibility: visible;
+    }
+    .summary {
+      display: flex;
+      justify-content: space-between;
+    }
+    .box {
+      border-radius: 4px;
+      border: 2px solid $input_font;
+      box-sizing: border-box;
+      display: flex;
+      position: relative;
+      overflow: hidden;
+      padding: 0 5px;
+      min-width: 90px;
+      .team {
+        text-align: left;
+        overflow: hidden;
+        margin-right: auto;
+      }
+      .inn {
+        width: 18px;
+        text-align: center;
+        margin-left: 5px;
+      }
+      .team,
+      .inn {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+      }
+      .cell {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+    .inn-out-onbase {
+      /* flex: 0 1 50px; */
+      position: relative;
+      .onbase {
+        width: 62px;
+        height: 62px;
+        display: inline-flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-content: space-between;
+        transform-origin: left center;
+        transform: rotate(45deg) scale(0.7) translateX(-50%);
+        position: relative;
+        left: 50%;
+        .base {
+          width: 29px;
+          height: 29px;
+          border: 3px solid $row_color;
+          border-radius: 4px;
+          box-sizing: border-box;
+          cursor: pointer;
+          &.has-player {
+            background-color: $active_bgcolor;
+          }
+          &.disabled {
+            border-color: $input_font;
+            cursor: not-allowed;
+          }
+        }
+      }
+      .inn-out {
+        display: flex;
+        position: absolute;
+        bottom: 4px;
+        left: 50%;
+        transform: translateX(-50%);
+        line-height: 18px;
+        .inn {
+          cursor: pointer;
+          white-space: nowrap;
+          color: $row_color;
+          font-weight: bold;
+        }
+        .top-bottom {
+          display: inline-block;
+          width: 0;
+          height: 0;
+          border-style: solid;
+          top: 1px;
+          position: relative;
+          margin-left: 2px;
+        }
+        .top {
+          border-width: 0 8px 10px 8px;
+          border-color: transparent transparent $input_font transparent;
+        }
+        .bottom {
+          border-width: 10px 8px 0 8px;
+          border-color: $input_font transparent transparent transparent;
+        }
+        .out {
+          display: inline-block;
+          width: 18px;
+          height: 18px;
+          margin-left: 2px;
+          box-sizing: border-box;
+          border-radius: 50%;
+          border: 2px solid $input_font;
+          &.selected {
+            background-color: $out;
+          }
+        }
+      }
+      &:after {
+        content: '';
+        display: block;
+        width: 72px;
+        height: 0;
+      }
+    }
+    .next3 {
+      flex: 0;
+      display: flex;
+      flex-direction: column;
+      white-space: nowrap;
+      justify-content: space-around;
+      line-height: 17px;
+      &-title {
+        margin-left: 30px;
+      }
+      &-order {
+        display: inline-block;
+        width: 30px;
+        text-align: right;
+      }
+      &-num {
+        display: inline-block;
+        width: 20px;
+        text-align: center;
+      }
+    }
+    .batter {
+      margin-top: 5px;
+      display: flex;
+      align-items: center;
+      .order {
+        white-space: nowrap;
+      }
+      .player {
+        margin: 0 5px;
+        border-radius: 4px;
+        background-color: transparent;
+      }
+      .contents {
+        flex: 0 1 100%;
+        display: flex;
+        .content {
+          color: #fff;
+          line-height: 26px;
+          width: 33px;
+          text-align: center;
+          margin-right: 2px;
+          &.red {
+            background-color: $hit;
+          }
+          &.yellow {
+            background-color: $nonpa;
+          }
+          &.blue {
+            background-color: $ng;
+          }
+        }
+      }
+    }
   }
   .desc {
     width: 300px;
@@ -765,8 +1014,8 @@
           }
           &.name {
             width: 60px;
-            color: #777;
-            border-color: #777;
+            color: $dark_gray;
+            border-color: $dark_gray;
           }
           &.out {
             width: 41px;
@@ -950,6 +1199,21 @@
   }
 }
 
+.modal {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  > div {
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+  }
+}
+
 @media only screen and (max-width: 760px) {
   .container {
     .step-bar {
@@ -1005,6 +1269,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { formatContent, formatColor } from '../libs/utils';
 
 export default {
   data() {
@@ -1060,6 +1325,14 @@ export default {
       benchPlayers: [],
       step: 1,
       steps: [1, 2, 3, 4],
+      useTeam: '',
+      opponent: '',
+      topBottom: '',
+      score: 0,
+      opponentScore: 0,
+      preContents: [],
+      next3: [],
+      showSetInn: false,
     };
   },
   created() {
@@ -1232,6 +1505,50 @@ export default {
             this.base.home.name = this.name = estimate.r || estimate.name;
           }
         }
+
+        const {
+          opponentScores,
+          useTeam,
+          opponent,
+          topBottom,
+          r,
+        } = this.boxSummary;
+        this.useTeam = useTeam;
+        this.opponent = opponent;
+        this.topBottom = topBottom;
+        this.score = r;
+        this.opponentScore = opponentScores.reduce(
+          (acc, num) => (acc += num || 0),
+          0,
+        );
+        this.preContents = this.boxSummary.contents.filter(
+          item => item.name === this.base.home.name,
+        );
+        if (this.box.length) {
+          const one_round = this.box[this.box.length - 1].order;
+          this.next3 = this.boxSummary.contents.reduce(
+            (acc, item, index, self) => {
+              if (item.name === this.base.home.name) {
+                return [
+                  {
+                    ...self[index + 1],
+                    nextOrder: (this.order + 1) % one_round || one_round,
+                  },
+                  {
+                    ...self[index + 2],
+                    nextOrder: (this.order + 2) % one_round || one_round,
+                  },
+                  {
+                    ...self[index + 3],
+                    nextOrder: (this.order + 3) % one_round || one_round,
+                  },
+                ];
+              }
+              return acc;
+            },
+            [],
+          );
+        }
       }
       const out = this.boxSummary.contents
         .slice(0, this.order - 1)
@@ -1355,6 +1672,9 @@ export default {
         case 'batter':
         case 'home':
           this.base.home.name = player.name;
+          this.preContents = this.boxSummary.contents.filter(
+            item => item.name === player.name,
+          );
           break;
         case 'runner':
           this.altRun.name = player.name;
@@ -1395,9 +1715,31 @@ export default {
       ).number;
     },
     getPlayer(name) {
-      return this.teamInfo.players.find(
-        player => player.name && player.name === name,
-      ) || {};
+      return (
+        this.teamInfo.players.find(
+          player => player.name && player.name === name,
+        ) || { name }
+      );
+    },
+    formatContent_(content, location = {}) {
+      switch (this.boxDisplay) {
+        case 'code':
+          return formatContent(this.boxDisplay, content, location.location);
+        case 'content':
+          return formatContent(
+            this.boxDisplay,
+            this.$t(content),
+            location.location,
+          );
+      }
+    },
+    formatColor_(content) {
+      return formatColor(content);
+    },
+    closeSetInn(e) {
+      if (e.currentTarget === e.target) {
+        this.showSetInn = false;
+      }
     },
   },
   watch: {
@@ -1516,6 +1858,7 @@ export default {
       boxSummary: 'boxSummary',
       currentTeamIcon: 'currentTeamIcon',
       pa: 'pa',
+      boxDisplay: 'boxDisplay',
     }),
   },
 };
