@@ -525,24 +525,29 @@
                   >
                     {{ $t(item) }}
                   </span>
-                  <span
-                    :class="[
-                      'out',
-                      {
-                        select: base.home.result === 'out',
-                        disabled:
-                          base.home.disabled ||
-                          !(prev5Players.length || base.home.name),
-                      },
-                    ]"
-                    @click="
-                      base.home.disabled ||
-                        !(prev5Players.length || base.home.name) ||
-                        toggle(`base.home.result`, 'out')
-                    "
-                  >
-                    {{ $t('Out') }}
-                  </span>
+                  <template v-if="testMode">
+                    <span
+                      :class="[
+                        'out',
+                        {
+                          select: base.home.result === 'out',
+                          disabled:
+                            base.home.disabled ||
+                            !(prev5Players.length || base.home.name),
+                        },
+                      ]"
+                      @click="
+                        base.home.disabled ||
+                          !(prev5Players.length || base.home.name) ||
+                          toggle(`base.home.result`, 'out')
+                      "
+                    >
+                      {{ $t('Out') }}
+                    </span>
+                  </template>
+                  <template v-else>
+                    <span style="cursor: auto;"></span>
+                  </template>
                 </div>
                 <div>
                   <span
@@ -553,34 +558,40 @@
                   >
                     {{ $t(item) }}
                   </span>
-                  <span
-                    :class="[
-                      'run',
-                      {
-                        select: base.home.result === 'run',
-                        disabled:
-                          base.home.disabled ||
-                          !(prev5Players.length || base.home.name),
-                      },
-                    ]"
-                    @click="
-                      base.home.disabled ||
-                        !(prev5Players.length || base.home.name) ||
-                        toggle(`base.home.result`, 'run')
-                    "
-                  >
-                    {{ $t('R') }}
-                  </span>
-                  <span
-                    :class="[
-                      'btn-next',
-                      {
-                        disabled: !content,
-                      },
-                    ]"
-                    @click="content && goto3or4()"
-                    >{{ $t('btn_next') }}</span
-                  >
+                  <template v-if="testMode">
+                    <span
+                      :class="[
+                        'run',
+                        {
+                          select: base.home.result === 'run',
+                          disabled:
+                            base.home.disabled ||
+                            !(prev5Players.length || base.home.name),
+                        },
+                      ]"
+                      @click="
+                        base.home.disabled ||
+                          !(prev5Players.length || base.home.name) ||
+                          toggle(`base.home.result`, 'run')
+                      "
+                    >
+                      {{ $t('R') }}
+                    </span>
+                    <span
+                      :class="[
+                        'btn-next',
+                        {
+                          disabled: !content,
+                        },
+                      ]"
+                      @click="content && goto3or4()"
+                      >{{ $t('btn_next') }}</span
+                    >
+                  </template>
+                  <template v-else>
+                    <span style="cursor: auto;"></span>
+                    <span style="cursor: auto;"></span>
+                  </template>
                 </div>
               </div>
             </div>
@@ -1004,6 +1015,7 @@
         border-radius: 50%;
         font-size: 16px;
         background-color: #fff;
+        cursor: pointer;
       }
       &:after {
         content: '';
@@ -1330,6 +1342,7 @@ import { formatContent, formatColor } from '../libs/utils';
 export default {
   data() {
     return {
+      testMode: ['MOMOCAT'].includes(this.$route.params.team),
       version: '',
       inn: '',
       out: 0,
@@ -1398,7 +1411,7 @@ export default {
     this.setOrder(this.$route.params.order);
     this.setPa();
 
-    if (['MOMOCAT'].includes(this.$route.params.team)) {
+    if (this.testMode) {
       this.step = 2;
       this.steps = [2, 3, 4];
     }
@@ -1744,7 +1757,7 @@ export default {
       this.$modal.hide('player');
       this.changeMode = '';
       this.checkModalPlayer();
-      if (this.prev5Players.length === 0) {
+      if (this.prev5Players.length === 0 && !this.testMode) {
         this.step = 2;
       }
     },
@@ -1880,11 +1893,13 @@ export default {
         if (this.content === 'SF') {
           this.rbi.value = 1;
         }
-        // if (['BB', 'K'].includes(this.content)) {
-        //   this.step = 4;
-        // } else {
-        //   this.step = 3;
-        // }
+        if (!this.testMode) {
+          if (['BB', 'K'].includes(this.content)) {
+            this.step = 4;
+          } else {
+            this.step = 3;
+          }
+        }
       } else {
         this.base.home.disabled = true;
         this.base.first.disabled = true;
