@@ -525,29 +525,7 @@
                   >
                     {{ $t(item) }}
                   </span>
-                  <template v-if="testMode">
-                    <span
-                      :class="[
-                        'out',
-                        {
-                          select: base.home.result === 'out',
-                          disabled:
-                            base.home.disabled ||
-                            !(prev5Players.length || base.home.name),
-                        },
-                      ]"
-                      @click="
-                        base.home.disabled ||
-                          !(prev5Players.length || base.home.name) ||
-                          toggle(`base.home.result`, 'out')
-                      "
-                    >
-                      {{ $t('Out') }}
-                    </span>
-                  </template>
-                  <template v-else>
-                    <span style="cursor: auto;"></span>
-                  </template>
+                  <span style="cursor: auto;"></span>
                 </div>
                 <div>
                   <span
@@ -558,7 +536,14 @@
                   >
                     {{ $t(item) }}
                   </span>
-                  <template v-if="testMode">
+                  <span style="cursor: auto;"></span>
+                  <span style="cursor: auto;"></span>
+                </div>
+                <template v-if="testMode">
+                  <div class="separater">
+                    <label>{{ `${$t('R')}/${$t('Out')}` }}</label>
+                  </div>
+                  <div>
                     <span
                       :class="[
                         'run',
@@ -579,6 +564,25 @@
                     </span>
                     <span
                       :class="[
+                        'out',
+                        {
+                          select: base.home.result === 'out',
+                          disabled:
+                            base.home.disabled ||
+                            !(prev5Players.length || base.home.name),
+                        },
+                      ]"
+                      @click="
+                        base.home.disabled ||
+                          !(prev5Players.length || base.home.name) ||
+                          toggle(`base.home.result`, 'out')
+                      "
+                    >
+                      {{ $t('Out') }}
+                    </span>
+                    <span style="cursor: auto;"></span>
+                    <span
+                      :class="[
                         'btn-next',
                         {
                           disabled: !content,
@@ -587,12 +591,8 @@
                       @click="content && goto3or4()"
                       >{{ $t('btn_next') }}</span
                     >
-                  </template>
-                  <template v-else>
-                    <span style="cursor: auto;"></span>
-                    <span style="cursor: auto;"></span>
-                  </template>
-                </div>
+                  </div>
+                </template>
               </div>
             </div>
             <div v-if="step === 3" class="coordination-step">
