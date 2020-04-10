@@ -99,6 +99,7 @@
         <div
           class="flex-container"
           :class="`layout-${divider % 4 === 1 ? -1 : divider % 2 ? 1 : 0}`"
+          :key="sourceList.length"
         >
           <div
             class="flex"
@@ -444,16 +445,26 @@
     font-size: 12px;
   }
   &.all-players {
-    &.drag:before {
-      content: attr(data-msg);
-      display: block;
-      height: 36px;
-      line-height: 36px;
-      border: 2px dashed $active_bgcolor;
-      color: $active_bgcolor;
-      border-radius: 5px;
-      margin-bottom: 5px;
-      text-align: center;
+    &.drag {
+      &:before {
+        content: attr(data-msg);
+        display: inline-block;
+        border: 2px dotted $active_bgcolor;
+        box-sizing: border-box;
+        color: $active_bgcolor;
+        border-radius: 5px;
+        text-align: center;
+        position: absolute;
+        right: 10px;
+        padding: 5px;
+        height: calc(100% - 80px);
+        width: calc(40% - 15px);
+      }
+      .player {
+        width: 60%;
+        margin-right: auto;
+        border-style: dotted;
+      }
     }
   }
   &.starting-players {
@@ -479,15 +490,19 @@
         text-align: center;
         float: left;
       }
+      &.drag .player {
+        border-style: dotted;
+      }
     }
   }
   .player {
     position: relative;
-    height: 36px;
-    line-height: 36px;
+    height: 40px;
+    line-height: 34px;
     background-color: $row_odd_bgcolor;
     color: $row_color;
     border: 2px solid $row_color;
+    box-sizing: border-box;
     border-radius: 5px;
     margin: 0 0 5px 0;
     padding: 0 10px 0 20px;
@@ -536,7 +551,7 @@
     }
     &.dragging {
       border-radius: 5px;
-      width: 200px;
+      width: 200px !important;
     }
   }
   .add-source {
@@ -681,7 +696,7 @@ i.fa {
   vertical-align: middle;
 }
 .drag {
-  border-style: dashed !important;
+  border-style: dotted !important;
 }
 .highlight {
   animation: shadow-pulse 0.8s 5;
