@@ -836,9 +836,11 @@ export default {
       this.doResetSource();
     },
     move(event) {
+      const fromEle = event.from;
+      const toEle = event.originalEvent.target;
       if (
-        event.from.className.indexOf('order') > -1 &&
-        event.to.className.indexOf('starting-players') > -1
+        fromEle.className.indexOf('order') > -1 &&
+        toEle.className.indexOf('starting-players') > -1
       ) {
         return false;
       }
@@ -848,7 +850,7 @@ export default {
       this.origin = event.draggedContext.element;
       this.target = event.relatedContext.element;
 
-      if (event.from.className.indexOf('order') > -1) {
+      if (fromEle.className.indexOf('order') > -1) {
         this.origin_order = this.ORDER.find(order => {
           return this[`order_${order}`].find(item => {
             const obj = this.origin;
@@ -861,7 +863,7 @@ export default {
         });
       }
 
-      if (event.to.className.indexOf('order') > -1) {
+      if (toEle.className.indexOf('order') > -1) {
         this.target_order =
           this.ORDER.find(order => {
             return this[`order_${order}`].find(item => {
@@ -873,10 +875,10 @@ export default {
                 false
               );
             });
-          }) || parseInt(event.to.getAttribute('data-order'));
+          }) || parseInt(toEle.getAttribute('data-order'));
       }
 
-      if (event.to.className.indexOf('starting-players') > -1) {
+      if (toEle.className.indexOf('starting-players') > -1) {
         this.target_order = this.ORDER.find(
           order => this[`order_${order}`].length === 0,
         );
