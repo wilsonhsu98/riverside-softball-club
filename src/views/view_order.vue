@@ -552,6 +552,7 @@
     &.dragging {
       border-radius: 5px;
       width: 200px !important;
+      border-style: solid !important;
     }
   }
   .add-source {
