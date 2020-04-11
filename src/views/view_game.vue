@@ -210,7 +210,7 @@
               <template v-for="(record, recordIndex) in item.content">
                 <div
                   class="record"
-                  v-if="record === undefined"
+                  v-if="record === undefined || !record.content"
                   :key="`content_${recordIndex}`"
                 ></div>
                 <div class="record" v-else :key="`content_${recordIndex}`">
@@ -370,7 +370,7 @@
               <template v-for="(record, recordIndex) in item.contentNormal">
                 <div
                   class="record"
-                  v-if="record === undefined"
+                  v-if="record === undefined || !record.content"
                   :key="`content_${recordIndex}`"
                 ></div>
                 <div class="record" v-else :key="`content_${recordIndex}`">

@@ -341,11 +341,14 @@
               <div class="summary">
                 <div class="box">
                   <div class="team">
-                    <div class="cell">
+                    <div v-if="topBottom" class="cell">
                       {{ topBottom === 'top' ? useTeam : opponent }}
                     </div>
-                    <div class="cell">
+                    <div v-if="topBottom" class="cell">
                       {{ topBottom === 'bot' ? useTeam : opponent }}
+                    </div>
+                    <div v-else class="cell">
+                      {{ opponent }}
                     </div>
                   </div>
                   <div class="inn">
@@ -381,12 +384,14 @@
                     <div class="inn" @click="showSetInn = true">
                       <span>{{ inn }}</span>
                       <div
+                        v-if="topBottom"
                         class="top-bottom"
                         :class="{
                           top: topBottom === 'top',
                           bottom: topBottom === 'bot',
                         }"
                       ></div>
+                      <span v-else>?</span>
                     </div>
                     <div :class="['out', { selected: out > 0 }]"></div>
                     <div :class="['out', { selected: out > 1 }]"></div>
@@ -1598,18 +1603,21 @@ export default {
           this.next3 = this.boxSummary.contents.reduce(
             (acc, item, index, self) => {
               if (item.name === this.base.home.name) {
+                const next1 = (this.order + 1) % one_round || one_round;
+                const next2 = (this.order + 2) % one_round || one_round;
+                const next3 = (this.order + 3) % one_round || one_round;
                 return [
                   {
-                    ...self[index + 1],
-                    nextOrder: (this.order + 1) % one_round || one_round,
+                    ...(self[index + 1] || self[next1 - 1]),
+                    nextOrder: next1,
                   },
                   {
-                    ...self[index + 2],
-                    nextOrder: (this.order + 2) % one_round || one_round,
+                    ...(self[index + 2] || self[next2 - 1]),
+                    nextOrder: next2,
                   },
                   {
-                    ...self[index + 3],
-                    nextOrder: (this.order + 3) % one_round || one_round,
+                    ...(self[index + 3] || self[next3 - 1]),
+                    nextOrder: next3,
                   },
                 ];
               }

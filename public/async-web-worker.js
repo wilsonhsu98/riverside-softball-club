@@ -225,6 +225,9 @@ const displayGame = (players, records, errors, role) => {
   let arr = [];
   let startOrder = 0;
   let innChange = 0;
+  const assumedOrder = 12;
+
+  (records.find(item => !item.content) || {}).content = 'new';
 
   records
     .map((item, i, self) => {
@@ -276,9 +279,9 @@ const displayGame = (players, records, errors, role) => {
         innChange = item.inn;
         item.innChange = item.inn;
       }
-      if (!item.content) {
-        item.content = 'new';
-      }
+      // if (!item.content) {
+      //   item.content = 'new';
+      // }
       item.color = contentColor(item.content);
 
       let index = -1;
@@ -286,7 +289,8 @@ const displayGame = (players, records, errors, role) => {
       if (find) {
         let middleArr = [];
         middleArr.length =
-          Math.ceil(item.order / (startOrder || 10) - 1) - find.content.length;
+          Math.ceil(item.order / (startOrder || assumedOrder) - 1) -
+          find.content.length;
         find.content = find.content.concat(middleArr, item);
       } else {
         // Handle 代打
@@ -302,7 +306,9 @@ const displayGame = (players, records, errors, role) => {
         });
         if (index > -1) {
           let middleArr = [];
-          middleArr.length = Math.ceil(item.order / (startOrder || 10) - 1);
+          middleArr.length = Math.ceil(
+            item.order / (startOrder || assumedOrder) - 1,
+          );
           arr.splice(index + 1, 0, {
             name: item.name,
             data: (players.find(sub => sub.id === item.name) || { data: {} })
@@ -326,7 +332,9 @@ const displayGame = (players, records, errors, role) => {
       });
       if (item.r && item.r !== item.name && index > -1) {
         let middleArr = [];
-        middleArr.length = Math.ceil(item.order / (startOrder || 10) - 1);
+        middleArr.length = Math.ceil(
+          item.order / (startOrder || assumedOrder) - 1,
+        );
         arr.splice(index + 1, 0, {
           name: item.r,
           data: (players.find(sub => sub.id === item.r) || { data: {} }).data,
@@ -364,10 +372,13 @@ const displayGame = (players, records, errors, role) => {
         inn: role === 'manager' && records[records.length - 1].inn,
       });
   }
-
   const header = innArray.reduce((acc, item, i) => {
     if (startOrder === 0) {
-      return [1];
+      const inns = records
+        .filter(record => record.inn)
+        .map(record => record.inn);
+      const maxInn = inns.length ? Math.max(...inns) : 1;
+      return Array.apply(null, Array(maxInn)).map((undefined, i) => i + 1);
     }
     if (i) {
       return [
@@ -419,6 +430,7 @@ const displayGame = (players, records, errors, role) => {
     item.content.length = paMax;
     item.contentNormal = header.reduce((acc, inn, i, self) => {
       const filter = item.content.filter(sub => sub.inn === inn);
+      const hasPrev = item.content.some(sub => sub.inn < inn);
       const arr = [];
       arr.length = 1;
       if (i && self[i - 1] === inn) {
@@ -430,7 +442,12 @@ const displayGame = (players, records, errors, role) => {
       } else if (filter.length) {
         return acc.concat(filter);
       } else {
-        if (role === 'manager' && startOrder === 0) {
+        if (
+          role === 'manager' &&
+          startOrder === 0 &&
+          i === self.length - 1 &&
+          !hasPrev
+        ) {
           return acc.concat(item.content);
         } else {
           return acc.concat(arr);
