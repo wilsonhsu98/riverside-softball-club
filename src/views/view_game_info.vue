@@ -21,7 +21,9 @@
         <i
           class="fa fa-info-circle"
           v-tooltip="{
-            content: $t('tip_lock_game'),
+            content: `<ul><li>${$t('tip_lock_game')
+              .split('|')
+              .join('</li><li>')}</li></ul>`,
             classes: ['info'],
             container: $refs.container,
           }"

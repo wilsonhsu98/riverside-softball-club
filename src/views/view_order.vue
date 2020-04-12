@@ -75,14 +75,16 @@
           >
             <div class="flex"></div>
             <div class="separater">
-              <!-- <i
+              <i
                 class="toggle-btn fa fa-info-circle"
                 v-tooltip="{
-                  content: $t('tip_player'),
+                  content: `<ul><li>${$t('tip_order')
+                    .split('|')
+                    .join('</li><li>')}</li></ul>`,
                   classes: ['info'],
                   container: $refs.container,
                 }"
-              ></i> -->
+              ></i>
               <i
                 class="toggle-btn fa fa-user-o"
                 :class="!avatar && 'deny'"
@@ -91,19 +93,18 @@
               <i class="toggle-btn divider" @click="divider += 1"
                 ><divider
               /></i>
-              <i class="toggle-btn fa fa-reply-all" @click="fillAll"></i>
-              <!-- <i
-                class="toggle-btn robot"
-              ><robot/></i> -->
+              <i class="toggle-btn robot disabled"><robot /></i>
+              <i class="toggle-btn fa fa-reply-all ltr" @click="fillAll"></i>
+              <i class="toggle-btn fa fa-reply-all" @click="clearAll"></i>
               <i
-                class="toggle-btn fa fa-trash"
+                class="toggle-btn trash"
                 :class="deleteMode && 'on'"
                 @click="deleteMode = !deleteMode"
-              ></i>
-              <i
-                class="toggle-btn fa fa-refresh"
-                @click="releaseHiddenPlayer()"
-              ></i>
+                ><trash
+              /></i>
+              <i class="toggle-btn trash-undo" @click="releaseHiddenPlayer()"
+                ><trash-undo
+              /></i>
             </div>
             <div class="flex"></div>
           </div>
@@ -215,7 +216,7 @@
                 </v-popover>
                 <div v-if="deleteMode && player.number" class="delete">
                   <i
-                    class="fa fa-trash"
+                    class="trash"
                     :style="
                       `
                         animation-delay: -${(
@@ -229,7 +230,8 @@
                       `
                     "
                     @click="addHiddenPlayer(player)"
-                  ></i>
+                    ><trash
+                  /></i>
                 </div>
               </div>
               <div class="add-source">
@@ -341,7 +343,7 @@
 }
 .sticky {
   position: sticky;
-  top: calc(50vh - (33px * 5 - 5px) / 2 - 35px);
+  top: calc(50vh - (33px * 8 - 5px) / 2 - 35px);
   z-index: 1;
   .fake-flex {
     position: absolute;
@@ -366,6 +368,10 @@
   left: 50%;
   transform: translateX(-50%);
   margin-bottom: 5px;
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
   &.fa-info-circle {
     font-size: 31px;
     position: relative;
@@ -385,7 +391,7 @@
       &:after {
         content: '';
         width: 2px;
-        height: 28px;
+        height: 27px;
         background-color: $error_color;
         display: inline-block;
         position: absolute;
@@ -405,6 +411,8 @@
       overflow: hidden;
     }
   }
+  &.trash,
+  &.trash-undo,
   &.robot {
     line-height: 22px;
     svg {
@@ -414,19 +422,16 @@
       fill: currentColor;
       overflow: hidden;
     }
+    &.on {
+      border-color: $active_bgcolor;
+      color: $active_bgcolor;
+    }
   }
   &.fa-reply-all {
     font-size: 18px;
     line-height: 24px;
-    transform: scaleX(-1) translateX(50%);
-  }
-  &.fa-trash,
-  &.fa-refresh {
-    font-size: 18px;
-    line-height: 24px;
-    &.on {
-      border-color: $active_bgcolor;
-      color: $active_bgcolor;
+    &.ltr {
+      transform: scaleX(-1) translateX(50%);
     }
   }
 }
@@ -717,12 +722,26 @@
   background-color: rgba(255, 255, 255, 0.5);
   z-index: 1;
   text-align: center;
+  .trash {
+    line-height: 28px;
+    width: 28px;
+    height: 28px;
+    display: inline-block;
+    cursor: pointer;
+    svg {
+      width: 28px;
+      height: 28px;
+      vertical-align: middle;
+      fill: currentColor;
+      overflow: hidden;
+    }
+  }
 }
-.player:nth-child(2n) .delete .fa-trash {
+.player:nth-child(2n) .delete .trash {
   animation: shake1 infinite;
   transform-origin: 50% 10%;
 }
-.player:nth-child(2n-1) .delete .fa-trash {
+.player:nth-child(2n-1) .delete .trash {
   animation: shake2 infinite alternate;
   transform-origin: 30% 5%;
 }
@@ -1095,6 +1114,14 @@ export default {
         },
       );
     },
+    clearAll() {
+      this.ORDER.forEach((order, index, self) => {
+        this[`order_${order}`] = [];
+        if (index === self.length - 1) {
+          this.sourceList = this.resetSource();
+        }
+      });
+    },
   },
   computed: {
     ...mapGetters({
@@ -1138,9 +1165,15 @@ export default {
     divider: {
       template: `<svg viewBox="0 0 365.368 365.368"><path d="M363.171,177.381L311.1,125.309c-1.406-1.407-3.314-2.197-5.303-2.197c-1.989,0-3.897,0.79-5.303,2.197l-14.143,14.143c-1.407,1.406-2.197,3.314-2.197,5.303c0,1.989,0.79,3.897,2.197,5.303l15.126,15.125h-52.543v-95.5c0-4.142-3.358-7.5-7.5-7.5h-20c-4.142,0-7.5,3.358-7.5,7.5v226c0,4.142,3.358,7.5,7.5,7.5h20c4.142,0,7.5-3.358,7.5-7.5v-95.5h52.543l-15.126,15.126c-1.407,1.406-2.197,3.314-2.197,5.303c0,1.989,0.79,3.897,2.197,5.303l14.143,14.143c1.406,1.407,3.314,2.197,5.303,2.197c1.989,0,3.897-0.79,5.303-2.197l52.071-52.071C366.1,185.058,366.1,180.309,363.171,177.381z"/><path d="M143.934,62.184h-20c-4.142,0-7.5,3.358-7.5,7.5v95.5H63.891l15.126-15.125c2.929-2.929,2.929-7.677,0-10.606l-14.142-14.143c-1.407-1.406-3.315-2.197-5.304-2.197c-1.989,0-3.897,0.79-5.303,2.197L2.197,177.381C0.79,178.787,0,180.695,0,182.684c0,1.989,0.79,3.897,2.197,5.303l52.072,52.071c1.407,1.407,3.314,2.197,5.303,2.197c1.989,0,3.897-0.79,5.304-2.197l14.142-14.143c2.929-2.929,2.928-7.678,0-10.606l-15.126-15.126h52.543v95.5c0,4.142,3.358,7.5,7.5,7.5h20c4.142,0,7.5-3.358,7.5-7.5v-226C151.434,65.542,148.076,62.184,143.934,62.184z"/></svg>`,
     },
-    // robot: {
-    //   template: `<svg viewBox="0 0 448 512"><path fill="currentColor" d="M17.99986,256H48V128H17.99986A17.9784,17.9784,0,0,0,0,146v92A17.97965,17.97965,0,0,0,17.99986,256Zm412-128H400V256h29.99985A17.97847,17.97847,0,0,0,448,238V146A17.97722,17.97722,0,0,0,429.99985,128ZM116,320H332a36.0356,36.0356,0,0,0,36-36V109a44.98411,44.98411,0,0,0-45-45H241.99985V18a18,18,0,1,0-36,0V64H125a44.98536,44.98536,0,0,0-45,45V284A36.03685,36.03685,0,0,0,116,320Zm188-48H272V240h32ZM288,128a32,32,0,1,1-32,32A31.99658,31.99658,0,0,1,288,128ZM208,240h32v32H208Zm-32,32H144V240h32ZM160,128a32,32,0,1,1-32,32A31.99658,31.99658,0,0,1,160,128ZM352,352H96A95.99975,95.99975,0,0,0,0,448v32a32.00033,32.00033,0,0,0,32,32h96V448a31.99908,31.99908,0,0,1,32-32H288a31.99908,31.99908,0,0,1,32,32v64h96a32.00033,32.00033,0,0,0,32-32V448A95.99975,95.99975,0,0,0,352,352ZM176,448a15.99954,15.99954,0,0,0-16,16v48h32V464A15.99954,15.99954,0,0,0,176,448Zm96,0a16,16,0,1,0,16,16A15.99954,15.99954,0,0,0,272,448Z"/></svg>`,
-    // },
+    trash: {
+      template: `<svg viewBox="0 0 448 512"><path fill="currentColor" d="M268 416h24a12 12 0 0 0 12-12V188a12 12 0 0 0-12-12h-24a12 12 0 0 0-12 12v216a12 12 0 0 0 12 12zM432 80h-82.41l-34-56.7A48 48 0 0 0 274.41 0H173.59a48 48 0 0 0-41.16 23.3L98.41 80H16A16 16 0 0 0 0 96v16a16 16 0 0 0 16 16h16v336a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128h16a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16zM171.84 50.91A6 6 0 0 1 177 48h94a6 6 0 0 1 5.15 2.91L293.61 80H154.39zM368 464H80V128h288zm-212-48h24a12 12 0 0 0 12-12V188a12 12 0 0 0-12-12h-24a12 12 0 0 0-12 12v216a12 12 0 0 0 12 12z"/></svg>`,
+    },
+    'trash-undo': {
+      template: `<svg viewBox="0 0 448 512"><path fill="currentColor" d="M432 80h-82.41l-34-56.7C307.88 10.44 289.44 0 274.44 0H173.59c-15 0-33.43 10.44-41.15 23.3L98.41 80H16A16 16 0 0 0 0 96v16a16 16 0 0 0 16 16h16v336a48 48 0 0 0 48 48h288a48 48 0 0 0 48-48V128h16a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16zM171.84 50.91A6.66 6.66 0 0 1 177 48h94a6.67 6.67 0 0 1 5.16 2.91L293.62 80H154.38zM368 464H80V128h288zM203.76 348.71A12 12 0 0 0 224 340v-35.16c48.68 5.1 65.21 26 48.45 84.78-2.15 7.53 6.15 13.37 12 8.72C303.11 383.45 320 355 320 326.19c0-62.88-39.64-82-96-86.17V204a12 12 0 0 0-20.24-8.73l-72 68a12 12 0 0 0 0 17.44z"/></svg>`,
+    },
+    robot: {
+      template: `<svg viewBox="0 0 448 512"><path fill="currentColor" d="M17.99986,256H48V128H17.99986A17.9784,17.9784,0,0,0,0,146v92A17.97965,17.97965,0,0,0,17.99986,256Zm412-128H400V256h29.99985A17.97847,17.97847,0,0,0,448,238V146A17.97722,17.97722,0,0,0,429.99985,128ZM116,320H332a36.0356,36.0356,0,0,0,36-36V109a44.98411,44.98411,0,0,0-45-45H241.99985V18a18,18,0,1,0-36,0V64H125a44.98536,44.98536,0,0,0-45,45V284A36.03685,36.03685,0,0,0,116,320Zm188-48H272V240h32ZM288,128a32,32,0,1,1-32,32A31.99658,31.99658,0,0,1,288,128ZM208,240h32v32H208Zm-32,32H144V240h32ZM160,128a32,32,0,1,1-32,32A31.99658,31.99658,0,0,1,160,128ZM352,352H96A95.99975,95.99975,0,0,0,0,448v32a32.00033,32.00033,0,0,0,32,32h96V448a31.99908,31.99908,0,0,1,32-32H288a31.99908,31.99908,0,0,1,32,32v64h96a32.00033,32.00033,0,0,0,32-32V448A95.99975,95.99975,0,0,0,352,352ZM176,448a15.99954,15.99954,0,0,0-16,16v48h32V464A15.99954,15.99954,0,0,0,176,448Zm96,0a16,16,0,1,0,16,16A15.99954,15.99954,0,0,0,272,448Z"/></svg>`,
+    },
   },
 };
 </script>

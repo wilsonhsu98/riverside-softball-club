@@ -86,7 +86,9 @@
           class="fa fa-info-circle"
           v-if="$route.params.team"
           v-tooltip="{
-            content: $t('tip_player'),
+            content: `<ul><li>${$t('tip_player')
+              .split('|')
+              .join('</li><li>')}</li></ul>`,
             classes: ['info'],
             container: $refs.container,
           }"
@@ -175,7 +177,9 @@
         <i
           class="fa fa-info-circle"
           v-tooltip="{
-            content: $t('tip_bench'),
+            content: `<ul><li>${$t('tip_bench')
+              .split('|')
+              .join('</li><li>')}</li></ul>`,
             classes: ['info'],
             container: $refs.container,
           }"

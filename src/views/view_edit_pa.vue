@@ -440,7 +440,9 @@
                 }}<i
                   class="fa fa-info-circle"
                   v-tooltip="{
-                    content: $t('tip_step'),
+                    content: `<ul><li>${$t('tip_step')
+                      .split('|')
+                      .join('</li><li>')}</li></ul>`,
                     classes: ['info'],
                     container: $refs.container,
                   }"
@@ -456,6 +458,14 @@
                 @click="step = i"
                 >{{ $t(`desc_step_${i}`) }}</span
               >
+            </div>
+            <div class="direction">
+              <button class="btn" :disabled="step === steps[0]" @click="goPrev">
+                {{ $t('btn_prev') }}
+              </button>
+              <button class="btn" :disabled="nextStatus()" @click="goNext">
+                {{ $t('btn_next') }}
+              </button>
             </div>
             <div v-if="step === 1">
               <infield class="infield">
@@ -479,13 +489,13 @@
                       }}
                     </span>
                   </div>
-                  <button
+                  <!-- <button
                     v-if="prev5Players.length === 0"
                     class="btn"
                     @click="step = 2"
                   >
                     {{ $t('btn_next') }}
-                  </button>
+                  </button> -->
                 </div>
               </infield>
               <div
@@ -586,16 +596,7 @@
                       {{ $t('Out') }}
                     </span>
                     <span style="cursor: auto;"></span>
-                    <span
-                      :class="[
-                        'btn-next',
-                        {
-                          disabled: !content,
-                        },
-                      ]"
-                      @click="content && goto3or4()"
-                      >{{ $t('btn_next') }}</span
-                    >
+                    <span style="cursor: auto;"></span>
                   </div>
                 </template>
               </div>
@@ -1038,6 +1039,10 @@
       }
     }
   }
+  .direction {
+    text-align: center;
+    margin-bottom: 10px;
+  }
   .coordination-step {
     height: 400px;
   }
@@ -1292,6 +1297,11 @@
     .step-bar {
       width: 100%;
     }
+    .direction {
+      .btn {
+        display: inline-block;
+      }
+    }
     .coordination-step {
       height: 300px;
     }
@@ -1516,7 +1526,10 @@ export default {
             ...(this.version === 'import' && { r }),
             ...(this.version !== 'import' && { onbase }),
             ...(this.location[0] &&
-              this.version !== 'import' && { location: this.location[0] }),
+              this.version !== 'import' &&
+              !['BB', 'K'].includes(this.content) && {
+                location: this.location[0],
+              }),
           },
           tempRecord.slice(i + 1),
         );
@@ -1765,9 +1778,9 @@ export default {
       this.$modal.hide('player');
       this.changeMode = '';
       this.checkModalPlayer();
-      if (this.prev5Players.length === 0 && !this.testMode) {
-        this.step = 2;
-      }
+      // if (this.prev5Players.length === 0 && !this.testMode) {
+      //   this.step = 2;
+      // }
     },
     clearPlayer() {
       switch (this.changeMode) {
@@ -1818,11 +1831,37 @@ export default {
         this.showSetInn = false;
       }
     },
-    goto3or4() {
-      if (['BB', 'K'].includes(this.content)) {
-        this.step = 4;
+    nextStatus() {
+      if (this.step === this.steps[this.steps.length - 1]) {
+        return true;
+      }
+      if (this.step === 2 && !this.content) {
+        return true;
+      }
+      if (this.step === 1 && this.prev5Players.length) {
+        return true;
+      }
+    },
+    goPrev() {
+      if (this.step === 4) {
+        if (['BB', 'K'].includes(this.content)) {
+          this.step = 2;
+        } else {
+          this.step = 3;
+        }
       } else {
-        this.step = 3;
+        this.step = this.step - 1;
+      }
+    },
+    goNext() {
+      if (this.step === 2) {
+        if (['BB', 'K'].includes(this.content)) {
+          this.step = 4;
+        } else {
+          this.step = 3;
+        }
+      } else {
+        this.step = this.step + 1;
       }
     },
   },
@@ -1901,13 +1940,13 @@ export default {
         if (this.content === 'SF') {
           this.rbi.value = 1;
         }
-        if (!this.testMode) {
-          if (['BB', 'K'].includes(this.content)) {
-            this.step = 4;
-          } else {
-            this.step = 3;
-          }
-        }
+        // if (!this.testMode) {
+        //   if (['BB', 'K'].includes(this.content)) {
+        //     this.step = 4;
+        //   } else {
+        //     this.step = 3;
+        //   }
+        // }
       } else {
         this.base.home.disabled = true;
         this.base.first.disabled = true;
@@ -1915,11 +1954,11 @@ export default {
         this.base.third.disabled = true;
       }
     },
-    location() {
-      setTimeout(() => {
-        this.step = 4;
-      }, 500);
-    },
+    // location() {
+    //   setTimeout(() => {
+    //     this.step = 4;
+    //   }, 500);
+    // },
     run: {
       handler() {
         if (this.run.value) {
