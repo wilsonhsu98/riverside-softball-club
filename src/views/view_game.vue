@@ -478,6 +478,9 @@
           <span class="summary">{{ item.summary }}</span>
         </div>
       </div>
+      <div class="button-container" v-if="stillCanEdit && role === 'manager'">
+        <span class="fa fa-pencil" @click="editOrder"></span>
+      </div>
     </div>
     <div style="text-align: center; margin: 14px;">
       <!-- <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
@@ -622,6 +625,31 @@
     overflow: hidden;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  }
+  .button-container {
+    margin: -60px 10px auto auto;
+    padding: 0;
+    text-align: right;
+    width: 60px;
+    position: sticky;
+    bottom: 20px;
+    background: none;
+    span {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      line-height: 50px;
+      color: #fff;
+      border-radius: 50%;
+      background-color: $current_user_bgcolor;
+      margin: 0;
+      font-size: 30px;
+      outline: none;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+        0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+    }
   }
   span {
     display: inline-block;
@@ -1064,6 +1092,13 @@
         }
       }
     }
+    .button-container {
+      margin-right: 0;
+      bottom: 50px;
+      span {
+        margin: 0 10px 10px 0;
+      }
+    }
     .player-records {
       .player {
         .order {
@@ -1192,6 +1227,7 @@ export default {
       videoIDs: [],
       gameNote: '',
       gameStatus: 'lock',
+      stillCanEdit: false,
     };
   },
   created() {
@@ -1260,6 +1296,17 @@ export default {
             location.location,
           );
       }
+    },
+    editOrder() {
+      const currentOrder = this.box.slice(1).map(player => player.name);
+      window.localStorage.setItem('temp_order', currentOrder);
+      this.$router.push({
+        name: 'game_order',
+        params: {
+          team: this.$route.params.team,
+          game: this.$route.params.game,
+        },
+      });
     },
   },
   computed: {
@@ -1348,6 +1395,17 @@ export default {
         )
           ? 'unlock'
           : 'lock';
+      },
+      immediate: true,
+    },
+    box: {
+      handler() {
+        if (
+          this.box.length &&
+          this.box.slice(1)[0].content[0].content === 'new'
+        ) {
+          this.stillCanEdit = true;
+        }
       },
       immediate: true,
     },

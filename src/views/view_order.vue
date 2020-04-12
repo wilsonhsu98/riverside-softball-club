@@ -806,6 +806,22 @@ export default {
   },
   created() {
     this.sortBy_ = this.sortBy;
+
+    // until first batter play, order still can change
+    const tempOrder = window.localStorage.getItem('temp_order');
+    window.localStorage.removeItem('temp_order');
+    if (tempOrder) {
+      tempOrder.split(',').forEach((name, index, self) => {
+        this[`order_${index + 1}`][0] = this.sourceList.find(
+          player => player.name === name,
+        );
+        if (index === self.length - 1) {
+          this.sourceList = this.sourceList.filter(
+            player => !self.includes(player.name),
+          );
+        }
+      });
+    }
   },
   methods: {
     ...mapActions({
