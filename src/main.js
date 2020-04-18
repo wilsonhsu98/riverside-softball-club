@@ -9,6 +9,8 @@ import VCalendar from 'v-calendar';
 import draggable from 'vuedraggable';
 import vSelect from 'vue-select';
 import VModal from 'vue-js-modal';
+import Carousel3d from 'vue-carousel-3d';
+import { Plugin } from 'vue-fragment';
 import smoothscroll from 'smoothscroll-polyfill';
 import './css/font-awesome.min.css';
 import './css/font.css';
@@ -51,6 +53,8 @@ Vue.use(VCalendar, {
   },
 });
 Vue.use(VModal);
+Vue.use(Carousel3d);
+Vue.use(Plugin);
 Vue.use({
   install() {
     Vue.cacheImg = cacheImg;

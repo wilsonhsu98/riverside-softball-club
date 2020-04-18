@@ -49,45 +49,28 @@
         </div>
       </div>
     </div>
-    <div class="item-container">
-      <div
-        class="item-container__table"
-        v-for="key in ['AVG', 'H', 'HR', 'RBI']"
-        :key="`block_${key}`"
-      >
-        <div class="header">
-          <span @click="goStats(key)">{{ $t(key) }}</span>
-        </div>
-        <template v-for="(item, index) in itemStats[key].slice(0, 5)">
-          <div v-if="index === 0" class="row" :key="`row_${index}`">
-            <span class="rank">{{ index + 1 }}</span>
-            <img
-              v-if="item.data.photo"
-              class="img"
-              :src="$cacheImg(item.data.photo)"
-              onLoad="this.className='img'"
-              onError="this.className='img-hidden'"
-            />
-            <span v-else class="img-hidden"></span>
-            <span class="name">{{ item.name }}</span>
-            <span class="dummy"></span>
-            <span class="value">{{ item[key] }}</span>
-          </div>
-          <div v-else class="row" :key="`row_${index}`">
-            <span class="rank">{{ index + 1 }}</span>
-            <span class="name">{{ item.name }}</span>
-            <span class="value">{{ item[key] }}</span>
-          </div>
-        </template>
-        <div class="note">
-          {{
-            $t(`${key}_note`, {
-              g: periodGames.length,
-              pa: parseInt(periodGames.length * 1.6, 10),
-            })
-          }}
+    <div class="web">
+      <div class="item-container">
+        <div
+          class="item-container__table"
+          v-for="key in ['AVG', 'H', 'HR', 'RBI', 'W']"
+          :key="`block_${key}`"
+        >
+          <board :cat="key" :itemStats="itemStats" :periodGames="periodGames" />
         </div>
       </div>
+    </div>
+    <div class="mobile">
+      <carousel-3d class="item-container" border="0" :width="200" :height="290">
+        <slide
+          v-for="(key, index) in ['AVG', 'H', 'HR', 'RBI', 'W']"
+          :index="index"
+          :key="`carousel_${key}`"
+          class="item-container__table"
+        >
+          <board :cat="key" :itemStats="itemStats" :periodGames="periodGames" />
+        </slide>
+      </carousel-3d>
     </div>
   </div>
 </template>
@@ -142,68 +125,76 @@ i.fa {
     overflow: hidden;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-    .header {
-      background: $header_bgcolor;
-      color: $header_color;
-      line-height: 36px;
-      text-align: right;
-      padding-right: 10px;
-      span {
-        cursor: pointer;
-        text-decoration: underline;
-      }
-    }
-    .row {
-      color: $row_color;
-      line-height: 36px;
-      height: 36px;
-      display: flex;
-      &:nth-child(even) {
-        background-color: $row_even_bgcolor;
-      }
-      &:nth-child(odd) {
-        background-color: $row_odd_bgcolor;
-      }
-      .rank {
-        width: 20px;
-        text-align: left;
-        padding-left: 10px;
-      }
-      .name,
-      .dummy {
-        flex: 1;
-      }
-      .value {
-        width: 50px;
+    &::v-deep {
+      .header {
+        background: $header_bgcolor;
+        color: $header_color;
+        line-height: 36px;
         text-align: right;
         padding-right: 10px;
+        span.clickable {
+          cursor: pointer;
+          text-decoration: underline;
+        }
       }
-    }
-    .img {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      position: relative;
-      top: -30px;
-      left: -7px;
-      ~ .name {
+      .row {
+        color: $row_color;
+        line-height: 36px;
+        height: 36px;
+        display: flex;
+        &:nth-child(even) {
+          background-color: $row_even_bgcolor;
+        }
+        &:nth-child(odd) {
+          background-color: $row_odd_bgcolor;
+        }
+        .rank {
+          width: 20px;
+          text-align: left;
+          padding-left: 10px;
+        }
+        .name,
+        .dummy {
+          flex: 1;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+        .value {
+          width: 50px;
+          text-align: right;
+          padding-right: 10px;
+        }
+      }
+      .img {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        position: relative;
+        top: -30px;
+        left: -7px;
+        ~ .name {
+          display: none;
+        }
+      }
+      .img-hidden {
         display: none;
+        ~ .dummy {
+          display: none;
+        }
       }
-    }
-    .img-hidden {
-      display: none;
-      ~ .dummy {
-        display: none;
+      .note {
+        border-top: 2px dotted $row_color;
+        padding: 10px;
+        background-color: $row_even_bgcolor;
+        margin-top: auto;
+        font-size: 12px;
       }
-    }
-    .note {
-      border-top: 2px dotted $row_color;
-      padding: 10px;
-      background-color: $row_even_bgcolor;
-      margin-top: auto;
-      font-size: 12px;
     }
   }
+}
+.mobile {
+  display: none;
 }
 @media only screen and (max-width: 760px) {
   .search-bar {
@@ -304,7 +295,7 @@ i.fa {
       }
     }
   }
-  .item-container {
+  /* .item-container {
     margin: 10px 0;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -315,6 +306,15 @@ i.fa {
       min-height: calc(var(--vh, 1vh) * 50 - 80px);
       border-radius: 0;
     }
+  } */
+  .mobile {
+    display: block;
+    .item-container__table {
+      margin: 0;
+    }
+  }
+  .web {
+    display: none;
   }
 }
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
@@ -399,6 +399,51 @@ export default {
       itemStats: 'itemStats',
       currentTeamIcon: 'currentTeamIcon',
     }),
+  },
+  components: {
+    board: {
+      template: `
+        <fragment>
+          <div class="header">
+            <span
+              :class="{ clickable: cat !== 'W' }"
+              @click="cat !== 'W' && goStats(cat)"
+              >{{ $t(cat) }}</span
+            >
+          </div>
+          <template v-for="(item, index) in itemStats[cat].slice(0, 5)">
+            <div v-if="index === 0" class="row" :key="index">
+              <span class="rank">{{ index + 1 }}</span>
+              <img
+                v-if="item.data.photo"
+                class="img"
+                :src="$cacheImg(item.data.photo)"
+                onLoad="this.className='img'"
+                onError="this.className='img-hidden'"
+              />
+              <span v-else class="img-hidden"></span>
+              <span class="name">{{ item.name }}</span>
+              <span class="dummy"></span>
+              <span class="value">{{ item[cat] }}</span>
+            </div>
+            <div v-else class="row" :key="index">
+              <span class="rank">{{ index + 1 }}</span>
+              <span class="name">{{ item.name }}</span>
+              <span class="value">{{ item[cat] }}</span>
+            </div>
+          </template>
+          <div class="note">
+            {{
+              $t(cat + '_note', {
+                g: periodGames.length,
+                pa: parseInt(periodGames.length * 1.6, 10),
+              })
+            }}
+          </div>
+        </fragment>
+      `,
+      props: ['cat', 'itemStats', 'periodGames'],
+    },
   },
 };
 </script>

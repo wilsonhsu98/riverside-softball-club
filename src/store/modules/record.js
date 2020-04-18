@@ -63,7 +63,7 @@ const state = {
   order: 0,
   games: [],
   genStatistics: [],
-  itemStats: { AVG: [], H: [], HR: [], RBI: [] },
+  itemStats: { AVG: [], H: [], HR: [], RBI: [], W: [] },
   box: [],
   boxDisplay: 'content',
 };
@@ -287,6 +287,7 @@ const actions = {
         players: state.players,
         records: state.records,
         period: state.period,
+        games: state.games,
       },
       data => {
         commit(types.SET_ITEMSTATS, data);

@@ -534,6 +534,31 @@ const execItemStats = state => {
         RBI: item.RBI,
         data: item.data,
       })),
+    W: state.games
+      .filter(
+        item =>
+          games.includes(item.game) && item.result === 'win' && item.pitcher,
+      )
+      .map(item => item.pitcher)
+      .reduce((acc, pitcher, undefined, self) => {
+        if (!acc.find(player => player.pitcher === pitcher)) {
+          return [
+            ...acc,
+            {
+              pitcher,
+              W: self.filter(player => player === pitcher).length,
+            },
+          ];
+        }
+        return acc;
+      }, [])
+      .sort((a, b) => b['W'] - a['W'])
+      .map(item => ({
+        name: item.pitcher,
+        W: item.W,
+        data: (state.players.find(player => player.id === item.pitcher) || {})
+          .data,
+      })),
   };
 };
 
