@@ -295,7 +295,7 @@
                     <div
                       v-if="record.location"
                       class="location-trigger"
-                      @click="coordinate = record.location"
+                      @click="setLocation(record)"
                     >
                       <i class="fa fa-map-marker"></i>
                     </div>
@@ -1279,6 +1279,61 @@ export default {
     },
     sumByInn(scores, inn) {
       return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
+    },
+    setLocation(record) {
+      this.coordinate = {
+        ...record.location,
+        onbase: {
+          0: {
+            ...record.onbase[0],
+            ...(record.onbase[0].name
+              ? {
+                  photo: (
+                    this.teamInfo.players.find(
+                      player => player.name === record.onbase[0].name,
+                    ) || {}
+                  ).photo,
+                }
+              : undefined),
+          },
+          1: {
+            ...record.onbase[1],
+            ...(record.onbase[1].name
+              ? {
+                  photo: (
+                    this.teamInfo.players.find(
+                      player => player.name === record.onbase[1].name,
+                    ) || {}
+                  ).photo,
+                }
+              : undefined),
+          },
+          2: {
+            ...record.onbase[2],
+            ...(record.onbase[2].name
+              ? {
+                  photo: (
+                    this.teamInfo.players.find(
+                      player => player.name === record.onbase[2].name,
+                    ) || {}
+                  ).photo,
+                }
+              : undefined),
+          },
+          3: {
+            ...record.onbase[3],
+            ...(record.onbase[3].name
+              ? {
+                  photo: (
+                    this.teamInfo.players.find(
+                      player => player.name === record.onbase[3].name,
+                    ) || {}
+                  ).photo,
+                }
+              : undefined),
+          },
+        },
+      };
     },
     closeLocation(e) {
       if (e.currentTarget === e.target) {

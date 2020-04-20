@@ -3,7 +3,10 @@
     <router-view class="content"></router-view>
     <header>
       <div class="header-container">
-        <img class="icon" :src="currentTeamIcon || defaultIcon" />
+        <img
+          class="icon"
+          :src="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
+        />
         <ul class="tab">
           <li v-if="currentTeam">
             <router-link

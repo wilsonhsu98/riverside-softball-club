@@ -2,7 +2,10 @@
   <div>
     <div class="search-bar" ref="searchBar">
       <div class="search-bar__container">
-        <img class="icon" :src="currentTeamIcon || defaultIcon" />
+        <img
+          class="icon"
+          :src="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
+        />
         <i class="fa fa-search"></i>
       </div>
       <input
@@ -51,22 +54,21 @@
     </div>
     <div class="web">
       <div class="item-container">
-        <div
-          class="item-container__table"
+        <board
           v-for="key in ['AVG', 'H', 'HR', 'RBI', 'W']"
           :key="`block_${key}`"
-        >
-          <board :cat="key" :itemStats="itemStats" :periodGames="periodGames" />
-        </div>
+          :cat="key"
+          :itemStats="itemStats"
+          :periodGames="periodGames"
+        />
       </div>
     </div>
     <div class="mobile">
-      <carousel-3d class="item-container" border="0" :width="200" :height="290">
+      <carousel-3d class="item-container" border="0" :width="200" :height="326">
         <slide
           v-for="(key, index) in ['AVG', 'H', 'HR', 'RBI', 'W']"
           :index="index"
           :key="`carousel_${key}`"
-          class="item-container__table"
         >
           <board :cat="key" :itemStats="itemStats" :periodGames="periodGames" />
         </slide>
@@ -309,8 +311,12 @@ i.fa {
   } */
   .mobile {
     display: block;
+    .carousel-3d-slide {
+      background-color: transparent;
+    }
     .item-container__table {
-      margin: 0;
+      margin: 10px;
+      height: calc(100% - 20px);
     }
   }
   .web {
@@ -403,7 +409,7 @@ export default {
   components: {
     board: {
       template: `
-        <fragment>
+        <div class="item-container__table">
           <div class="header">
             <span
               :class="{ clickable: cat !== 'W' }"
@@ -440,7 +446,7 @@ export default {
               })
             }}
           </div>
-        </fragment>
+        </div>
       `,
       props: ['cat', 'itemStats', 'periodGames'],
     },

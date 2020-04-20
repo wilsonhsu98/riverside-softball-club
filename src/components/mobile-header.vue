@@ -2,7 +2,7 @@
   <header>
     <i v-if="back" class="fa fa-arrow-left" @click="back_"></i>
     <span v-else></span>
-    <img class="icon" :src="icon || defaultIcon" />
+    <img class="icon" :src="$cacheImg(icon) || $cacheImg(defaultIcon)" />
     <div
       v-if="save"
       :class="`save-btn${disabled === true ? ' disabled' : ''}`"

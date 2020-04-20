@@ -75,7 +75,10 @@
           :key="`team_${team.teamCode}`"
         >
           <i v-if="team.teamCode === currentTeam" class="fa fa-check" />
-          <img :src="team.icon || defaultIcon" style="height: 50px;" />
+          <img
+            :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)"
+            style="height: 50px;"
+          />
           <p class="team__name">{{ team.name }}</p>
           <p
             class="team__name"

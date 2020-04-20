@@ -40,7 +40,10 @@
             @click="searchTeam_(team.teamCode)"
             :key="`team_${team.teamCode}`"
           >
-            <img :src="team.icon || defaultIcon" style="height: 50px;" />
+            <img
+              :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)"
+              style="height: 50px;"
+            />
             <p class="team__name">{{ team.name }}</p>
             <p
               class="team__name"
@@ -54,7 +57,10 @@
         <template v-if="teamCode">
           <div
             class="team-info"
-            :style="{ backgroundImage: `url(${icon || defaultIcon})` }"
+            :style="{
+              backgroundImage: `url(${$cacheImg(icon) ||
+                $cacheImg(defaultIcon)})`,
+            }"
           >
             <label class="section-header">{{ $t('ttl_team_intro') }}</label>
             <p>{{ teamName }}</p>

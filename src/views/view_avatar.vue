@@ -14,7 +14,7 @@
             @click="setCurrent(provider)"
           >
             <i v-if="provider === current" class="fa fa-check" />
-            <img :src="accountInfo[`${provider}_photo`]" />
+            <img :src="$cacheImg(accountInfo[`${provider}_photo`])" />
           </span>
           <span
             :key="`avatar_${provider}`"
@@ -25,7 +25,7 @@
             @click="setCurrent(provider)"
           >
             <i v-if="provider === current" class="fa fa-check" />
-            <img :src="img || accountInfo.custom_photo" />
+            <img :src="$cacheImg(img) || $cacheImg(accountInfo.custom_photo)" />
           </span>
         </template>
       </div>

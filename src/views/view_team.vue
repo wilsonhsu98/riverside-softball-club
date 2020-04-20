@@ -60,10 +60,10 @@
       <div
         v-if="!iconEdit"
         class="icon-container"
-        :style="{ background: `url(${transparentPng})` }"
+        :style="{ background: `url(${$cacheImg(transparentPng)})` }"
       >
         <i class="fa fa-picture-o" @click="iconEdit = true"></i>
-        <img :src="icon" />
+        <img :src="$cacheImg(icon)" />
       </div>
       <div v-else class="icon-editor-container">
         <i class="fa fa-times" @click="iconEdit = false"></i>

@@ -2,7 +2,10 @@
   <div>
     <div class="search-bar" ref="searchBar">
       <div class="search-bar__container">
-        <img class="icon" :src="currentTeamIcon || defaultIcon" />
+        <img
+          class="icon"
+          :src="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
+        />
         <i class="fa fa-search"></i>
       </div>
       <input

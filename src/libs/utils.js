@@ -196,11 +196,14 @@ const cacheImg = url => {
   if (cache[url]) {
     return cache[url];
   } else {
-    if (!/\.(gif|jpg|jpeg|tiff|png)$/i.test(url)) {
-      toDataURL(url, dataUrl => {
-        cache[url] = dataUrl;
-      });
-    }
+    // if (!/\.(gif|jpg|jpeg|tiff|png)$/i.test(url)) {
+    //   toDataURL(url, dataUrl => {
+    //     cache[url] = dataUrl;
+    //   });
+    // }
+    toDataURL(url, dataUrl => {
+      cache[url] = dataUrl;
+    });
     return url;
   }
 };

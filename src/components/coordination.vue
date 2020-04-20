@@ -50,15 +50,56 @@ export default {
         (Array.isArray(this.values) && this.values.length > 1) || this.no_track,
       imgSrc: '',
       ballImage: '',
+      homeImage: '',
+      firstImage: '',
+      secondImage: '',
+      thirdImage: '',
     };
   },
   mounted() {
-    const img = new Image();
-    img.onload = () => {
-      this.ballImage = img;
+    Promise.all(
+      [
+        { var: 'ballImage', src: ballIcon },
+        ...(typeof this.xy[0] === 'object' && this.xy[0].onbase
+          ? [
+              {
+                var: 'homeImage',
+                src: this.xy[0].onbase[0].photo,
+              },
+              {
+                var: 'firstImage',
+                src: this.xy[0].onbase[1].photo,
+              },
+              {
+                var: 'secondImage',
+                src: this.xy[0].onbase[2].photo,
+              },
+              {
+                var: 'thirdImage',
+                src: this.xy[0].onbase[3].photo,
+              },
+            ]
+          : []),
+      ].map(item => {
+        return new Promise(resolve => {
+          const img = new Image();
+          img.onload = () => {
+            this[item.var] = img;
+            resolve();
+          };
+          img.onerror = () => {
+            resolve();
+          };
+          if (item.src) {
+            img.src = this.$cacheImg(item.src);
+          } else {
+            resolve();
+          }
+        });
+      }),
+    ).then(() => {
       this.draw();
-    };
-    img.src = ballIcon;
+    });
 
     if (!this.fixedSize) {
       window.addEventListener('resize', this.draw);
@@ -73,6 +114,7 @@ export default {
     draw() {
       const canvas = this.$refs.canvas;
       const img = this.$refs.img;
+      if (!canvas) return;
       const { width } = canvas.getBoundingClientRect();
 
       if (this.fixedSize) {
@@ -119,6 +161,9 @@ export default {
       };
       const aBase = base * 0.02;
       const rotateBase = base * 0.034;
+      const avatarRadius = base * 0.07;
+      const avatarBackgroundColor = 'rgba(237, 247, 248, 1)'; // $row_odd_bgcolor
+      const avatarBorderColor = 'rgba(50, 122, 129, 1)'; // $row_color
 
       // background
       ctx.beginPath();
@@ -319,6 +364,37 @@ export default {
       ctx.fillStyle = white;
       ctx.fill();
 
+      if (
+        typeof this.xy[0] === 'object' &&
+        this.xy[0].onbase &&
+        this.xy[0].onbase[0].name
+      ) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(c.x - avatarRadius, c.y + aBase - avatarRadius);
+        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
+        if (this.homeImage) {
+          ctx.clip();
+          ctx.drawImage(
+            this.homeImage,
+            0,
+            0,
+            avatarRadius * 2,
+            avatarRadius * 2,
+          );
+        } else {
+          ctx.fillStyle = avatarBackgroundColor;
+          ctx.fill();
+          ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          ctx.fillStyle = avatarBorderColor;
+          ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          ctx.lineWidth = avatarRadius * 0.1;
+          ctx.strokeStyle = avatarBorderColor;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
       // p
       ctx.beginPath();
       ctx.fillStyle = white;
@@ -337,6 +413,37 @@ export default {
       ctx.fillRect(0, 0, rotateBase, rotateBase);
       ctx.restore();
 
+      if (
+        typeof this.xy[0] === 'object' &&
+        this.xy[0].onbase &&
+        this.xy[0].onbase[1].name
+      ) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(p.x + clip - avatarRadius, p.y - aBase - avatarRadius);
+        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
+        if (this.firstImage) {
+          ctx.clip();
+          ctx.drawImage(
+            this.firstImage,
+            0,
+            0,
+            avatarRadius * 2,
+            avatarRadius * 2,
+          );
+        } else {
+          ctx.fillStyle = avatarBackgroundColor;
+          ctx.fill();
+          ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          ctx.fillStyle = avatarBorderColor;
+          ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          ctx.lineWidth = avatarRadius * 0.1;
+          ctx.strokeStyle = avatarBorderColor;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
       // 2B
       ctx.save();
       ctx.translate(p.x, p.y - clip - aBase);
@@ -345,6 +452,37 @@ export default {
       ctx.fillRect(0, 0, rotateBase, rotateBase);
       ctx.restore();
 
+      if (
+        typeof this.xy[0] === 'object' &&
+        this.xy[0].onbase &&
+        this.xy[0].onbase[2].name
+      ) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(p.x - avatarRadius, p.y - clip - aBase - avatarRadius);
+        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
+        if (this.secondImage) {
+          ctx.clip();
+          ctx.drawImage(
+            this.secondImage,
+            0,
+            0,
+            avatarRadius * 2,
+            avatarRadius * 2,
+          );
+        } else {
+          ctx.fillStyle = avatarBackgroundColor;
+          ctx.fill();
+          ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          ctx.fillStyle = avatarBorderColor;
+          ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          ctx.lineWidth = avatarRadius * 0.1;
+          ctx.strokeStyle = avatarBorderColor;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
       // 3B
       ctx.save();
       ctx.translate(p.x - clip, p.y - aBase);
@@ -352,6 +490,37 @@ export default {
       ctx.fillStyle = white;
       ctx.fillRect(0, 0, rotateBase, rotateBase);
       ctx.restore();
+
+      if (
+        typeof this.xy[0] === 'object' &&
+        this.xy[0].onbase &&
+        this.xy[0].onbase[3].name
+      ) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(p.x - clip - avatarRadius, p.y - aBase - avatarRadius);
+        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
+        if (this.thirdImage) {
+          ctx.clip();
+          ctx.drawImage(
+            this.thirdImage,
+            0,
+            0,
+            avatarRadius * 2,
+            avatarRadius * 2,
+          );
+        } else {
+          ctx.fillStyle = avatarBackgroundColor;
+          ctx.fill();
+          ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          ctx.fillStyle = avatarBorderColor;
+          ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          ctx.lineWidth = avatarRadius * 0.1;
+          ctx.strokeStyle = avatarBorderColor;
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
 
       if (this.xy.length === 1 && this.xy[0].click) {
         const drawingDot = this.xy[0];

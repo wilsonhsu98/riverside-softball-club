@@ -3,7 +3,7 @@
     <div
       v-if="img"
       class="logo"
-      :style="`background-image: url(${defaultIcon})`"
+      :style="`background-image: url(${$cacheImg(defaultIcon)})`"
     ></div>
     <div v-else class="sk-cube-grid">
       <div class="sk-cube sk-cube1"></div>
