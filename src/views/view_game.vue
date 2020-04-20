@@ -454,7 +454,7 @@
                     <div
                       v-if="record.location"
                       class="location-trigger"
-                      @click="coordinate = record.location"
+                      @click="setLocation(record)"
                     >
                       <i class="fa fa-map-marker"></i>
                     </div>

@@ -562,8 +562,9 @@ export default {
             0,
             2 * Math.PI,
           );
-          ctx.lineWidth = base * 0.001;
-          ctx.strokeStyle = 'black';
+          ctx.lineWidth =
+            item.borderColor === 'white' ? base * 0.005 : base * 0.001;
+          ctx.strokeStyle = item.borderColor || 'black';
           ctx.stroke();
         });
       }

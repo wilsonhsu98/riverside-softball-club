@@ -173,7 +173,8 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         .map(item => ({
           x: item.location.x,
           y: item.location.y,
-          color: item.content === 'HR' ? 'white' : contentColor(item.content),
+          color: contentColor(item.content),
+          borderColor: item.content === 'HR' ? 'white' : 'black',
         })),
     };
     if (pa === 0) {
