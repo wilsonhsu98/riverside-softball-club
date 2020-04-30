@@ -221,9 +221,20 @@ function scrollTo(element) {
   }
 }
 
+const getShuffledArr = arr => {
+  if (arr.length === 1) {
+    return arr;
+  }
+  const rand = Math.floor(Math.random() * arr.length);
+  return [
+    arr[rand],
+    ...getShuffledArr(arr.filter((undefined, i) => i !== rand)),
+  ];
+};
+
 export default {
   parseGame,
   genGameList,
 };
 
-export { cacheImg, scrollTo, formatContent, formatColor };
+export { cacheImg, scrollTo, formatContent, formatColor, getShuffledArr };

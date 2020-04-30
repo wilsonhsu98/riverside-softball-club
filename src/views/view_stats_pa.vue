@@ -313,12 +313,9 @@ i.fa {
     color: $header_color;
     .cell {
       background: $header_bgcolor;
-      &:first-of-type {
-        border-top-left-radius: 10px;
-      }
-      &:last-of-type {
-        border-top-right-radius: 10px;
-      }
+      position: sticky;
+      top: 70px;
+      z-index: 3;
       &:not(.Rank):not(.name) {
         cursor: pointer;
       }

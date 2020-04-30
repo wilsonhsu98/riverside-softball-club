@@ -166,7 +166,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       OBP: '-',
       SLG: '-',
       OPS: '-',
-      LEVLE: '-/-/-',
+      LEVEL: '-/-/-',
       listByGame: games,
       locations: top
         .filter(item => item.location && item.location.x)

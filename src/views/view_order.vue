@@ -93,7 +93,8 @@
               <i class="toggle-btn divider" @click="divider += 1"
                 ><divider
               /></i>
-              <i class="toggle-btn robot disabled"><robot /></i>
+              <i class="toggle-btn robot disabled" @click="fillAI"><robot /></i>
+              <i class="toggle-btn fa fa-random" @click="fillRandom"></i>
               <i class="toggle-btn fa fa-reply-all ltr" @click="fillAll"></i>
               <i class="toggle-btn fa fa-reply-all" @click="clearAll"></i>
               <i
@@ -343,7 +344,7 @@
 }
 .sticky {
   position: sticky;
-  top: calc(50vh - (33px * 8 - 5px) / 2 - 35px);
+  top: calc(50vh - (33px * 9 - 5px) / 2 - 35px);
   z-index: 1;
   .fake-flex {
     position: absolute;
@@ -427,6 +428,7 @@
       color: $active_bgcolor;
     }
   }
+  &.fa-random,
   &.fa-reply-all {
     font-size: 18px;
     line-height: 24px;
@@ -787,13 +789,35 @@ i.fa {
   }
 }
 
-@media only screen and (max-width: 760px) {
+/* @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) { */
+@media only screen and (max-height: 414px) and (min-aspect-ratio: 13/9) {
+  .sticky {
+    top: calc(50vh - (33px * 5 - 5px) / 2 - 35px);
+  }
+  .flex-container {
+    .separater {
+      width: 71px;
+    }
+  }
+  .toggle-btn {
+    margin-left: 5px;
+    transform: translateX(0);
+    left: 0;
+    vertical-align: top;
+    &.fa-info-circle {
+      display: block;
+      margin: 0 auto 5px;
+    }
+    &.fa-reply-all.ltr {
+      transform: scaleX(-1);
+    }
+  }
 }
 </style>
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { scrollTo } from '../libs/utils';
+import { scrollTo, getShuffledArr } from '../libs/utils';
 
 export default {
   data() {
@@ -1104,15 +1128,48 @@ export default {
         ? value.toFixed(3)
         : value;
     },
+    fillAI() {
+      // const rules = [
+      //   { order: 3, rule: ['OPS'] },
+      //   { order: 4, rule: ['SLG'] },
+      //   { order: 5, rule: ['RBI', 'SLG'] },
+      //   { order: 1, rule: ['OBP'] },
+      //   { order: 2, rule: ['AVG'] },
+      //   { order: 8, rule: ['OPS'] },
+      //   { order: 7, rule: ['SLG'] },
+      //   { order: 6, rule: ['RBI', 'SLG'] },
+      //   { order: 10, rule: ['OBP'] },
+      //   { order: 9, rule: ['AVG'] },
+      // ];
+    },
+    fillRandom() {
+      console.log(this.sourceList);
+      const shuffleSource = getShuffledArr(this.sourceList);
+      this.ORDER.filter(
+        order =>
+          this[`order_${order}`].length === 0 && ![11, 12].includes(order),
+      ).forEach((order, index, self) => {
+        this[`order_${order}`][0] = shuffleSource[index];
+        if (index === self.length - 1) {
+          const shuffleNames = shuffleSource
+            .map(player => player.name)
+            .slice(index + 1);
+          this.sourceList = this.sourceList.filter(player =>
+            shuffleNames.includes(player.name),
+          );
+        }
+      });
+    },
     fillAll() {
-      this.ORDER.filter(order => this[`order_${order}`].length === 0).forEach(
-        (order, index, self) => {
-          this[`order_${order}`][0] = this.sourceList[index];
-          if (index === self.length - 1) {
-            this.sourceList = this.sourceList.slice(index + 1);
-          }
-        },
-      );
+      this.ORDER.filter(
+        order =>
+          this[`order_${order}`].length === 0 && ![11, 12].includes(order),
+      ).forEach((order, index, self) => {
+        this[`order_${order}`][0] = this.sourceList[index];
+        if (index === self.length - 1) {
+          this.sourceList = this.sourceList.slice(index + 1);
+        }
+      });
     },
     clearAll() {
       this.ORDER.forEach((order, index, self) => {

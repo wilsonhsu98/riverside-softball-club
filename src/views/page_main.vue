@@ -32,7 +32,7 @@
               active-class="active"
               :data-label="$t('menu_stats_item')"
             >
-              <i class="fa fa-th-large"></i>
+              <i class="fa carousel"><carousel /></i>
             </router-link>
           </li>
           <li v-if="currentTeam && role === 'manager'">
@@ -267,6 +267,10 @@ header {
           -moz-transition: background-color 0.5s;
           -webkit-transition: background-color 0.5s;
           transition: background-color 0.5s;
+          &.carousel > svg {
+            margin-top: -2px;
+            width: 34px;
+          }
         }
         &:after {
           content: attr(data-label);
@@ -287,6 +291,10 @@ header {
           margin-bottom: 3px;
           color: $current_user_color;
           opacity: 0.9;
+          &.carousel > svg {
+            margin-top: 0;
+            height: 40px;
+          }
         }
       }
     }
@@ -391,6 +399,11 @@ export default {
           }, 0);
       },
       immediate: true,
+    },
+  },
+  components: {
+    carousel: {
+      template: `<svg viewBox="0 0 100 100"><path fill="currentColor" d="M60.163,26.516v42.231H39.792V26.516H60.163 M65.832,20.846H34.123v53.57h31.709V20.846L65.832,20.846z"/><rect fill="currentColor" x="18.08" y="27.188" width="12.684" height="40.886"/><rect fill="currentColor" x="69.189" y="27.188" width="12.686" height="40.886"/><rect fill="currentColor" x="85.232" y="31.549" width="8.513" height="32.164"/><rect fill="currentColor" x="6.208" y="31.549" width="8.513" height="32.164"/></svg>`,
     },
   },
 };
