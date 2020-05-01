@@ -176,6 +176,7 @@
                   >
                 </span>
                 <v-popover
+                  v-if="(player.listByGame || []).length"
                   placement="bottom"
                   trigger="click"
                   popoverClass="info"
@@ -190,7 +191,7 @@
 
                   <!-- This will be the content of the popover -->
                   <template slot="popover">
-                    <div v-if="(player.listByGame || []).length" class="chart">
+                    <div class="chart">
                       <div class="chart-inner">
                         <div
                           class="bar"
@@ -1134,6 +1135,7 @@ export default {
         : value;
     },
     fillAI() {
+      this.deleteMode = false;
       const rules = [
         { order: 3, rule: ['OPS'] },
         { order: 4, rule: ['SLG'] },
@@ -1153,47 +1155,43 @@ export default {
         }
         return b[sortBy] - a[sortBy];
       };
-      this.sourceList = rules.reduce((acc, { order, rule }) => {
-        if (this[`order_${order}`].length === 0) {
-          const candidates = [...acc].sort((a, b) =>
-            sort(a, b, [...rule, 'PA'], 0),
-          );
-          // console.log(candidates.map(player => player[sortBy]).join(' '));
-          this[`order_${order}`][0] = candidates[0];
-          return acc.filter(player => player.name !== candidates[0].name);
+      this.sourceList = rules
+        .filter(({ order }) => order <= this.sourceList.length)
+        .reduce((acc, { order, rule }) => {
+          if (this[`order_${order}`].length === 0) {
+            const candidates = [...acc].sort((a, b) =>
+              sort(a, b, [...rule, 'PA'], 0),
+            );
+            if (candidates[0]) {
+              this[`order_${order}`][0] = candidates[0];
+              return acc.filter(player => player.name !== candidates[0].name);
+            }
+          }
+          return acc;
+        }, this.sourceList);
+    },
+    fillRandom() {
+      this.deleteMode = false;
+      this.fill10(getShuffledArr(this.sourceList));
+    },
+    fillAll() {
+      this.deleteMode = false;
+      this.fill10(this.sourceList);
+    },
+    fill10(source) {
+      this.sourceList = this.ORDER.filter(
+        order =>
+          this[`order_${order}`].length === 0 && ![11, 12].includes(order),
+      ).reduce((acc, order, index) => {
+        if (source[index]) {
+          this[`order_${order}`][0] = source[index];
+          return acc.filter(player => player.name !== source[index].name);
         }
         return acc;
       }, this.sourceList);
     },
-    fillRandom() {
-      const shuffleSource = getShuffledArr(this.sourceList);
-      this.ORDER.filter(
-        order =>
-          this[`order_${order}`].length === 0 && ![11, 12].includes(order),
-      ).forEach((order, index, self) => {
-        this[`order_${order}`][0] = shuffleSource[index];
-        if (index === self.length - 1) {
-          const shuffleNames = shuffleSource
-            .map(player => player.name)
-            .slice(index + 1);
-          this.sourceList = this.sourceList.filter(player =>
-            shuffleNames.includes(player.name),
-          );
-        }
-      });
-    },
-    fillAll() {
-      this.ORDER.filter(
-        order =>
-          this[`order_${order}`].length === 0 && ![11, 12].includes(order),
-      ).forEach((order, index, self) => {
-        this[`order_${order}`][0] = this.sourceList[index];
-        if (index === self.length - 1) {
-          this.sourceList = this.sourceList.slice(index + 1);
-        }
-      });
-    },
     clearAll() {
+      this.deleteMode = false;
       this.ORDER.forEach((order, index, self) => {
         this[`order_${order}`] = [];
         if (index === self.length - 1) {
