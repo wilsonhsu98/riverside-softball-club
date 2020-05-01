@@ -11,7 +11,7 @@
       <div class="condition">
         <div class="condition__group">
           <div class="condition__label">{{ $t('col_period') }}</div>
-          <div class="selectdiv" :class="sortBy_ === 'number' && 'disabled'">
+          <div class="selectdiv" :class="{ disabled: sortBy_ === 'number' }">
             <select
               class="dropdown"
               :value="periodSelect"
@@ -93,7 +93,12 @@
               <i class="toggle-btn divider" @click="divider += 1"
                 ><divider
               /></i>
-              <i class="toggle-btn robot disabled" @click="fillAI"><robot /></i>
+              <i
+                class="toggle-btn robot"
+                :class="{ disabled: sortBy_ === 'number' }"
+                @click="sortBy_ !== 'number' && fillAI()"
+                ><robot
+              /></i>
               <i class="toggle-btn fa fa-random" @click="fillRandom"></i>
               <i class="toggle-btn fa fa-reply-all ltr" @click="fillAll"></i>
               <i class="toggle-btn fa fa-reply-all" @click="clearAll"></i>
@@ -1129,21 +1134,38 @@ export default {
         : value;
     },
     fillAI() {
-      // const rules = [
-      //   { order: 3, rule: ['OPS'] },
-      //   { order: 4, rule: ['SLG'] },
-      //   { order: 5, rule: ['RBI', 'SLG'] },
-      //   { order: 1, rule: ['OBP'] },
-      //   { order: 2, rule: ['AVG'] },
-      //   { order: 8, rule: ['OPS'] },
-      //   { order: 7, rule: ['SLG'] },
-      //   { order: 6, rule: ['RBI', 'SLG'] },
-      //   { order: 10, rule: ['OBP'] },
-      //   { order: 9, rule: ['AVG'] },
-      // ];
+      const rules = [
+        { order: 3, rule: ['OPS'] },
+        { order: 4, rule: ['SLG'] },
+        { order: 5, rule: ['RBI', 'SLG'] },
+        { order: 1, rule: ['OBP'] },
+        { order: 2, rule: ['AVG'] },
+        { order: 8, rule: ['OPS'] },
+        { order: 7, rule: ['SLG'] },
+        { order: 6, rule: ['RBI', 'SLG'] },
+        { order: 10, rule: ['OBP'] },
+        { order: 9, rule: ['AVG'] },
+      ];
+      const sort = (a, b, rule, i) => {
+        const sortBy = rule[i] || 'number';
+        if (a[sortBy] === b[sortBy]) {
+          return sort(a, b, rule, i + 1);
+        }
+        return b[sortBy] - a[sortBy];
+      };
+      this.sourceList = rules.reduce((acc, { order, rule }) => {
+        if (this[`order_${order}`].length === 0) {
+          const candidates = [...acc].sort((a, b) =>
+            sort(a, b, [...rule, 'PA'], 0),
+          );
+          // console.log(candidates.map(player => player[sortBy]).join(' '));
+          this[`order_${order}`][0] = candidates[0];
+          return acc.filter(player => player.name !== candidates[0].name);
+        }
+        return acc;
+      }, this.sourceList);
     },
     fillRandom() {
-      console.log(this.sourceList);
       const shuffleSource = getShuffledArr(this.sourceList);
       this.ORDER.filter(
         order =>
