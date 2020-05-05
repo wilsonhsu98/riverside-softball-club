@@ -19,6 +19,7 @@
 	"col_update": "Last update:",
 	"col_update_short": "Update:",
 	"period_all": "All time",
+	"period_empty": "Not set",
 	"All": "All",
 	"Rank": "Rank",
 	"name": "Name",

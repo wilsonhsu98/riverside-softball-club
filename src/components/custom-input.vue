@@ -97,6 +97,7 @@
             :value="value"
             :disabled="disabled"
             @blur="blur"
+            @keyup.enter="enter"
             @keyup="keyup($event.target.value)"
             @input="input($event.target.value)"
           />
@@ -119,6 +120,8 @@
   }
   &-children {
     display: flex;
+    border: 2px solid $input_border;
+    border-radius: 4px;
   }
   &.focused {
     .field-wrapper-children {
@@ -165,10 +168,6 @@
     .field-wrapper:hover:not(.disabled) .field-wrapper-children {
       border-color: #3b5998;
     }
-  }
-  &-children {
-    border: 2px solid $input_border;
-    border-radius: 4px;
   }
   input,
   textarea {
@@ -439,6 +438,9 @@ export default {
     },
     input(val) {
       this.$emit('input', val);
+    },
+    enter() {
+      this.$emit('enter', this.value);
     },
   },
   watch: {

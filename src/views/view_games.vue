@@ -30,7 +30,9 @@
                   >{{
                     `${
                       item.period === 'period_all'
-                        ? $t(item.period)
+                        ? $t('period_all')
+                        : item.period === ''
+                        ? $t('period_empty')
                         : item.period
                     }`
                   }}</option
@@ -529,7 +531,11 @@ i.fa {
   }
   .container {
     padding: 10px 0 0;
+    margin: 0;
     background-color: transparent;
+    box-shadow: none;
+    min-height: calc(100vh - 100px);
+    min-height: calc(var(--vh, 1vh) * 100 - 100px);
     .row .cell .result,
     .row:after {
       color: #fff;

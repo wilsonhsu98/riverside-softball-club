@@ -344,7 +344,9 @@ const mutations = {
     const period = [
       { period: 'period_all' },
       ...data.map(item => ({ period: item.period })),
-      ...data.map(item => ({ period: `${parseInt(item.period)}` })),
+      ...data
+        .filter(item => !isNaN(parseInt(item.period)))
+        .map(item => ({ period: `${parseInt(item.period)}` })),
     ]
       .filter((value, index, self) => {
         return self.map(item => item.period).indexOf(value.period) === index;
@@ -365,7 +367,7 @@ const mutations = {
                 );
               }),
           };
-        } else if (!isNaN(item.period)) {
+        } else if (item.period && !isNaN(item.period)) {
           return {
             ...item,
             games: data

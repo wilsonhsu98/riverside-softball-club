@@ -10,7 +10,7 @@
       <h1>
         {{ $route.params.order === 'new' ? $t('add_pa') : $t('edit_pa') }}
       </h1>
-      <div v-if="version === 'import'" class="single">
+      <div v-if="version === 'import'" class="single-col">
         <div class="separater">
           <label>{{ $t('ttl_current_pa') }}</label>
         </div>
@@ -154,7 +154,7 @@
       </div>
       <template v-else>
         <template v-if="pa">
-          <div class="left">
+          <div class="single-col">
             <div class="separater">
               <label>{{ $t('ttl_current_pa') }}</label>
             </div>
@@ -319,21 +319,23 @@
               </div>
             </div>
           </div>
-          <div class="right">
+          <div class="single-col">
             <div class="separater">
               <label>{{ $t('ttl_location') }}</label>
             </div>
-            <div class="coordination">
-              <coordination
-                :values="location"
-                :disabled="['BB', 'K', ''].includes(content)"
-                @change="val => (location = [].concat(val))"
-              />
+            <div class="coordination-step">
+              <div class="coordination">
+                <coordination
+                  :values="location"
+                  :disabled="['BB', 'K', ''].includes(content)"
+                  @change="val => (location = [].concat(val))"
+                />
+              </div>
             </div>
           </div>
         </template>
         <template v-else>
-          <div class="single">
+          <div class="single-col">
             <div class="separater">
               <label>{{ $t('ttl_current_pa') }}</label>
             </div>
@@ -1239,12 +1241,7 @@
     margin: 0;
     text-align: center;
   }
-  .left,
-  .right {
-    margin: 0 auto;
-    width: 400px;
-  }
-  .single {
+  .single-col {
     max-width: 400px;
     width: 100%;
     margin: 0 auto;
@@ -1326,7 +1323,7 @@
       left: 50%;
       transform: translateX(-50%);
     }
-    .single .coordination {
+    .single-col .coordination {
       margin: 0;
       position: absolute;
       left: 50%;

@@ -22,6 +22,7 @@
         class="field-wrapper"
         :name="$t('ttl_search_team')"
         v-model="keyWord"
+        @enter="value => searchTeams({ keyword: value, type: 'join' })"
       >
         <i
           class="fa fa-search"

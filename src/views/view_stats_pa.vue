@@ -30,7 +30,9 @@
                   >{{
                     `${
                       item.period === 'period_all'
-                        ? $t(item.period)
+                        ? $t('period_all')
+                        : item.period === ''
+                        ? $t('period_empty')
                         : item.period
                     }`
                   }}</option
@@ -419,6 +421,7 @@ i.fa {
         align-items: flex-end;
         direction: rtl;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
         width: 100%;
         &.has-coordination {
           width: calc(100% - 133px);

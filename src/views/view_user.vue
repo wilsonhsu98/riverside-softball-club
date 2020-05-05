@@ -47,6 +47,7 @@
             class="field-wrapper"
             :name="$t('ttl_search_team')"
             v-model="keyWord"
+            @enter="value => searchTeams({ keyword: value, type: 'anonymous' })"
           >
             <i
               class="fa fa-search"
@@ -155,27 +156,27 @@
   .team-wrapper {
     flex: 1 0 268px;
     height: 100%;
-    border: 1px solid $input_border;
+    border: 2px solid $input_border;
     border-radius: 4px;
     margin-top: 12px;
     padding: 10px 5px 5px;
     position: relative;
     box-sizing: border-box;
     label {
-      position: absolute;
+      background-color: #fff;
       color: $input_font;
+      font-size: $input_font_size - 2;
+      line-height: $input_font_size;
       max-width: 90%;
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
-      transition: all 0.1s;
-      left: 8px;
-      top: -7px;
-      z-index: 1;
-      background-color: #fff;
-      font-size: 12px;
       padding: 0 4px;
-      line-height: 14px;
+      position: absolute;
+      top: -$input_font_size/2;
+      right: auto;
+      left: 8px;
+      z-index: 1;
     }
   }
   .btn-container {
@@ -237,10 +238,14 @@
   .container {
     .info-wrapper {
       flex: none;
-      width: calc(100% - 20px);
+      width: 100%;
       text-align: center;
       .btn-container {
         justify-content: center;
+        margin: 8px 0;
+        > button {
+          margin: 0 3px;
+        }
       }
     }
     .logout-btn {

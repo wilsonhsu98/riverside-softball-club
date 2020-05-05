@@ -30,7 +30,9 @@
                   >{{
                     `${
                       item.period === 'period_all'
-                        ? $t(item.period)
+                        ? $t('period_all')
+                        : item.period === ''
+                        ? $t('period_empty')
                         : item.period
                     }`
                   }}</option
@@ -60,6 +62,7 @@
           :cat="key"
           :itemStats="itemStats"
           :periodGames="periodGames"
+          :goStats="goStats"
         />
       </div>
     </div>
@@ -70,7 +73,12 @@
           :index="index"
           :key="`carousel_${key}`"
         >
-          <board :cat="key" :itemStats="itemStats" :periodGames="periodGames" />
+          <board
+            :cat="key"
+            :itemStats="itemStats"
+            :periodGames="periodGames"
+            :goStats="goStats"
+          />
         </slide>
       </carousel-3d>
     </div>
@@ -408,6 +416,7 @@ export default {
   },
   components: {
     board: {
+      props: ['cat', 'itemStats', 'periodGames', 'goStats'],
       template: `
         <div class="item-container__table">
           <div class="header">
@@ -448,7 +457,6 @@ export default {
           </div>
         </div>
       `,
-      props: ['cat', 'itemStats', 'periodGames'],
     },
   },
 };
