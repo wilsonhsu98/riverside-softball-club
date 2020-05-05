@@ -1,7 +1,7 @@
 @import "variable";
 
 html {
-	background-color: #CCC;
+	background-color: #ccc;
 }
 body {
 	font-family: 'Inconsolata', '微軟正黑體';
@@ -34,6 +34,7 @@ input[type=radio]:not(.non-input) {
 }
 
 button {
+	font-family: 'Inconsolata', '微軟正黑體';
 	margin: 0 5px;
 	color: #FFF;
 	border: none;
@@ -108,7 +109,7 @@ select::-ms-expand {
 	-moz-appearance: none;
 	appearance: none;
 	/* Add some styling */
-
+	font-family: 'Inconsolata', '微軟正黑體';
 	display: block;
 	width: 100%;
 	max-width: 320px;
@@ -215,12 +216,12 @@ select::-ms-expand {
 
 @media only screen and (max-width: 760px) {
 	.container {
-		margin: 0;
+		margin: 10px;
+		padding: 20px 10px 10px;
 		background-color: #fff;
-		border-radius: 0;
-		box-shadow: none;
-		min-height: calc(100vh - 100px);
-		min-height: calc(var(--vh, 1vh) * 100 - 100px);
+		// min-height: calc(100vh - 100px);
+		// min-height: calc(var(--vh, 1vh) * 100 - 100px);
+
 		// overflow-x: hidden;
 		.btn-container {
 			padding: 0;
