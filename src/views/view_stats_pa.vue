@@ -193,7 +193,7 @@
             {{ item.LEVEL }}
           </div>
           <div
-            v-if="item.listByGame.length"
+            v-if="item.listByGame.length && lazy"
             class="cell chart"
             :style="{ top: `${(itemIndex + 2) * 36}px` }"
             :id="`row_${item.name}`"
@@ -850,10 +850,14 @@ export default {
       toggleTarget: null,
       defaultIcon,
       coordinates: [],
+      lazy: false,
     };
   },
   created() {},
   mounted() {
+    setTimeout(() => {
+      this.lazy = true;
+    }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
   },
   beforeDestroy() {
