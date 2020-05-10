@@ -108,7 +108,14 @@
                 @click="deleteMode = !deleteMode"
                 ><trash
               /></i>
-              <i class="toggle-btn trash-undo" @click="releaseHiddenPlayer()"
+              <i
+                class="toggle-btn trash-undo"
+                @click="releaseHiddenPlayer()"
+                :data-deletes="
+                  (hiddenList || []).length === 0
+                    ? undefined
+                    : hiddenList.length
+                "
                 ><trash-undo
               /></i>
             </div>
@@ -441,6 +448,21 @@
     &.ltr {
       transform: scaleX(-1) translateX(50%);
     }
+  }
+  &[data-deletes]:before {
+    content: attr(data-deletes);
+    position: absolute;
+    right: -5px;
+    bottom: -5px;
+    height: 16px;
+    width: 16px;
+    line-height: 16px;
+    font-size: 12px;
+    background-color: #ff2200;
+    border-radius: 50%;
+    text-align: center;
+    color: #fff;
+    font-style: normal;
   }
 }
 .flex-container {
@@ -1121,10 +1143,17 @@ export default {
     },
     addHiddenPlayer(player) {
       this.hiddenList = [...this.hiddenList, player];
+      window.localStorage.setItem(
+        'hidden_list',
+        JSON.stringify(
+          this.hiddenList.map(({ name, number }) => ({ name, number })),
+        ),
+      );
       this.doResetSource();
     },
     releaseHiddenPlayer() {
       this.hiddenList = [];
+      window.localStorage.setItem('hidden_list', JSON.stringify([]));
       this.doResetSource();
     },
     formatValue(value, col) {
@@ -1155,8 +1184,15 @@ export default {
         }
         return b[sortBy] - a[sortBy];
       };
+      const alreadySetOrders = Array(10)
+        .fill(undefined)
+        .map((undefined, i) => i + 1)
+        .filter(order => this[`order_${order}`].length === 1);
       this.sourceList = rules
-        .filter(({ order }) => order <= this.sourceList.length)
+        .filter(
+          ({ order }) =>
+            order <= this.sourceList.length + alreadySetOrders.length,
+        )
         .reduce((acc, { order, rule }) => {
           if (this[`order_${order}`].length === 0) {
             const candidates = [...acc].sort((a, b) =>
@@ -1221,14 +1257,17 @@ export default {
     },
     teamInfo: {
       handler() {
-        // 請假球員清空
-        // 先發球員清空
-        // 成績排序 + 沒成績球員
-        this.releaseHiddenPlayer();
-        this.ORDER.forEach(order => {
-          this[`order_${order}`] = [];
-        });
-        this.sourceList = this.resetSource();
+        if (this.sourceList.length === 0) {
+          // 請假球員清空
+          // 先發球員清空
+          // 成績排序 + 沒成績球員
+          this.hiddenList =
+            JSON.parse(window.localStorage.getItem('hidden_list')) || [];
+          this.ORDER.forEach(order => {
+            this[`order_${order}`] = [];
+          });
+          this.sourceList = this.resetSource();
+        }
       },
       immediate: true,
     },
