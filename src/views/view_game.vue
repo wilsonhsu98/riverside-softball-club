@@ -582,6 +582,7 @@
       > pre {
         font-family: auto;
         margin: 0;
+        white-space: pre-wrap;
       }
     }
   }
