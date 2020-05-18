@@ -120,15 +120,35 @@
             <div class="tag" v-for="other in tags" :key="other">
               {{ other }}
             </div>
-            <router-link
-              v-if="role === 'manager'"
-              :to="{
-                name: 'edit_game_info',
-                params: { team: $route.params.team, game: $route.params.game },
-              }"
-              class="fa fa-pencil"
-              tag="i"
-            />
+            <div v-if="role === 'manager'" class="action">
+              <router-link
+                v-if="gameStatus === 'unlock'"
+                :to="{
+                  name: 'edit_game_info',
+                  params: {
+                    team: $route.params.team,
+                    game: $route.params.game,
+                  },
+                }"
+                class="fa fa-pencil"
+                tag="i"
+              />
+              <i
+                class="fa"
+                :class="`fa-${gameStatus}`"
+                @click="toggleGameStatus_(gameStatus)"
+              ></i>
+              <i
+                class="fa fa-info-circle"
+                v-tooltip="{
+                  content: `<ul><li>${$t('tip_lock_game')
+                    .split('|')
+                    .join('</li><li>')}</li></ul>`,
+                  classes: ['info'],
+                  container: $refs.container,
+                }"
+              ></i>
+            </div>
           </div>
         </template>
         <template v-else>
@@ -478,7 +498,10 @@
           <span class="summary">{{ item.summary }}</span>
         </div>
       </div>
-      <div class="button-container" v-if="stillCanEdit && role === 'manager'">
+      <div
+        class="button-container"
+        v-if="stillCanEdit && role === 'manager' && gameStatus === 'unlock'"
+      >
         <span class="fa fa-pencil" @click="editOrder"></span>
       </div>
     </div>
@@ -561,9 +584,6 @@
       font-size: 30px;
     }
     .fa {
-      color: white;
-      background-color: $current_user_bgcolor;
-      border-radius: 4px;
       width: 26px;
       height: 26px;
       line-height: 26px;
@@ -572,6 +592,20 @@
       cursor: pointer;
       text-align: center;
       vertical-align: middle;
+      margin-left: 3px;
+      &.fa-pencil {
+        color: white;
+        background-color: $current_user_bgcolor;
+        border-radius: 4px;
+      }
+      &.fa-lock,
+      &.fa-unlock {
+        font-size: 28px;
+      }
+      &.fa-info-circle {
+        font-size: 28px;
+        color: $input_font;
+      }
     }
     &.game-note {
       min-height: auto;
@@ -883,8 +917,7 @@
       margin: 10px 10px 0 0;
       line-height: 20px;
     }
-    .fa.fa-pencil {
-      position: inherit;
+    .action {
       margin: auto 0 0 auto;
     }
   }
@@ -1054,11 +1087,6 @@
         position: initial;
         font-size: 14px;
       }
-      .fa {
-        position: absolute;
-        right: 10px;
-        bottom: 10px;
-      }
       &.game-note {
         text-align: left;
         margin: 0 10px;
@@ -1179,8 +1207,8 @@
       }
     }
     .tags {
-      .fa.fa-pencil {
-        margin: 10px 0 0 auto;
+      .action {
+        margin-top: 10px;
       }
     }
   }
@@ -1242,6 +1270,7 @@ export default {
       setGame: 'setGame',
       toggleLoading: 'toggleLoading',
       setBoxDisplay: 'setBoxDisplay',
+      toggleGameStatus: 'toggleGameStatus',
     }),
     screenshot() {
       this.toggleLoading(true);
@@ -1362,6 +1391,13 @@ export default {
           team: this.$route.params.team,
           game: this.$route.params.game,
         },
+      });
+    },
+    toggleGameStatus_(value) {
+      this.toggleGameStatus({
+        teamCode: this.$route.params.team,
+        gameId: this.$route.params.game,
+        value,
       });
     },
   },

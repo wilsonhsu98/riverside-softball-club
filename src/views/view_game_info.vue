@@ -11,24 +11,6 @@
 
       <div v-if="mode === 'edit'" class="field-wrapper edit">
         <label>{{ $t('ttl_after_game') }}</label>
-
-        <i
-          class="fa"
-          :class="`fa-${gameStatus}`"
-          @click="toggleGameStatus_(gameStatus)"
-        ></i>
-
-        <i
-          class="fa fa-info-circle"
-          v-tooltip="{
-            content: `<ul><li>${$t('tip_lock_game')
-              .split('|')
-              .join('</li><li>')}</li></ul>`,
-            classes: ['info'],
-            container: $refs.container,
-          }"
-        ></i>
-
         <div v-if="version !== 'import' && topBottom" class="team-versus">
           <div class="team-name">
             <div class="name">
@@ -608,25 +590,10 @@
   .fa {
     cursor: pointer;
     vertical-align: middle;
-    &.fa-lock,
-    &.fa-unlock,
     &.fa-minus-circle,
-    &.fa-plus-circle,
-    &.fa-info-circle {
+    &.fa-plus-circle {
       font-size: 28px;
     }
-  }
-  .fa-lock,
-  .fa-unlock {
-    position: relative;
-    top: -47px;
-    left: 10px;
-  }
-  .fa-info-circle {
-    position: absolute;
-    top: -47px;
-    left: 42px;
-    color: $input_font;
   }
 }
 
@@ -704,7 +671,6 @@ export default {
       setGame: 'setGame',
       editGame: 'editGame',
       deleteGame: 'deleteGame',
-      toggleGameStatus: 'toggleGameStatus',
       alert: 'alert',
       confirm: 'confirm',
     }),
@@ -895,13 +861,6 @@ export default {
       } else {
         this.result = 'tie';
       }
-    },
-    toggleGameStatus_(value) {
-      this.toggleGameStatus({
-        teamCode: this.$route.params.team,
-        gameId: this.prevId,
-        value,
-      });
     },
   },
   computed: {
