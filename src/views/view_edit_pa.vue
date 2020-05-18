@@ -1644,7 +1644,7 @@ export default {
         .reduce((acc, sub) => acc.concat(sub), [])
         .filter(item => item && item.result === 'out');
       this.out = out.length;
-      if (out.length === 3 && this.$route.params.order === 'new') {
+      if (out.length === 3 && !this.pa) {
         this.inn += 1;
         this.out = 0;
       }
