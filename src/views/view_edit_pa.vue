@@ -566,6 +566,7 @@
                         {
                           select: base[b].result === targetBase,
                           disabled: isSubBaseDisabled(b, targetBase),
+                          nobase: (b === 'second' && ['first'].includes(targetBase)) || (b === 'third' && ['first', 'second'].includes(targetBase)),
                         },
                       ]"
                       @click="
@@ -1161,6 +1162,9 @@
           &.disabled {
             opacity: 0.2;
             cursor: not-allowed;
+          }
+          &.nobase {
+            font-size: 0;
           }
         }
         &.first {
@@ -1951,7 +1955,7 @@ export default {
       }
     },
     estimate() {
-      console.log(this.content);
+      this.revertOnbase();
       if (['FO', 'GO', 'FOUL', 'K'].includes(this.content)) {
         // 全不動 打者出局
         this.base.home.result = 'out';
