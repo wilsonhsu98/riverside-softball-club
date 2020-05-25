@@ -209,7 +209,7 @@ const actions = {
       });
   },
   deleteLastPa({ commit }, data) {
-    const { teamCode, gameId } = data;
+    const { teamCode, gameId, order = 0 } = data;
     const refGameDoc = db.doc(`teams/${teamCode}/games/${gameId}`);
     commit(rootTypes.LOADING, true);
     refGameDoc
@@ -217,9 +217,14 @@ const actions = {
       .then(gameDoc => {
         const { orders } = gameDoc.data();
         const batch = db.batch();
+        const newOrders = order
+          ? orders.map(item => {
+              return item.order === order ? { name: item.name } : item;
+            })
+          : orders.slice(0, -1);
         batch.set(
           refGameDoc,
-          { orders: orders.slice(0, -1), timestamp },
+          { orders: newOrders, timestamp },
           { merge: true },
         );
         batch.set(

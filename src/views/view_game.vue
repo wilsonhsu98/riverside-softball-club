@@ -179,15 +179,35 @@
                 })
               }}
             </template>
-            <router-link
-              v-if="role === 'manager'"
-              :to="{
-                name: 'edit_game_info',
-                params: { team: $route.params.team, game: $route.params.game },
-              }"
-              class="fa fa-pencil"
-              tag="i"
-            />
+            <div v-if="role === 'manager'" class="action">
+              <router-link
+                v-if="gameStatus === 'unlock'"
+                :to="{
+                  name: 'edit_game_info',
+                  params: {
+                    team: $route.params.team,
+                    game: $route.params.game,
+                  },
+                }"
+                class="fa fa-pencil"
+                tag="i"
+              />
+              <i
+                class="fa"
+                :class="`fa-${gameStatus}`"
+                @click="toggleGameStatus_(gameStatus)"
+              ></i>
+              <i
+                class="fa fa-info-circle"
+                v-tooltip="{
+                  content: `<ul><li>${$t('tip_lock_game')
+                    .split('|')
+                    .join('</li><li>')}</li></ul>`,
+                  classes: ['info'],
+                  container: $refs.container,
+                }"
+              ></i>
+            </div>
           </div>
         </template>
       </div>
@@ -256,9 +276,16 @@
                         out: record.out,
                         badout:
                           record.out &&
-                          !['GO', 'FO', 'SF', 'K', 'SF', 'DP', 'TP'].includes(
-                            record.content,
-                          ),
+                          ![
+                            'GO',
+                            'FO',
+                            'SF',
+                            'K',
+                            'SF',
+                            'DP',
+                            'TP',
+                            'FOUL',
+                          ].includes(record.content),
                         new: record.content === 'new',
                       },
                     ]"
@@ -297,9 +324,16 @@
                         out: record.out,
                         badout:
                           record.out &&
-                          !['GO', 'FO', 'SF', 'K', 'SF', 'DP', 'TP'].includes(
-                            record.content,
-                          ),
+                          ![
+                            'GO',
+                            'FO',
+                            'SF',
+                            'K',
+                            'SF',
+                            'DP',
+                            'TP',
+                            'FOUL',
+                          ].includes(record.content),
                         [record.color]: record.content !== 'new',
                       },
                     ]"
@@ -415,9 +449,16 @@
                         out: record.out,
                         badout:
                           record.out &&
-                          !['GO', 'FO', 'SF', 'K', 'SF', 'DP', 'TP'].includes(
-                            record.content,
-                          ),
+                          ![
+                            'GO',
+                            'FO',
+                            'SF',
+                            'K',
+                            'SF',
+                            'DP',
+                            'TP',
+                            'FOUL',
+                          ].includes(record.content),
                         new: record.content === 'new',
                       },
                     ]"
@@ -456,9 +497,16 @@
                         out: record.out,
                         badout:
                           record.out &&
-                          !['GO', 'FO', 'SF', 'K', 'SF', 'DP', 'TP'].includes(
-                            record.content,
-                          ),
+                          ![
+                            'GO',
+                            'FO',
+                            'SF',
+                            'K',
+                            'SF',
+                            'DP',
+                            'TP',
+                            'FOUL',
+                          ].includes(record.content),
                         [record.color]: record.content !== 'new',
                       },
                     ]"
@@ -582,6 +630,8 @@
       top: 20px;
       right: 20px;
       font-size: 30px;
+      display: flex;
+      align-items: center;
     }
     .fa {
       width: 26px;
@@ -592,7 +642,7 @@
       cursor: pointer;
       text-align: center;
       vertical-align: middle;
-      margin-left: 3px;
+      margin-left: 5px;
       &.fa-pencil {
         color: white;
         background-color: $current_user_bgcolor;
@@ -1086,6 +1136,7 @@
       .result {
         position: initial;
         font-size: 14px;
+        display: block;
       }
       &.game-note {
         text-align: left;

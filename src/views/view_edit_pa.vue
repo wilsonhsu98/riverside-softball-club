@@ -5,10 +5,11 @@
       :icon="currentTeamIcon"
       :save="edit_"
       :disabled="content ? false : true"
+      :focus="false"
     />
     <div class="container" ref="container">
       <h1>
-        {{ $route.params.order === 'new' ? $t('add_pa') : $t('edit_pa') }}
+        {{ pa ? $t('edit_pa') : $t('add_pa') }}
       </h1>
       <div v-if="version === 'import'" class="single-col">
         <div class="separater">
@@ -45,7 +46,7 @@
           />
         </div>
         <div class="separater">
-          <label>{{ $t('desc_step_2') }}</label>
+          <label>{{ $t('desc_step_1') }}</label>
         </div>
         <div class="content">
           <div>
@@ -112,13 +113,12 @@
           <div>
             <span
               :key="`item_${item}`"
-              v-for="item in ['FC', 'DP', 'TP']"
+              v-for="item in ['FC', 'DP', 'TP', 'FOUL']"
               :class="['blue', { select: content === item }]"
               @click="toggle('content', item)"
             >
               {{ $t(item) }}
             </span>
-            <span style="cursor: auto;"></span>
             <span
               :class="[
                 'rbi',
@@ -189,6 +189,89 @@
               />
             </div>
             <div class="separater">
+              <label>{{ $t('ttl_content') }}</label>
+            </div>
+            <div class="content">
+              <div>
+                <span
+                  :key="`item_${item}`"
+                  v-for="item in ['1H', '2H', '3H', 'HR']"
+                  :class="['red', { select: content === item }]"
+                  @click="toggle('content', item)"
+                >
+                  {{ $t(item) }}
+                </span>
+                <span
+                  :class="[
+                    'rbi',
+                    { select: rbi.value === 1, disabled: rbi.one.disabled },
+                  ]"
+                  @click="rbi.one.disabled || toggle('rbi.value', 1)"
+                >
+                  {{ $t('RBI_count', { rbi: 1 }) }}
+                </span>
+              </div>
+              <div>
+                <span
+                  :key="`item_${item}`"
+                  v-for="item in ['K', 'FO', 'GO', 'E']"
+                  :class="['blue', { select: content === item }]"
+                  @click="toggle('content', item)"
+                >
+                  {{ $t(item) }}
+                </span>
+                <span
+                  :class="[
+                    'rbi',
+                    { select: rbi.value === 2, disabled: rbi.two.disabled },
+                  ]"
+                  @click="rbi.two.disabled || toggle('rbi.value', 2)"
+                >
+                  {{ $t('RBI_count', { rbi: 2 }) }}
+                </span>
+              </div>
+              <div>
+                <span
+                  :key="`item_${item}`"
+                  v-for="item in ['FC', 'DP', 'TP', 'FOUL']"
+                  :class="['blue', { select: content === item }]"
+                  @click="toggle('content', item)"
+                >
+                  {{ $t(item) }}
+                </span>
+                <span
+                  :class="[
+                    'rbi',
+                    { select: rbi.value === 3, disabled: rbi.three.disabled },
+                  ]"
+                  @click="rbi.three.disabled || toggle('rbi.value', 3)"
+                >
+                  {{ $t('RBI_count', { rbi: 3 }) }}
+                </span>
+              </div>
+              <div>
+                <span
+                  :key="`item_${item}`"
+                  v-for="item in ['BB', 'SF']"
+                  :class="['yellow', { select: content === item }]"
+                  @click="toggle('content', item)"
+                >
+                  {{ $t(item) }}
+                </span>
+                <span style="cursor: auto;"></span>
+                <span style="cursor: auto;"></span>
+                <span
+                  :class="[
+                    'rbi',
+                    { select: rbi.value === 4, disabled: rbi.four.disabled },
+                  ]"
+                  @click="rbi.four.disabled || toggle('rbi.value', 4)"
+                >
+                  {{ $t('RBI_count', { rbi: 4 }) }}
+                </span>
+              </div>
+            </div>
+            <div class="separater">
               <label>{{ $t('ttl_onbase') }}</label>
             </div>
             <infield class="infield">
@@ -234,90 +317,6 @@
                 </div>
               </div>
             </infield>
-            <div class="separater">
-              <label>{{ $t('ttl_content') }}</label>
-            </div>
-            <div class="content">
-              <div>
-                <span
-                  :key="`item_${item}`"
-                  v-for="item in ['1H', '2H', '3H', 'HR']"
-                  :class="['red', { select: content === item }]"
-                  @click="toggle('content', item)"
-                >
-                  {{ $t(item) }}
-                </span>
-                <span
-                  :class="[
-                    'rbi',
-                    { select: rbi.value === 1, disabled: rbi.one.disabled },
-                  ]"
-                  @click="rbi.one.disabled || toggle('rbi.value', 1)"
-                >
-                  {{ $t('RBI_count', { rbi: 1 }) }}
-                </span>
-              </div>
-              <div>
-                <span
-                  :key="`item_${item}`"
-                  v-for="item in ['K', 'FO', 'GO', 'E']"
-                  :class="['blue', { select: content === item }]"
-                  @click="toggle('content', item)"
-                >
-                  {{ $t(item) }}
-                </span>
-                <span
-                  :class="[
-                    'rbi',
-                    { select: rbi.value === 2, disabled: rbi.two.disabled },
-                  ]"
-                  @click="rbi.two.disabled || toggle('rbi.value', 2)"
-                >
-                  {{ $t('RBI_count', { rbi: 2 }) }}
-                </span>
-              </div>
-              <div>
-                <span
-                  :key="`item_${item}`"
-                  v-for="item in ['FC', 'DP', 'TP']"
-                  :class="['blue', { select: content === item }]"
-                  @click="toggle('content', item)"
-                >
-                  {{ $t(item) }}
-                </span>
-                <span style="cursor: auto;"></span>
-                <span
-                  :class="[
-                    'rbi',
-                    { select: rbi.value === 3, disabled: rbi.three.disabled },
-                  ]"
-                  @click="rbi.three.disabled || toggle('rbi.value', 3)"
-                >
-                  {{ $t('RBI_count', { rbi: 3 }) }}
-                </span>
-              </div>
-              <div>
-                <span
-                  :key="`item_${item}`"
-                  v-for="item in ['BB', 'SF']"
-                  :class="['yellow', { select: content === item }]"
-                  @click="toggle('content', item)"
-                >
-                  {{ $t(item) }}
-                </span>
-                <span style="cursor: auto;"></span>
-                <span style="cursor: auto;"></span>
-                <span
-                  :class="[
-                    'rbi',
-                    { select: rbi.value === 4, disabled: rbi.four.disabled },
-                  ]"
-                  @click="rbi.four.disabled || toggle('rbi.value', 4)"
-                >
-                  {{ $t('RBI_count', { rbi: 4 }) }}
-                </span>
-              </div>
-            </div>
           </div>
           <div class="single-col">
             <div class="separater">
@@ -327,7 +326,7 @@
               <div class="coordination">
                 <coordination
                   :values="location"
-                  :disabled="['BB', 'K', ''].includes(content)"
+                  :disabled="['BB', 'K', 'FOUL', ''].includes(content)"
                   @change="val => (location = [].concat(val))"
                 />
               </div>
@@ -374,11 +373,11 @@
                         'base',
                         {
                           'has-player': base[b].name,
-                          disabled: !(prev5Players.length || base[b].name),
+                          disabled: !(isBaseNotFulled() || base[b].name),
                         },
                       ]"
                       @click="
-                        (prev5Players.length || base[b].name) && changePlayer(b)
+                        (isBaseNotFulled() || base[b].name) && changePlayer(b)
                       "
                     ></div>
                   </div>
@@ -428,8 +427,14 @@
                 <div class="contents">
                   <span
                     :key="`content_${i}`"
-                    v-for="(record, i) in preContents"
-                    :class="['content', `${formatColor_(record.content)}`]"
+                    v-for="(record, i) in content
+                      ? [...preContents, { content, new: true }]
+                      : preContents"
+                    :class="[
+                      'content',
+                      `${formatColor_(record.content)}`,
+                      { current: record.new },
+                    ]"
                   >
                     {{ formatContent_(record.content, record.location) }}
                   </span>
@@ -452,6 +457,11 @@
               ></label>
             </div>
             <div class="step-bar">
+              <button
+                class="btn left"
+                :disabled="step === steps[0]"
+                @click="goPrev"
+              ></button>
               <span
                 v-for="(i, index) in steps"
                 :key="`step${i}`"
@@ -460,58 +470,13 @@
                 @click="step = i"
                 >{{ $t(`desc_step_${i}`) }}</span
               >
-            </div>
-            <div class="direction">
-              <button class="btn" :disabled="step === steps[0]" @click="goPrev">
-                {{ $t('btn_prev') }}
-              </button>
-              <button class="btn" :disabled="nextStatus()" @click="goNext">
-                {{ $t('btn_next') }}
-              </button>
+              <button
+                class="btn right"
+                :disabled="nextStatus()"
+                @click="goNext"
+              ></button>
             </div>
             <div v-if="step === 1">
-              <infield class="infield">
-                <div class="player-container">
-                  <div
-                    :class="['on-base-player', 'only', b]"
-                    v-for="(b, bi) in ['first', 'second', 'third', 'home']"
-                    :key="`onbase_${bi}`"
-                  >
-                    <span
-                      :class="[
-                        'name',
-                        { disabled: !(prev5Players.length || base[b].name) },
-                      ]"
-                      @click="
-                        (prev5Players.length || base[b].name) && changePlayer(b)
-                      "
-                    >
-                      {{
-                        `${getPlayerNumber(base[b].name)}${base[b].name || ''}`
-                      }}
-                    </span>
-                  </div>
-                  <!-- <button
-                    v-if="prev5Players.length === 0"
-                    class="btn"
-                    @click="step = 2"
-                  >
-                    {{ $t('btn_next') }}
-                  </button> -->
-                </div>
-              </infield>
-              <div
-                v-if="prev5Players.length"
-                style="margin-top: 5px; text-align: center;"
-              >
-                {{
-                  $t('desc_possible_players', {
-                    players: prev5Players.map(player => player.name).join(', '),
-                  })
-                }}
-              </div>
-            </div>
-            <div v-if="step === 2">
               <div class="content wide">
                 <div>
                   <span
@@ -536,13 +501,12 @@
                 <div>
                   <span
                     :key="`item_${item}`"
-                    v-for="item in ['FC', 'DP', 'TP']"
+                    v-for="item in ['FC', 'DP', 'TP', 'FOUL']"
                     :class="['blue', { select: content === item }]"
                     @click="toggle('content', item)"
                   >
                     {{ $t(item) }}
                   </span>
-                  <span style="cursor: auto;"></span>
                 </div>
                 <div>
                   <span
@@ -556,95 +520,38 @@
                   <span style="cursor: auto;"></span>
                   <span style="cursor: auto;"></span>
                 </div>
-                <template v-if="testMode">
-                  <div class="separater">
-                    <label>{{ `${$t('R')}/${$t('Out')}` }}</label>
-                  </div>
-                  <div>
-                    <span
-                      :class="[
-                        'run',
-                        {
-                          select: base.home.result === 'run',
-                          disabled:
-                            base.home.disabled ||
-                            !(prev5Players.length || base.home.name),
-                        },
-                      ]"
-                      @click="
-                        base.home.disabled ||
-                          !(prev5Players.length || base.home.name) ||
-                          toggle(`base.home.result`, 'run')
-                      "
-                    >
-                      {{ $t('R') }}
-                    </span>
-                    <span
-                      :class="[
-                        'out',
-                        {
-                          select: base.home.result === 'out',
-                          disabled:
-                            base.home.disabled ||
-                            !(prev5Players.length || base.home.name),
-                        },
-                      ]"
-                      @click="
-                        base.home.disabled ||
-                          !(prev5Players.length || base.home.name) ||
-                          toggle(`base.home.result`, 'out')
-                      "
-                    >
-                      {{ $t('Out') }}
-                    </span>
-                    <span style="cursor: auto;"></span>
-                    <span style="cursor: auto;"></span>
-                  </div>
-                </template>
               </div>
             </div>
-            <div v-if="step === 3" class="coordination-step">
+            <div v-if="step === 2" class="coordination-step">
               <div class="coordination">
                 <coordination
                   :values="location"
-                  :disabled="['BB', 'K', ''].includes(content)"
+                  :disabled="['BB', 'K', 'FOUL', ''].includes(content)"
                   @change="val => (location = [].concat(val))"
                 />
               </div>
             </div>
-            <div v-if="step === 4">
+            <div v-if="step === 3">
               <infield class="infield">
                 <div class="player-container">
+                  <button class="btn" @click="revertOnbase">
+                    {{ $t('btn_original') }}
+                  </button>
+                  <button class="btn" @click="estimate">
+                    {{ $t('btn_estimate') }}
+                  </button>
                   <div
-                    :class="['on-base-player', b]"
+                    :class="['on-base-player2', b]"
                     v-for="(b, bi) in ['first', 'second', 'third', 'home']"
                     :key="`onbase_${bi}`"
                   >
                     <span
                       :class="[
-                        'run',
-                        {
-                          select: base[b].result === 'run',
-                          disabled:
-                            base[b].disabled ||
-                            !(prev5Players.length || base[b].name),
-                        },
-                      ]"
-                      @click="
-                        base[b].disabled ||
-                          !(prev5Players.length || base[b].name) ||
-                          toggle(`base.${b}.result`, 'run')
-                      "
-                    >
-                      {{ $t('R') }}
-                    </span>
-                    <span
-                      :class="[
                         'name',
-                        { disabled: !(prev5Players.length || base[b].name) },
+                        { disabled: !(isBaseNotFulled() || base[b].name) },
                       ]"
                       @click="
-                        (prev5Players.length || base[b].name) && changePlayer(b)
+                        (isBaseNotFulled() || base[b].name) && changePlayer(b)
                       "
                     >
                       {{
@@ -652,26 +559,64 @@
                       }}
                     </span>
                     <span
+                      v-for="(targetBase, tbi) in ['first', 'second', 'third']"
+                      :key="`onbase_${bi}_${tbi}`"
                       :class="[
-                        'out',
+                        'base',
                         {
-                          select: base[b].result === 'out',
-                          disabled:
-                            base[b].disabled ||
-                            !(prev5Players.length || base[b].name),
+                          select: base[b].result === targetBase,
+                          disabled: isSubBaseDisabled(b, targetBase),
+                        },
+                      ]"
+                      @click="
+                        isSubBaseDisabled(b, targetBase) ||
+                          toggle(`base.${b}.result`, targetBase)
+                      "
+                      >{{ `${tbi + 1}B` }}</span
+                    >
+                    <span
+                      :class="[
+                        'run',
+                        {
+                          select: base[b].result === 'run',
+                          disabled: base[b].disabled || !base[b].name,
                         },
                       ]"
                       @click="
                         base[b].disabled ||
-                          !(prev5Players.length || base[b].name) ||
+                          !base[b].name ||
+                          toggle(`base.${b}.result`, 'run')
+                      "
+                      >R</span
+                    >
+                    <span
+                      :class="[
+                        'out',
+                        {
+                          select: base[b].result === 'out',
+                          disabled: base[b].disabled || !base[b].name,
+                        },
+                      ]"
+                      @click="
+                        base[b].disabled ||
+                          !base[b].name ||
                           toggle(`base.${b}.result`, 'out')
                       "
+                      >O</span
                     >
-                      {{ $t('Out') }}
-                    </span>
                   </div>
                 </div>
               </infield>
+              <div
+                v-if="isBaseNotFulled() && prev5Players.length"
+                style="margin-top: 5px; text-align: center;"
+              >
+                {{
+                  $t('desc_possible_players', {
+                    players: prev5Players.map(player => player.name).join(', '),
+                  })
+                }}
+              </div>
               <div class="separater">
                 <label>{{ $t('RBI') }}</label>
               </div>
@@ -721,7 +666,10 @@
       </template>
       <div style="width: 100%;"></div>
       <div
-        v-if="pa && boxSummary.contents.length === order"
+        v-if="
+          pa &&
+            boxSummary.contents.filter(item => item.content).length === order
+        "
         class="delete-btn-container"
       >
         <button class="btn danger" @click="delete_">
@@ -731,7 +679,10 @@
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
         <button
-          v-if="pa && boxSummary.contents.length === order"
+          v-if="
+            pa &&
+              boxSummary.contents.filter(item => item.content).length === order
+          "
           class="btn danger"
           @click="delete_"
         >
@@ -944,6 +895,7 @@
         .content {
           color: #fff;
           line-height: 26px;
+          height: 26px;
           width: 33px;
           text-align: center;
           margin-right: 2px;
@@ -956,6 +908,20 @@
           }
           &.blue {
             background-color: $ng;
+          }
+          &.current {
+            animation: currentContent 1s linear infinite;
+          }
+          @keyframes currentContent {
+            0% {
+              box-shadow: 0 0 15px $input_font;
+            }
+            50% {
+              box-shadow: none;
+            }
+            100% {
+              box-shadow: 0 0 15px $input_font;
+            }
           }
         }
       }
@@ -990,6 +956,7 @@
     display: flex;
     justify-content: space-around;
     margin: 0 auto 10px;
+    max-width: 300px;
     > span {
       text-align: center;
       color: $row_color;
@@ -1036,14 +1003,36 @@
         right: 50%;
         z-index: -1;
       }
-      &:first-child:after {
+      &:first-of-type:after {
         content: none;
       }
     }
-  }
-  .direction {
-    text-align: center;
-    margin-bottom: 10px;
+    > .btn {
+      display: block;
+      width: 20px;
+      height: 20px;
+      padding: 0;
+      &:before {
+        content: '';
+        border: solid #fff;
+        border-width: 0 3px 3px 0;
+        display: inline-block;
+        padding: 3px;
+        vertical-align: middle;
+      }
+      &:after {
+        content: '';
+        display: inline-block;
+        height: 100%;
+        vertical-align: middle;
+      }
+      &.left:before {
+        transform: translateX(2px) rotate(135deg);
+      }
+      &.right:before {
+        transform: translateX(-2px) rotate(-45deg);
+      }
+    }
   }
   .coordination-step {
     height: 400px;
@@ -1124,17 +1113,80 @@
           left: 50%;
           transform: translateX(-50%);
         }
-        &.only > span {
+      }
+      .on-base-player2 {
+        position: absolute;
+        display: flex;
+        flex-wrap: wrap;
+        width: 120px;
+        justify-content: center;
+        > span {
+          font-size: 12px;
+          text-align: center;
+          white-space: nowrap;
+          overflow: hidden;
+          line-height: 22px;
+          height: 26px;
+          color: $dark_gray;
+          border: 2px solid $dark_gray;
+          background-color: rgba(248, 248, 248, 0.6);
+          box-sizing: border-box;
+          cursor: pointer;
+          flex: 1;
+          margin: 1px;
           border-radius: 5px;
+          &.name {
+            flex: 0 1 100%;
+          }
+          &.run {
+            color: $run;
+            border-color: $run;
+          }
+          &.out {
+            color: $out;
+            border-color: $out;
+          }
+          &.select {
+            color: #fff;
+            &.run {
+              background-color: $run;
+            }
+            &.out {
+              background-color: $out;
+            }
+            &.base {
+              background-color: $dark_gray;
+            }
+          }
+          &.disabled {
+            opacity: 0.2;
+            cursor: not-allowed;
+          }
+        }
+        &.first {
+          top: 62px;
+          right: 3px;
+        }
+        &.second {
+          top: 3px;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+        &.third {
+          top: 62px;
+          left: 3px;
+        }
+        &.home {
+          bottom: 3px;
+          left: 50%;
+          transform: translateX(-50%);
         }
       }
       .btn {
-        position: absolute;
-        top: 66px;
-        left: 50%;
-        transform: translateX(-50%);
-        margin: 0;
-        display: block;
+        display: inline-block;
+        width: auto;
+        padding: 5px;
+        margin: 5px 0 0 5px;
       }
     }
   }
@@ -1205,14 +1257,6 @@
           &.select {
             font-size: 12px;
           }
-        }
-      }
-      &.out {
-        color: $out;
-        border: 3px solid $out;
-        &.select {
-          color: #fff;
-          background-color: $out;
         }
       }
       &.btn-next {
@@ -1293,11 +1337,6 @@
   .container {
     .step-bar {
       width: 100%;
-    }
-    .direction {
-      .btn {
-        display: inline-block;
-      }
     }
     .coordination-step {
       height: 300px;
@@ -1403,9 +1442,10 @@ export default {
       currentPlayer: undefined,
       reJoinPlayer: undefined,
       prev5Players: [],
+      maxOnbase: undefined,
       benchPlayers: [],
       step: 1,
-      steps: [1, 2, 3, 4],
+      steps: [1, 2, 3],
       useTeam: '',
       opponent: '',
       topBottom: '',
@@ -1422,11 +1462,6 @@ export default {
     }
     this.setOrder(this.$route.params.order);
     this.setPa();
-
-    if (this.testMode) {
-      this.step = 2;
-      this.steps = [2, 3, 4];
-    }
     // console.log(this.boxSummary);
     // console.log(this.box);
     // console.log(this.teamInfo);
@@ -1524,7 +1559,7 @@ export default {
             ...(this.version !== 'import' && { onbase }),
             ...(this.location[0] &&
               this.version !== 'import' &&
-              !['BB', 'K'].includes(this.content) && {
+              !['BB', 'K', 'FOUL'].includes(this.content) && {
                 location: this.location[0],
               }),
           },
@@ -1539,10 +1574,18 @@ export default {
     },
     delete_() {
       this.confirm(this.$t('msg_delete_warning')).then(() => {
-        this.deleteLastPa({
-          teamCode: this.$route.params.team,
-          gameId: this.$route.params.game,
-        });
+        if (this.order <= this.boxSummary.contents.length) {
+          this.deleteLastPa({
+            teamCode: this.$route.params.team,
+            gameId: this.$route.params.game,
+            order: this.order,
+          });
+        } else {
+          this.deleteLastPa({
+            teamCode: this.$route.params.team,
+            gameId: this.$route.params.game,
+          });
+        }
       });
     },
     setInn(val) {
@@ -1606,7 +1649,7 @@ export default {
           0,
         );
         this.preContents = this.boxSummary.contents.filter(
-          item => item.name === this.base.home.name,
+          item => item.name === this.base.home.name && item.content,
         );
         if (this.box.length) {
           const one_round = this.box[this.box.length - 1].order;
@@ -1636,6 +1679,7 @@ export default {
             [],
           );
         }
+        this.revertOnbase();
       }
       const out = this.boxSummary.contents
         .slice(0, this.order - 1)
@@ -1701,28 +1745,32 @@ export default {
         .filter(
           player => !onbasePlayers.find(sub => sub && sub.name === player.name),
         );
-      this.prev5Players = this.boxSummary.contents
+      const tempPrev5 = this.boxSummary.contents
         .slice(Math.max(this.order - 6, 0), this.order - 1)
-        .filter(item => item.inn === this.inn)
-        .filter(item => {
-          const prev5 = this.boxSummary.contents
-            .slice(Math.max(this.order - 6, 0), this.order - 1)
-            .filter(item => item.inn === this.inn)
-            .map(sub => sub.onbase)
-            .reduce((acc, sub) => acc.concat(sub), [])
-            .filter(item => item && item.result !== '' && item.name)
-            .concat(onbasePlayers);
-          return prev5.find(sub => sub && sub.name === item.name)
-            ? false
-            : true;
-        })
+        .filter(item => item.inn === this.inn);
+      const shouldNotPrev5 = tempPrev5
+        .map(item => item.onbase)
+        .reduce((acc, item) => [...acc, item], [])
+        .filter(
+          item => item && ['out', 'run'].includes(item.result) && item.name,
+        )
+        .concat(onbasePlayers);
+      this.prev5Players = tempPrev5
+        .filter(
+          item => !shouldNotPrev5.find(sub => sub && sub.name === item.name),
+        )
         .map(
           player =>
             this.teamInfo.players.find(p => p.name === player.name) || {
               name: player.name,
             },
         );
-      // .reverse();
+      if (!this.maxOnbase) {
+        this.maxOnbase =
+          onbasePlayers.filter(item => item.name).length ||
+          this.prev5Players.length ||
+          0;
+      }
     },
     changePlayer(mode) {
       this.changeMode = mode;
@@ -1760,7 +1808,7 @@ export default {
         case 'home':
           this.base.home.name = player.name;
           this.preContents = this.boxSummary.contents.filter(
-            item => item.name === player.name,
+            item => item.name === player.name && item.content,
           );
           break;
         case 'runner':
@@ -1770,14 +1818,12 @@ export default {
         case 'second':
         case 'third':
           this.base[this.changeMode].name = player.name;
+          this.base[this.changeMode].result = this.changeMode;
           break;
       }
       this.$modal.hide('player');
       this.changeMode = '';
       this.checkModalPlayer();
-      // if (this.prev5Players.length === 0 && !this.testMode) {
-      //   this.step = 2;
-      // }
     },
     clearPlayer() {
       switch (this.changeMode) {
@@ -1788,6 +1834,7 @@ export default {
         case 'second':
         case 'third':
           this.base[this.changeMode].name = '';
+          this.base[this.changeMode].result = '';
           break;
       }
       this.$modal.hide('player');
@@ -1832,33 +1879,229 @@ export default {
       if (this.step === this.steps[this.steps.length - 1]) {
         return true;
       }
-      if (this.step === 2 && !this.content) {
-        return true;
-      }
-      if (this.step === 1 && this.prev5Players.length) {
+      if (this.step === 1 && !this.content) {
         return true;
       }
     },
     goPrev() {
-      if (this.step === 4) {
-        if (['BB', 'K'].includes(this.content)) {
-          this.step = 2;
+      if (this.step === 3) {
+        if (['BB', 'K', 'FOUL'].includes(this.content)) {
+          this.step = 1;
         } else {
-          this.step = 3;
+          this.step = 2;
         }
       } else {
         this.step = this.step - 1;
       }
     },
     goNext() {
-      if (this.step === 2) {
-        if (['BB', 'K'].includes(this.content)) {
-          this.step = 4;
-        } else {
+      if (this.step === 1) {
+        if (['BB', 'K', 'FOUL'].includes(this.content)) {
           this.step = 3;
+        } else {
+          this.step = 2;
         }
       } else {
         this.step = this.step + 1;
+      }
+    },
+    isSubBaseDisabled(iterateBase, targetBase) {
+      return (
+        this.base[iterateBase].disabled ||
+        !this.base[iterateBase].name ||
+        (iterateBase === 'second' && ['first'].includes(targetBase)) ||
+        (iterateBase === 'third' && ['first', 'second'].includes(targetBase)) ||
+        (this.base[iterateBase].result !== targetBase &&
+          [
+            this.base.home.result,
+            this.base.first.result,
+            this.base.second.result,
+            this.base.third.result,
+          ].includes(targetBase))
+      );
+    },
+    isBaseNotFulled() {
+      const onbasePlayers = [
+        { name: this.base.home.name },
+        { name: this.base.first.name },
+        { name: this.base.second.name },
+        { name: this.base.third.name },
+      ];
+      return this.maxOnbase !== onbasePlayers.filter(item => item.name).length;
+    },
+    revertOnbase() {
+      const prev = this.boxSummary.contents.slice(
+        this.order - 2,
+        this.order - 1,
+      )[0];
+      if (prev && Array.isArray(prev.onbase)) {
+        this.base.home.result = '';
+        ['first', 'second', 'third'].forEach(b => {
+          this.base[b].name = '';
+          this.base[b].result = '';
+        });
+        prev.onbase
+          .filter(onbase =>
+            ['first', 'second', 'third'].includes(onbase.result),
+          )
+          .forEach(onbase => {
+            this.base[onbase.result].name = onbase.name;
+            this.base[onbase.result].result = onbase.result;
+          });
+      }
+    },
+    estimate() {
+      console.log(this.content);
+      if (['FO', 'GO', 'FOUL', 'K'].includes(this.content)) {
+        // 全不動 打者出局
+        this.base.home.result = 'out';
+        return;
+      }
+      if (this.content === '1H') {
+        // 一安 壘上全部推一壘
+        if (this.base.third.name) {
+          this.base.third.result = 'run';
+          this.rbi.value = 1;
+        }
+        if (this.base.second.name) this.base.second.result = 'third';
+        if (this.base.first.name) this.base.first.result = 'second';
+        this.base.home.result = 'first';
+        return;
+      }
+      if (this.content === '2H') {
+        // 二安 壘上全部推兩壘
+        let rbi = 0;
+        if (this.base.third.name) {
+          this.base.third.result = 'run';
+          rbi += 1;
+        }
+        if (this.base.second.name) {
+          this.base.second.result = 'run';
+          rbi += 1;
+        }
+        this.rbi.value = rbi;
+        if (this.base.first.name) this.base.first.result = 'third';
+        this.base.home.result = 'second';
+        return;
+      }
+      if (this.content === '3H') {
+        // 三安 壘上全部得分
+        let rbi = 0;
+        if (this.base.third.name) {
+          this.base.third.result = 'run';
+          rbi += 1;
+        }
+        if (this.base.second.name) {
+          this.base.second.result = 'run';
+          rbi += 1;
+        }
+        if (this.base.first.name) {
+          this.base.first.result = 'run';
+          rbi += 1;
+        }
+        this.rbi.value = rbi;
+        this.base.home.result = 'third';
+        return;
+      }
+      if (this.content === 'HR') {
+        // 全壘打 打點得分
+        let rbi = 0;
+        if (this.base.third.name) {
+          this.base.third.result = 'run';
+          rbi += 1;
+        }
+        if (this.base.second.name) {
+          this.base.second.result = 'run';
+          rbi += 1;
+        }
+        if (this.base.first.name) {
+          this.base.first.result = 'run';
+          rbi += 1;
+        }
+        this.base.home.result = 'run';
+        rbi += 1;
+        this.rbi.value = rbi;
+        return;
+      }
+      if (this.content === 'BB') {
+        // 四壞 前位跑者往前推
+        this.base.home.result = 'first';
+        if (this.base.first.name) {
+          this.base.first.result = 'second';
+        } else {
+          return;
+        }
+        if (this.base.second.name) {
+          this.base.second.result = 'third';
+        } else {
+          return;
+        }
+        if (this.base.third.name) {
+          this.base.third.result = 'run';
+          this.rbi.value = 1;
+        }
+        return;
+      }
+      if (this.content === 'FC') {
+        // 野選 前位跑者出局 打者一壘
+        this.base.home.result = 'first';
+        if (this.base.first.name) {
+          this.base.first.result = 'out';
+          return;
+        }
+        if (this.base.second.name) {
+          this.base.second.result = 'out';
+          return;
+        }
+        if (this.base.third.name) {
+          this.base.third.result = 'out';
+          return;
+        }
+        return;
+      }
+      if (this.content === 'DP') {
+        // 雙殺 前位跑者出局 打者出局
+        this.base.home.result = 'out';
+        if (this.base.first.name) {
+          this.base.first.result = 'out';
+          return;
+        }
+        if (this.base.second.name) {
+          this.base.second.result = 'out';
+          return;
+        }
+        if (this.base.third.name) {
+          this.base.third.result = 'out';
+          return;
+        }
+        return;
+      }
+      if (this.content === 'TP') {
+        // 三殺 前兩位跑者出局 打者出局
+        let out = 0;
+        this.base.home.result = 'out';
+        out += 1;
+        if (this.base.first.name && out < 3) {
+          this.base.first.result = 'out';
+          out += 1;
+        }
+        if (this.base.second.name && out < 3) {
+          this.base.second.result = 'out';
+          out += 1;
+        }
+        if (this.base.third.name && out < 3) {
+          this.base.third.result = 'out';
+          out += 1;
+        }
+        return;
+      }
+      if (this.content === 'SF') {
+        // 犧飛 三壘跑者得分 打者出局
+        this.base.home.result = 'out';
+        if (this.base.third.name) {
+          this.base.third.result = 'run';
+          this.rbi.value = 1;
+        }
       }
     },
   },
@@ -1874,7 +2117,7 @@ export default {
           .slice(0, this.order - 1)
           .filter(r => r.inn === this.inn)
           .reduce((acc, r) => {
-            if (['FO', 'GO', 'K', 'FC', 'SF'].includes(r.content)) {
+            if (['FO', 'GO', 'K', 'FC', 'SF', 'FOUL'].includes(r.content)) {
               acc += 1;
             } else if (r.content === 'DP') {
               acc += 2;
@@ -1931,19 +2174,15 @@ export default {
           this.run.value = true;
           this.base.home.result = 'run';
         }
-        if (['K', 'FO', 'GO', 'DP', 'TP', 'SF'].includes(this.content)) {
+        if (
+          ['K', 'FO', 'GO', 'DP', 'TP', 'SF', 'FOUL'].includes(this.content)
+        ) {
           this.base.home.result = 'out';
         }
         if (this.content === 'SF') {
           this.rbi.value = 1;
         }
-        // if (!this.testMode) {
-        //   if (['BB', 'K'].includes(this.content)) {
-        //     this.step = 4;
-        //   } else {
-        //     this.step = 3;
-        //   }
-        // }
+        this.estimate();
       } else {
         this.base.home.disabled = true;
         this.base.first.disabled = true;

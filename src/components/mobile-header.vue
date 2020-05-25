@@ -5,7 +5,7 @@
     <img class="icon" :src="$cacheImg(icon) || $cacheImg(defaultIcon)" />
     <div
       v-if="save"
-      :class="`save-btn${disabled === true ? ' disabled' : ''}`"
+      :class="['save-btn', { disabled: disabled, focus: focus }]"
       @click="save_"
     >
       {{ save_label || $t('btn_update') }}
@@ -37,6 +37,20 @@ header {
     &.disabled {
       cursor: not-allowed;
       opacity: 0.5;
+    }
+    &.focus {
+      animation: blink 0.8s linear infinite;
+    }
+    @keyframes blink {
+      0% {
+        text-shadow: 0 0 15px white;
+      }
+      50% {
+        text-shadow: none;
+      }
+      100% {
+        text-shadow: 0 0 15px white;
+      }
     }
   }
 }
@@ -73,7 +87,7 @@ header {
 import defaultIcon from '../images/icon.png';
 
 export default {
-  props: ['back', 'icon', 'save', 'save_label', 'disabled'],
+  props: ['back', 'icon', 'save', 'save_label', 'disabled', 'focus'],
   data() {
     return {
       defaultIcon,

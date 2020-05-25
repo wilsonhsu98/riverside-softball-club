@@ -68,6 +68,7 @@ const contentMapping = {
   滾地: 'GO',
   BB: 'BB',
   K: 'K',
+  FOUL: 'FOUL',
   E: 'E',
   野選: 'FC',
   犧飛: 'SF',
