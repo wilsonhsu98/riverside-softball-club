@@ -1582,7 +1582,9 @@ export default {
     },
     delete_() {
       this.confirm(this.$t('msg_delete_warning')).then(() => {
-        if (this.order <= this.boxSummary.contents.length) {
+        const startedValue = this.box[0].slice(-1)[0];
+        // this.box[0].slice(-1)[0] is the value of started players which is not defined before first round
+        if (startedValue === 0 || this.order <= startedValue) {
           this.deleteLastPa({
             teamCode: this.$route.params.team,
             gameId: this.$route.params.game,
