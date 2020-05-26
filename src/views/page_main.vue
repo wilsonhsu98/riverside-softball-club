@@ -350,6 +350,7 @@ export default {
       this.confirm('');
     },
     confirmNo() {
+      this.confirmPromiseReject();
       this.confirm('');
     },
   },
@@ -364,6 +365,7 @@ export default {
       alertMsg: 'alertMsg',
       confirmMsg: 'confirmMsg',
       confirmPromiseResolve: 'confirmPromiseResolve',
+      confirmPromiseReject: 'confirmPromiseReject',
     }),
   },
   watch: {

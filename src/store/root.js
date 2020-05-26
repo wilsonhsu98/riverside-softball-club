@@ -50,6 +50,7 @@ const state = {
   alertMsg: '',
   confirmMsg: '',
   confirmPromiseResolve: () => {},
+  confirmPromiseReject: () => {},
 };
 
 const getters = {
@@ -77,6 +78,7 @@ const getters = {
   alertMsg: state => state.alertMsg,
   confirmMsg: state => state.confirmMsg,
   confirmPromiseResolve: state => state.confirmPromiseResolve,
+  confirmPromiseReject: state => state.confirmPromiseReject,
 };
 
 const actions = {
@@ -375,8 +377,8 @@ const actions = {
   },
   confirm({ commit }, msg) {
     if (msg) {
-      return new Promise(resolve => {
-        commit(types.CONFIRM, { msg, resolve });
+      return new Promise((resolve, reject) => {
+        commit(types.CONFIRM, { msg, resolve, reject });
       });
     } else {
       commit(types.CONFIRM, { msg });
@@ -461,9 +463,10 @@ const mutations = {
   [types.ALERT](state, msg = '') {
     state.alertMsg = msg;
   },
-  [types.CONFIRM](state, { msg = '', resolve = () => {} }) {
+  [types.CONFIRM](state, { msg = '', resolve = () => {}, reject = () => {} }) {
     state.confirmMsg = msg;
     state.confirmPromiseResolve = resolve;
+    state.confirmPromiseReject = reject;
   },
 };
 

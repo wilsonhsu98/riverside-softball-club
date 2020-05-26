@@ -566,7 +566,11 @@
                         {
                           select: base[b].result === targetBase,
                           disabled: isSubBaseDisabled(b, targetBase),
-                          nobase: (b === 'second' && ['first'].includes(targetBase)) || (b === 'third' && ['first', 'second'].includes(targetBase)),
+                          nobase:
+                            (b === 'second' &&
+                              ['first'].includes(targetBase)) ||
+                            (b === 'third' &&
+                              ['first', 'second'].includes(targetBase)),
                         },
                       ]"
                       @click="
@@ -1695,6 +1699,7 @@ export default {
       if (out.length === 3 && !this.pa) {
         this.inn += 1;
         this.out = 0;
+        this.revertOnbase();
       }
 
       if (Array.isArray(this.box[0])) {
@@ -1938,12 +1943,12 @@ export default {
         this.order - 2,
         this.order - 1,
       )[0];
-      if (prev && Array.isArray(prev.onbase)) {
-        this.base.home.result = '';
-        ['first', 'second', 'third'].forEach(b => {
-          this.base[b].name = '';
-          this.base[b].result = '';
-        });
+      this.base.home.result = '';
+      ['first', 'second', 'third'].forEach(b => {
+        this.base[b].name = '';
+        this.base[b].result = '';
+      });
+      if (prev && Array.isArray(prev.onbase) && prev.inn === this.inn) {
         prev.onbase
           .filter(onbase =>
             ['first', 'second', 'third'].includes(onbase.result),
