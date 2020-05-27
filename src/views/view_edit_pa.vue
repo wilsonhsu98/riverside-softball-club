@@ -1543,11 +1543,13 @@ export default {
         },
         {
           condition: ['third', 'second', 'first'].some(b => {
-            const find = onbase.find(item => item.result === b);
+            const find = onbase.find(
+              item => item.base !== 'home' && item.result === b,
+            );
             if (
               find &&
               find.name &&
-              rule[b].back.some(bb =>
+              rule[find.base].back.some(bb =>
                 rule[b].invalid.includes(this.base[bb].result),
               )
             ) {
