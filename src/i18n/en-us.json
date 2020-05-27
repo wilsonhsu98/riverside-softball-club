@@ -156,6 +156,8 @@
 	"RBI_count": "%{rbi}分",
 	"btn_original": "原況",
 	"btn_estimate": "推測",
+	"msg_onbase_empty": "尚有未選擇壘上情況的球員",
+	"msg_onbase_offside": "壘上發生越位情況",
 
 	"create_team": "Create a team",
 	"manage_team": "Manage your team",

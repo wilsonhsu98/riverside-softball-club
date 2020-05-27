@@ -1480,6 +1480,7 @@ export default {
       setOrder: 'setOrder',
       editGameOrder: 'editGameOrder',
       deleteLastPa: 'deleteLastPa',
+      alert: 'alert',
       confirm: 'confirm',
     }),
     toggle(path, value) {
@@ -1510,8 +1511,68 @@ export default {
         `/main/games/${this.$route.params.team}/${this.$route.params.game}`,
       );
     },
+    validate() {
+      const rule = {
+        third: {
+          back: ['second', 'first', 'home'],
+          invalid: ['run'],
+        },
+        second: {
+          back: ['first', 'home'],
+          invalid: ['run', 'third'],
+        },
+        first: {
+          back: ['home'],
+          invalid: ['run', 'third', 'second'],
+        },
+      };
+      const onbase = ['third', 'second', 'first', 'home']
+        .map(b => ({
+          base: b,
+          name: this.base[b].name,
+          result: this.base[b].result,
+        }))
+        .filter(item => item.name);
+
+      const err = [
+        {
+          condition: ['home', 'first', 'second', 'third'].some(
+            b => this.base[b].name && this.base[b].result === '',
+          ),
+          err: this.$t('msg_onbase_empty'),
+        },
+        {
+          condition: ['third', 'second', 'first'].some(b => {
+            const find = onbase.find(item => item.result === b);
+            if (
+              find &&
+              find.name &&
+              rule[b].back.some(bb =>
+                rule[b].invalid.includes(this.base[bb].result),
+              )
+            ) {
+              return true;
+            }
+          }),
+          err: this.$t('msg_onbase_offside'),
+        },
+      ].reduce((acc, check) => {
+        return check.condition ? [...acc, check.err] : acc;
+      }, []);
+
+      if (err.length) {
+        this.step = 3;
+        this.alert(
+          err.length === 1
+            ? err[0]
+            : `<ul><li>${err.join('</li><li>')}</li></ul>`,
+        );
+      }
+
+      return ![err].some(str => !!str);
+    },
     edit_() {
-      if (this.content) {
+      if (this.content && this.validate()) {
         const rbi = (() => {
           if (
             !(
@@ -2052,6 +2113,10 @@ export default {
           this.rbi.value = 1;
         }
         return;
+      }
+      if (this.content === 'E') {
+        // 失誤 全不動 打者清空
+        this.base.home.result = '';
       }
       if (this.content === 'FC') {
         // 野選 前位跑者出局 打者一壘

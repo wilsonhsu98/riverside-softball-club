@@ -66,13 +66,13 @@
     <loading v-if="loading" :text="loading.text"></loading>
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
-        <p class="msg">{{ alertMsg }}</p>
+        <p class="msg" v-html="alertMsg"></p>
         <button @click="alert('')">{{ $t('btn_noticed') }}</button>
       </div>
     </div>
     <div class="modal" v-if="confirmMsg">
       <div class="dialog">
-        <p class="msg">{{ confirmMsg }}</p>
+        <p class="msg" v-html="confirmMsg"></p>
         <button @click="confirmYes">{{ $t('btn_yes') }}</button>
         <button @click="confirmNo">{{ $t('btn_no') }}</button>
       </div>
@@ -200,6 +200,12 @@ header {
     margin: 0 0 15px;
     text-align: left;
     width: 100%;
+    &::v-deep {
+      ul {
+        margin: 0;
+        padding-inline-start: 25px;
+      }
+    }
   }
   button {
     background-color: $header_bgcolor;
