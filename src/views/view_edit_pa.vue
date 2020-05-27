@@ -1567,9 +1567,10 @@ export default {
             ? err[0]
             : `<ul><li>${err.join('</li><li>')}</li></ul>`,
         );
+        return false;
       }
 
-      return ![err].some(str => !!str);
+      return true;
     },
     edit_() {
       if (this.content && this.validate()) {
