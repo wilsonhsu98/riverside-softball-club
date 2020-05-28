@@ -276,6 +276,12 @@
             </div>
             <infield class="infield">
               <div class="player-container">
+                <button class="btn" @click="revertOnbase">
+                  {{ $t('btn_original') }}
+                </button>
+                <button class="btn" @click="estimate">
+                  {{ $t('btn_estimate') }}
+                </button>
                 <div
                   :class="['on-base-player', b]"
                   v-for="(b, bi) in ['first', 'second', 'third', 'home']"
@@ -283,37 +289,67 @@
                 >
                   <span
                     :class="[
-                      'run',
-                      {
-                        select: base[b].result === 'run',
-                        disabled: base[b].disabled,
-                      },
+                      'name',
+                      { disabled: !(isBaseNotFulled() || base[b].name) },
                     ]"
                     @click="
-                      base[b].disabled || toggle(`base.${b}.result`, 'run')
+                      (isBaseNotFulled() || base[b].name) && changePlayer(b)
                     "
                   >
-                    {{ $t('R') }}
-                  </span>
-                  <span class="name" @click="changePlayer(b)">
                     {{
                       `${getPlayerNumber(base[b].name)}${base[b].name || ''}`
                     }}
                   </span>
                   <span
+                    v-for="(targetBase, tbi) in ['first', 'second', 'third']"
+                    :key="`onbase_${bi}_${tbi}`"
+                    :class="[
+                      'base',
+                      {
+                        select: base[b].result === targetBase,
+                        disabled: isSubBaseDisabled(b, targetBase),
+                        nobase:
+                          (b === 'second' && ['first'].includes(targetBase)) ||
+                          (b === 'third' &&
+                            ['first', 'second'].includes(targetBase)),
+                      },
+                    ]"
+                    @click="
+                      isSubBaseDisabled(b, targetBase) ||
+                        toggle(`base.${b}.result`, targetBase)
+                    "
+                    >{{ `${tbi + 1}B` }}</span
+                  >
+                  <span
+                    :class="[
+                      'run',
+                      {
+                        select: base[b].result === 'run',
+                        disabled: base[b].disabled || !base[b].name,
+                      },
+                    ]"
+                    @click="
+                      base[b].disabled ||
+                        !base[b].name ||
+                        toggle(`base.${b}.result`, 'run')
+                    "
+                    >R</span
+                  >
+                  <span
                     :class="[
                       'out',
                       {
                         select: base[b].result === 'out',
-                        disabled: base[b].disabled,
+                        disabled: base[b].disabled || !base[b].name,
                       },
                     ]"
                     @click="
-                      base[b].disabled || toggle(`base.${b}.result`, 'out')
+                      base[b].disabled ||
+                        !base[b].name ||
+                        toggle(`base.${b}.result`, 'out')
                     "
+                    >O</span
                   >
-                    {{ $t('Out') }}
-                  </span>
                 </div>
               </div>
             </infield>
@@ -541,7 +577,7 @@
                     {{ $t('btn_estimate') }}
                   </button>
                   <div
-                    :class="['on-base-player2', b]"
+                    :class="['on-base-player', b]"
                     v-for="(b, bi) in ['first', 'second', 'third', 'home']"
                     :key="`onbase_${bi}`"
                   >
@@ -1042,162 +1078,6 @@
   .coordination-step {
     height: 400px;
   }
-  .infield {
-    display: block;
-    margin: 0 auto;
-    .player-container {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      .on-base-player {
-        position: absolute;
-        display: flex;
-        width: 142px;
-        justify-content: center;
-        > span {
-          font-size: 12px;
-          text-align: center;
-          white-space: nowrap;
-          overflow: hidden;
-          line-height: 28px;
-          height: 34px;
-          border: 3px solid transparent;
-          background-color: rgba(248, 248, 248, 0.6);
-          box-sizing: border-box;
-          cursor: pointer;
-          &.run {
-            width: 41px;
-            color: $run;
-            border-color: $run;
-            border-right: 0;
-            border-radius: 5px 0 0 5px;
-          }
-          &.name {
-            width: 60px;
-            color: $dark_gray;
-            border-color: $dark_gray;
-          }
-          &.out {
-            width: 41px;
-            color: $out;
-            border-color: $out;
-            border-left: 0;
-            border-radius: 0 5px 5px 0;
-          }
-          &.select {
-            color: #fff;
-            &.run {
-              background-color: $run;
-            }
-            &.out {
-              background-color: $out;
-            }
-          }
-          &.disabled {
-            opacity: 0.2;
-            cursor: not-allowed;
-          }
-        }
-        &.first {
-          top: 68px;
-          right: 5px;
-        }
-        &.second {
-          top: 14px;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-        &.third {
-          top: 68px;
-          left: 5px;
-        }
-        &.home {
-          bottom: 22px;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-      }
-      .on-base-player2 {
-        position: absolute;
-        display: flex;
-        flex-wrap: wrap;
-        width: 120px;
-        justify-content: center;
-        > span {
-          font-size: 12px;
-          text-align: center;
-          white-space: nowrap;
-          overflow: hidden;
-          line-height: 22px;
-          height: 26px;
-          color: $dark_gray;
-          border: 2px solid $dark_gray;
-          background-color: rgba(248, 248, 248, 0.6);
-          box-sizing: border-box;
-          cursor: pointer;
-          flex: 1;
-          margin: 1px;
-          border-radius: 5px;
-          &.name {
-            flex: 0 1 100%;
-          }
-          &.run {
-            color: $run;
-            border-color: $run;
-          }
-          &.out {
-            color: $out;
-            border-color: $out;
-          }
-          &.select {
-            color: #fff;
-            &.run {
-              background-color: $run;
-            }
-            &.out {
-              background-color: $out;
-            }
-            &.base {
-              background-color: $dark_gray;
-            }
-          }
-          &.disabled {
-            opacity: 0.2;
-            cursor: not-allowed;
-          }
-          &.nobase {
-            font-size: 0;
-          }
-        }
-        &.first {
-          top: 62px;
-          right: 3px;
-        }
-        &.second {
-          top: 3px;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-        &.third {
-          top: 62px;
-          left: 3px;
-        }
-        &.home {
-          bottom: 3px;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-      }
-      .btn {
-        display: inline-block;
-        width: auto;
-        padding: 5px;
-        margin: 5px 0 0 5px;
-      }
-    }
-  }
   .content {
     margin: 0;
     display: block;
@@ -1339,6 +1219,125 @@
     left: 50%;
     transform: translateY(-50%) translateX(-50%);
   }
+  .dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 260px;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 3px;
+    box-shadow: 0 20px 60px -2px rgba(27, 33, 58, 0.4);
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    &::v-deep {
+      .outer-container > :first-child {
+        left: -35px;
+      }
+    }
+  }
+  button {
+    background-color: $header_bgcolor;
+    padding: 10px;
+    margin: 0;
+    outline: none;
+    flex: 1;
+    &:nth-of-type(2) {
+      margin-left: 10px;
+    }
+  }
+}
+
+.infield {
+  display: block;
+  margin: 0 auto;
+  .player-container {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    .on-base-player {
+      position: absolute;
+      display: flex;
+      flex-wrap: wrap;
+      width: 120px;
+      justify-content: center;
+      > span {
+        font-size: 12px;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        line-height: 22px;
+        height: 26px;
+        color: $dark_gray;
+        border: 2px solid $dark_gray;
+        background-color: rgba(248, 248, 248, 0.6);
+        box-sizing: border-box;
+        cursor: pointer;
+        flex: 1;
+        margin: 1px;
+        border-radius: 5px;
+        &.name {
+          flex: 0 1 100%;
+        }
+        &.run {
+          color: $run;
+          border-color: $run;
+        }
+        &.out {
+          color: $out;
+          border-color: $out;
+        }
+        &.select {
+          color: #fff;
+          &.run {
+            background-color: $run;
+          }
+          &.out {
+            background-color: $out;
+          }
+          &.base {
+            background-color: $dark_gray;
+          }
+        }
+        &.disabled {
+          opacity: 0.2;
+          cursor: not-allowed;
+        }
+        &.nobase {
+          font-size: 0;
+        }
+      }
+      &.first {
+        top: 62px;
+        right: 3px;
+      }
+      &.second {
+        top: 3px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      &.third {
+        top: 62px;
+        left: 3px;
+      }
+      &.home {
+        bottom: 3px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+    }
+    .btn {
+      display: inline-block;
+      width: auto;
+      padding: 5px;
+      margin: 5px 0 0 5px;
+    }
+  }
 }
 
 @media only screen and (max-width: 760px) {
@@ -1462,6 +1461,7 @@ export default {
       preContents: [],
       next3: [],
       showSetInn: false,
+      showNextOnbase: false,
     };
   },
   created() {
@@ -2010,6 +2010,7 @@ export default {
         this.order - 1,
       )[0];
       this.base.home.result = '';
+      this.rbi.value = 0;
       ['first', 'second', 'third'].forEach(b => {
         this.base[b].name = '';
         this.base[b].result = '';
@@ -2026,7 +2027,9 @@ export default {
       }
     },
     estimate() {
-      this.revertOnbase();
+      if (!this.pa) {
+        this.revertOnbase();
+      }
       if (['FO', 'GO', 'FOUL', 'K'].includes(this.content)) {
         // 全不動 打者出局
         this.base.home.result = 'out';
@@ -2261,7 +2264,14 @@ export default {
         if (this.content === 'SF') {
           this.rbi.value = 1;
         }
-        this.estimate();
+        if (['BB', 'K'].includes(this.content)) {
+          this.step = 3;
+        } else {
+          this.step = 2;
+        }
+        if (!this.pa) {
+          this.estimate();
+        }
       } else {
         this.base.home.disabled = true;
         this.base.first.disabled = true;
@@ -2269,11 +2279,11 @@ export default {
         this.base.third.disabled = true;
       }
     },
-    // location() {
-    //   setTimeout(() => {
-    //     this.step = 4;
-    //   }, 500);
-    // },
+    location() {
+      setTimeout(() => {
+        this.step = 3;
+      }, 500);
+    },
     run: {
       handler() {
         if (this.run.value) {
