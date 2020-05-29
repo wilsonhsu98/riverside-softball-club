@@ -21,15 +21,7 @@
             {{ $t('desc_inn') }}
           </div>
           <div>{{ $t('desc_order', { n: order }) }}</div>
-          <div>
-            <template>
-              {{
-                $t(version === 'import' ? 'desc_might_out' : 'desc_out', {
-                  n: out,
-                })
-              }}
-            </template>
-          </div>
+          <div>{{ $t('desc_might_out', { n: out }) }}</div>
           <div>
             {{
               $t('desc_batting', {
@@ -754,6 +746,49 @@
     <div class="modal" v-if="showSetInn" @click="closeSetInn">
       <minus-plus-number :value="inn" @change="setInn" />
     </div>
+    <div class="modal" v-if="showNextOnbase">
+      <div class="dialog">
+        <p class="msg">{{ $t('msg_onbase_confirm') }}</p>
+        <infield class="infield">
+          <div class="player-container">
+            <template v-if="onbaseOut < 3">
+              <player
+                v-for="(b, bi) in Object.keys(onbasePlayers).map(base => ({
+                  base,
+                  name: onbasePlayers[base],
+                }))"
+                :key="`onbase_${bi}`"
+                :class="b.base"
+                :player="getPlayer(b.name)"
+              />
+              <div class="inn-out">
+                <div class="inn">
+                  <span>{{ onbaseInn }}</span>
+                  <div
+                    v-if="topBottom"
+                    class="top-bottom"
+                    :class="{
+                      top: topBottom === 'top',
+                      bottom: topBottom === 'bot',
+                    }"
+                  ></div>
+                  <span v-else>?</span>
+                </div>
+                <div :class="['out', { selected: onbaseOut > 0 }]"></div>
+                <div :class="['out', { selected: onbaseOut > 1 }]"></div>
+              </div>
+            </template>
+            <p class="inn-change-msg" v-else>
+              {{ $t('msg_onbase_inn_change') }}
+            </p>
+          </div>
+        </infield>
+        <button @click="edit_">{{ $t('btn_onbase_confirm') }}</button>
+        <button @click="showNextOnbase = false">
+          {{ $t('btn_onbase_cancel') }}
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1239,6 +1274,57 @@
       }
     }
   }
+  .msg {
+    margin: 0 0 15px;
+    text-align: left;
+    width: 100%;
+  }
+  .infield {
+    margin: 0 0 15px;
+    .inn-out {
+      display: flex;
+      position: absolute;
+      right: 20px;
+      bottom: 20px;
+      left: 20px;
+      line-height: 18px;
+      .inn {
+        white-space: nowrap;
+        color: white;
+        font-weight: bold;
+        margin-right: auto;
+      }
+      .top-bottom {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        border-style: solid;
+        top: 1px;
+        position: relative;
+        margin-left: 2px;
+      }
+      .top {
+        border-width: 0 8px 10px 8px;
+        border-color: transparent transparent white transparent;
+      }
+      .bottom {
+        border-width: 10px 8px 0 8px;
+        border-color: white transparent transparent transparent;
+      }
+      .out {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        margin-left: 2px;
+        box-sizing: border-box;
+        border-radius: 50%;
+        border: 2px solid white;
+        &.selected {
+          background-color: $out;
+        }
+      }
+    }
+  }
   button {
     background-color: $header_bgcolor;
     padding: 10px;
@@ -1331,6 +1417,31 @@
         transform: translateX(-50%);
       }
     }
+    .player {
+      width: 110px;
+      margin: 0;
+      position: absolute;
+      background-color: rgba(237, 247, 248, 0.5);
+      font-size: 14px;
+      cursor: auto;
+      &.first {
+        top: 62px;
+        right: 3px;
+      }
+      &.second {
+        top: 6px;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+      &.third {
+        top: 62px;
+        left: 3px;
+      }
+    }
+    .inn-change-msg {
+      margin: 0;
+      line-height: 180px;
+    }
     .btn {
       display: inline-block;
       width: auto;
@@ -1402,7 +1513,7 @@ export default {
     return {
       testMode: ['MOMOCAT'].includes(this.$route.params.team),
       version: '',
-      inn: '',
+      inn: 1,
       out: 0,
       order: '',
       name: '',
@@ -1462,6 +1573,9 @@ export default {
       next3: [],
       showSetInn: false,
       showNextOnbase: false,
+      onbasePlayers: [],
+      onbaseInn: 1,
+      onbaseOut: 0,
     };
   },
   created() {
@@ -1512,6 +1626,7 @@ export default {
       );
     },
     validate() {
+      if (this.version === 'import') return true;
       const rule = {
         third: {
           back: ['second', 'first', 'home'],
@@ -1576,6 +1691,39 @@ export default {
     },
     edit_() {
       if (this.content && this.validate()) {
+        if (this.version !== 'import') {
+          if (
+            this.showNextOnbase === false &&
+            !this.pa &&
+            !['K', 'BB', 'HR'].includes(this.content)
+          ) {
+            this.showNextOnbase = true;
+            this.onbasePlayers = ['first', 'second', 'third'].reduce(
+              (acc, b) => {
+                const find = ['home', 'first', 'second', 'third'].find(
+                  bb => this.base[bb].result === b,
+                );
+                return find
+                  ? {
+                      ...acc,
+                      [b]: this.base[find].name,
+                    }
+                  : acc;
+              },
+              {},
+            );
+            this.onbaseOut = Math.min(
+              this.out +
+                ['home', 'first', 'second', 'third'].filter(
+                  bb => this.base[bb].result === 'out',
+                ).length,
+              3,
+            );
+            this.onbaseInn = this.onbaseOut === 3 ? this.inn + 1 : this.inn;
+            return;
+          }
+          this.showNextOnbase = false;
+        }
         const rbi = (() => {
           if (
             !(
@@ -1825,7 +1973,7 @@ export default {
         .filter(item => item.inn === this.inn);
       const shouldNotPrev5 = tempPrev5
         .map(item => item.onbase)
-        .reduce((acc, item) => [...acc, item], [])
+        .reduce((acc, item) => [...acc, ...item], [])
         .filter(
           item => item && ['out', 'run'].includes(item.result) && item.name,
         )
