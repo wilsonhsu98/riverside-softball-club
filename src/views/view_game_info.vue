@@ -341,6 +341,15 @@
         <label v-if="coach">{{ coach }}</label>
       </div>
 
+      <div
+        class="field-wrapper field-wrapper-item"
+        :class="recorder ? '' : 'empty'"
+        @click="changePlayer('recorder')"
+      >
+        <span>{{ $t('ttl_recorder') }}</span>
+        <label v-if="recorder">{{ recorder }}</label>
+      </div>
+
       <custom-input
         type="select"
         taggable
@@ -652,6 +661,7 @@ export default {
       pitcher: '',
       mvp: '',
       coach: '',
+      recorder: '',
       period: '',
       gameNote: '',
       youtubeVideos: '',
@@ -745,6 +755,7 @@ export default {
             place,
             topBottom,
             coach,
+            recorder,
             tags,
             result,
             opponentScores,
@@ -767,6 +778,7 @@ export default {
             place,
             topBottom,
             coach,
+            recorder,
             tags,
             result,
             opponentScores: opponentScores.slice(0, inn),
@@ -792,52 +804,24 @@ export default {
       });
     },
     changePlayer(mode) {
-      this.changeMode = mode;
-      switch (mode) {
-        case 'coach':
-          this.currentPlayer = this.teamInfo.players.find(
-            player => player.name && player.name === this.coach,
-          );
-          break;
-        case 'pitcher':
-          this.currentPlayer = this.teamInfo.players.find(
-            player => player.name && player.name === this.pitcher,
-          );
-          break;
-        case 'mvp':
-          this.currentPlayer = this.teamInfo.players.find(
-            player => player.name && player.name === this.mvp,
-          );
-          break;
+      if (['coach', 'recorder', 'pitcher', 'mvp'].includes(mode)) {
+        this.currentPlayer = this.teamInfo.players.find(
+          player => player.name && player.name === this[mode],
+        );
       }
       this.$modal.show('player');
+      this.changeMode = mode;
     },
     selectPlayer(player) {
-      switch (this.changeMode) {
-        case 'coach':
-          this.coach = player.name;
-          break;
-        case 'pitcher':
-          this.pitcher = player.name;
-          break;
-        case 'mvp':
-          this.mvp = player.name;
-          break;
+      if (['coach', 'recorder', 'pitcher', 'mvp'].includes(this.changeMode)) {
+        this[this.changeMode] = player.name;
       }
       this.$modal.hide('player');
       this.changeMode = '';
     },
     clearPlayer() {
-      switch (this.changeMode) {
-        case 'coach':
-          this.coach = '';
-          break;
-        case 'pitcher':
-          this.pitcher = '';
-          break;
-        case 'mvp':
-          this.mvp = '';
-          break;
+      if (['coach', 'recorder', 'pitcher', 'mvp'].includes(this.changeMode)) {
+        this[this.changeMode] = '';
       }
       this.$modal.hide('player');
       this.changeMode = '';
@@ -893,6 +877,7 @@ export default {
             place,
             topBottom,
             coach,
+            recorder,
             tags,
             pitcher,
             mvp,
@@ -902,7 +887,7 @@ export default {
           } = this.boxSummary;
           this.version = version;
           this.result = result;
-          this.inn = Math.max(scores.length, opponentScores.length);
+          this.inn = Math.max(scores.length, opponentScores.length, 1);
           this.scores = scores;
           this.opponentScores = [...opponentScores];
           this.prevId = game;
@@ -916,6 +901,7 @@ export default {
           this.place = place;
           this.topBottom = topBottom;
           this.coach = coach;
+          this.recorder = recorder;
           this.tags = tags;
           this.pitcher = pitcher;
           this.mvp = mvp;

@@ -86,7 +86,7 @@ const router = new VueRouter({
         {
           path: 'games/:team/:game/:order',
           name: 'pa',
-          component: require('./views/view_edit_pa').default,
+          component: require('./views/view_pa').default,
           meta: { requiresAuth: true },
         },
         {

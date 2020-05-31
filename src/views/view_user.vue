@@ -279,6 +279,9 @@ export default {
     switchTeam_(teamCode) {
       if (this.currentTeam !== teamCode) {
         this.switchTeam(teamCode);
+        if (this.isAnonymous) {
+          this.$router.push(`/main/games/${teamCode}`);
+        }
       }
     },
   },

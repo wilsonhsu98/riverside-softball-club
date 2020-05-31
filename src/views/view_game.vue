@@ -117,6 +117,9 @@
             <div v-if="coach" class="tag">
               {{ $t('box_coach', { name: coach }) }}
             </div>
+            <div v-if="recorder" class="tag">
+              {{ $t('box_recorder', { name: recorder }) }}
+            </div>
             <div class="tag" v-for="other in tags" :key="other">
               {{ other }}
             </div>
@@ -1299,6 +1302,7 @@ export default {
       gameType: '',
       place: '',
       coach: '',
+      recorder: '',
       pitcher: '',
       mvp: '',
       result: '',
@@ -1482,6 +1486,7 @@ export default {
             gameType,
             place,
             coach,
+            recorder,
             pitcher,
             mvp,
             result,
@@ -1518,6 +1523,7 @@ export default {
             '',
           ][['1', '3', '4', ''].indexOf(place)];
           this.coach = coach;
+          this.recorder = recorder;
           this.pitcher = pitcher;
           this.mvp = mvp;
           this.result = result;

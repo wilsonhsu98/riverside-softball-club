@@ -189,7 +189,7 @@ header {
     width: 260px;
     text-align: center;
     background-color: #fff;
-    border-radius: 3px;
+    border-radius: 10px;
     box-shadow: 0 20px 60px -2px rgba(27, 33, 58, 0.4);
     padding: 15px;
     box-sizing: border-box;

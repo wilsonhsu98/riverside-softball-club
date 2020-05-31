@@ -386,7 +386,6 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import i18n from '../i18n';
 import defaultIcon from '../images/icon.png';
 
 export default {
@@ -435,10 +434,10 @@ export default {
     joinTeam_() {
       const obj = {};
       if (this.choice === 'join') {
-        obj.msg = `${i18n.t('msg_just_join')}${this.otherPlayer}`;
+        obj.msg = `${this.$t('msg_just_join')}${this.otherPlayer}`;
       } else {
         obj.name = this.bindPlayer.name;
-        obj.msg = i18n.t('msg_join_bind', { name: this.bindPlayer.name });
+        obj.msg = this.$t('msg_join_bind', { name: this.bindPlayer.name });
       }
       this.requestJoin({
         ...obj,
