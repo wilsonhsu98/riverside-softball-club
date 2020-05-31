@@ -26,6 +26,7 @@
         :value="value"
         :data-label="name"
         @input="input"
+        @change="input"
         @search:blur="blur"
       >
         <div slot="no-options">{{ $t('msg_no_option') }}</div>
@@ -437,7 +438,7 @@ export default {
       this.$emit('input', newVal);
     },
     input(val) {
-      this.$emit('input', val);
+      this.$emit('input', val === null ? '' : val);
     },
     enter() {
       this.$emit('enter', this.value);
