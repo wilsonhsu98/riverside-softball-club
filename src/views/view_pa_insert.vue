@@ -1479,8 +1479,8 @@ export default {
     },
     changePlayer(mode) {
       if (['home', 'first', 'second', 'third'].includes(mode)) {
-        this.currentPlayer = this.base[this.changeMode].name
-          ? this.getPlayer(this.base[this.changeMode].name)
+        this.currentPlayer = this.base[mode].name
+          ? this.getPlayer(this.base[mode].name)
           : '';
       }
       this.$modal.show('player');

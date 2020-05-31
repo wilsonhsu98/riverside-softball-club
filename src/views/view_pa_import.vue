@@ -594,7 +594,6 @@ export default {
       );
     },
     changePlayer(mode) {
-      this.changeMode = mode;
       switch (mode) {
         case 'batter':
         case 'home':
@@ -607,6 +606,7 @@ export default {
           break;
       }
       this.$modal.show('player');
+      this.changeMode = mode;
     },
     selectPlayer(player) {
       switch (this.changeMode) {

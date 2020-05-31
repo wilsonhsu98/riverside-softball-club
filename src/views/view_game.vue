@@ -971,7 +971,9 @@
       line-height: 20px;
     }
     .action {
-      margin: auto 0 0 auto;
+      margin: 10px 0 0 auto;
+      display: flex;
+      align-items: flex-end;
     }
   }
   .result-icon {
