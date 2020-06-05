@@ -107,9 +107,7 @@ const resetVH = () => {
   // document.documentElement.style.maxHeight = `${window.innerHeight}px`;
 };
 resetVH();
-window.addEventListener('resize', () => {
-  resetVH();
-});
+window.addEventListener('resize', () => window.requestAnimationFrame(resetVH));
 smoothscroll.polyfill();
 
 document.title = 'Riverside Softball Club';

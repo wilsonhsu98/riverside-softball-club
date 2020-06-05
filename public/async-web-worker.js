@@ -171,6 +171,11 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       listByGame: games,
       locations: top
         .filter(item => item.location && item.location.x)
+        .sort((a, b) => {
+          if (a.content === 'HR' && b.content !== 'HR') return 1;
+          if (a.content !== 'HR' && b.content === 'HR') return -1;
+          return 0;
+        })
         .map(item => ({
           x: item.location.x,
           y: item.location.y,
