@@ -96,6 +96,7 @@
                 pattern="\d*"
                 min="0"
                 class="input-score cell"
+                required="required"
                 v-model.number.lazy="opponentScores[index]"
                 :ref="`score${index}`"
                 @focus="isFocusInn = `score${index}`"
@@ -112,6 +113,7 @@
                 pattern="\d*"
                 min="0"
                 class="input-score cell"
+                required="required"
                 v-model.number.lazy="opponentScores[index]"
                 :ref="`score${index}`"
                 @focus="isFocusInn = `score${index}`"
@@ -124,6 +126,7 @@
                 pattern="\d*"
                 min="0"
                 class="input-score cell"
+                required="required"
                 v-model.number.lazy="opponentScores[index]"
                 :ref="`score${index}`"
                 @focus="isFocusInn = `score${index}`"
@@ -567,6 +570,8 @@
         background-color: #fff;
         .input-score {
           width: calc(100% - 4px);
+          bottom: 2px;
+          position: relative;
         }
       }
       > div:first-child {
@@ -591,6 +596,10 @@
       outline: none;
       text-align: center;
       box-sizing: border-box;
+      &:invalid {
+        border: 2px solid $input_border;
+        border-radius: 4px;
+      }
     }
   }
   .delete-btn-container {
