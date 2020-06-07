@@ -695,17 +695,15 @@
 }
 .chart {
   text-align: center;
-  overflow-x: auto;
-  overflow-y: hidden;
-  direction: rtl;
-  -webkit-overflow-scrolling: touch;
-
   font-size: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   padding-top: 5px;
   .chart-inner {
     display: flex;
     align-items: flex-end;
+    direction: rtl;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     width: 100%;
   }
   .bar {
