@@ -703,9 +703,6 @@
   font-size: 12px;
   margin-bottom: 10px;
   padding-top: 5px;
-  border-top: 0;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 0 0 10px 10px;
   .chart-inner {
     display: flex;
     align-items: flex-end;
