@@ -163,13 +163,16 @@
 
 .modal-wrapper {
   background-color: rgba(0, 0, 0, 0.5);
+  ::v-deep .v--modal-box {
+    border-radius: 10px;
+  }
 }
 
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .modal-wrapper::v-deep .v--modal-box {
     position: fixed;
-    top: 60px !important;
-    bottom: 60px !important;
+    top: 80px !important;
+    bottom: 80px !important;
     height: auto !important;
     left: 20px !important;
     right: 20px !important;

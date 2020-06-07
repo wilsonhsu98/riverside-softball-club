@@ -698,6 +698,7 @@
   overflow-x: auto;
   overflow-y: hidden;
   direction: rtl;
+  -webkit-overflow-scrolling: touch;
 
   font-size: 12px;
   margin-bottom: 10px;
