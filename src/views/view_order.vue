@@ -703,6 +703,7 @@
     align-items: flex-end;
     direction: rtl;
     overflow-x: auto;
+    visibility: visible;
     -webkit-overflow-scrolling: touch;
     width: 100%;
   }
@@ -813,11 +814,7 @@ i.fa {
   }
 }
 
-@media only screen and (max-width: 760px) {
-  .chart .chart-inner {
-    overflow-x: scroll;
-  }
-}
+/* @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) { */
 @media only screen and (max-height: 414px) and (min-aspect-ratio: 13/9) {
   .sticky {
     top: calc(50vh - (33px * 5 - 5px) / 2 - 35px);
