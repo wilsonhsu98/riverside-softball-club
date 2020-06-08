@@ -583,6 +583,7 @@ export default {
         four: { disabled: true },
       },
       location: [],
+      break: undefined,
       changeMode: '',
       currentPlayer: undefined,
       reJoinPlayer: undefined,
@@ -722,6 +723,7 @@ export default {
           ...(item.rbi !== undefined && { rbi: item.rbi }),
           ...(item.onbase !== undefined && { onbase: item.onbase }),
           ...(item.location !== undefined && { location: item.location }),
+          ...(item.break !== undefined && { break: item.break }),
         }));
         tempRecord.length = Math.max(i, tempRecord.length);
         const orders = tempRecord.slice(0, i).concat(
@@ -736,6 +738,7 @@ export default {
               !['BB', 'K', 'FOUL'].includes(this.content) && {
                 location: this.location[0],
               }),
+            ...(this.break && { break: true }),
           },
           tempRecord.slice(i + 1),
         );
@@ -773,6 +776,7 @@ export default {
       this.base.home.name = this.name = this.pa.name;
       this.content = this.pa.content === 'new' ? '' : this.pa.content;
       this.rbi.value = this.pa.rbi;
+      this.break = this.pa.break;
       if (typeof this.pa.location === 'object')
         this.location = [].concat(this.pa.location);
       ['home', 'first', 'second', 'third'].forEach((b, i) => {

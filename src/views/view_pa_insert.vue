@@ -1276,8 +1276,16 @@ export default {
           ...(item.rbi !== undefined && { rbi: item.rbi }),
           ...(item.onbase !== undefined && { onbase: item.onbase }),
           ...(item.location !== undefined && { location: item.location }),
+          ...(item.break !== undefined && { break: item.break }),
         }));
         tempRecord.length = Math.max(i, tempRecord.length);
+        const breakOrder =
+          this.name !== this.base.home.name &&
+          this.order % this.box[this.box.length - 1].order === 1 &&
+          this.order ===
+            (this.order % this.box[this.box.length - 1].order) +
+              this.box.length -
+              1;
         const orders = tempRecord.slice(0, i).concat(
           {
             inn: this.inn,
@@ -1290,6 +1298,7 @@ export default {
               !['BB', 'K', 'FOUL'].includes(this.content) && {
                 location: this.location[0],
               }),
+            ...(breakOrder && { break: true }),
           },
           tempRecord.slice(i + 1),
         );
@@ -1299,24 +1308,6 @@ export default {
           orders,
         });
       }
-    },
-    delete_() {
-      this.confirm(this.$t('msg_delete_warning')).then(() => {
-        const startedValue = this.box[0].slice(-1)[0];
-        // this.box[0].slice(-1)[0] is the value of started players which is not defined before first round
-        if (startedValue === 0 || this.order <= startedValue) {
-          this.deleteLastPa({
-            teamCode: this.$route.params.team,
-            gameId: this.$route.params.game,
-            order: this.order,
-          });
-        } else {
-          this.deleteLastPa({
-            teamCode: this.$route.params.team,
-            gameId: this.$route.params.game,
-          });
-        }
-      });
     },
     setInn(val) {
       this.inn = val;

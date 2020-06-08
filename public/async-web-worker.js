@@ -242,7 +242,7 @@ const displayGame = (players, records, errors, role) => {
       if (!item.order) {
         item.order = i + 1;
       }
-      if (!find && startOrder === 0) {
+      if (!find && startOrder === 0 && !item.break) {
         arr.push({
           name: item.name,
           data: (players.find(sub => sub.id === item.name) || { data: {} })
@@ -253,7 +253,11 @@ const displayGame = (players, records, errors, role) => {
         });
       } else {
         if (startOrder === 0) {
-          startOrder = item.order - find.order;
+          if (item.break) {
+            startOrder = item.order - 1;
+          } else {
+            startOrder = item.order - find.order;
+          }
         }
       }
 
