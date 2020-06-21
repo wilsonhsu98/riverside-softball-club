@@ -972,57 +972,41 @@ export default {
       }
       if (this.content === '2H') {
         // 二安 壘上全部推兩壘
-        let rbi = 0;
-        if (this.base.third.name) {
-          this.base.third.result = 'run';
-          rbi += 1;
-        }
-        if (this.base.second.name) {
-          this.base.second.result = 'run';
-          rbi += 1;
-        }
-        this.rbi.value = rbi;
+        this.rbi.value = ['third', 'second'].reduce((rbi, b) => {
+          if (this.base[b].name) {
+            this.base[b].result = 'run';
+            return rbi + 1;
+          }
+          return rbi;
+        }, 0);
         if (this.base.first.name) this.base.first.result = 'third';
         this.base.home.result = 'second';
         return;
       }
       if (this.content === '3H') {
         // 三安 壘上全部得分
-        let rbi = 0;
-        if (this.base.third.name) {
-          this.base.third.result = 'run';
-          rbi += 1;
-        }
-        if (this.base.second.name) {
-          this.base.second.result = 'run';
-          rbi += 1;
-        }
-        if (this.base.first.name) {
-          this.base.first.result = 'run';
-          rbi += 1;
-        }
-        this.rbi.value = rbi;
+        this.rbi.value = ['third', 'second', 'first'].reduce((rbi, b) => {
+          if (this.base[b].name) {
+            this.base[b].result = 'run';
+            return rbi + 1;
+          }
+          return rbi;
+        }, 0);
         this.base.home.result = 'third';
         return;
       }
       if (this.content === 'HR') {
         // 全壘打 打點得分
-        let rbi = 0;
-        if (this.base.third.name) {
-          this.base.third.result = 'run';
-          rbi += 1;
-        }
-        if (this.base.second.name) {
-          this.base.second.result = 'run';
-          rbi += 1;
-        }
-        if (this.base.first.name) {
-          this.base.first.result = 'run';
-          rbi += 1;
-        }
-        this.base.home.result = 'run';
-        rbi += 1;
-        this.rbi.value = rbi;
+        this.rbi.value = ['third', 'second', 'first', 'home'].reduce(
+          (rbi, b) => {
+            if (this.base[b].name) {
+              this.base[b].result = 'run';
+              return rbi + 1;
+            }
+            return rbi;
+          },
+          0,
+        );
         return;
       }
       if (this.content === 'BB') {
@@ -1084,21 +1068,13 @@ export default {
       }
       if (this.content === 'TP') {
         // 三殺 前兩位跑者出局 打者出局
-        let out = 0;
-        this.base.home.result = 'out';
-        out += 1;
-        if (this.base.first.name && out < 3) {
-          this.base.first.result = 'out';
-          out += 1;
-        }
-        if (this.base.second.name && out < 3) {
-          this.base.second.result = 'out';
-          out += 1;
-        }
-        if (this.base.third.name && out < 3) {
-          this.base.third.result = 'out';
-          out += 1;
-        }
+        ['home', 'first', 'second', 'third'].reduce((out, b) => {
+          if (this.base[b].name && out < 3) {
+            this.base[b].result = 'out';
+            return out + 1;
+          }
+          return out;
+        }, 0);
         return;
       }
       if (this.content === 'SF') {

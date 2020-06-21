@@ -59,13 +59,10 @@ const getters = {
   userId: state => state.userId || window.localStorage.getItem('user') || '',
   userName: state =>
     state.userName || window.localStorage.getItem('userName') || '',
-  accountInfo: state => {
-    let info = window.localStorage.getItem('accountInfo');
-    if (info) {
-      info = JSON.parse(info);
-    }
-    return state.accountInfo || info || {};
-  },
+  accountInfo: state =>
+    state.accountInfo ||
+    JSON.parse(window.localStorage.getItem('accountInfo')) ||
+    {},
   currentTeam: state => state.currentTeam,
   currentTeamIcon: state => state.currentTeamIcon,
   role: state => state.role,

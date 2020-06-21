@@ -229,49 +229,34 @@ const genStatistics = (players, records, filterPA, filterGames) => {
 };
 
 const displayGame = (players, records, errors, role) => {
-  let arr = [];
-  let startOrder = 0;
-  let innChange = 0;
   const assumedOrder = 12;
+  return records.reduce(
+    (acc, item, i, self) => {
+      const { arr, startOrder: prevStartOrder, prevInn, isSetNewContent } = acc;
+      const order = !item.order ? i + 1 : item.order;
+      const startOrder = item.break ? order - 1 : prevStartOrder;
 
-  (records.find(item => !item.content) || {}).content = 'new';
-
-  records
-    .map((item, i, self) => {
       const find = arr.find(sub => sub.name === item.name);
-      if (!item.order) {
-        item.order = i + 1;
-      }
-      if (!find && startOrder === 0 && !item.break) {
-        arr.push({
-          name: item.name,
-          data: (players.find(sub => sub.id === item.name) || { data: {} })
-            .data,
-          order: item.order,
-          content: [],
-          location: item.location,
-        });
-      } else {
-        if (startOrder === 0) {
-          if (item.break) {
-            startOrder = item.order - 1;
-          } else {
-            startOrder = item.order - find.order;
-          }
-        }
-      }
+      const findIndex = arr.indexOf(find);
+      const canPushPlayer = !find && startOrder === 0 && !item.break;
+      const shouldSetStartOrder = find && startOrder === 0;
+      const shouldSetInnChange = item.inn !== prevInn;
+      const shouldSetNewContent =
+        role === 'manager' && !item.content && !isSetNewContent;
 
-      const onbase = (() => {
+      const { r, out } = (() => {
         const selfAndNext5 = self
           .slice(i, i + 6)
           .map(sub => sub.onbase)
           .reduce((acc, sub) => acc.concat(sub), []);
         return {
-          r: selfAndNext5.find(
-            sub => sub && sub.name === item.name && sub.result === 'run',
-          )
-            ? item.name
-            : '',
+          r:
+            item.r ||
+            (selfAndNext5.find(
+              sub => sub && sub.name === item.name && sub.result === 'run',
+            )
+              ? item.name
+              : ''),
           out: selfAndNext5.find(
             sub => sub && sub.name === item.name && sub.result === 'out',
           )
@@ -279,197 +264,276 @@ const displayGame = (players, records, errors, role) => {
             : false,
         };
       })();
-      return {
-        ...item,
-        r: item.r || onbase.r,
-        out: onbase.out,
+      const { name, inn, rbi, location, onbase } = item;
+      const newItem = {
+        name,
+        inn,
+        order,
+        content: shouldSetNewContent ? 'new' : item.content,
+        rbi,
+        r,
+        out,
+        location,
+        onbase,
+        color: contentColor(item.content),
+        // 換局
+        ...(shouldSetInnChange && {
+          innChange: item.inn,
+        }),
       };
-    })
-    .forEach(item => {
-      if (item.inn !== innChange) {
-        innChange = item.inn;
-        item.innChange = item.inn;
-      }
-      // if (!item.content) {
-      //   item.content = 'new';
-      // }
-      item.color = contentColor(item.content);
 
-      let index = -1;
-      const find = arr.find(sub => sub.name === item.name);
-      if (find) {
-        let middleArr = [];
-        middleArr.length =
-          Math.ceil(item.order / (startOrder || assumedOrder) - 1) -
-          find.content.length;
-        find.content = find.content.concat(middleArr, item);
-      } else {
-        // Handle 代打
-        index = -1;
-        arr.forEach((sub, i) => {
-          if (
+      const alt = arr
+        .map(
+          sub =>
             (sub.altOrder &&
-              sub.altOrder === (item.order % startOrder || startOrder)) ||
-            sub.order === (item.order % startOrder || startOrder)
-          ) {
-            index = i;
-          }
-        });
-        if (index > -1) {
-          let middleArr = [];
-          middleArr.length = Math.ceil(
-            item.order / (startOrder || assumedOrder) - 1,
-          );
-          arr.splice(index + 1, 0, {
-            name: item.name,
-            data: (players.find(sub => sub.id === item.name) || { data: {} })
-              .data,
-            order: item.order,
-            altOrder: item.order % startOrder || startOrder,
-            content: [].concat(middleArr, item),
-          });
-        }
-      }
-      // Handle 代跑
-      index = -1;
-      arr.forEach((sub, i) => {
-        if (
-          (sub.altOrder &&
-            sub.altOrder === (item.order % startOrder || startOrder)) ||
-          sub.order === (item.order % startOrder || startOrder)
-        ) {
-          index = i;
-        }
-      });
-      if (item.r && item.r !== item.name && index > -1) {
-        let middleArr = [];
-        middleArr.length = Math.ceil(
-          item.order / (startOrder || assumedOrder) - 1,
-        );
-        arr.splice(index + 1, 0, {
-          name: item.r,
-          data: (players.find(sub => sub.id === item.r) || { data: {} }).data,
-          order: item.order,
-          altOrder: item.order % startOrder || startOrder,
-          content: [].concat(middleArr, {
-            inn: item.inn,
-            name: item.r,
-            order: item.order,
-            r: item.r,
-            color: 'gray',
-            content: 'PR',
-          }),
-        });
-      }
-    });
-
-  if (
-    (records.length && startOrder) ||
-    (startOrder === 0 &&
-      [undefined, 'new'].indexOf(records[records.length - 1].content) === -1)
-  ) {
-    if (startOrder === 0) startOrder = records.length;
-    let insertAt = records[records.length - startOrder];
-    if (insertAt.r && insertAt.name !== insertAt.r) {
-      insertAt = insertAt.r;
-    } else {
-      insertAt = insertAt.name;
-    }
-    arr
-      .find(player => player.name === insertAt)
-      .content.push({
-        content: 'new',
-        name: insertAt,
-        inn: role === 'manager' && records[records.length - 1].inn,
-      });
-  }
-  const header = innArray.reduce((acc, item, i) => {
-    if (startOrder === 0) {
-      const inns = records
-        .filter(record => record.inn)
-        .map(record => record.inn);
-      const maxInn = inns.length ? Math.max(...inns) : 1;
-      return Array.apply(null, Array(maxInn)).map((undefined, i) => i + 1);
-    }
-    if (i) {
-      return [
-        ...acc,
-        ...Array(
-          Math.ceil(
-            (records.filter(record => record.inn === i).length +
-              (i === (records[records.length - 1] || {}).inn &&
-              role === 'manager'
-                ? 1
-                : 0)) /
-              startOrder,
-          ),
+              sub.altOrder === (order % startOrder || startOrder)) ||
+            sub.order === (order % startOrder || startOrder),
         )
-          .fill(undefined)
-          .map(() => i),
-      ];
-    }
-    return acc;
-  }, []);
+        .lastIndexOf(true);
+      const shouldSetAltBatter = !find && alt > -1;
+      const shouldSetAltRunner = r && r !== item.name && alt > -1;
+      const isLast = i === self.length - 1;
+      const midLen = Math.ceil(order / (startOrder || assumedOrder) - 1);
 
-  let paMax = 0;
-  arr.forEach(item => {
-    if (item.content.length > paMax) paMax = item.content.length;
-  });
-  arr.forEach(item => {
-    let ab = 0;
-    let h = 0;
-    const error = errors.find(sub => sub.name === item.name);
-    item.content.forEach(sub => {
-      ab +=
-        [
-          '1H',
-          '2H',
-          '3H',
-          'HR',
-          'FO',
-          'GO',
-          'K',
-          'FOUL',
-          'E',
-          'FC',
-          'DP',
-          'TP',
-        ].indexOf(sub.content) > -1
-          ? 1
-          : 0;
-      h += ['1H', '2H', '3H', 'HR'].indexOf(sub.content) > -1 ? 1 : 0;
-    });
-    item.content.length = paMax;
-    item.contentNormal = header.reduce((acc, inn, i, self) => {
-      const filter = item.content.filter(sub => sub.inn === inn);
-      const hasPrev = item.content.some(sub => sub.inn < inn);
-      const arr = [];
-      arr.length = 1;
-      if (i && self[i - 1] === inn) {
-        if (filter.length > 1) {
+      const result = {
+        ...acc,
+        prevInn: item.inn,
+        // 第一輪加入球員
+        ...(canPushPlayer && {
+          arr: [
+            ...arr,
+            {
+              name: item.name,
+              data: (players.find(sub => sub.id === item.name) || { data: {} })
+                .data,
+              order,
+              content: [newItem],
+            },
+          ],
+        }),
+        // 第二輪找到原本球員並加入打擊內容
+        ...(find && {
+          arr: [
+            ...arr.slice(0, findIndex),
+            {
+              ...find,
+              /*
+               * https://stackoverflow.com/questions/34559918/spread-syntax-es6
+               * Array.prototype.concat will preserve the empty slots in the array
+               * while the Spread will replace them with undefined values.
+               */
+              content: find.content.concat(
+                Array(Math.max(midLen - find.content.length, 0)),
+                newItem,
+              ),
+            },
+            // 代跑
+            ...(shouldSetAltRunner
+              ? [
+                  {
+                    name: r,
+                    data: (players.find(sub => sub.id === r) || { data: {} })
+                      .data,
+                    order,
+                    altOrder: item.order % startOrder || startOrder,
+                    content: Array(midLen).concat({
+                      inn: item.inn,
+                      name: r,
+                      order,
+                      r,
+                      color: 'gray',
+                      content: 'PR',
+                    }),
+                  },
+                ]
+              : []),
+            ...arr.slice(findIndex + 1),
+          ],
+        }),
+        // 代打
+        ...(shouldSetAltBatter && {
+          arr: [
+            ...arr.slice(0, alt + 1),
+            {
+              name: item.name,
+              data: (players.find(sub => sub.id === item.name) || { data: {} })
+                .data,
+              order,
+              altOrder: order % startOrder || startOrder,
+              content: Array(midLen).concat(newItem),
+            },
+            ...arr.slice(alt + 1),
+          ],
+        }),
+        // 一輪有幾棒
+        ...(shouldSetStartOrder && {
+          startOrder: item.break ? order - 1 : order - find.order,
+        }),
+        // 設定第一個內容為空的球員 打擊內容為 new
+        ...(shouldSetNewContent && {
+          isSetNewContent: true,
+        }),
+      };
+
+      if (isLast) {
+        /*
+         * 最後一round
+         * 取得單場最多次打席數
+         * 加header & start order
+         * 修正所有content array長度至最多打席數
+         * h / ab
+         * 失誤總數
+         */
+        const { arr, startOrder: prevStartOrder, isSetNewContent } = result;
+        const startOrder = item.break ? order - 1 : prevStartOrder;
+        const paMax =
+          Math.ceil(self.length / (startOrder || self.length)) +
+          (self.length % (startOrder || self.length) === 0 && role === 'manager'
+            ? 1
+            : 0);
+        const header = innArray.reduce((acc, item, i) => {
+          if (startOrder === 0) {
+            const inns = records
+              .filter(record => record.inn)
+              .map(record => record.inn);
+            const maxInn = inns.length ? Math.max(...inns) : 1;
+            return Array.apply(null, Array(maxInn)).map(
+              (undefined, i) => i + 1,
+            );
+          }
+          if (i) {
+            return [
+              ...acc,
+              ...Array(
+                Math.ceil(
+                  (records.filter(record => record.inn === i).length +
+                    (i === (records[records.length - 1] || {}).inn &&
+                    role === 'manager'
+                      ? 1
+                      : 0)) /
+                    startOrder,
+                ),
+              )
+                .fill(undefined)
+                .map(() => i),
+            ];
+          }
           return acc;
-        } else {
-          return acc.concat(arr);
-        }
-      } else if (filter.length) {
-        return acc.concat(filter);
+        }, []);
+
+        // if (
+        //   (records.length && startOrder) ||
+        //   (startOrder === 0 &&
+        //     [undefined, 'new'].indexOf(records[records.length - 1].content) === -1)
+        // ) {
+        //   if (startOrder === 0) startOrder = records.length;
+        //   let insertAt = records[records.length - startOrder];
+        //   if (insertAt.r && insertAt.name !== insertAt.r) {
+        //     insertAt = insertAt.r;
+        //   } else {
+        //     insertAt = insertAt.name;
+        //   }
+        //   arr
+        //     .find(player => player.name === insertAt)
+        //     .content.push({
+        //       content: 'new',
+        //       name: insertAt,
+        //       inn: role === 'manager' && records[records.length - 1].inn,
+        //     });
+        // }
+        return [
+          [...header, startOrder],
+          ...arr.map(sub => {
+            const { ab, h } = sub.content.reduce(
+              ({ ab, h }, item) => ({
+                ab:
+                  ab +
+                  ([
+                    '1H',
+                    '2H',
+                    '3H',
+                    'HR',
+                    'FO',
+                    'GO',
+                    'K',
+                    'FOUL',
+                    'E',
+                    'FC',
+                    'DP',
+                    'TP',
+                  ].includes(item.content)
+                    ? 1
+                    : 0),
+                h:
+                  h + (['1H', '2H', '3H', 'HR'].includes(item.content) ? 1 : 0),
+              }),
+              { ab: 0, h: 0 },
+            );
+            const preBatter = self[self.length - (startOrder || self.length)];
+            const newBatter =
+              preBatter.r && preBatter.name !== preBatter.r
+                ? preBatter.r
+                : preBatter.name;
+            const shouldSetLastNew =
+              role === 'manager' && sub.name === newBatter;
+            const newContent =
+              !isSetNewContent && shouldSetLastNew
+                ? [
+                    ...sub.content,
+                    {
+                      content: 'new',
+                      name: newBatter,
+                      inn: self[self.length - 1].inn,
+                    },
+                  ]
+                : sub.content;
+
+            newContent.length = paMax || 1;
+            return {
+              ...sub,
+              content: newContent,
+              contentNormal: header.reduce((acc, inn, i, self) => {
+                const filter = newContent.filter(sub => sub && sub.inn === inn);
+                const hasPrev = newContent.some(sub => sub && sub.inn < inn);
+                const arr = [];
+                arr.length = 1;
+                if (i && self[i - 1] === inn) {
+                  if (filter.length > 1) {
+                    return acc;
+                  } else {
+                    return acc.concat(arr);
+                  }
+                } else if (filter.length) {
+                  return acc.concat(filter);
+                } else {
+                  if (
+                    role === 'manager' &&
+                    startOrder === 0 &&
+                    i === self.length - 1 &&
+                    !hasPrev
+                  ) {
+                    return acc.concat(newContent);
+                  } else {
+                    return acc.concat(arr);
+                  }
+                }
+              }, []),
+              summary: `${ab}-${h}`,
+              error: (errors.find(({ name }) => name === sub.name) || {}).count,
+            };
+          }),
+        ];
       } else {
-        if (
-          role === 'manager' &&
-          startOrder === 0 &&
-          i === self.length - 1 &&
-          !hasPrev
-        ) {
-          return acc.concat(item.content);
-        } else {
-          return acc.concat(arr);
-        }
+        return result;
       }
-    }, []);
-    item.summary = `${ab}-${h}`;
-    item.error = error && error.count;
-  });
-  return [[...header, startOrder]].concat(arr);
+    },
+    {
+      arr: [],
+      startOrder: 0,
+      prevInn: 0,
+      isSetNewContent: false,
+    },
+  );
 };
 
 const execGenStatistics = state => {
