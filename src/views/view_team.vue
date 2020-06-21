@@ -137,7 +137,7 @@
           <i
             v-if="player.uid !== userId"
             class="fa fa-minus-circle"
-            @click="players.splice(i, 1)"
+            @click="players = [...players.slice(0, i), ...players.slice(i + 1)]"
           ></i>
         </template>
 
@@ -168,7 +168,10 @@
             />
             <span>{{ $t('bind_self') }}</span>
           </label>
-          <i class="fa fa-minus-circle" @click="players.splice(i, 1)"></i>
+          <i
+            class="fa fa-minus-circle"
+            @click="players = [...players.slice(0, i), ...players.slice(i + 1)]"
+          ></i>
         </template>
       </div>
 
@@ -224,7 +227,7 @@
           <i
             v-if="player.uid !== userId"
             class="fa fa-times-circle"
-            @click="benches.splice(i, 1)"
+            @click="benches = [...benches.slice(0, i), ...benches.slice(i + 1)]"
           ></i>
         </template>
       </div>

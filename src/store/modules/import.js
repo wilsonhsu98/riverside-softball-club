@@ -446,7 +446,7 @@ const mutations = {
   [types.SET_TODO](state, item) {
     if (item) {
       if (state.todo.indexOf(item) === -1) {
-        state.todo = Array.from(state.todo).concat([item]);
+        state.todo = [...state.todo].concat([item]);
       } else {
         state.todo = [
           ...state.todo.slice(0, state.todo.indexOf(item)),
@@ -460,7 +460,7 @@ const mutations = {
   [types.SET_DONE](state, item) {
     if (item) {
       if (state.done.indexOf(item) === -1) {
-        state.done = Array.from(state.done).concat([item]);
+        state.done = [...state.done].concat([item]);
       } else {
         state.done = [
           ...state.done.slice(0, state.done.indexOf(item)),

@@ -159,9 +159,7 @@ const actions = {
                   );
                   commit(
                     types.FETCH_TEAMS,
-                    Array.from(teams).sort((a, b) =>
-                      b.name.localeCompare(a.name),
-                    ),
+                    [...teams].sort((a, b) => b.name.localeCompare(a.name)),
                   );
                   commit(rootTypes.SET_AUTH, teams);
                   record.actions.workerBox({ commit });

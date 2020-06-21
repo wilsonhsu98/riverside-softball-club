@@ -531,7 +531,7 @@ export default {
         if (!isNaN(parseInt(this.$route.params.order, 10))) {
           this.order = parseInt(this.$route.params.order, 10);
           this.base.home.name = this.name = (
-            Array.from(this.boxSummary.contents)[this.order - 1] || { name: '' }
+            [...this.boxSummary.contents][this.order - 1] || { name: '' }
           ).name;
         } else {
           this.order = this.boxSummary.contents.length + 1;

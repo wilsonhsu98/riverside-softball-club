@@ -488,8 +488,8 @@ export default {
         this.teamIntro = this.teamInfo.teamIntro;
         this.otherNames = this.teamInfo.otherNames;
         this.icon = this.teamInfo.icon;
-        this.players = Array.from(this.teamInfo.players);
-        this.benches = Array.from(this.teamInfo.benches);
+        this.players = [...this.teamInfo.players];
+        this.benches = [...this.teamInfo.benches];
 
         this.joined =
           this.players.some(player => player.uid === this.userId) ||

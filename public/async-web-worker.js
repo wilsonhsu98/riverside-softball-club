@@ -11,7 +11,7 @@ const innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
 
 const genStatistics = (players, records, filterPA, filterGames) => {
   // filterPA = filterPA || 10;
-  const sortRecords = Array.from(records).sort((a, b) => {
+  const sortRecords = [...records].sort((a, b) => {
     return (
       parseInt(b._table.match(/\d/g).join('') + (b.order + 10), 10) -
       parseInt(a._table.match(/\d/g).join('') + (a.order + 10), 10)
