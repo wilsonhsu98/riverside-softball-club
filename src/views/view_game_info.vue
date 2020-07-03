@@ -935,7 +935,7 @@ export default {
       this.gameDate = this.formatDate(this.date);
       this.gamePostfix =
         this.games
-          .filter(item => item.game.indexOf(this.gameDate) > -1)
+          .filter(item => item.game.includes(this.gameDate))
           .map(item => item.game.split('-')[1])
           .reduce((a, b) => Math.max(a, b), 0) + 1;
       if (this.mode === 'edit' && this.gameDate === this.prevId.split('-')[0]) {

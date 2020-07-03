@@ -82,7 +82,7 @@ Vue.config.productionTip = false;
 //   );
 // };
 
-const version = 8;
+const version = 9;
 if (window.localStorage.getItem('version') !== version.toString()) {
   store.dispatch('forceLogin', version);
   window.indexedDB.deleteDatabase(process.env.VUE_APP_PROJECTNAME);

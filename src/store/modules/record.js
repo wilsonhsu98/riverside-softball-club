@@ -58,6 +58,10 @@ const state = {
     { name: 'OBP', visible: true },
     { name: 'SLG', visible: true },
     { name: 'OPS', visible: true },
+    { name: 'LEVEL', visible: true },
+    { name: 'AVG_NO', visible: true },
+    { name: 'AVG_SP', visible: true },
+    { name: 'AVG_FB', visible: true },
   ],
   game: '',
   order: 0,
@@ -115,9 +119,8 @@ const getters = {
     return {
       ...boxSummary,
       result: boxSummary.result,
-      h: game.filter(
-        item => ['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1,
-      ).length,
+      h: game.filter(item => ['1H', '2H', '3H', 'HR'].includes(item.content))
+        .length,
       r:
         game.filter(item => item.r).length ||
         game

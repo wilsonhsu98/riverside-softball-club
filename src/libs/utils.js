@@ -165,10 +165,10 @@ const formatContent = (mode, content, location) => {
 };
 
 const formatColor = content => {
-  if (['1H', '2H', '3H', 'HR'].indexOf(content) > -1) {
+  if (['1H', '2H', '3H', 'HR'].includes(content)) {
     return 'red';
   }
-  if (['BB', 'SF'].indexOf(content) > -1) {
+  if (['BB', 'SF'].includes(content)) {
     return 'yellow';
   }
   return 'blue';

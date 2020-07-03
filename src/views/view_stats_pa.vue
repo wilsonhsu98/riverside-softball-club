@@ -64,9 +64,8 @@
               :disabled="unlimitedPA"
               @change="setTop_"
             />
-            <label for="unlimited_pa">
+            <label class="unlimited_pa">
               <input
-                id="unlimited_pa"
                 type="checkbox"
                 :checked="unlimitedPA"
                 @change="setUnlimitedPA_($event.target.checked)"
@@ -76,9 +75,8 @@
           <br />
           <div class="condition__label col">{{ $t('col_display') }}</div>
           <div class="condition__element col">
-            <label class="condition__col" for="check_all">
+            <label class="condition__col">
               <input
-                id="check_all"
                 type="checkbox"
                 :checked="checkAll"
                 @change="setCheckAll_($event.target.checked)"
@@ -86,12 +84,10 @@
             </label>
             <label
               class="condition__col"
-              :for="col.name"
               v-for="col in conditionCols"
               :key="`condition_${col.name}`"
             >
               <input
-                :id="col.name"
                 type="checkbox"
                 :value="col.name"
                 :checked="col.visible"
@@ -113,131 +109,170 @@
         </div>
       </div>
     </div>
-    <div id="table">
-      <div class="header-row">
-        <template v-for="col in displayedCols">
-          <span
-            v-if="col.name === 'Rank'"
-            :key="`header_${col.name}`"
-            class="cell Rank"
-            :title="$t(col.name)"
-            ><div>{{ $t(col.name) }}</div></span
+    <div class="sticky-table-wrapper" ref="sticky-table-wrapper">
+      <div class="sticky-table">
+        <div class="header-row">
+          <template v-for="col in displayedCols">
+            <div
+              v-if="col.name === 'Rank'"
+              :key="`header_${col.name}`"
+              class="cell rank"
+              :title="$t(col.name)"
+            >
+              {{ $t(col.name) }}
+            </div>
+            <div
+              v-else-if="col.name === 'name'"
+              :key="`header_${col.name}`"
+              class="cell name"
+              :title="$t(col.name)"
+            >
+              {{ $t(col.name) }}
+            </div>
+            <div
+              v-else
+              :key="`header_${col.name}`"
+              class="cell"
+              :class="{
+                sort: col.name === sortBy,
+                [col.name]: true,
+              }"
+              :title="$t(col.name)"
+              @click="setSortBy_(col.name)"
+            >
+              <div>{{ $t(col.name) }}</div>
+            </div>
+          </template>
+        </div>
+        <template v-for="(item, itemIndex) in list">
+          <input
+            :key="`chk_${item.name}`"
+            :id="`chk_${item.name}`"
+            type="radio"
+            name="expand"
+            class="toggle-row non-input"
+            :checked="toggleTarget === item.name"
+            @click="e => toggleRadio(e, item.name)"
+          />
+          <div
+            class="normal-row"
+            :class="{ current: item.name === userName }"
+            :key="`div_${item.name}`"
           >
-          <span
-            v-else-if="col.name === 'name'"
-            :key="`header_${col.name}`"
-            class="cell name"
-            :title="$t(col.name)"
-            ><div>{{ $t(col.name) }}</div></span
-          >
-          <span
-            v-else
-            :key="`header_${col.name}`"
-            :class="`cell ${col.name}${col.name === sortBy ? ' sort' : ''}`"
-            :title="$t(col.name)"
-            @click="setSortBy_(col.name)"
-            ><div>{{ $t(col.name) }}</div></span
-          >
+            <template v-for="(col, colIndex) in displayedCols">
+              <label
+                v-if="col.name === 'Rank'"
+                :key="`row_${item.name}_${colIndex}`"
+                :for="`chk_${item.name}`"
+                class="cell rank"
+                ><div class="align-right">{{ itemIndex + 1 }}</div></label
+              >
+              <label
+                v-else-if="col.name === 'name'"
+                :key="`row_${item.name}_${colIndex}`"
+                :for="`chk_${item.name}`"
+                class="cell name"
+              >
+                <div class="player">
+                  <div class="img" style="border-width: 1px">
+                    <i class="fa fa-user-o"></i>
+                  </div>
+                  <img
+                    v-if="item.data.photo"
+                    class="img"
+                    :src="$cacheImg(item.data.photo)"
+                    onError="this.style.display='none'"
+                  />
+                  {{ item.name }}
+                </div>
+                <div
+                  v-if="item.listByGame.length && lazy"
+                  class="chart"
+                  :id="`chart_${item.name}`"
+                  :style="{ width: `${chartWidth}px` }"
+                  @click="e => e.preventDefault()"
+                >
+                  <div class="chart-wrapper">
+                    <div class="chart-inner">
+                      <div
+                        class="bar"
+                        v-for="(cube, cubeIndex) in item.listByGame"
+                        :key="`bar_${item.name}_${cubeIndex}`"
+                      >
+                        <template v-for="(cell, cellIndex) in cube">
+                          <div
+                            v-if="cellIndex === cube.length - 1"
+                            class="game"
+                            :key="`${cubeIndex}${cellIndex}`"
+                          >
+                            {{ cell }}
+                          </div>
+                          <div
+                            v-else
+                            class="item"
+                            :class="{
+                              [cell.color]: true,
+                              exclude: cell.exclude,
+                            }"
+                            :key="`${cubeIndex}${cellIndex}`"
+                          >
+                            {{ $t(cell.content) }}
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+                    <coordination
+                      v-if="item.locations.length"
+                      :values="item.locations"
+                      :no_track="true"
+                      fixedSize="144"
+                      style="cursor: pointer;"
+                      @click.native="coordinates = item.locations"
+                    />
+                  </div>
+                </div>
+              </label>
+              <div
+                v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
+                class="cell advance"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_${item.name}_${colIndex}`"
+              >
+                <div>{{ formatValue(item[col.name]) }}</div>
+                <div>{{ `(${item[col.name.replace('_', '_DESC_')]})` }}</div>
+              </div>
+              <div
+                v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
+                class="cell"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_${item.name}_${colIndex}`"
+              >
+                {{ formatValue(item[col.name]) }}
+              </div>
+              <div
+                v-else-if="col.name === 'LEVEL'"
+                class="cell"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_${item.name}_${colIndex}`"
+              >
+                {{ item[col.name] }}
+              </div>
+              <div
+                v-else
+                class="cell"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_${item.name}_${colIndex}`"
+              >
+                <div class="align-right">{{ item[col.name] }}</div>
+              </div>
+            </template>
+          </div>
         </template>
       </div>
-      <template v-for="(item, itemIndex) in list">
-        <input
-          type="radio"
-          name="expand"
-          class="toggle-row non-input"
-          :checked="toggleTarget === item.name"
-          @click="e => toggleRadio(e, item.name)"
-          :key="`chk_${encodeURI(item.name)}`"
-        />
-        <div
-          :class="`row-grid${item.name === userName ? ' current' : ''}`"
-          :key="`div_${encodeURI(item.name)}`"
-        >
-          <template v-for="(col, colIndex) in displayedCols">
-            <span
-              v-if="col.name === 'Rank'"
-              class="cell Rank"
-              data-label="Rank"
-              :key="`row_${encodeURI(item.name)}_${colIndex}`"
-              >{{ itemIndex + 1 }}</span
-            >
-            <span
-              v-else-if="col.name === 'name'"
-              class="cell name"
-              data-label="name"
-              :key="`row_${encodeURI(item.name)}_${colIndex}`"
-            >
-              <span>
-                <span class="img" style="border-width: 1px">
-                  <i class="fa fa-user-o"></i>
-                </span>
-                <img
-                  v-if="item.data.photo"
-                  class="img"
-                  :src="$cacheImg(item.data.photo)"
-                  onError="this.style.display='none'"
-                />
-                {{ item.name }}
-              </span>
-            </span>
-            <span
-              v-else
-              :class="`cell${col.name === sortBy ? ' sort' : ''}`"
-              :data-label="$t(col.name)"
-              :key="`row_${encodeURI(item.name)}_${colIndex}`"
-            >
-              {{ formatValue(item[col.name], col.name) }}
-            </span>
-          </template>
-          <div class="cell level">
-            {{ item.LEVEL }}
-          </div>
-          <div
-            v-if="item.listByGame.length && lazy"
-            class="cell chart"
-            :style="{ top: `${(itemIndex + 2) * 36}px` }"
-            :id="`row_${item.name}`"
-          >
-            <div class="chart-wrapper">
-              <div
-                class="chart-inner"
-                :class="{ 'has-coordination': item.locations.length }"
-              >
-                <div
-                  class="bar"
-                  v-for="(cube, cubeIndex) in item.listByGame"
-                  :key="`bar_${encodeURI(item.name)}_${cubeIndex}`"
-                >
-                  <template v-for="(cell, cellIndex) in cube">
-                    <span
-                      v-if="cellIndex === cube.length - 1"
-                      class="game"
-                      :key="`${cubeIndex}${cellIndex}`"
-                      >{{ cell }}</span
-                    >
-                    <span
-                      v-else
-                      :class="
-                        `item ${cell.color} ${cell.exclude ? 'exclude' : ''}`
-                      "
-                      :key="`${cubeIndex}${cellIndex}`"
-                      >{{ $t(cell.content) }}</span
-                    >
-                  </template>
-                </div>
-              </div>
-              <coordination
-                v-if="item.locations.length"
-                :values="item.locations"
-                :no_track="true"
-                fixedSize="133"
-                style="cursor: pointer;"
-                @click.native="coordinates = item.locations"
-              />
-            </div>
-          </div>
-        </div>
-      </template>
     </div>
     <div
       v-if="coordinates.length > 0"
@@ -265,7 +300,7 @@
     line-height: 30px;
     height: 30px;
     vertical-align: middle;
-    &[for='unlimited_pa'] {
+    &.unlimited_pa {
       margin-left: 5px;
     }
   }
@@ -289,6 +324,7 @@
     margin-right: 10px;
     vertical-align: middle;
     text-align: left;
+    overflow: hidden;
   }
 }
 
@@ -298,40 +334,50 @@ i.fa {
   cursor: pointer;
 }
 
-#table {
+.sticky-table-wrapper {
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  max-height: calc(100vh - 70px - 20px);
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+.sticky-table {
   display: table;
-  width: 100%;
-  // background: #FFF;
+  min-width: 100%;
   margin: 0;
   box-sizing: border-box;
   color: $row_color;
   position: relative;
   z-index: 0;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
-    0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  border-radius: 10px;
   .header-row {
     display: table-row;
     color: $header_color;
     .cell {
-      background: $header_bgcolor;
+      background: $header_bgcolor_noalpha;
       position: sticky;
-      top: 70px;
-      z-index: 3;
-      &:not(.Rank):not(.name) {
+      top: 0;
+      z-index: 4;
+      text-align: center;
+      &:not(.rank):not(.name) {
         cursor: pointer;
       }
       > div {
         height: 36px;
-        overflow: hidden;
+        white-space: nowrap;
       }
-      &.Rank {
-        width: 45px;
+      &.rank {
+        width: 1px;
+        z-index: 5;
+        cursor: initial;
       }
       &.name {
-        width: 100px;
+        width: 1px;
         padding-left: 0;
         text-align: center;
+        z-index: 5;
+        cursor: initial;
       }
       &:nth-child(2n + 3):not(.sort) {
         opacity: 1;
@@ -344,48 +390,40 @@ i.fa {
   .toggle-row {
     display: block;
     position: absolute;
-    left: 0;
-    z-index: 1;
-    height: 36px;
     width: 100%;
+    height: 36px;
+    z-index: 1;
     margin: 0;
     opacity: 0;
     cursor: pointer;
-    &:checked {
-      & + .row-grid span.cell:last-of-type {
-        display: block;
-        border-bottom-right-radius: 0;
+    &:checked + .normal-row {
+      .cell.name {
+        z-index: 3;
       }
-      & + .row-grid .cell.chart {
+      .chart {
         display: block;
       }
     }
   }
-  .row-grid {
+  .normal-row {
     display: table-row;
-    &:nth-child(4n + 3) {
+    &:nth-child(4n + 3) .cell {
       background-color: $row_even_bgcolor;
     }
-    &:nth-child(4n + 1) {
+    &:nth-child(4n + 1) .cell {
       background-color: $row_odd_bgcolor;
     }
-    &:last-child {
-      span.cell {
-        &:first-of-type {
-          border-bottom-left-radius: 10px;
-        }
-        &:last-of-type {
-          border-bottom-right-radius: 10px;
-        }
-      }
-    }
     &.current {
-      background-color: $current_user_bgcolor;
       color: $current_user_color;
-      .cell .img {
-        border-color: $current_user_color;
+      .cell {
+        &:not(.chart) {
+          background-color: $current_user_bgcolor;
+        }
+        .img {
+          border-color: $current_user_color;
+        }
       }
-      .cell.chart .game {
+      .chart .game {
         color: $row_color;
       }
     }
@@ -394,77 +432,26 @@ i.fa {
     display: table-cell;
     line-height: 36px;
     text-align: center;
-    &span:nth-of-type(2n + 3) {
-      opacity: 0.6;
-    }
-    &.chart {
-      background-color: #fff;
-      position: absolute;
-      left: 145px;
-      right: 0;
+    padding: 0 5px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    &.rank {
+      position: sticky !important;
+      left: 0 !important;
       z-index: 2;
-      overflow: hidden;
-
-      display: none;
-
-      font-size: 12px;
-      margin-bottom: 20px;
-      border-top: 0;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-      border-radius: 0 0 10px 10px;
-      .chart-wrapper {
-        display: flex;
-        width: 100%;
-      }
-      .chart-inner {
-        display: flex;
-        align-items: flex-end;
-        direction: rtl;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        width: 100%;
-        &.has-coordination {
-          width: calc(100% - 133px);
-        }
-      }
-      .bar {
-        flex-grow: 1;
-        min-width: 50px;
-      }
-      .item {
-        display: block;
-        height: 20px;
-        line-height: 20px;
-        width: 36px;
-        margin: auto;
-        color: #fff;
-        margin-bottom: 1px;
-        &.red {
-          background-color: $hit;
-        }
-        &.yellow {
-          background-color: $nonpa;
-        }
-        &.blue {
-          background-color: $ng;
-        }
-        &.exclude {
-          opacity: 0.5;
-        }
-      }
-      .game {
-        display: block;
-        line-height: 20px;
-        width: 36px;
-        margin: auto;
-      }
+      cursor: pointer;
     }
     &.name {
+      position: sticky !important;
+      left: 42px !important;
+      z-index: 2;
+      /* box-shadow: 5px 0 5px -5px #333; */
+      cursor: pointer;
       text-align: center;
       &:first-letter {
         text-transform: uppercase;
       }
-      > span {
+      .player {
         position: relative;
         padding-left: 36px;
         text-align: left;
@@ -493,17 +480,91 @@ i.fa {
       }
     }
     &.sort {
-      opacity: 1;
       color: $error_color;
-      > div {
-        opacity: 1;
-      }
     }
     &.level {
       display: none;
     }
+    &.advance > div {
+      display: inline-block;
+      &:first-child {
+        width: 50px;
+        text-align: right;
+      }
+      &:last-child {
+        margin-left: 5px;
+        width: 58px;
+        text-align: left;
+      }
+    }
+    .align-right {
+      margin: auto;
+      width: 20px;
+      text-align: right;
+      direction: rtl;
+    }
+  }
+  .chart {
+    background-color: #fff;
+    position: absolute;
+    left: 110px;
+    z-index: 2;
+    overflow: hidden;
+
+    display: none;
+
+    font-size: 12px;
+    padding: 0;
+    border-top: 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    .chart-wrapper {
+      display: flex;
+      width: 100%;
+    }
+    .chart-inner {
+      display: flex;
+      align-items: flex-end;
+      direction: rtl;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      width: 100%;
+      cursor: initial;
+    }
+    .bar {
+      flex-grow: 1;
+      min-width: 50px;
+    }
+    .item {
+      display: block;
+      height: 20px;
+      line-height: 20px;
+      width: 36px;
+      margin: auto;
+      color: #fff;
+      margin-bottom: 1px;
+      text-align: center;
+      &.red {
+        background-color: $hit;
+      }
+      &.yellow {
+        background-color: $nonpa;
+      }
+      &.blue {
+        background-color: $ng;
+      }
+      &.exclude {
+        opacity: 0.5;
+      }
+    }
+    .game {
+      display: block;
+      line-height: 20px;
+      width: 36px;
+      margin: auto;
+    }
   }
 }
+
 .search-bar__container,
 .toggle-search {
   display: none;
@@ -618,131 +679,17 @@ i.fa {
       }
     }
   }
-  #table {
-    display: block;
-    border: none;
-    overflow: hidden;
-    position: relative;
-    z-index: 0;
-    border-radius: 0;
-    .row-grid {
-      position: relative;
-      display: flex;
-      flex-wrap: wrap;
-
-      z-index: 0;
-      background-color: #fff;
-      transition: max-height 0.8s cubic-bezier(0, 1, 0, 1) -0.1s;
-      max-height: 36px;
-      &:nth-child(4n + 1) {
-        background-color: $row_odd_bgcolor;
-      }
-      &:nth-child(4n + 3) {
-        background-color: $row_even_bgcolor;
-      }
-      &.current {
-        .cell {
-          color: $current_user_bgcolor;
-          &.Rank,
-          &.name,
-          &.level,
-          &.sort {
-            background-color: $current_user_bgcolor;
-            color: $current_user_color;
-          }
-          &.chart .game {
-            color: $current_user_bgcolor;
-          }
-        }
-      }
-      .cell:nth-child(2n + 3) {
-        opacity: 1;
-      }
-      &:last-child {
-        span.cell {
-          &:first-of-type {
-            border-bottom-left-radius: 0;
-          }
-          &:last-of-type {
-            border-bottom-right-radius: 0;
-          }
-        }
-      }
-    }
-    .header-row {
-      display: none;
-    }
-    .cell {
-      order: 6;
-      display: block;
-      box-sizing: border-box;
-      &:not(.sort):not(.Rank):not(.name):not(.chart):not(.level) {
-        text-align: left;
-      }
-      &:not(.Rank):not(.name):not(.chart):not(.level) {
-        &:before {
-          content: attr(data-label) ':';
-          display: inline-block;
-          width: 58px;
-          text-align: right;
-          margin-right: -2px;
-        }
-      }
-      &.Rank {
-        order: 1;
-      }
-      &.name {
-        order: 2;
-      }
-      &.level {
-        order: 3;
-        display: block;
-      }
-      &.sort {
-        order: 4;
-        color: inherit;
-      }
-      &.chart {
-        order: 5;
-        position: initial;
-        margin: 0;
-        border: none;
-        box-shadow: none;
-        background-color: transparent;
-        display: flex;
-        border-radius: 0;
-      }
-    }
-    .toggle-row:checked + .row-grid {
-      max-height: 200vh;
-      transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
-      transition-delay: 0s;
+  .sticky-table-wrapper {
+    max-height: calc(100vh - 100px);
+  }
+  .sticky-table {
+    .toggle-row:checked + .normal-row .chart {
+      left: -42px;
+      width: 100vw !important;
     }
   }
 }
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
-  #table {
-    .row-grid {
-      .cell {
-        width: 33%;
-        &.Rank {
-          width: 10%;
-        }
-        &.name {
-          width: 33%;
-        }
-        &.level {
-          width: 70px;
-        }
-        &.sort {
-          width: calc(57% - 70px);
-        }
-        &.chart {
-          width: 100%;
-        }
-      }
-    }
-  }
   .search-bar {
     .condition {
       &__label {
@@ -778,28 +725,6 @@ i.fa {
   }
 }
 @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
-  #table {
-    .row-grid {
-      .cell {
-        width: 20%;
-        &.Rank {
-          width: 10%;
-        }
-        &.name {
-          width: 20%;
-        }
-        &.level {
-          width: 80px;
-        }
-        &.sort {
-          width: calc(70% - 80px);
-        }
-        &.chart {
-          width: 100%;
-        }
-      }
-    }
-  }
   .search-bar {
     .condition {
       &__label {
@@ -851,6 +776,7 @@ export default {
       defaultIcon,
       coordinates: [],
       lazy: false,
+      chartWidth: 0,
     };
   },
   created() {},
@@ -859,9 +785,12 @@ export default {
       this.lazy = true;
     }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
+    window.addEventListener('resize', this.requestAnimationFrame);
+    this.detectChartWidth();
   },
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
+    window.removeEventListener('resize', this.requestAnimationFrame);
   },
   methods: {
     ...mapActions([
@@ -872,24 +801,25 @@ export default {
       'setCheckAll',
       'toggleColumn',
     ]),
-    formatValue(value, col) {
-      return ['AVG', 'OBP', 'SLG', 'OPS'].indexOf(col) > -1 && value !== '-'
-        ? value.toFixed(3)
-        : value;
+    formatValue(value) {
+      return value !== '-' ? value.toFixed(3) : value;
     },
     toggleRadio(e, target) {
       if (this.toggleTarget === target) {
         this.toggleTarget = null;
       } else {
         this.toggleTarget = target;
-        const scrollToHandler = function() {
-          scrollTo(e.target.nextSibling);
-          e.target.nextSibling.removeEventListener(
-            'transitionend',
-            scrollToHandler,
-          );
-        };
-        e.target.nextSibling.addEventListener('transitionend', scrollToHandler);
+
+        // document.querySelector(`#${e.target.id.replace('chk_', 'chart_')}`).scrollIntoView({behavior: "smooth", block: "nearest"});
+
+        // const scrollToHandler = function() {
+        //   scrollTo(e.target.nextSibling);
+        //   e.target.nextSibling.removeEventListener(
+        //     'transitionend',
+        //     scrollToHandler,
+        //   );
+        // };
+        // e.target.nextSibling.addEventListener('transitionend', scrollToHandler);
       }
     },
     collapseSearch(event) {
@@ -914,8 +844,10 @@ export default {
       this.setUnlimitedPA(isChecked);
     },
     setSortBy_(sortItem) {
-      this.toggleTarget = null;
-      this.setSortBy(sortItem);
+      if (sortItem !== this.sortBy) {
+        this.toggleTarget = null;
+        this.setSortBy(sortItem);
+      }
     },
     setCheckAll_(isCheckAll) {
       this.toggleTarget = null;
@@ -929,6 +861,15 @@ export default {
       if (e.currentTarget === e.target) {
         this.coordinates = [];
       }
+    },
+    detectChartWidth() {
+      const { width } = this.$refs[
+        'sticky-table-wrapper'
+      ].getBoundingClientRect();
+      this.chartWidth = width - 152;
+    },
+    requestAnimationFrame() {
+      window.requestAnimationFrame(this.detectChartWidth);
     },
   },
   computed: {

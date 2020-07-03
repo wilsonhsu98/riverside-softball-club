@@ -960,8 +960,8 @@ export default {
       const fromEle = event.from;
       const toEle = event.originalEvent.target;
       if (
-        fromEle.className.indexOf('order') > -1 &&
-        toEle.className.indexOf('starting-players') > -1
+        fromEle.className.includes('order') &&
+        toEle.className.includes('starting-players')
       ) {
         return false;
       }
@@ -971,7 +971,7 @@ export default {
       this.origin = event.draggedContext.element;
       this.target = event.relatedContext.element;
 
-      if (fromEle.className.indexOf('order') > -1) {
+      if (fromEle.className.includes('order')) {
         this.origin_order = this.ORDER.find(order => {
           return this[`order_${order}`].find(item => {
             const obj = this.origin;
@@ -984,7 +984,7 @@ export default {
         });
       }
 
-      if (toEle.className.indexOf('order') > -1) {
+      if (toEle.className.includes('order')) {
         this.target_order =
           this.ORDER.find(order => {
             return this[`order_${order}`].find(item => {
@@ -999,7 +999,7 @@ export default {
           }) || parseInt(toEle.getAttribute('data-order'));
       }
 
-      if (toEle.className.indexOf('starting-players') > -1) {
+      if (toEle.className.includes('starting-players')) {
         this.target_order = this.ORDER.find(
           order => this[`order_${order}`].length === 0,
         );

@@ -650,14 +650,14 @@ export default {
           err: this.$t('msg_duplicate_number'),
         },
         {
-          condition: this.benches.filter(
-            v => this.players.map(item => item.name).indexOf(v.name) > -1,
+          condition: this.benches.filter(v =>
+            this.players.map(item => item.name).includes(v.name),
           ).length,
           err: this.$t('msg_duplicate_name'),
         },
         {
-          condition: this.benches.filter(
-            v => this.players.map(item => item.number).indexOf(v.number) > -1,
+          condition: this.benches.filter(v =>
+            this.players.map(item => item.number).includes(v.number),
           ).length,
           err: this.$t('msg_duplicate_number'),
         },

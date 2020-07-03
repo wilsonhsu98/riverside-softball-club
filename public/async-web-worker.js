@@ -1,8 +1,8 @@
 const contentColor = content => {
-  if (['1H', '2H', '3H', 'HR'].indexOf(content) > -1) {
+  if (['1H', '2H', '3H', 'HR'].includes(content)) {
     return 'red';
   }
-  if (['BB', 'SF'].indexOf(content) > -1) {
+  if (['BB', 'SF'].includes(content)) {
     return 'yellow';
   }
   return 'blue';
@@ -26,7 +26,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         return filterGames === undefined ||
           (Array.isArray(filterGames) && filterGames.length === 0)
           ? true
-          : filterGames.indexOf(item._table) > -1;
+          : filterGames.includes(item._table);
       })
       .filter(item => item.name === name)
       .slice(0, filterPA)
@@ -73,33 +73,78 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       });
     const calc = top.reduce(
       (acc, item) => {
+        const isAB = [
+          '1H',
+          '2H',
+          '3H',
+          'HR',
+          'FO',
+          'GO',
+          'K',
+          'FOUL',
+          'E',
+          'FC',
+          'DP',
+          'TP',
+        ].includes(item.content);
+        const isHit = ['1H', '2H', '3H', 'HR'].includes(item.content);
         return {
           pa: acc.pa + 1,
-          ab:
-            acc.ab +
-            ([
-              '1H',
-              '2H',
-              '3H',
-              'HR',
-              'FO',
-              'GO',
-              'K',
-              'FOUL',
-              'E',
-              'FC',
-              'DP',
-              'TP',
-            ].indexOf(item.content) > -1
-              ? 1
-              : 0),
-          h:
-            acc.h +
-            (['1H', '2H', '3H', 'HR'].indexOf(item.content) > -1 ? 1 : 0),
+          ab: acc.ab + (isAB ? 1 : 0),
+          h: acc.h + (isHit ? 1 : 0),
+          ...(Array.isArray(item.onbase) && item.onbase.length && isAB
+            ? {
+                abNo:
+                  acc.abNo +
+                  (!item.onbase[1].name &&
+                  !item.onbase[2].name &&
+                  !item.onbase[3].name
+                    ? 1
+                    : 0),
+                hNo:
+                  acc.hNo +
+                  (!item.onbase[1].name &&
+                  !item.onbase[2].name &&
+                  !item.onbase[3].name &&
+                  isHit
+                    ? 1
+                    : 0),
+                abSP:
+                  acc.abSP +
+                  (item.onbase[2].name || item.onbase[3].name ? 1 : 0),
+                hSP:
+                  acc.hSP +
+                  ((item.onbase[2].name || item.onbase[3].name) && isHit
+                    ? 1
+                    : 0),
+                abFB:
+                  acc.abFB +
+                  (item.onbase[1].name &&
+                  item.onbase[2].name &&
+                  item.onbase[3].name
+                    ? 1
+                    : 0),
+                hFB:
+                  acc.hFB +
+                  (item.onbase[1].name &&
+                  item.onbase[2].name &&
+                  item.onbase[3].name &&
+                  isHit
+                    ? 1
+                    : 0),
+              }
+            : {
+                abNo: acc.abNo,
+                hNo: acc.hNo,
+                abSP: acc.abSP,
+                hSP: acc.hSP,
+                abFB: acc.abFB,
+                hFB: acc.hFB,
+              }),
           tb: acc.tb + (['1H', '2H', '3H', 'HR'].indexOf(item.content) + 1),
           tob:
             acc.tob +
-            (['1H', '2H', '3H', 'HR', 'BB'].indexOf(item.content) > -1 ? 1 : 0),
+            (['1H', '2H', '3H', 'HR', 'BB'].includes(item.content) ? 1 : 0),
           rbi: acc.rbi + (item.rbi || 0),
           h1: acc.h1 + (item.content === '1H' ? 1 : 0),
           h2: acc.h2 + (item.content === '2H' ? 1 : 0),
@@ -116,6 +161,12 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         pa: 0,
         ab: 0,
         h: 0,
+        abNo: 0,
+        hNo: 0,
+        abSP: 0,
+        hSP: 0,
+        abFB: 0,
+        hFB: 0,
         tb: 0,
         tob: 0,
         rbi: 0,
@@ -137,15 +188,36 @@ const genStatistics = (players, records, filterPA, filterGames) => {
                   return filterGames === undefined ||
                     (Array.isArray(filterGames) && filterGames.length === 0)
                     ? true
-                    : filterGames.indexOf(item._table) > -1;
+                    : filterGames.includes(item._table);
                 }).length
             : 0,
       },
     );
-
-    const { pa, ab, h, tb, tob, rbi, h1, h2, h3, hr, k, bb, sf, dp, r } = calc;
+    const {
+      pa,
+      ab,
+      h,
+      tb,
+      tob,
+      rbi,
+      h1,
+      h2,
+      h3,
+      hr,
+      k,
+      bb,
+      sf,
+      dp,
+      r,
+      abNo,
+      hNo,
+      abSP,
+      hSP,
+      abFB,
+      hFB,
+    } = calc;
     const obj = {
-      name: name,
+      name,
       data: player.data,
       records: top,
       PA: '-',
@@ -164,6 +236,12 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       SF: '-',
       DP: '-',
       AVG: '-',
+      AVG_NO: '-',
+      AVG_DESC_NO: '0-0',
+      AVG_SP: '-',
+      AVG_DESC_SP: '0-0',
+      AVG_FB: '-',
+      AVG_DESC_FB: '0-0',
       OBP: '-',
       SLG: '-',
       OPS: '-',
@@ -217,6 +295,12 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         SF: sf,
         DP: dp,
         AVG: Math.round((h / ab) * 1000) / 1000,
+        AVG_NO: abNo ? Math.round((hNo / abNo) * 1000) / 1000 : '-',
+        AVG_DESC_NO: `${abNo}-${hNo}`,
+        AVG_SP: abSP ? Math.round((hSP / abSP) * 1000) / 1000 : '-',
+        AVG_DESC_SP: `${abSP}-${hSP}`,
+        AVG_FB: abFB ? Math.round((hFB / abFB) * 1000) / 1000 : '-',
+        AVG_DESC_FB: `${abFB}-${hFB}`,
         OBP: Math.round((tob / pa) * 1000) / 1000,
         SLG: Math.round((tb / ab) * 1000) / 1000,
         OPS: Math.round((tob / pa + tb / ab) * 1000) / 1000,
@@ -547,10 +631,21 @@ const execGenStatistics = state => {
       item => item.PA !== '-' && (state.unlimitedPA || item.PA === state.top),
     )
     .sort((a, b) => {
-      if (['AVG', 'OBP', 'SLG', 'OPS'].indexOf(state.sortBy) > -1) {
+      if (
+        ['AVG', 'OBP', 'SLG', 'OPS', 'AVG_NO', 'AVG_SP', 'AVG_FB'].includes(
+          state.sortBy,
+        )
+      ) {
+        if (typeof a[state.sortBy] < typeof b[state.sortBy]) {
+          return -1;
+        }
         return b[state.sortBy] === a[state.sortBy]
           ? b['PA'] - a['PA']
           : b[state.sortBy] - a[state.sortBy];
+      } else if (state.sortBy === 'LEVEL') {
+        return b[state.sortBy] === a[state.sortBy]
+          ? b['PA'] - a['PA']
+          : b[state.sortBy].localeCompare(a[state.sortBy]);
       } else {
         if (b[state.sortBy] === 0 && a[state.sortBy] === 0) {
           return b['PA'] - a['PA'];

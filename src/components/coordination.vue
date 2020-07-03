@@ -102,12 +102,12 @@ export default {
     });
 
     if (!this.fixedSize) {
-      window.addEventListener('resize', this.requestAnimationFram);
+      window.addEventListener('resize', this.requestAnimationFrame);
     }
   },
   beforeDestroy() {
     if (!this.fixedSize) {
-      window.removeEventListener('resize', this.requestAnimationFram);
+      window.removeEventListener('resize', this.requestAnimationFrame);
     }
   },
   methods: {
@@ -648,7 +648,7 @@ export default {
       ];
       this.draw();
     },
-    requestAnimationFram() {
+    requestAnimationFrame() {
       window.requestAnimationFrame(this.draw);
     },
   },
