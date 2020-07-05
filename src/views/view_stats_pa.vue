@@ -188,6 +188,7 @@
                 <div
                   v-if="item.listByGame.length && lazy"
                   class="chart"
+                  tabIndex="-1"
                   :id="`chart_${item.name}`"
                   :style="{ width: `${chartWidth}px` }"
                   @click="e => e.preventDefault()"
@@ -511,6 +512,7 @@ i.fa {
     left: 110px;
     z-index: 2;
     overflow: hidden;
+    outline: none;
 
     display: none;
 
@@ -529,6 +531,7 @@ i.fa {
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
       width: 100%;
+      padding-top: 5px;
       cursor: initial;
     }
     .bar {
@@ -764,7 +767,6 @@ i.fa {
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
-import { scrollTo } from '../libs/utils';
 const clickEvent = (() => {
   if ('ontouchstart' in document.documentElement === true) return 'touchstart';
   else return 'click';
@@ -811,17 +813,9 @@ export default {
         this.toggleTarget = null;
       } else {
         this.toggleTarget = target;
-
-        // document.querySelector(`#${e.target.id.replace('chk_', 'chart_')}`).scrollIntoView({behavior: "smooth", block: "nearest"});
-
-        // const scrollToHandler = function() {
-        //   scrollTo(e.target.nextSibling);
-        //   e.target.nextSibling.removeEventListener(
-        //     'transitionend',
-        //     scrollToHandler,
-        //   );
-        // };
-        // e.target.nextSibling.addEventListener('transitionend', scrollToHandler);
+        document
+          .querySelector(`#${e.target.id.replace('chk_', 'chart_')}`)
+          .focus();
       }
     },
     collapseSearch(event) {
