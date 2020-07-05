@@ -480,6 +480,19 @@ i.fa {
           }
         }
       }
+      &:after {
+        content: '';
+        position: absolute;
+        right: -5px;
+        display: inline-block;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.12),
+          rgba(0, 0, 0, 0)
+        );
+      }
     }
     &.sort {
       color: $error_color;
