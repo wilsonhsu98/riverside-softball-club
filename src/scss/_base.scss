@@ -2,12 +2,18 @@
 
 html {
 	background-color: #ccc;
+	min-height: 100vh;
+	min-height: calc(var(--vh, 1vh) * 100);
+	// min-height: -webkit-fill-available;
 }
 body {
 	font-family: 'Inconsolata', '微軟正黑體';
 	margin: 0;
 	overscroll-behavior-y: none;
 	overscroll-behavior-x: none;
+	min-height: 100vh;
+	min-height: calc(var(--vh, 1vh) * 100);
+	// min-height: -webkit-fill-available;
 }
 
 input, textarea {

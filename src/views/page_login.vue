@@ -26,7 +26,8 @@
 .login-container {
   text-align: center;
   height: 100vh;
-  height: -webkit-fill-available;
+  height: calc(var(--vh, 1vh) * 100);
+  /* height: -webkit-fill-available; */
   display: flex;
   flex-direction: column;
   justify-content: center;

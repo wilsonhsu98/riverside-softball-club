@@ -104,7 +104,10 @@ new Promise(resolve => {
 const resetVH = () => {
   const vh = window.innerHeight * 0.01;
   document.documentElement.style.setProperty('--vh', `${vh}px`);
-  // document.documentElement.style.maxHeight = `${window.innerHeight}px`;
+  setTimeout(() => {
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+  }, 500);
 };
 resetVH();
 window.addEventListener('resize', () => window.requestAnimationFrame(resetVH));

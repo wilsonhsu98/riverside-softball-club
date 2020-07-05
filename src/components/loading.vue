@@ -36,7 +36,8 @@
   background: 50% 50% no-repeat;
   background-size: 320px auto;
   height: 100vh;
-  height: -webkit-fill-available;
+  height: calc(var(--vh, 1vh) * 100);
+  /* height: -webkit-fill-available; */
 }
 
 .loading-mask {
