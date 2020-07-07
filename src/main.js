@@ -11,12 +11,14 @@ import vSelect from 'vue-select';
 import VModal from 'vue-js-modal';
 import Carousel3d from 'vue-carousel-3d';
 import { Plugin } from 'vue-fragment';
+import simplebar from 'simplebar-vue';
 import smoothscroll from 'smoothscroll-polyfill';
 import './css/font-awesome.min.css';
 import './css/font.css';
 import './scss/_base.scss';
 import './scss/v-tooltip.scss';
 import 'vue-select/dist/vue-select.css';
+import 'simplebar/dist/simplebar.min.css';
 
 const componentsReq = require.context('./components/', false, /\.vue$/);
 componentsReq.keys().forEach(path => {
@@ -30,6 +32,7 @@ componentsReq.keys().forEach(path => {
 Vue.component('vue-tags-input', VueTagsInput);
 Vue.component('vue-draggable', draggable);
 Vue.component('v-select', vSelect);
+Vue.component('simplebar', simplebar);
 const tootipConfig = {
   defaultTrigger: 'hover focus click',
   disposeTimeout: 1000,

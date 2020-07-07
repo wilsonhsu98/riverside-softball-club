@@ -109,171 +109,173 @@
         </div>
       </div>
     </div>
-    <div class="sticky-table-wrapper" ref="sticky-table-wrapper">
-      <div class="sticky-table">
-        <div class="header-row">
-          <template v-for="col in displayedCols">
-            <div
-              v-if="col.name === 'Rank'"
-              :key="`header_${col.name}`"
-              class="cell rank"
-              :title="$t(col.name)"
-            >
-              {{ $t(col.name) }}
-            </div>
-            <div
-              v-else-if="col.name === 'name'"
-              :key="`header_${col.name}`"
-              class="cell name"
-              :title="$t(col.name)"
-            >
-              {{ $t(col.name) }}
-            </div>
-            <div
-              v-else
-              :key="`header_${col.name}`"
-              class="cell"
-              :class="{
-                sort: col.name === sortBy,
-                [col.name]: true,
-              }"
-              :title="$t(col.name)"
-              @click="setSortBy_(col.name)"
-            >
-              <div>{{ $t(col.name) }}</div>
-            </div>
-          </template>
-        </div>
-        <template v-for="(item, itemIndex) in list">
-          <input
-            :key="`chk_${item.name}`"
-            :id="`chk_${item.name}`"
-            type="radio"
-            name="expand"
-            class="toggle-row non-input"
-            :checked="toggleTarget === item.name"
-            @click="e => toggleRadio(e, item.name)"
-          />
-          <div
-            class="normal-row"
-            :class="{ current: item.name === userName }"
-            :key="`div_${item.name}`"
-          >
-            <template v-for="(col, colIndex) in displayedCols">
-              <label
+    <div ref="sticky-table-wrapper">
+      <simplebar class="sticky-table-wrapper">
+        <div class="sticky-table">
+          <div class="header-row">
+            <template v-for="col in displayedCols">
+              <div
                 v-if="col.name === 'Rank'"
-                :key="`row_${item.name}_${colIndex}`"
-                :for="`chk_${item.name}`"
+                :key="`header_${col.name}`"
                 class="cell rank"
-                ><div class="align-right">{{ itemIndex + 1 }}</div></label
+                :title="$t(col.name)"
               >
-              <label
+                {{ $t(col.name) }}
+              </div>
+              <div
                 v-else-if="col.name === 'name'"
-                :key="`row_${item.name}_${colIndex}`"
-                :for="`chk_${item.name}`"
+                :key="`header_${col.name}`"
                 class="cell name"
+                :title="$t(col.name)"
               >
-                <div class="player">
-                  <div class="img" style="border-width: 1px">
-                    <i class="fa fa-user-o"></i>
-                  </div>
-                  <img
-                    v-if="item.data.photo"
-                    class="img"
-                    :src="$cacheImg(item.data.photo)"
-                    onError="this.style.display='none'"
-                  />
-                  {{ item.name }}
-                </div>
-                <div
-                  v-if="item.listByGame.length && lazy"
-                  class="chart"
-                  tabIndex="-1"
-                  :id="`chart_${item.name}`"
-                  :style="{ width: `${chartWidth}px` }"
-                  @click="e => e.preventDefault()"
-                >
-                  <div class="chart-wrapper">
-                    <div class="chart-inner">
-                      <div
-                        class="bar"
-                        v-for="(cube, cubeIndex) in item.listByGame"
-                        :key="`bar_${item.name}_${cubeIndex}`"
-                      >
-                        <template v-for="(cell, cellIndex) in cube">
-                          <div
-                            v-if="cellIndex === cube.length - 1"
-                            class="game"
-                            :key="`${cubeIndex}${cellIndex}`"
-                          >
-                            {{ cell }}
-                          </div>
-                          <div
-                            v-else
-                            class="item"
-                            :class="{
-                              [cell.color]: true,
-                              exclude: cell.exclude,
-                            }"
-                            :key="`${cubeIndex}${cellIndex}`"
-                          >
-                            {{ $t(cell.content) }}
-                          </div>
-                        </template>
-                      </div>
-                    </div>
-                    <coordination
-                      v-if="item.locations.length"
-                      :values="item.locations"
-                      :no_track="true"
-                      fixedSize="144"
-                      style="cursor: pointer;"
-                      @click.native="coordinates = item.locations"
-                    />
-                  </div>
-                </div>
-              </label>
-              <div
-                v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
-                class="cell advance"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_${item.name}_${colIndex}`"
-              >
-                <div>{{ formatValue(item[col.name]) }}</div>
-                <div>{{ `(${item[col.name.replace('_', '_DESC_')]})` }}</div>
-              </div>
-              <div
-                v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
-                class="cell"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_${item.name}_${colIndex}`"
-              >
-                {{ formatValue(item[col.name]) }}
-              </div>
-              <div
-                v-else-if="col.name === 'LEVEL'"
-                class="cell"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_${item.name}_${colIndex}`"
-              >
-                {{ item[col.name] }}
+                {{ $t(col.name) }}
               </div>
               <div
                 v-else
+                :key="`header_${col.name}`"
                 class="cell"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_${item.name}_${colIndex}`"
+                :class="{
+                  sort: col.name === sortBy,
+                  [col.name]: true,
+                }"
+                :title="$t(col.name)"
+                @click="setSortBy_(col.name)"
               >
-                <div class="align-right">{{ item[col.name] }}</div>
+                <div>{{ $t(col.name) }}</div>
               </div>
             </template>
           </div>
-        </template>
-      </div>
+          <template v-for="(item, itemIndex) in list">
+            <input
+              :key="`chk_${item.name}`"
+              :id="`chk_${item.name}`"
+              type="radio"
+              name="expand"
+              class="toggle-row non-input"
+              :checked="toggleTarget === item.name"
+              @click="e => toggleRadio(e, item.name)"
+            />
+            <div
+              class="normal-row"
+              :class="{ current: item.name === userName }"
+              :key="`div_${item.name}`"
+            >
+              <template v-for="(col, colIndex) in displayedCols">
+                <label
+                  v-if="col.name === 'Rank'"
+                  :key="`row_${item.name}_${colIndex}`"
+                  :for="`chk_${item.name}`"
+                  class="cell rank"
+                  ><div class="align-right">{{ itemIndex + 1 }}</div></label
+                >
+                <label
+                  v-else-if="col.name === 'name'"
+                  :key="`row_${item.name}_${colIndex}`"
+                  :for="`chk_${item.name}`"
+                  class="cell name"
+                >
+                  <div class="player">
+                    <div class="img" style="border-width: 1px">
+                      <i class="fa fa-user-o"></i>
+                    </div>
+                    <img
+                      v-if="item.data.photo"
+                      class="img"
+                      :src="$cacheImg(item.data.photo)"
+                      onError="this.style.display='none'"
+                    />
+                    {{ item.name }}
+                  </div>
+                  <div
+                    v-if="item.listByGame.length && lazy"
+                    class="chart"
+                    tabIndex="-1"
+                    :id="`chart_${item.name}`"
+                    :style="{ width: `${chartWidth}px` }"
+                    @click="e => e.preventDefault()"
+                  >
+                    <div class="chart-wrapper">
+                      <simplebar class="chart-inner">
+                        <div
+                          class="bar"
+                          v-for="(cube, cubeIndex) in item.listByGame"
+                          :key="`bar_${item.name}_${cubeIndex}`"
+                        >
+                          <template v-for="(cell, cellIndex) in cube">
+                            <div
+                              v-if="cellIndex === cube.length - 1"
+                              class="game"
+                              :key="`${cubeIndex}${cellIndex}`"
+                            >
+                              {{ cell }}
+                            </div>
+                            <div
+                              v-else
+                              class="item"
+                              :class="{
+                                [cell.color]: true,
+                                exclude: cell.exclude,
+                              }"
+                              :key="`${cubeIndex}${cellIndex}`"
+                            >
+                              {{ $t(cell.content) }}
+                            </div>
+                          </template>
+                        </div>
+                      </simplebar>
+                      <coordination
+                        v-if="item.locations.length"
+                        :values="item.locations"
+                        :no_track="true"
+                        fixedSize="144"
+                        style="cursor: pointer;"
+                        @click.native="coordinates = item.locations"
+                      />
+                    </div>
+                  </div>
+                </label>
+                <div
+                  v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
+                  class="cell advance"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_${item.name}_${colIndex}`"
+                >
+                  <div>{{ formatValue(item[col.name]) }}</div>
+                  <div>{{ `(${item[col.name.replace('_', '_DESC_')]})` }}</div>
+                </div>
+                <div
+                  v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
+                  class="cell"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_${item.name}_${colIndex}`"
+                >
+                  {{ formatValue(item[col.name]) }}
+                </div>
+                <div
+                  v-else-if="col.name === 'LEVEL'"
+                  class="cell"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_${item.name}_${colIndex}`"
+                >
+                  {{ item[col.name] }}
+                </div>
+                <div
+                  v-else
+                  class="cell"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_${item.name}_${colIndex}`"
+                >
+                  <div class="align-right">{{ item[col.name] }}</div>
+                </div>
+              </template>
+            </div>
+          </template>
+        </div>
+      </simplebar>
     </div>
     <div
       v-if="coordinates.length > 0"
@@ -336,14 +338,8 @@ i.fa {
 }
 
 .sticky-table-wrapper {
-  overflow: scroll;
-  -webkit-overflow-scrolling: touch;
-  max-width: 100%;
   max-height: calc(100vh - 70px - 20px);
   max-height: calc(var(--vh, 1vh) * 100 - 70px - 20px);
-  &::-webkit-scrollbar {
-    display: none;
-  }
 }
 .sticky-table {
   display: table;
@@ -536,16 +532,19 @@ i.fa {
     .chart-wrapper {
       display: flex;
       width: 100%;
+      align-items: flex-end;
     }
     .chart-inner {
-      display: flex;
-      align-items: flex-end;
+      flex-grow: 1;
       direction: rtl;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      width: 100%;
       padding-top: 5px;
       cursor: initial;
+      &::v-deep {
+        .simplebar-content {
+          display: flex;
+          align-items: flex-end;
+        }
+      }
     }
     .bar {
       flex-grow: 1;

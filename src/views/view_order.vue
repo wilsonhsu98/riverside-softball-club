@@ -192,6 +192,7 @@
                   delay="300"
                   :autoHide="true"
                   :container="$refs.container"
+                  @show="setSimplebar(`chart-inner_${player.name}`)"
                 >
                   <!-- This will be the popover target (for the events and position) -->
                   <div class="tip-trigger"></div>
@@ -199,7 +200,10 @@
                   <!-- This will be the content of the popover -->
                   <template slot="popover">
                     <div class="chart">
-                      <div class="chart-inner">
+                      <div
+                        class="chart-inner"
+                        :id="`chart-inner_${player.name}`"
+                      >
                         <div
                           class="bar"
                           v-for="(cube, cubeIndex) in player.listByGame"
@@ -699,17 +703,12 @@
   margin-bottom: 5px;
   padding-top: 5px;
   .chart-inner {
-    display: flex;
-    align-items: flex-end;
+    white-space: nowrap;
     direction: rtl;
-    overflow-x: auto;
-    visibility: visible;
-    -webkit-overflow-scrolling: touch;
-    width: 100%;
   }
   .bar {
-    flex-grow: 1;
-    min-width: 50px;
+    width: 50px;
+    display: inline-block;
   }
   .item {
     display: block;
@@ -841,6 +840,7 @@ i.fa {
 </style>
 
 <script>
+import SimpleBar from 'simplebar';
 import { mapGetters, mapActions } from 'vuex';
 import { scrollTo, getShuffledArr } from '../libs/utils';
 
@@ -1233,6 +1233,11 @@ export default {
         }
       });
       this.highlight = [];
+    },
+    setSimplebar(id) {
+      setTimeout(() => {
+        new SimpleBar(document.querySelector(`#${id}`));
+      }, 300);
     },
   },
   computed: {
