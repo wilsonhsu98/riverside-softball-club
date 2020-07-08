@@ -706,6 +706,9 @@
   .chart-inner {
     white-space: nowrap;
     direction: rtl;
+    ::-webkit-scrollbar {
+      display: none;
+    }
   }
   .bar {
     width: 50px;
@@ -1161,7 +1164,9 @@ export default {
     },
     formatValue(value, col) {
       return value !== undefined &&
-        ['AVG', 'OBP', 'SLG', 'OPS'].includes(col) &&
+        ['AVG', 'OBP', 'SLG', 'OPS', 'AVG_NO', 'AVG_SP', 'AVG_FB'].includes(
+          col,
+        ) &&
         value !== '-'
         ? value.toFixed(3)
         : value;
@@ -1170,7 +1175,7 @@ export default {
       this.deleteMode = false;
       const rules = [
         { order: 3, rule: ['OPS'] },
-        { order: 4, rule: ['SLG'] },
+        { order: 4, rule: ['AVG_SP', 'SLG'] },
         { order: 5, rule: ['RBI', 'SLG'] },
         { order: 1, rule: ['OBP'] },
         { order: 2, rule: ['AVG'] },

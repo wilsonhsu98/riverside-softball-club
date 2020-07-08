@@ -340,6 +340,9 @@ i.fa {
 .sticky-table-wrapper {
   max-height: calc(100vh - 70px - 20px);
   max-height: calc(var(--vh, 1vh) * 100 - 70px - 20px);
+  ::-webkit-scrollbar {
+    display: none;
+  }
 }
 .sticky-table {
   display: table;
@@ -539,6 +542,9 @@ i.fa {
       direction: rtl;
       padding-top: 5px;
       cursor: initial;
+      ::-webkit-scrollbar {
+        display: none;
+      }
       &::v-deep {
         .simplebar-content {
           display: flex;

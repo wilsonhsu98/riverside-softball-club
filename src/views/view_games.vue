@@ -57,11 +57,11 @@
     <div
       class="container"
       ref="container"
-      :class="{ empty: role === 'manager' && gameList_.length === 0 }"
+      :class="{ empty: role === 'manager' && groupGames.length === 0 }"
     >
-      <template v-for="(item, i) in gameList_">
+      <template v-for="(item, i) in groupGames">
         <div
-          :class="['row', { last: i === gameList_.length - 1 }]"
+          :class="['row', { last: i === groupGames.length - 1 }]"
           :data-date="item.date"
           :key="`date_${item.date}`"
         >
@@ -606,7 +606,6 @@ export default {
     window.localStorage.removeItem('focus_game');
     return {
       container: null,
-      gameList_: [],
       focus_game,
       version: '',
       inn: 0,
@@ -661,19 +660,12 @@ export default {
       role: 'role',
       period: 'period',
       periodSelect: 'periodSelect',
+      periodGames: 'periodGames',
       lastUpdate: 'lastUpdate',
       teamInfo: 'teamInfo',
     }),
   },
   watch: {
-    groupGames: {
-      handler() {
-        this.$nextTick(() => {
-          this.gameList_ = this.groupGames;
-        });
-      },
-      immediate: true,
-    },
     boxSummary: {
       handler() {
         if (this.boxSummary.game) {
