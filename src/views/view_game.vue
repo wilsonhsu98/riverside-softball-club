@@ -142,6 +142,7 @@
                 @click="toggleGameStatus_(gameStatus)"
               ></i>
               <i
+                v-if="container"
                 class="fa fa-info-circle"
                 v-tooltip="{
                   content: `<ul><li>${$t('tip_lock_game')
@@ -201,6 +202,7 @@
                 @click="toggleGameStatus_(gameStatus)"
               ></i>
               <i
+                v-if="container"
                 class="fa fa-info-circle"
                 v-tooltip="{
                   content: `<ul><li>${$t('tip_lock_game')
@@ -1288,6 +1290,7 @@ import { formatContent } from '../libs/utils';
 export default {
   data() {
     return {
+      container: null,
       version: '',
       inn: 0,
       scores: [],
@@ -1321,7 +1324,9 @@ export default {
       this.setGame(this.$route.params.game);
     }
   },
-  mounted() {},
+  mounted() {
+    this.container = this.$refs.container;
+  },
   methods: {
     ...mapActions({
       setGame: 'setGame',

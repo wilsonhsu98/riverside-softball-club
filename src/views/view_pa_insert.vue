@@ -120,6 +120,7 @@
           <label
             >{{ $t('ttl_step')
             }}<i
+              v-if="container"
               class="fa fa-info-circle"
               v-tooltip="{
                 content: `<ul><li>${$t('tip_step')
@@ -1060,6 +1061,7 @@ import { formatContent, formatColor } from '../libs/utils';
 export default {
   data() {
     return {
+      container: null,
       inn: 1,
       out: 0,
       order: '',
@@ -1119,6 +1121,9 @@ export default {
   },
   created() {
     this.setPa();
+  },
+  mounted() {
+    this.container = this.$refs.container;
   },
   methods: {
     ...mapActions({

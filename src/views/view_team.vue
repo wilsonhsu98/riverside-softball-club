@@ -83,8 +83,8 @@
       <h2 class="player-header">
         {{ $t('ttl_player_list') }}
         <i
+          v-if="$route.params.team && container"
           class="fa fa-info-circle"
-          v-if="$route.params.team"
           v-tooltip="{
             content: `<ul><li>${$t('tip_player')
               .split('|')
@@ -178,6 +178,7 @@
       <h2 class="player-header" v-if="$route.params.team && benches.length">
         {{ $t('ttl_bench_list') }}
         <i
+          v-if="container"
           class="fa fa-info-circle"
           v-tooltip="{
             content: `<ul><li>${$t('tip_bench')
@@ -217,6 +218,7 @@
             class="binded"
           />
           <i
+            v-if="container"
             class="fa fa-commenting-o"
             v-tooltip="{
               content: player.msg,
@@ -561,6 +563,7 @@ import transparentPng from '../images/transparent.png';
 export default {
   data() {
     return {
+      container: null,
       teamCode: '',
       teamCode_err: '',
       teamName: '',
@@ -576,7 +579,9 @@ export default {
     };
   },
   created() {},
-  mounted() {},
+  mounted() {
+    this.container = this.$refs.container;
+  },
   beforeDestroy() {},
   methods: {
     ...mapActions({

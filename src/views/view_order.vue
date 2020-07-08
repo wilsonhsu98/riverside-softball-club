@@ -76,6 +76,7 @@
             <div class="flex"></div>
             <div class="separater">
               <i
+                v-if="container"
                 class="toggle-btn fa fa-info-circle"
                 v-tooltip="{
                   content: `<ul><li>${$t('tip_order')
@@ -183,7 +184,7 @@
                   >
                 </span>
                 <v-popover
-                  v-if="(player.listByGame || []).length"
+                  v-if="(player.listByGame || []).length && container"
                   placement="bottom"
                   trigger="click"
                   popoverClass="info"
@@ -854,6 +855,7 @@ export default {
       return acc;
     }, {});
     return {
+      container: null,
       avatar: true,
       deleteMode: false,
       drag: false,
@@ -891,6 +893,9 @@ export default {
         }
       });
     }
+  },
+  mounted() {
+    this.container = this.$refs.container;
   },
   methods: {
     ...mapActions({

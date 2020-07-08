@@ -67,6 +67,7 @@
         >
           <template v-for="sub in item.games">
             <v-popover
+              v-if="container"
               placement="bottom"
               trigger="click"
               offset="0"
@@ -604,6 +605,7 @@ export default {
     const focus_game = window.localStorage.getItem('focus_game');
     window.localStorage.removeItem('focus_game');
     return {
+      container: null,
       gameList_: [],
       focus_game,
       version: '',
@@ -623,6 +625,7 @@ export default {
   },
   created() {},
   mounted() {
+    this.container = this.$refs.container;
     document.addEventListener(clickEvent, this.collapseSearch, true);
   },
   beforeDestroy() {
