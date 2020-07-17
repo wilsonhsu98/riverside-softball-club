@@ -195,7 +195,17 @@
                     @click="e => e.preventDefault()"
                   >
                     <div class="chart-wrapper">
-                      <simplebar class="chart-inner">
+                      <simplebar
+                        class="chart-inner"
+                        :style="{
+                          height: item.locations.length ? '144px' : 'auto',
+                          width: `${
+                            item.locations.length
+                              ? chartWidth - 144
+                              : chartWidth
+                          }px`,
+                        }"
+                      >
                         <div
                           class="bar"
                           v-for="(cube, cubeIndex) in item.listByGame"
@@ -541,6 +551,7 @@ i.fa {
       flex-grow: 1;
       direction: rtl;
       padding-top: 5px;
+      box-sizing: border-box;
       cursor: initial;
       ::-webkit-scrollbar {
         display: none;
@@ -549,6 +560,8 @@ i.fa {
         .simplebar-content {
           display: flex;
           align-items: flex-end;
+          height: 100%;
+          box-sizing: border-box;
         }
       }
     }
