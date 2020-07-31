@@ -848,7 +848,7 @@ export default {
           document
             .querySelector(`#${e.target.id.replace('chk_', 'chart_')}`)
             .focus();
-        });
+        }, 100);
       }
     },
     collapseSearch(event) {
