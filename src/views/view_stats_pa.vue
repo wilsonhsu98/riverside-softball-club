@@ -384,7 +384,7 @@ i.fa {
         cursor: initial;
       }
       &.name {
-        width: 1px;
+        min-width: 110px;
         padding-left: 0;
         text-align: center;
         z-index: 5;
@@ -844,9 +844,11 @@ export default {
         this.toggleTarget = null;
       } else {
         this.toggleTarget = target;
-        document
-          .querySelector(`#${e.target.id.replace('chk_', 'chart_')}`)
-          .focus();
+        setTimeout(() => {
+          document
+            .querySelector(`#${e.target.id.replace('chk_', 'chart_')}`)
+            .focus();
+        });
       }
     },
     collapseSearch(event) {

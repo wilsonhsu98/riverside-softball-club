@@ -86,7 +86,7 @@
                 <div v-if="unlockGames.includes(sub.game)" class="result">
                   ?
                 </div>
-                <div v-else="" :class="`result ${sub.result} ${sub.group}`">
+                <div v-else="" :class="`result ${sub.result}`">
                   {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
                 </div>
                 <div class="name">{{ sub.opponent || sub.game }}</div>
@@ -216,6 +216,20 @@
           </template>
         </div>
       </template>
+      <div
+        class="summary-container"
+        v-if="gamesResult.win || gamesResult.lose || gamesResult.tie"
+      >
+        <div class="result win" :class="`len${gamesResult.maxLength}`">
+          {{ gamesResult.win }}
+        </div>
+        <div class="result lose" :class="`len${gamesResult.maxLength}`">
+          {{ gamesResult.lose }}
+        </div>
+        <div class="result tie" :class="`len${gamesResult.maxLength}`">
+          {{ gamesResult.tie }}
+        </div>
+      </div>
       <div class="button-container" v-if="role === 'manager'">
         <router-link
           :to="{
@@ -240,6 +254,35 @@
   outline: none;
   font-size: 14px;
 }
+.result {
+  border-radius: 50%;
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  line-height: 50px;
+  text-transform: uppercase;
+  font-size: 40px;
+  font-weight: bold;
+  text-decoration: none;
+  color: $gray;
+  box-sizing: border-box;
+  border: 5px solid;
+  border-color: $row_odd_bgcolor;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
+  background-color: #ccc;
+  color: #fff;
+  text-align: center;
+  &.win {
+    background-color: $hit;
+  }
+  &.tie {
+    background-color: $nonpa;
+  }
+  &.lose {
+    background-color: $ng;
+  }
+}
 .container {
   display: flex;
   flex-direction: column;
@@ -261,40 +304,6 @@
           line-height: 24px;
         }
       }
-      .result {
-        border-radius: 50%;
-        display: inline-block;
-        width: 60px;
-        height: 60px;
-        line-height: 50px;
-        text-transform: uppercase;
-        font-size: 40px;
-        font-weight: bold;
-        text-decoration: none;
-        color: $gray;
-        box-sizing: border-box;
-        border: 5px solid;
-        border-color: $row_odd_bgcolor;
-        box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-          0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-        background-color: #ccc;
-        color: #fff;
-        &.win {
-          background-color: $hit;
-        }
-        &.tie {
-          background-color: $nonpa;
-        }
-        &.lose {
-          background-color: $ng;
-        }
-        // &.C { border-color: $header_bgcolor; }
-        // &.G { border-color: $row_odd_bgcolor; }
-        // &.no-order {
-        //  opacity: .5;
-        //  cursor: not-allowed;
-        // }
-      }
     }
     &:after {
       content: attr(data-date);
@@ -305,6 +314,30 @@
       left: 50%;
       bottom: 5px;
       transform: translateX(-50%);
+    }
+  }
+  .summary-container {
+    margin-top: -50px;
+    padding: 0;
+    width: 150px;
+    position: sticky;
+    bottom: 20px;
+    background: none;
+    display: flex;
+    .result {
+      margin-left: 5px;
+      width: 44px;
+      height: 44px;
+      line-height: 34px;
+      &.len1 {
+        font-size: 34px;
+      }
+      &.len2 {
+        font-size: 28px;
+      }
+      &.len3 {
+        font-size: 20px;
+      }
     }
   }
   .button-container {
@@ -541,11 +574,14 @@ i.fa {
     .row:after {
       color: #fff;
     }
+    .summary-container {
+      margin-top: 10px;
+      bottom: 60px;
+    }
     .button-container {
-      margin-top: -15px;
-      bottom: 50px;
+      bottom: 60px;
       span {
-        margin: 0 10px 10px 0;
+        margin-right: 10px;
       }
     }
     &.empty {
@@ -660,7 +696,7 @@ export default {
       role: 'role',
       period: 'period',
       periodSelect: 'periodSelect',
-      periodGames: 'periodGames',
+      gamesResult: 'gamesResult',
       lastUpdate: 'lastUpdate',
       teamInfo: 'teamInfo',
     }),

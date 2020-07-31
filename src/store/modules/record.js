@@ -155,6 +155,27 @@ const getters = {
     };
   },
   games: state => state.games,
+  gamesResult: state =>
+    state.games
+      .filter(item =>
+        (state.period.find(item => item.select).games || []).includes(
+          item.game,
+        ),
+      )
+      .reduce(
+        ({ win, lose, tie }, item) => {
+          const w = win + (item.result === 'win' ? 1 : 0);
+          const l = lose + (item.result === 'lose' ? 1 : 0);
+          const t = tie + (item.result === 'tie' ? 1 : 0);
+          return {
+            win: w,
+            lose: l,
+            tie: t,
+            maxLength: Math.max(`${w}`.length, `${l}`.length, `${t}`.length),
+          };
+        },
+        { win: 0, lose: 0, tie: 0 },
+      ),
   groupGames: state =>
     utils.genGameList(
       state.games,
