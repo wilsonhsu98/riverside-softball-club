@@ -401,6 +401,49 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
       res.status(500).send(err.message);
     });
 });
+
+// http://localhost:9000/.netlify/functions/index/delete_anonymous_users
+router.get('/delete_anonymous_users', (undefined, res) => {
+  let count = 0;
+  const deleteAnonymousUsers = nextPageToken => {
+    admin
+      .auth()
+      .listUsers(20, nextPageToken)
+      .then(listUsersResult => {
+        listUsersResult.users.forEach(userRecord => {
+          if (
+            userRecord.providerData.length === 0 &&
+            !userRecord.uid.includes('LINE: ')
+          ) {
+            // this user is anonymous
+            count += 1;
+            admin
+              .auth()
+              .deleteUser(userRecord.uid)
+              .then(() => {
+                console.log('Successfully deleted user');
+              })
+              .catch(error => {
+                console.log('Error deleting user:', error);
+              });
+          }
+        });
+        if (listUsersResult.pageToken) {
+          // List next batch of users.
+          deleteAnonymousUsers(listUsersResult.pageToken);
+        } else {
+          res.send(`success: ${count}`);
+        }
+      })
+      .catch(err => {
+        console.log(err);
+        res.status(500).send(err.message);
+      });
+  };
+
+  deleteAnonymousUsers();
+});
+
 app.use('/.netlify/functions/index', router);
 
 /**
