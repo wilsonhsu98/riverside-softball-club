@@ -404,6 +404,7 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
 
 // http://localhost:9000/.netlify/functions/index/delete_anonymous_users
 router.get('/delete_anonymous_users', (undefined, res) => {
+  const currentTime = new Date();
   let count = 0;
   const deleteAnonymousUsers = nextPageToken => {
     admin
@@ -411,16 +412,18 @@ router.get('/delete_anonymous_users', (undefined, res) => {
       .listUsers(20, nextPageToken)
       .then(listUsersResult => {
         listUsersResult.users.forEach(userRecord => {
+          const lastSignInTime = new Date(userRecord.metadata.lastSignInTime);
           if (
             userRecord.providerData.length === 0 &&
-            !userRecord.uid.includes('LINE: ')
+            !userRecord.uid.includes('LINE: ') &&
+            currentTime - lastSignInTime > 86400000
           ) {
             // this user is anonymous
-            count += 1;
             admin
               .auth()
               .deleteUser(userRecord.uid)
               .then(() => {
+                count += 1;
                 console.log('Successfully deleted user');
               })
               .catch(error => {
