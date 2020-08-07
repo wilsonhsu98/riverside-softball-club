@@ -8,6 +8,7 @@ html {
 }
 body {
 	font-family: 'Inconsolata', '微軟正黑體';
+	-webkit-text-size-adjust: 100% !important;
 	margin: 0;
 	overscroll-behavior-y: none;
 	overscroll-behavior-x: none;
