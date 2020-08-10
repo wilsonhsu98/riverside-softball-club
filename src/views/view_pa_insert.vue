@@ -1308,6 +1308,13 @@ export default {
           tempRecord.slice(i + 1),
         );
         this.editGameOrder({
+          redirect: () => {
+            if (this.onbaseOut === 3) {
+              this.$router.push(
+                `/main/games/${this.$route.params.team}/${this.$route.params.game}/edit`,
+              );
+            }
+          },
           teamCode: this.$route.params.team,
           gameId: this.$route.params.game,
           orders,
@@ -1418,6 +1425,17 @@ export default {
 
         this.checkModalPlayer();
       }
+
+      this.step = 1;
+      this.content = undefined;
+      this.rbi = {
+        value: '',
+        one: { disabled: true },
+        two: { disabled: true },
+        three: { disabled: true },
+        four: { disabled: true },
+      };
+      this.location = [];
     },
     checkReJoin(sameOrderPlayers) {
       return sameOrderPlayers.reduceRight((acc, item, i, self) => {
@@ -1805,10 +1823,12 @@ export default {
         this.base.third.disabled = true;
       }
     },
-    location() {
-      setTimeout(() => {
-        this.step = 3;
-      }, 500);
+    location(newVal) {
+      if (newVal.length) {
+        setTimeout(() => {
+          this.step = 3;
+        }, 500);
+      }
     },
   },
   computed: {

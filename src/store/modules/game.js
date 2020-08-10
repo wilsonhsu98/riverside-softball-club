@@ -160,7 +160,7 @@ const actions = {
       });
   },
   editGameOrder({ commit, dispatch }, data) {
-    const { teamCode, gameId, orders } = data;
+    const { teamCode, gameId, orders, redirect } = data;
     commit(rootTypes.LOADING, true);
     const batch = db.batch();
     batch.set(
@@ -176,8 +176,12 @@ const actions = {
     batch
       .commit()
       .then(() => {
-        dispatch('setGame', gameId);
-        router.push(`/main/games/${teamCode}/${gameId}`);
+        if (typeof redirect === 'function') {
+          redirect();
+        } else {
+          dispatch('setGame', gameId);
+          router.push(`/main/games/${teamCode}/${gameId}`);
+        }
         commit(rootTypes.LOADING, false);
       })
       .catch(error => {
