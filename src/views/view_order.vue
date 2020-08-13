@@ -533,10 +533,11 @@
         position: absolute;
         right: 10px;
         padding: 5px;
-        height: calc(100% - 80px);
+        height: calc(100% - 35px);
         width: calc(40% - 15px);
       }
-      .player {
+      .player,
+      .add-source {
         width: 60%;
         margin-right: auto;
         border-style: dotted;
@@ -627,12 +628,12 @@
     }
     &.dragging {
       border-radius: 5px;
-      width: 200px !important;
+      /* width: 200px !important; */
       border-style: solid !important;
     }
   }
   .add-source {
-    height: 36px;
+    height: 40px;
     line-height: 36px;
     border: 2px solid $active_bgcolor;
     border-radius: 5px;
@@ -640,6 +641,7 @@
     text-align: left;
     color: $active_bgcolor;
     padding-left: 5px;
+    box-sizing: border-box;
     > input[type='text'] {
       color: $gray;
       font-size: 16px;
@@ -967,6 +969,17 @@ export default {
     move(event) {
       const fromEle = event.from;
       const toEle = event.originalEvent.target;
+      // console.log(toEle)
+      if (typeof toEle.className === 'object') return false;
+      if (
+        !(
+          toEle.className.includes('order') ||
+          toEle.className.includes('starting-players') ||
+          toEle.className.includes('all-players players') ||
+          toEle.classList.contains('player')
+        )
+      )
+        return false;
       if (
         fromEle.className.includes('order') &&
         toEle.className.includes('starting-players')
@@ -1005,6 +1018,7 @@ export default {
               );
             });
           }) || parseInt(toEle.getAttribute('data-order'));
+        this.target = this[`order_${this.target_order}`][0];
       }
 
       if (toEle.className.includes('starting-players')) {
@@ -1013,6 +1027,18 @@ export default {
         );
       }
 
+      if (
+        toEle.classList.contains('player') &&
+        toEle.parentElement.getAttribute('data-order')
+      ) {
+        this.target_order = parseInt(
+          toEle.parentElement.getAttribute('data-order'),
+        );
+        this.target = this[`order_${this.target_order}`][0];
+      }
+      // console.log('toele', toEle)
+      // console.log('origin', this.origin, event.draggedContext)
+      // console.log('target', this.target, event.relatedContext)
       return false;
     },
     moveByDblclick(e, currentTargetData, order) {
