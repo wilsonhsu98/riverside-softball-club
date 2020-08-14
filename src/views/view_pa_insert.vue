@@ -932,7 +932,7 @@
   > div {
     top: 50%;
     left: 50%;
-    transform: translateY(-50%) translateX(-50%);
+    transform: translate(-50%, -50%) scale(2);
   }
   .dialog {
     position: absolute;
