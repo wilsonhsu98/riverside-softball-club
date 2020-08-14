@@ -476,7 +476,7 @@
   .flex {
     flex: 1;
     position: relative;
-    transition: flex 0.5s;
+    transition: all 0.5s;
   }
   .separater {
     width: 20px;

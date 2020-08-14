@@ -270,8 +270,6 @@ header {
           height: 30px;
           line-height: 30px;
           margin: 0 auto;
-          -moz-transition: background-color 0.5s;
-          -webkit-transition: background-color 0.5s;
           transition: background-color 0.5s;
           &.carousel > svg {
             margin-top: -2px;
