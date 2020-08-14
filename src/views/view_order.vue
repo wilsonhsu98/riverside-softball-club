@@ -1214,7 +1214,11 @@ export default {
       const sort = (a, b, rule, i) => {
         const sortBy = rule[i] || 'number';
         if (a[sortBy] === b[sortBy]) {
-          return sort(a, b, rule, i + 1);
+          if (a[sortBy] || b[sortBy]) {
+            return sort(a, b, rule, i + 1);
+          } else {
+            return 0;
+          }
         }
         return b[sortBy] - a[sortBy];
       };
