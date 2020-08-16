@@ -42,7 +42,7 @@ const colorMappging = {
 };
 
 export default {
-  props: ['values', 'disabled', 'no_track', 'fixedSize'],
+  props: ['values', 'disabled', 'no_track', 'fixedSize', 'showPercentage'],
   data() {
     return {
       xy: this.values || [],
@@ -533,6 +533,8 @@ export default {
         ctx.strokeStyle = 'black';
         ctx.stroke();
 
+        // console.log(drawingDot.x, drawingDot.y);
+
         // draw clicking ball
         ctx.beginPath();
         const ballWidth = base * 0.1;
@@ -544,29 +546,148 @@ export default {
           ballWidth,
         );
       } else {
-        this.xy.forEach(item => {
+        if (this.showPercentage) {
+          const percentage = this.xy.reduce((acc, item, i, self) => {
+            const p = {
+              ...acc,
+              [item.location]: (acc[item.location] || 0) + 1,
+            };
+            if (i === self.length - 1) {
+              const values = Object.keys(p).map(key => p[key]);
+              const max = Math.max(...values);
+              const maxCount = values.filter(
+                value => value === Math.max(...values),
+              ).length;
+              return Object.keys(p).reduce(
+                (subAcc, key) => ({
+                  ...subAcc,
+                  [key]: `${Math.round((p[key] / self.length) * 100)}%`,
+                  ...(maxCount === 1 && p[key] === max
+                    ? { max: key }
+                    : undefined),
+                }),
+                {},
+              );
+            } else {
+              return p;
+            }
+          }, {});
+          ctx.lineWidth = base * 0.008;
+          ctx.strokeStyle = 'yellow';
+          // 界外線
           ctx.beginPath();
-          ctx.arc(
-            (item.x / 100) * base,
-            (item.y / 100) * base,
-            base * 0.02,
-            0,
-            2 * Math.PI,
-          );
-          ctx.fillStyle = colorMappging[item.color] || item.color || 'yellow';
-          ctx.fill();
-          ctx.arc(
-            (item.x / 100) * base,
-            (item.y / 100) * base,
-            base * 0.02,
-            0,
-            2 * Math.PI,
-          );
-          ctx.lineWidth =
-            item.borderColor === 'white' ? base * 0.005 : base * 0.001;
-          ctx.strokeStyle = item.borderColor || 'black';
+          ctx.moveTo((50 / 100) * base, (87.7 / 100) * base);
+          ctx.lineTo((0 / 100) * base, (38 / 100) * base);
+          ctx.moveTo((50 / 100) * base, (87.7 / 100) * base);
+          ctx.lineTo((138 / 100) * base, (0 / 100) * base);
           ctx.stroke();
-        });
+          // 內野弧線
+          // Math.pow(x - 50, 2) + Math.pow(y - 66, 2) <= Math.pow(21, 2)
+          ctx.beginPath();
+          for (let x = 0; x < 100; x += 1) {
+            const y = -Math.sqrt(Math.pow(21, 2) - Math.pow(x - 50, 2)) + 66;
+            ctx.lineTo((x / 100) * base, (y / 100) * base);
+          }
+          ctx.stroke();
+
+          ctx.beginPath();
+          // 三壘
+          ctx.moveTo((31.8 / 100) * base, (56 / 100) * base);
+          ctx.lineTo((46 / 100) * base, (64 / 100) * base);
+          ctx.lineTo((40.2 / 100) * base, (77.3 / 100) * base);
+          // 一壘
+          ctx.moveTo((68.2 / 100) * base, (56 / 100) * base);
+          ctx.lineTo((54 / 100) * base, (64 / 100) * base);
+          ctx.lineTo((59.8 / 100) * base, (77.3 / 100) * base);
+          // 中線
+          ctx.moveTo((50 / 100) * base, (64 / 100) * base);
+          ctx.lineTo((50 / 100) * base, (45 / 100) * base);
+          // 投手線
+          ctx.moveTo((46 / 100) * base, (64 / 100) * base);
+          ctx.lineTo((54 / 100) * base, (64 / 100) * base);
+          ctx.stroke();
+          // 外野弧線
+          // Math.pow(x - 50, 2) + Math.pow(y - 66, 2) < Math.pow(58.5, 2)
+          ctx.beginPath();
+          for (let x = -1; x <= 101; x += 1) {
+            const y = -Math.sqrt(Math.pow(58.5, 2) - Math.pow(x - 50, 2)) + 66;
+            ctx.lineTo((x / 100) * base, (y / 100) * base);
+          }
+          ctx.stroke();
+          // 左中線 中右線
+          ctx.beginPath();
+          ctx.moveTo((38.5 / 100) * base, (48.5 / 100) * base);
+          ctx.lineTo((28 / 100) * base, (11.5 / 100) * base);
+          ctx.moveTo((61.5 / 100) * base, (48.5 / 100) * base);
+          ctx.lineTo((72 / 100) * base, (11.5 / 100) * base);
+          ctx.stroke();
+
+          ctx.font = `${avatarRadius * 0.8}px Arial`;
+          ctx.shadowColor = 'black';
+          ctx.shadowBlur = 7;
+          const textLocation = {
+            cf: { x: 50, y: 30 },
+            rf: { x: 79, y: 40 },
+            lf: { x: 21, y: 40 },
+            ss: { x: 42, y: 57 },
+            '2B': { x: 58, y: 57 },
+            '3B': { x: 38, y: 68 },
+            '1B': { x: 62, y: 68 },
+            P: { x: 50, y: 75 },
+            foul: { x: 6, y: 80 },
+          };
+          Object.keys(percentage)
+            .filter(key => key !== 'max')
+            .forEach(key => {
+              if (key === 'foul') {
+                ctx.fillStyle = 'yellow';
+                ctx.textAlign = 'left';
+                ctx.fillText(
+                  `Foul: ${percentage.foul}`,
+                  (textLocation.foul.x / 100) * base,
+                  (textLocation.foul.y / 100) * base,
+                );
+              } else {
+                if (key === percentage.max) {
+                  ctx.fillStyle = 'red';
+                } else {
+                  ctx.fillStyle = 'yellow';
+                }
+                ctx.textAlign = 'center';
+                ctx.fillText(
+                  percentage[key],
+                  (textLocation[key].x / 100) * base,
+                  (textLocation[key].y / 100) * base,
+                );
+              }
+            });
+        } else {
+          this.xy.forEach(item => {
+            ctx.beginPath();
+            ctx.shadowColor = 'black';
+            ctx.shadowBlur = 2;
+            ctx.arc(
+              (item.x / 100) * base,
+              (item.y / 100) * base,
+              base * 0.02,
+              0,
+              2 * Math.PI,
+            );
+            ctx.fillStyle = colorMappging[item.color] || item.color || 'yellow';
+            ctx.fill();
+            ctx.arc(
+              (item.x / 100) * base,
+              (item.y / 100) * base,
+              base * 0.02,
+              0,
+              2 * Math.PI,
+            );
+            ctx.lineWidth =
+              item.borderColor === 'white' ? base * 0.005 : base * 0.001;
+            ctx.strokeStyle = item.borderColor || 'black';
+            ctx.stroke();
+          });
+        }
       }
 
       if (this.disabled) {
@@ -669,6 +790,9 @@ export default {
       if (this.disabled) {
         this.xy = [];
       }
+      this.draw();
+    },
+    showPercentage() {
       this.draw();
     },
   },

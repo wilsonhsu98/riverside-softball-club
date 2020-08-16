@@ -257,6 +257,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         .map(item => ({
           x: item.location.x,
           y: item.location.y,
+          location: item.location.location,
           color: contentColor(item.content),
           borderColor: item.content === 'HR' ? 'white' : 'black',
         })),

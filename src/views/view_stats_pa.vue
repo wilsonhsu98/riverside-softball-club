@@ -237,10 +237,24 @@
                         v-if="item.locations.length"
                         :values="item.locations"
                         :no_track="true"
+                        :showPercentage="showPercentage.includes(item.name)"
                         fixedSize="144"
                         style="cursor: pointer;"
-                        @click.native="coordinates = item.locations"
+                        @click.native="
+                          popupCoordinates = {
+                            values: item.locations,
+                            showPercentage: showPercentage.includes(item.name),
+                          }
+                        "
                       />
+                      <i
+                        class="fa"
+                        :class="{
+                          'fa-map-marker': showPercentage.includes(item.name),
+                          'fa-percent': !showPercentage.includes(item.name),
+                        }"
+                        @click="toggleLocationMode(item.name)"
+                      ></i>
                     </div>
                   </div>
                 </label>
@@ -288,11 +302,15 @@
       </simplebar>
     </div>
     <div
-      v-if="coordinates.length > 0"
+      v-if="popupCoordinates.values.length > 0"
       class="location-modal"
       @click="closeLocation"
     >
-      <coordination :values="coordinates" :no_track="true" />
+      <coordination
+        :values="popupCoordinates.values"
+        :no_track="true"
+        :showPercentage="popupCoordinates.showPercentage"
+      />
     </div>
   </div>
 </template>
@@ -597,6 +615,19 @@ i.fa {
       width: 36px;
       margin: auto;
     }
+    i.fa {
+      color: white;
+      background-color: $active_bgcolor;
+      border-radius: 4px;
+      width: 26px;
+      height: 26px;
+      line-height: 26px;
+      font-size: 18px;
+      box-sizing: border-box;
+      position: absolute;
+      right: 5px;
+      bottom: 5px;
+    }
   }
 }
 
@@ -809,9 +840,13 @@ export default {
       toggleSearch: false,
       toggleTarget: null,
       defaultIcon,
-      coordinates: [],
+      popupCoordinates: {
+        values: [],
+        showPercentage: false,
+      },
       lazy: false,
       chartWidth: 0,
+      showPercentage: [],
     };
   },
   created() {},
@@ -888,7 +923,10 @@ export default {
     },
     closeLocation(e) {
       if (e.currentTarget === e.target) {
-        this.coordinates = [];
+        this.popupCoordinates = {
+          values: [],
+          showPercentage: false,
+        };
       }
     },
     detectChartWidth() {
@@ -899,6 +937,13 @@ export default {
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectChartWidth);
+    },
+    toggleLocationMode(name) {
+      if (this.showPercentage.includes(name)) {
+        this.showPercentage = this.showPercentage.filter(n => n !== name);
+      } else {
+        this.showPercentage = [...this.showPercentage, name];
+      }
     },
   },
   computed: {
