@@ -246,15 +246,16 @@
                             showPercentage: showPercentage.includes(item.name),
                           }
                         "
-                      />
-                      <i
-                        class="fa"
-                        :class="{
-                          'fa-map-marker': showPercentage.includes(item.name),
-                          'fa-percent': !showPercentage.includes(item.name),
-                        }"
-                        @click="toggleLocationMode(item.name)"
-                      ></i>
+                      >
+                        <i
+                          class="fa"
+                          :class="{
+                            'fa-map-marker': showPercentage.includes(item.name),
+                            'fa-percent': !showPercentage.includes(item.name),
+                          }"
+                          @click="toggleLocationMode(item.name)"
+                        ></i>
+                      </coordination>
                     </div>
                   </div>
                 </label>
@@ -625,8 +626,9 @@ i.fa {
       font-size: 18px;
       box-sizing: border-box;
       position: absolute;
-      right: 5px;
-      bottom: 5px;
+      right: 10px;
+      bottom: 10px;
+      transform: translateZ(0);
     }
   }
 }
