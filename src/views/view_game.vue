@@ -243,6 +243,7 @@
                 v-if="item.data.photo"
                 class="img"
                 :src="$cacheImg(item.data.photo)"
+                onerror="this.style.display='none'"
               />
               {{ item.name }}
             </span>
@@ -417,6 +418,7 @@
                 v-if="item.data.photo"
                 class="img"
                 :src="$cacheImg(item.data.photo)"
+                onerror="this.style.display='none'"
               />
               {{ item.name }}
             </span>

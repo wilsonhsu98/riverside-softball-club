@@ -5,7 +5,12 @@
         <span class="img" style="border-width: 1px">
           <i class="fa fa-user-o"></i>
         </span>
-        <img v-if="player.photo" class="img" :src="$cacheImg(player.photo)" />
+        <img
+          v-if="player.photo"
+          class="img"
+          :src="$cacheImg(player.photo)"
+          onerror="this.style.display='none'"
+        />
       </span>
       <span class="number">{{ player.number || '?' }}</span>
       <span>{{ player.name }}</span>

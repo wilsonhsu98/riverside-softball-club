@@ -182,7 +182,7 @@
                       v-if="item.data.photo"
                       class="img"
                       :src="$cacheImg(item.data.photo)"
-                      onError="this.style.display='none'"
+                      onerror="this.style.display='none'"
                     />
                     {{ item.name }}
                   </div>
