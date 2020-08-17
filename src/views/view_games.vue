@@ -86,7 +86,7 @@
                 <div v-if="unlockGames.includes(sub.game)" class="result">
                   ?
                 </div>
-                <div v-else="" :class="`result ${sub.result}`">
+                <div v-else :class="`result ${sub.result}`">
                   {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
                 </div>
                 <div class="name">{{ sub.opponent || sub.game }}</div>
@@ -141,21 +141,19 @@
                     >
                       <div>{{ index + 1 }}</div>
                       <div class="cell" v-if="topBottom === 'top'">
-                        {{
-                          scores[index] !== undefined ? scores[index] : '&nbsp;'
-                        }}
+                        {{ scores[index] !== undefined ? scores[index] : '?' }}
                       </div>
                       <div class="cell">
                         {{
                           opponentScores[index] !== undefined
                             ? opponentScores[index]
-                            : '&nbsp;'
+                            : topBottom === 'top'
+                            ? 'X'
+                            : '?'
                         }}
                       </div>
                       <div class="cell" v-if="topBottom === 'bot'">
-                        {{
-                          scores[index] !== undefined ? scores[index] : '&nbsp;'
-                        }}
+                        {{ scores[index] !== undefined ? scores[index] : 'X' }}
                       </div>
                     </div>
                     <div class="inn" style="margin-left: auto;">

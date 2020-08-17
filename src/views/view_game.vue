@@ -58,17 +58,19 @@
             >
               <div>{{ index + 1 }}</div>
               <div class="cell" v-if="topBottom === 'top'">
-                {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+                {{ scores[index] !== undefined ? scores[index] : '?' }}
               </div>
               <div class="cell">
                 {{
                   opponentScores[index] !== undefined
                     ? opponentScores[index]
-                    : '&nbsp;'
+                    : topBottom === 'top'
+                    ? 'X'
+                    : '?'
                 }}
               </div>
               <div class="cell" v-if="topBottom === 'bot'">
-                {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+                {{ scores[index] !== undefined ? scores[index] : 'X' }}
               </div>
             </div>
             <div class="inn" style="margin-left: auto;">
