@@ -1,7 +1,6 @@
 <template>
   <div class="root-container">
-    <canvas ref="canvas" @mousedown="trackXY" :disabled="disabled"></canvas>
-    <img ref="img" v-if="isImage" :src="imgSrc" />
+    <img ref="img" :src="imgSrc" @mousedown="trackXY" :disabled="disabled" />
   </div>
 </template>
 
@@ -10,22 +9,14 @@
   position: relative;
   line-height: 0;
 }
-canvas {
+img {
   width: 400px;
   height: 400px;
   &[disabled] {
     cursor: not-allowed;
   }
 }
-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 400px;
-  height: 400px;
-}
 @media only screen and (max-width: 760px) {
-  canvas,
   img {
     width: 300px;
     height: 300px;
@@ -42,24 +33,32 @@ const colorMappging = {
 };
 
 export default {
-  props: ['values', 'disabled', 'no_track', 'fixedSize', 'showPercentage'],
+  props: [
+    'values',
+    'disabled',
+    'no_track',
+    'fixedSize',
+    'showPercentage',
+    'avatar',
+    'player',
+  ],
   data() {
     return {
       xy: this.values || [],
-      isImage:
-        (Array.isArray(this.values) && this.values.length > 1) || this.no_track,
       imgSrc: '',
       ballImage: '',
       homeImage: '',
       firstImage: '',
       secondImage: '',
       thirdImage: '',
+      avatarImage: '',
     };
   },
   mounted() {
     Promise.all(
       [
         { var: 'ballImage', src: ballIcon },
+        ...(this.avatar ? [{ var: 'avatarImage', src: this.avatar }] : []),
         ...(typeof this.xy[0] === 'object' && this.xy[0].onbase
           ? [
               {
@@ -112,27 +111,20 @@ export default {
   },
   methods: {
     draw() {
-      const canvas = this.$refs.canvas;
       const img = this.$refs.img;
-      if (!canvas) return;
-      const { width } = canvas.getBoundingClientRect();
+      const { width } = img.getBoundingClientRect();
 
       if (this.fixedSize) {
-        canvas.style.width = `${this.fixedSize}px`;
-        canvas.style.height = `${this.fixedSize}px`;
-        canvas.width = this.fixedSize;
-        canvas.height = this.fixedSize;
-        if (this.isImage) {
-          img.style.width = `${this.fixedSize}px`;
-          img.style.height = `${this.fixedSize}px`;
-        }
-      } else {
-        canvas.width = width;
-        canvas.height = width;
+        img.style.width = `${this.fixedSize}px`;
+        img.style.height = `${this.fixedSize}px`;
       }
 
-      const { width: temp } = canvas.getBoundingClientRect();
-      const base = this.fixedSize ? this.fixedSize : temp || width;
+      const { width: temp } = img.getBoundingClientRect();
+      const scale = 2;
+      const base = (this.fixedSize ? this.fixedSize : temp || width) * scale;
+      const canvas = document.createElement('canvas');
+      canvas.width = base;
+      canvas.height = base;
       const ctx = canvas.getContext('2d');
 
       const green = '#6aa253';
@@ -624,7 +616,7 @@ export default {
 
           ctx.font = `${avatarRadius * 0.8}px Arial`;
           ctx.shadowColor = 'black';
-          ctx.shadowBlur = 7;
+          ctx.shadowBlur = (1 / 100) * base;
           const textLocation = {
             cf: { x: 50, y: 30 },
             rf: { x: 79, y: 40 },
@@ -665,7 +657,7 @@ export default {
           this.xy.forEach(item => {
             ctx.beginPath();
             ctx.shadowColor = 'black';
-            ctx.shadowBlur = 2;
+            ctx.shadowBlur = (1 / 100) * base;
             ctx.arc(
               (item.x / 100) * base,
               (item.y / 100) * base,
@@ -688,6 +680,45 @@ export default {
             ctx.stroke();
           });
         }
+        // 個人頭貼
+        if (this.avatarImage) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.translate(
+            base - avatarRadius * 2 - (5 / 100) * base,
+            base - avatarRadius * 2 - (5 / 100) * base,
+          );
+          ctx.arc(
+            avatarRadius,
+            avatarRadius,
+            avatarRadius,
+            0,
+            Math.PI * 2,
+            true,
+          );
+          ctx.clip();
+          ctx.drawImage(
+            this.avatarImage,
+            0,
+            0,
+            avatarRadius * 2,
+            avatarRadius * 2,
+          );
+          ctx.restore();
+        } else {
+          if (this.player) {
+            ctx.font = `${avatarRadius * 1.2}px Arial`;
+            ctx.shadowColor = 'white';
+            ctx.shadowBlur = (1 / 100) * base;
+            ctx.fillStyle = avatarBorderColor;
+            ctx.textAlign = 'right';
+            ctx.fillText(
+              this.player,
+              base - (5 / 100) * base,
+              base - (6 / 100) * base,
+            );
+          }
+        }
       }
 
       if (this.disabled) {
@@ -705,7 +736,7 @@ export default {
         top,
         width,
         height,
-      } = this.$refs.canvas.getBoundingClientRect();
+      } = this.$refs.img.getBoundingClientRect();
       const x = parseInt(
         ((event.pageX - left - window.scrollX) / width) * 100,
         10,

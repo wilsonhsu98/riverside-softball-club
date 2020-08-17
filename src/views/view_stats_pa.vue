@@ -240,7 +240,13 @@
                         :showPercentage="isPercentageMode"
                         fixedSize="144"
                         style="cursor: pointer;"
-                        @click.native="coordinates = item.locations"
+                        @click.native="
+                          coordinates = {
+                            values: item.locations,
+                            avatar: item.data.photo,
+                            player: item.name,
+                          }
+                        "
                       />
                       <i
                         v-if="item.locations.length"
@@ -298,14 +304,16 @@
       </simplebar>
     </div>
     <div
-      v-if="coordinates.length > 0"
+      v-if="coordinates.values.length > 0"
       class="location-modal"
       @click="closeLocation"
     >
       <coordination
-        :values="coordinates"
+        :values="coordinates.values"
         :no_track="true"
         :showPercentage="isPercentageMode"
+        :avatar="coordinates.avatar"
+        :player="coordinates.player"
       />
     </div>
   </div>
@@ -837,7 +845,11 @@ export default {
       toggleSearch: false,
       toggleTarget: null,
       defaultIcon,
-      coordinates: [],
+      coordinates: {
+        values: [],
+        avatar: '',
+        player: '',
+      },
       lazy: false,
       chartWidth: 0,
       showPercentage: [],
@@ -918,7 +930,11 @@ export default {
     },
     closeLocation(e) {
       if (e.currentTarget === e.target) {
-        this.coordinates = [];
+        this.coordinates = {
+          values: [],
+          avatar: '',
+          player: '',
+        };
       }
     },
     detectChartWidth() {
