@@ -237,24 +237,19 @@
                         v-if="item.locations.length"
                         :values="item.locations"
                         :no_track="true"
-                        :showPercentage="showPercentage.includes(item.name)"
+                        :showPercentage="isPercentageMode"
                         fixedSize="144"
                         style="cursor: pointer;"
-                        @click.native="
-                          popupCoordinates = {
-                            values: item.locations,
-                            showPercentage: showPercentage.includes(item.name),
-                          }
-                        "
+                        @click.native="coordinates = item.locations"
                       />
                       <i
                         v-if="item.locations.length"
                         class="fa"
                         :class="{
-                          'fa-map-marker': showPercentage.includes(item.name),
-                          'fa-percent': !showPercentage.includes(item.name),
+                          'fa-map-marker': isPercentageMode,
+                          'fa-percent': !isPercentageMode,
                         }"
-                        @click="toggleLocationMode(item.name)"
+                        @click="isPercentageMode = !isPercentageMode"
                       ></i>
                     </div>
                   </div>
@@ -303,14 +298,14 @@
       </simplebar>
     </div>
     <div
-      v-if="popupCoordinates.values.length > 0"
+      v-if="coordinates.length > 0"
       class="location-modal"
       @click="closeLocation"
     >
       <coordination
-        :values="popupCoordinates.values"
+        :values="coordinates"
         :no_track="true"
-        :showPercentage="popupCoordinates.showPercentage"
+        :showPercentage="isPercentageMode"
       />
     </div>
   </div>
@@ -842,13 +837,11 @@ export default {
       toggleSearch: false,
       toggleTarget: null,
       defaultIcon,
-      popupCoordinates: {
-        values: [],
-        showPercentage: false,
-      },
+      coordinates: [],
       lazy: false,
       chartWidth: 0,
       showPercentage: [],
+      isPercentageMode: false,
     };
   },
   created() {},
@@ -925,10 +918,7 @@ export default {
     },
     closeLocation(e) {
       if (e.currentTarget === e.target) {
-        this.popupCoordinates = {
-          values: [],
-          showPercentage: false,
-        };
+        this.coordinates = [];
       }
     },
     detectChartWidth() {
@@ -939,13 +929,6 @@ export default {
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectChartWidth);
-    },
-    toggleLocationMode(name) {
-      if (this.showPercentage.includes(name)) {
-        this.showPercentage = this.showPercentage.filter(n => n !== name);
-      } else {
-        this.showPercentage = [...this.showPercentage, name];
-      }
     },
   },
   computed: {
