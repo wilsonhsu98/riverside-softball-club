@@ -2,7 +2,6 @@
   <div class="root-container">
     <canvas ref="canvas" @mousedown="trackXY" :disabled="disabled"></canvas>
     <img ref="img" v-if="isImage" :src="imgSrc" />
-    <slot></slot>
   </div>
 </template>
 

@@ -246,16 +246,16 @@
                             showPercentage: showPercentage.includes(item.name),
                           }
                         "
-                      >
-                        <i
-                          class="fa"
-                          :class="{
-                            'fa-map-marker': showPercentage.includes(item.name),
-                            'fa-percent': !showPercentage.includes(item.name),
-                          }"
-                          @click="toggleLocationMode(item.name)"
-                        ></i>
-                      </coordination>
+                      />
+                      <i
+                        v-if="item.locations.length"
+                        class="fa"
+                        :class="{
+                          'fa-map-marker': showPercentage.includes(item.name),
+                          'fa-percent': !showPercentage.includes(item.name),
+                        }"
+                        @click="toggleLocationMode(item.name)"
+                      ></i>
                     </div>
                   </div>
                 </label>
