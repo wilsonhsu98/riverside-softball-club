@@ -51,7 +51,7 @@
   overflow: hidden;
   display: inline-block;
   .name {
-    margin: 0 5px;
+    margin: 0 15px 0 5px;
     text-align: left;
     line-height: 36px;
     box-sizing: border-box;
@@ -96,11 +96,13 @@
       flex: 1 1 auto;
       margin-right: auto;
       padding: 0;
-      font-size: inherit;
-      line-height: 36px;
+      font-size: $input_font_size;
+      line-height: $input_font_size + 2;
+      height: 34px;
     }
     .text {
       margin-right: auto;
+      font-size: $input_font_size;
     }
     > .fa {
       line-height: 36px;
@@ -134,6 +136,8 @@ export default {
         this.$nextTick(() => {
           this.$refs.input.focus();
         });
+      } else {
+        this.name = this.player.name || '';
       }
     },
   },

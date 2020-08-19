@@ -814,9 +814,11 @@ export default {
     },
     changePlayer(mode) {
       if (['coach', 'recorder', 'pitcher', 'mvp'].includes(mode)) {
-        this.currentPlayer = this.teamInfo.players.find(
-          player => player.name && player.name === this[mode],
-        );
+        this.currentPlayer = this[mode]
+          ? this.teamInfo.players.find(
+              player => player.name && player.name === this[mode],
+            ) || { name: this[mode] }
+          : '';
       }
       this.$modal.show('player');
       this.changeMode = mode;
