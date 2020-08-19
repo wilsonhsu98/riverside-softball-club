@@ -13,7 +13,21 @@
         />
       </span>
       <span class="number">{{ player.number || '?' }}</span>
-      <span>{{ player.name }}</span>
+      <input
+        v-if="isEditMode"
+        type="text"
+        class="input"
+        v-model="name"
+        ref="input"
+      />
+      <span v-else class="text">{{ player.name }}</span>
+      <i v-if="isEditMode" class="fa fa-check" @click="confirm"></i>
+      <i
+        v-if="editable"
+        class="fa"
+        :class="{ 'fa-pencil': !isEditMode, 'fa-times': isEditMode }"
+        @click="toggleMode"
+      ></i>
     </span>
   </div>
 </template>
@@ -37,7 +51,7 @@
   overflow: hidden;
   display: inline-block;
   .name {
-    margin-left: 5px;
+    margin: 0 5px;
     text-align: left;
     line-height: 36px;
     box-sizing: border-box;
@@ -75,19 +89,52 @@
       text-align: center;
       flex: 0 0 16px;
     }
+    .input {
+      border: 0;
+      outline: none;
+      width: 0;
+      flex: 1 1 auto;
+      margin-right: auto;
+      padding: 0;
+      font-size: inherit;
+      line-height: 36px;
+    }
+    .text {
+      margin-right: auto;
+    }
+    > .fa {
+      line-height: 36px;
+      font-size: 18px;
+      cursor: pointer;
+      margin: 0 5px;
+    }
   }
 }
 </style>
 
 <script>
 export default {
-  props: ['player'],
+  props: ['player', 'editable'],
   data() {
-    return {};
+    return {
+      name: this.player.name || '',
+      isEditMode: false,
+    };
   },
   methods: {
     select() {
       this.$emit('click', this.player);
+    },
+    confirm() {
+      this.$emit('edit', { name: this.name });
+    },
+    toggleMode() {
+      this.isEditMode = !this.isEditMode;
+      if (this.isEditMode) {
+        this.$nextTick(() => {
+          this.$refs.input.focus();
+        });
+      }
     },
   },
 };

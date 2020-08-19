@@ -11,7 +11,12 @@
         <div class="label-container current">
           <label>{{ current_label }}</label>
           <div class="delete-wrapper">
-            <player v-if="current" :player="current" />
+            <player
+              v-if="current"
+              :player="current"
+              :editable="true"
+              @edit="select_"
+            />
             <i
               v-if="typeof clear === 'function' && current"
               class="fa fa-times"
