@@ -573,7 +573,7 @@
       margin-bottom: 10px;
     }
     .field-block-wrapper {
-      max-height: 100px;
+      max-height: 106px;
       overflow: auto;
       margin-bottom: 10px;
       padding: 0 0 10px 0;
@@ -784,6 +784,11 @@ i.fa {
           &:before {
             content: attr(data-short);
           }
+        }
+      }
+      .tags {
+        .field-block-wrapper {
+          max-height: 89px;
         }
       }
     }
