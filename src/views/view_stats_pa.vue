@@ -333,8 +333,7 @@
   label {
     display: inline-block;
     line-height: 30px;
-    height: 30px;
-    vertical-align: middle;
+    vertical-align: top;
     &.unlimited_pa {
       margin-left: 5px;
     }
@@ -726,6 +725,9 @@ i.fa {
         display: none;
       }
       &__col {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
         margin: 0 8px 3px 0;
       }
       &__label {
@@ -896,6 +898,7 @@ export default {
     collapseSearch(event) {
       if (
         this.toggleSearch &&
+        this.$refs &&
         !this.$refs['searchBar'].contains(event.target)
       ) {
         this.toggleSearch = false;

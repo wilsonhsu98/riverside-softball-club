@@ -95,10 +95,13 @@ const state = {
 
 const getters = {
   teamInfo: state => state.teamInfo,
-  teamNames: state =>
-    [state.teamInfo.teamName].concat(
-      state.teamInfo.otherNames.split(',').sort((a, b) => a.localeCompare(b)),
-    ),
+  teamNames: state => [
+    state.teamInfo.teamName,
+    ...state.teamInfo.otherNames
+      .split(',')
+      .filter(team => team)
+      .sort((a, b) => a.localeCompare(b)),
+  ],
   teamList: state => state.teamList,
   requests: state => state.requests,
 };

@@ -175,6 +175,7 @@
                       v-if="player.photo"
                       class="img"
                       :src="$cacheImg(player.photo)"
+                      onerror="this.style.display='none'"
                     />
                   </span>
                   <span class="number">{{ player.number || '?' }}</span>
@@ -314,6 +315,7 @@
                           v-if="player.photo"
                           class="img"
                           :src="$cacheImg(player.photo)"
+                          onerror="this.style.display='none'"
                         />
                       </span>
                       <span class="number">{{ player.number || '?' }}</span>

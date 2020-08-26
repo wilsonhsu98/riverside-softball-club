@@ -26,6 +26,8 @@ const types = {
   SET_BOX: 'RECORD/SET_BOX',
   RESET_PERIOD: 'RECORD/RESET_PERIOD',
   SET_BOX_DISPLAY: 'RECORD/SET_BOX_DISPLAY',
+  SET_OTHER_CONDITIONS: 'RECORD/SET_OTHER_CONDITIONS',
+  SET_UNION_INTERSECT: 'RECORD/SET_UNION_INTERSECT',
 };
 
 const state = {
@@ -70,6 +72,9 @@ const state = {
   itemStats: { AVG: [], H: [], HR: [], RBI: [], W: [] },
   box: [],
   boxDisplay: 'content',
+  otherConditions: [],
+  unionOrIntersect: 'union',
+  conditionGames: [],
 };
 
 const getters = {
@@ -156,7 +161,7 @@ const getters = {
   },
   games: state => state.games,
   gamesResult: state =>
-    state.games
+    state.conditionGames
       .filter(item =>
         (state.period.find(item => item.select).games || []).includes(
           item.game,
@@ -176,30 +181,37 @@ const getters = {
         },
         { win: 0, lose: 0, tie: 0 },
       ),
-  groupGames: state =>
-    utils.genGameList(
-      state.games,
+  groupGames: state => {
+    return utils.genGameList(
+      state.conditionGames,
       (state.period.find(item => item.select) || { games: [] }).games,
-    ),
+    );
+  },
   gameOptions: state =>
     state.games.reduce(
       (acc, item, i, self) => {
         if (i === self.length - 1) {
           return {
             opponent: [...new Set(acc.opponent.concat(item.opponent))]
-              .filter(item => !!item)
+              .filter(item => item)
               .sort((a, b) => a.localeCompare(b), 'zh-TW'),
             league: [...new Set(acc.league.concat(item.league))]
-              .filter(item => !!item)
+              .filter(item => item)
               .sort((a, b) => a.localeCompare(b), 'zh-TW'),
             group: [...new Set(acc.group.concat(item.group))]
-              .filter(item => !!item)
+              .filter(item => item)
               .sort((a, b) => a.localeCompare(b), 'zh-TW'),
             period: [...new Set(acc.period.concat(item.period))]
-              .filter(item => !!item)
+              .filter(item => item)
+              .sort((a, b) => b.localeCompare(a), 'zh-TW'),
+            coach: [...new Set(acc.coach.concat(item.coach))]
+              .filter(item => item)
+              .sort((a, b) => b.localeCompare(a), 'zh-TW'),
+            recorder: [...new Set(acc.recorder.concat(item.recorder))]
+              .filter(item => item)
               .sort((a, b) => b.localeCompare(a), 'zh-TW'),
             tags: [...new Set(acc.tags.concat(item.tags))]
-              .filter(item => !!item)
+              .filter(item => item)
               .sort((a, b) => b.localeCompare(a), 'zh-TW'),
           };
         } else {
@@ -208,17 +220,29 @@ const getters = {
             league: acc.league.concat(item.league),
             group: acc.group.concat(item.group),
             period: acc.period.concat(item.period),
+            coach: acc.coach.concat(item.coach),
+            recorder: acc.recorder.concat(item.recorder),
             tags: acc.tags.concat(item.tags),
           };
         }
       },
-      { opponent: [], league: [], group: [], period: [], tags: [] },
+      {
+        opponent: [],
+        league: [],
+        group: [],
+        period: [],
+        coach: [],
+        recorder: [],
+        tags: [],
+      },
     ),
   game: state => state.game,
   periodGames: state => state.period.find(item => item.select).games || [],
   itemStats: state => state.itemStats,
   box: state => state.box,
   boxDisplay: state => state.boxDisplay,
+  otherConditions: state => state.otherConditions,
+  unionOrIntersect: state => state.unionOrIntersect,
 };
 
 const actions = {
@@ -343,6 +367,12 @@ const actions = {
   setBoxDisplay({ commit }, value) {
     commit(types.SET_BOX_DISPLAY, value);
   },
+  setOtherConditions({ commit }, value) {
+    commit(types.SET_OTHER_CONDITIONS, value);
+  },
+  setUnionOrIntersect({ commit }, value) {
+    commit(types.SET_UNION_INTERSECT, value);
+  },
 };
 
 const mutations = {
@@ -355,14 +385,23 @@ const mutations = {
     state.sortBy = window.localStorage.getItem('pref_sortby') || state.sortBy;
     state.boxDisplay =
       window.localStorage.getItem('pref_box_display') || state.boxDisplay;
+    state.unionOrIntersect =
+      window.localStorage.getItem('pref_union_intersect') ||
+      state.unionOrIntersect;
 
     const pref_period = window.localStorage.getItem('pref_period');
     if (pref_period) state.period = JSON.parse(pref_period);
     const pref_cols = window.localStorage.getItem('pref_cols');
     if (pref_cols) state.cols = JSON.parse(pref_cols);
+    const pref_other_conditions = window.localStorage.getItem(
+      'pref_other_conditions',
+    );
+    if (pref_other_conditions)
+      state.otherConditions = JSON.parse(pref_other_conditions);
   },
   [types.RESET_PERIOD](state) {
     state.period = [{ period: 'period_all', select: true }];
+    state.otherConditions = [];
   },
   [types.GET_PERIOD](state, data) {
     const period = [
@@ -466,6 +505,11 @@ const mutations = {
   },
   [types.GET_GAMELIST](state, data) {
     state.games = data;
+    state.conditionGames = utils.unionOrIntersect(
+      state.unionOrIntersect,
+      state.otherConditions,
+      state.games,
+    );
   },
   [types.SET_GENSTATISTICS](state, data) {
     state.genStatistics = data;
@@ -479,6 +523,27 @@ const mutations = {
   [types.SET_BOX_DISPLAY](state, value) {
     state.boxDisplay = value;
     window.localStorage.setItem('pref_box_display', state.boxDisplay);
+  },
+  [types.SET_OTHER_CONDITIONS](state, data) {
+    state.otherConditions = data;
+    window.localStorage.setItem(
+      'pref_other_conditions',
+      JSON.stringify(state.otherConditions),
+    );
+    state.conditionGames = utils.unionOrIntersect(
+      state.unionOrIntersect,
+      state.otherConditions,
+      state.games,
+    );
+  },
+  [types.SET_UNION_INTERSECT](state, data) {
+    state.unionOrIntersect = data;
+    window.localStorage.setItem('pref_union_intersect', state.unionOrIntersect);
+    state.conditionGames = utils.unionOrIntersect(
+      state.unionOrIntersect,
+      state.otherConditions,
+      state.games,
+    );
   },
 };
 

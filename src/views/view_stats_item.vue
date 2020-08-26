@@ -388,6 +388,7 @@ export default {
     collapseSearch(event) {
       if (
         this.toggleSearch &&
+        this.$refs &&
         !this.$refs['searchBar'].contains(event.target)
       ) {
         this.toggleSearch = false;

@@ -233,9 +233,51 @@ const getShuffledArr = arr => {
   ];
 };
 
+const unionOrIntersect = (type, conditions = [], games = []) => {
+  if (type === 'union' && Array.isArray(conditions) && conditions.length) {
+    // 聯集
+    return conditions
+      .map(condition => condition.value)
+      .reduce((acc, condition) => {
+        const [key, val] = condition.split(':');
+        return [
+          ...new Set([
+            ...acc,
+            ...games.filter(item => {
+              if (Array.isArray(item[key])) {
+                return item[key].includes(val);
+              } else {
+                return item[key] === val;
+              }
+            }),
+          ]),
+        ];
+      }, []);
+  }
+
+  if (type === 'intersect' && Array.isArray(conditions) && conditions.length) {
+    // 交集
+    return conditions
+      .map(condition => condition.value)
+      .reduce((acc, condition) => {
+        const [key, val] = condition.split(':');
+        return acc.filter(item => {
+          if (Array.isArray(item[key])) {
+            return item[key].includes(val);
+          } else {
+            return item[key] === val;
+          }
+        });
+      }, games);
+  }
+
+  return games;
+};
+
 export default {
   parseGame,
   genGameList,
+  unionOrIntersect,
 };
 
 export { cacheImg, scrollTo, formatContent, formatColor, getShuffledArr };

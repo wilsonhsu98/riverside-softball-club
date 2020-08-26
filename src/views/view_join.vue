@@ -84,6 +84,7 @@
                 v-if="player.photo"
                 class="img"
                 :src="$cacheImg(player.photo)"
+                onerror="this.style.display='none'"
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
@@ -110,6 +111,7 @@
                 v-if="player.photo"
                 class="img"
                 :src="$cacheImg(player.photo)"
+                onerror="this.style.display='none'"
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
@@ -139,6 +141,7 @@
                 v-if="player.photo"
                 class="img"
                 :src="$cacheImg(player.photo)"
+                onerror="this.style.display='none'"
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number

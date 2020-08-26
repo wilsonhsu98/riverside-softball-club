@@ -16,7 +16,7 @@
       <div class="condition__container">
         <div class="condition">
           <div class="condition__label">{{ $t('col_period') }}</div>
-          <div class="condition__element">
+          <div class="condition__element" :data-col="$t('col_period')">
             <div class="selectdiv">
               <select
                 class="dropdown"
@@ -39,6 +39,93 @@
                 >
               </select>
             </div>
+          </div>
+          <br />
+          <div class="condition__label">{{ $t('col_others') }}</div>
+          <div class="condition__element tags" :data-col="$t('col_others')">
+            <span
+              :key="field"
+              class="tag"
+              :style="
+                selectedField === field
+                  ? {
+                      borderColor: color,
+                      backgroundColor: color,
+                      color: invertColor,
+                    }
+                  : {
+                      borderColor: color,
+                      backgroundColor: invertColor,
+                      color: color,
+                    }
+              "
+              v-for="{ field, color, invertColor } in queryFields"
+              @click="toggleField(field)"
+              >{{ $t(`ttl_${field}`) }}</span
+            >
+            <div class="field-block-wrapper" v-if="fieldOptions.length">
+              <div class="field-block">
+                <span
+                  :key="option.value"
+                  class="tag"
+                  :style="
+                    conditions.find(
+                      condition => condition.value === option.value,
+                    )
+                      ? {
+                          borderColor: option.color,
+                          backgroundColor: option.color,
+                          color: option.invertColor,
+                        }
+                      : {
+                          borderColor: option.color,
+                          backgroundColor: option.invertColor,
+                          color: option.color,
+                        }
+                  "
+                  v-for="option in fieldOptions"
+                  @click="toggleCondition(option)"
+                  >{{ option.text }}</span
+                >
+              </div>
+            </div>
+            <div class="field-block-wrapper" v-if="conditions.length">
+              <div class="field-block">
+                <i class="fa fa-refresh" @click="clearCondition"></i>
+                <span
+                  :key="condition.value"
+                  class="tag"
+                  :style="{
+                    borderColor: condition.color,
+                    backgroundColor: condition.color,
+                    color: condition.invertColor,
+                  }"
+                  v-for="condition in conditions"
+                  @click="removeCondition(condition)"
+                  ><i class="fa fa-times"></i>{{ condition.text }}</span
+                >
+              </div>
+            </div>
+            <template v-if="conditions.length > 0">
+              <label>
+                <input
+                  type="radio"
+                  value="union"
+                  :checked="unionOrIntersect === 'union'"
+                  @change="setUnionOrIntersect($event.target.value)"
+                />
+                <span>{{ $t('ttl_union') }}</span>
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  value="intersect"
+                  :checked="unionOrIntersect === 'intersect'"
+                  @change="setUnionOrIntersect($event.target.value)"
+                />
+                <span>{{ $t('ttl_intersect') }}</span>
+              </label>
+            </template>
           </div>
           <template v-if="lastUpdate">
             <br />
@@ -290,6 +377,7 @@
     position: relative;
     &.last {
       margin-bottom: auto;
+      padding-bottom: 50px;
     }
     .cell {
       color: $row_color;
@@ -310,7 +398,7 @@
       color: $gray;
       position: absolute;
       left: 50%;
-      bottom: 5px;
+      top: 82px;
       transform: translateX(-50%);
     }
   }
@@ -443,14 +531,56 @@
   label {
     display: inline-block;
     line-height: 30px;
-    height: 30px;
-    vertical-align: middle;
+    vertical-align: top;
   }
   label {
     cursor: pointer;
   }
   &__label {
     padding: 0 4px;
+    margin-bottom: 10px;
+    &.date {
+      margin-bottom: 0;
+    }
+  }
+  .tags {
+    width: calc(100% - 90px);
+    display: inline-block;
+    .tag {
+      white-space: nowrap;
+      display: inline-block;
+      border-radius: 4px;
+      border: 2px solid;
+      box-sizing: border-box;
+      padding: 4px 8px;
+      margin: 0 10px 10px 0;
+      line-height: 20px;
+      cursor: pointer;
+      .fa-times {
+        font-size: 16px;
+        vertical-align: unset;
+        margin-right: 5px;
+      }
+    }
+    .field-block-wrapper {
+      max-height: 100px;
+      overflow: auto;
+      margin-bottom: 10px;
+      padding: 0 0 10px 0;
+      .field-block {
+        margin: -10px 0 -10px 0;
+        .fa-refresh {
+          font-size: 24px;
+          margin-right: 10px;
+        }
+        .tag {
+          margin: 10px 10px 0 0;
+        }
+      }
+    }
+    label > span {
+      margin: 0 10px 0 3px;
+    }
   }
 }
 i.fa {
@@ -527,7 +657,7 @@ i.fa {
       margin: 0;
       display: flex;
       flex-wrap: wrap;
-      padding: 3px;
+      padding: 3px 10px 3px;
       box-sizing: border-box;
       position: relative;
       > br {
@@ -540,22 +670,53 @@ i.fa {
         color: $header_color;
       }
       &__label {
-        text-align: right;
-        margin: 0 3px 6px 0;
-        &.date {
-          display: none;
-        }
+        display: none;
       }
       &__element {
+        width: 100%;
         text-align: left;
-        margin: 0 3px 6px 0;
+        line-height: normal;
+        margin-bottom: 5px;
+        &::before {
+          content: attr(data-col);
+          display: inline-block;
+          vertical-align: top;
+          margin-right: 3px;
+          line-height: 30px;
+        }
         &.date {
           width: 100vw;
           text-align: right;
           padding: 0 10px 10px 0;
           margin: 0;
+          line-height: 30px;
           &:before {
             content: attr(data-long);
+          }
+        }
+      }
+      .tags {
+        .tag {
+          font-size: 12px;
+          margin: 0 5px 5px 0;
+          padding: 2px 4px;
+          .fa-times {
+            font-size: 12px;
+          }
+        }
+        .field-block-wrapper {
+          max-height: 56px;
+          margin-bottom: 5px;
+          padding-bottom: 5px;
+          .field-block {
+            margin: -5px 0 -5px 0;
+            .fa-refresh {
+              margin-left: 3px;
+              font-size: 20px;
+            }
+            .tag {
+              margin: 5px 5px 0 0;
+            }
           }
         }
       }
@@ -571,6 +732,9 @@ i.fa {
     .row .cell .result,
     .row:after {
       color: #fff;
+    }
+    .row.last {
+      padding-bottom: 20px;
     }
     .summary-container {
       margin-top: 10px;
@@ -599,9 +763,6 @@ i.fa {
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .search-bar {
     .condition {
-      &__label {
-        width: 33vw;
-      }
       &__element {
         &.date {
           &:before {
@@ -613,16 +774,6 @@ i.fa {
   }
 }
 @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
-  .search-bar {
-    .condition {
-      &__label {
-        width: 20vw;
-      }
-      &__element {
-        width: 30vw;
-      }
-    }
-  }
 }
 </style>
 
@@ -633,6 +784,59 @@ const clickEvent = (() => {
   if ('ontouchstart' in document.documentElement === true) return 'touchstart';
   else return 'click';
 })();
+
+const queryFields = [
+  {
+    field: 'use_team',
+    color: '#007bff',
+    invertColor: '#fff',
+  },
+  {
+    field: 'opponent',
+    color: '#f3722c',
+    invertColor: '#fff',
+  },
+  {
+    field: 'league',
+    color: '#28a745',
+    invertColor: '#fff',
+  },
+  {
+    field: 'group',
+    color: '#dc3545',
+    invertColor: '#fff',
+  },
+  {
+    field: 'game_type',
+    color: '#ffc107',
+    invertColor: '#fff',
+  },
+  {
+    field: 'place',
+    color: '#17a2b8',
+    invertColor: '#fff',
+  },
+  {
+    field: 'top_bot',
+    color: '#813405',
+    invertColor: '#fff',
+  },
+  {
+    field: 'coach',
+    color: '#7678ed',
+    invertColor: '#fff',
+  },
+  {
+    field: 'recorder',
+    color: '#990066',
+    invertColor: '#fff',
+  },
+  {
+    field: 'game_tag',
+    color: '#70d6ff',
+    invertColor: '#fff',
+  },
+];
 
 export default {
   data() {
@@ -654,6 +858,10 @@ export default {
       toggleSearch: false,
       defaultIcon,
       unlockGames: [],
+      queryFields,
+      selectedField: '',
+      fieldOptions: [],
+      conditions: [],
     };
   },
   created() {},
@@ -668,10 +876,13 @@ export default {
     ...mapActions({
       setGame: 'setGame',
       setPeriod: 'setPeriod',
+      setOtherConditions: 'setOtherConditions',
+      setUnionOrIntersect: 'setUnionOrIntersect',
     }),
     collapseSearch(event) {
       if (
         this.toggleSearch &&
+        this.$refs &&
         !this.$refs['searchBar'].contains(event.target)
       ) {
         this.toggleSearch = false;
@@ -685,6 +896,29 @@ export default {
     sumByInn(scores, inn) {
       return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
     },
+    toggleField(field) {
+      this.selectedField = this.selectedField === field ? '' : field;
+    },
+    toggleCondition(field) {
+      if (this.conditions.find(condition => condition.value === field.value)) {
+        this.removeCondition(field);
+      } else {
+        this.conditions = [...this.conditions, field].filter(
+          (item, index, self) => self.indexOf(item) === index,
+        );
+        this.setOtherConditions(this.conditions);
+      }
+    },
+    removeCondition(value) {
+      this.conditions = this.conditions.filter(
+        condition => condition !== value,
+      );
+      this.setOtherConditions(this.conditions);
+    },
+    clearCondition() {
+      this.conditions = [];
+      this.setOtherConditions(this.conditions);
+    },
   },
   computed: {
     ...mapGetters({
@@ -697,6 +931,10 @@ export default {
       gamesResult: 'gamesResult',
       lastUpdate: 'lastUpdate',
       teamInfo: 'teamInfo',
+      teamNames: 'teamNames',
+      gameOptions: 'gameOptions',
+      otherConditions: 'otherConditions',
+      unionOrIntersect: 'unionOrIntersect',
     }),
   },
   watch: {
@@ -733,6 +971,122 @@ export default {
     teamInfo: {
       handler() {
         this.unlockGames = this.teamInfo.unlockGames;
+      },
+      immediate: true,
+    },
+    selectedField: {
+      handler() {
+        const { color, invertColor } =
+          this.queryFields.find(({ field }) => field === this.selectedField) ||
+          {};
+        switch (this.selectedField) {
+          case 'use_team':
+            this.fieldOptions = this.teamNames.map(teamName => ({
+              text: teamName,
+              value: `useTeam:${teamName}`,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'opponent':
+            this.fieldOptions = this.gameOptions.opponent.map(opponent => ({
+              text: opponent,
+              value: `${this.selectedField}:${opponent}`,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'league':
+            this.fieldOptions = this.gameOptions.league.map(league => ({
+              text: league,
+              value: `${this.selectedField}:${league}`,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'group':
+            this.fieldOptions = this.gameOptions.group.map(group => ({
+              text: group,
+              value: `${this.selectedField}:${group}`,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'game_type':
+            this.fieldOptions = [
+              { text: this.$t('ttl_fun'), value: `gameType:fun` },
+              {
+                text: this.$t('ttl_regular'),
+                value: `gameType:regular`,
+              },
+              {
+                text: this.$t('ttl_playoff'),
+                value: `gameType:playoff`,
+              },
+            ].map(item => ({
+              ...item,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'place':
+            this.fieldOptions = [
+              { text: this.$t('ttl_1st'), value: `${this.selectedField}:1` },
+              { text: this.$t('ttl_3rd'), value: `${this.selectedField}:3` },
+              {
+                text: this.$t('ttl_home'),
+                value: `${this.selectedField}:4`,
+              },
+            ].map(item => ({
+              ...item,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'top_bot':
+            this.fieldOptions = [
+              { text: this.$t('ttl_top'), value: `topBottom:top` },
+              { text: this.$t('ttl_bot'), value: `topBottom:bot` },
+            ].map(item => ({
+              ...item,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'coach':
+            this.fieldOptions = this.gameOptions.coach.map(name => ({
+              text: name,
+              value: `coach:${name}`,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'recorder':
+            this.fieldOptions = this.gameOptions.recorder.map(name => ({
+              text: name,
+              value: `recorder:${name}`,
+              color,
+              invertColor,
+            }));
+            break;
+          case 'game_tag':
+            this.fieldOptions = this.gameOptions.tags.map(tag => ({
+              text: tag,
+              value: `tags:${tag}`,
+              color,
+              invertColor,
+            }));
+            break;
+          default:
+            this.fieldOptions = [];
+            break;
+        }
+      },
+      immediate: true,
+    },
+    otherConditions: {
+      handler() {
+        this.conditions = this.otherConditions;
       },
       immediate: true,
     },
