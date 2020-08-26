@@ -63,68 +63,74 @@
               @click="toggleField(field)"
               >{{ $t(`ttl_${field}`) }}</span
             >
-            <div class="field-block-wrapper" v-if="fieldOptions.length">
-              <div class="field-block">
-                <span
-                  :key="option.value"
-                  class="tag"
-                  :style="
-                    conditions.find(
-                      condition => condition.value === option.value,
-                    )
-                      ? {
-                          borderColor: option.color,
-                          backgroundColor: option.color,
-                          color: option.invertColor,
-                        }
-                      : {
-                          borderColor: option.color,
-                          backgroundColor: option.invertColor,
-                          color: option.color,
-                        }
-                  "
-                  v-for="option in fieldOptions"
-                  @click="toggleCondition(option)"
-                  >{{ option.text }}</span
-                >
+            <template v-if="fieldOptions.length">
+              <div class="hr"></div>
+              <div class="field-block-wrapper">
+                <div class="field-block">
+                  <span
+                    :key="option.value"
+                    class="tag"
+                    :style="
+                      conditions.find(
+                        condition => condition.value === option.value,
+                      )
+                        ? {
+                            borderColor: option.color,
+                            backgroundColor: option.color,
+                            color: option.invertColor,
+                          }
+                        : {
+                            borderColor: option.color,
+                            backgroundColor: option.invertColor,
+                            color: option.color,
+                          }
+                    "
+                    v-for="option in fieldOptions"
+                    @click="toggleCondition(option)"
+                    >{{ option.text }}</span
+                  >
+                </div>
               </div>
-            </div>
-            <div class="field-block-wrapper" v-if="conditions.length">
-              <div class="field-block">
-                <i class="fa fa-refresh" @click="clearCondition"></i>
-                <span
-                  :key="condition.value"
-                  class="tag"
-                  :style="{
-                    borderColor: condition.color,
-                    backgroundColor: condition.color,
-                    color: condition.invertColor,
-                  }"
-                  v-for="condition in conditions"
-                  @click="removeCondition(condition)"
-                  ><i class="fa fa-times"></i>{{ condition.text }}</span
-                >
+            </template>
+            <template v-if="conditions.length">
+              <div class="hr"></div>
+              <div class="field-block-wrapper" v-if="conditions.length">
+                <div class="field-block">
+                  <i class="fa fa-refresh" @click="clearCondition"></i>
+                  <span
+                    :key="condition.value"
+                    class="tag"
+                    :style="{
+                      borderColor: condition.color,
+                      backgroundColor: condition.color,
+                      color: condition.invertColor,
+                    }"
+                    v-for="condition in conditions"
+                    @click="removeCondition(condition.value)"
+                    ><i class="fa fa-times"></i>{{ condition.text }}</span
+                  >
+                </div>
               </div>
-            </div>
-            <template v-if="conditions.length > 0">
-              <label>
-                <input
-                  type="radio"
-                  value="union"
-                  :checked="unionOrIntersect === 'union'"
-                  @change="setUnionOrIntersect($event.target.value)"
-                />
-                <span>{{ $t('ttl_union') }}</span>
-              </label>
-              <label>
-                <input
-                  type="radio"
-                  value="intersect"
-                  :checked="unionOrIntersect === 'intersect'"
-                  @change="setUnionOrIntersect($event.target.value)"
-                />
-                <span>{{ $t('ttl_intersect') }}</span>
-              </label>
+              <template v-if="conditions.length > 0">
+                <label>
+                  <input
+                    type="radio"
+                    value="union"
+                    :checked="unionOrIntersect === 'union'"
+                    @change="setUnionOrIntersect($event.target.value)"
+                  />
+                  <span>{{ $t('ttl_union') }}</span>
+                </label>
+                <label>
+                  <input
+                    type="radio"
+                    value="intersect"
+                    :checked="unionOrIntersect === 'intersect'"
+                    @change="setUnionOrIntersect($event.target.value)"
+                  />
+                  <span>{{ $t('ttl_intersect') }}</span>
+                </label>
+              </template>
             </template>
           </div>
           <template v-if="lastUpdate">
@@ -562,6 +568,10 @@
         margin-right: 5px;
       }
     }
+    .hr {
+      border-top: 2px solid $gray;
+      margin-bottom: 10px;
+    }
     .field-block-wrapper {
       max-height: 100px;
       overflow: auto;
@@ -697,12 +707,18 @@ i.fa {
       }
       .tags {
         .tag {
-          font-size: 12px;
+          font-size: 14px;
           margin: 0 5px 5px 0;
-          padding: 2px 4px;
+          padding: 0 6px;
+          text-align: center;
+          min-width: 36px;
+          line-height: 24px;
           .fa-times {
-            font-size: 12px;
+            font-size: 14px;
           }
+        }
+        .hr {
+          margin-bottom: 5px;
         }
         .field-block-wrapper {
           max-height: 56px;
@@ -808,7 +824,7 @@ const queryFields = [
   },
   {
     field: 'game_type',
-    color: '#ffc107',
+    color: '#efaf34',
     invertColor: '#fff',
   },
   {
@@ -833,7 +849,7 @@ const queryFields = [
   },
   {
     field: 'game_tag',
-    color: '#70d6ff',
+    color: '#3f00ff',
     invertColor: '#fff',
   },
 ];
@@ -901,7 +917,7 @@ export default {
     },
     toggleCondition(field) {
       if (this.conditions.find(condition => condition.value === field.value)) {
-        this.removeCondition(field);
+        this.removeCondition(field.value);
       } else {
         this.conditions = [...this.conditions, field].filter(
           (item, index, self) => self.indexOf(item) === index,
@@ -911,7 +927,7 @@ export default {
     },
     removeCondition(value) {
       this.conditions = this.conditions.filter(
-        condition => condition !== value,
+        condition => condition.value !== value,
       );
       this.setOtherConditions(this.conditions);
     },
