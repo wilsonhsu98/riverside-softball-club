@@ -82,6 +82,7 @@ export default {
       ].map(item => {
         return new Promise(resolve => {
           const img = new Image();
+          img.crossOrigin = 'Anonymous';
           img.onload = () => {
             this[item.var] = img;
             resolve();

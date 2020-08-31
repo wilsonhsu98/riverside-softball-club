@@ -770,7 +770,7 @@ i.fa {
       position: relative;
       .button-container {
         position: absolute;
-        bottom: 0;
+        bottom: 10px;
         right: 0;
       }
     }
