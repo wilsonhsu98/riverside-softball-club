@@ -97,12 +97,17 @@
       margin-right: auto;
       padding: 0;
       font-size: $input_font_size;
-      line-height: $input_font_size + 2;
-      height: 34px;
+      height: 36px;
+      line-height: normal;
+      display: flex;
+      align-items: center;
     }
     .text {
       margin-right: auto;
       font-size: $input_font_size;
+      line-height: normal;
+      display: flex;
+      align-items: center;
     }
     > .fa {
       line-height: 36px;
