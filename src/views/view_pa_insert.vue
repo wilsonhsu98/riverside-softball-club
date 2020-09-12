@@ -1129,6 +1129,7 @@ export default {
     ...mapActions({
       editGameOrder: 'editGameOrder',
       deleteLastPa: 'deleteLastPa',
+      setOrder: 'setOrder',
       alert: 'alert',
       confirm: 'confirm',
     }),
@@ -1312,6 +1313,21 @@ export default {
             if (this.onbaseOut === 3) {
               this.$router.push(
                 `/main/games/${this.$route.params.team}/${this.$route.params.game}/edit`,
+              );
+            } else if (
+              this.$route.params.order !== 'new' &&
+              this.order < this.box.length - 1
+            ) {
+              this.setOrder(this.order + 1);
+              this.$router.push(
+                `/main/games/${this.$route.params.team}/${
+                  this.$route.params.game
+                }/${this.order + 1}`,
+              );
+            } else {
+              this.setOrder(this.order + 1);
+              this.$router.push(
+                `/main/games/${this.$route.params.team}/${this.$route.params.game}/new`,
               );
             }
           },
