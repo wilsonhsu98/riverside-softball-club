@@ -1131,7 +1131,6 @@ export default {
       deleteLastPa: 'deleteLastPa',
       setOrder: 'setOrder',
       alert: 'alert',
-      confirm: 'confirm',
     }),
     toggle(path, value) {
       const setPath = (path, value) =>
@@ -1424,6 +1423,18 @@ export default {
         this.revertOnbase();
       }
 
+      this.step = 1;
+      this.content = undefined;
+      this.maxOnbase = undefined;
+      this.rbi = {
+        value: '',
+        one: { disabled: true },
+        two: { disabled: true },
+        three: { disabled: true },
+        four: { disabled: true },
+      };
+      this.location = [];
+
       if (Array.isArray(this.box[0])) {
         const startOrder = this.box[0].slice(-1)[0];
         const sameOrderPlayers = this.boxSummary.contents
@@ -1441,17 +1452,6 @@ export default {
 
         this.checkModalPlayer();
       }
-
-      this.step = 1;
-      this.content = undefined;
-      this.rbi = {
-        value: '',
-        one: { disabled: true },
-        two: { disabled: true },
-        three: { disabled: true },
-        four: { disabled: true },
-      };
-      this.location = [];
     },
     checkReJoin(sameOrderPlayers) {
       return sameOrderPlayers.reduceRight((acc, item, i, self) => {
