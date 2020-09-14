@@ -744,7 +744,9 @@ export default {
       );
     },
     back_() {
-      this.$router.back();
+      this.$router.push(
+        `/main/games/${this.$route.params.team}/${this.$route.params.game}`,
+      );
     },
     edit_() {
       if (this.gameStatus === 'lock' && this.mode === 'edit') {
@@ -898,7 +900,13 @@ export default {
           } = this.boxSummary;
           this.version = version;
           this.result = result;
-          this.inn = Math.max(scores.length, opponentScores.length, 1);
+          this.inn = Math.max(
+            opponentScores.length,
+            1,
+            topBottom === 'bot' && scores.length <= 7
+              ? scores.length + 1
+              : scores.length,
+          );
           this.scores = scores;
           this.opponentScores = [...opponentScores];
           this.prevId = game;

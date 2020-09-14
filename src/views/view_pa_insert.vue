@@ -1226,7 +1226,7 @@ export default {
       if (this.content && this.validate()) {
         if (
           this.showNextOnbase === false &&
-          !['K', 'BB', 'HR'].includes(this.content)
+          !['BB', 'HR'].includes(this.content)
         ) {
           this.showNextOnbase = true;
           this.onbasePlayers = ['first', 'second', 'third'].reduce((acc, b) => {
@@ -1248,6 +1248,8 @@ export default {
             3,
           );
           this.onbaseInn = this.onbaseOut === 3 ? this.inn + 1 : this.inn;
+          if (this.content === 'K' && this.onbaseOut === 3)
+            this.showNextOnbase = true;
           return;
         }
         this.showNextOnbase = false;
