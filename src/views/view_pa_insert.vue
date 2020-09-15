@@ -1248,9 +1248,10 @@ export default {
             3,
           );
           this.onbaseInn = this.onbaseOut === 3 ? this.inn + 1 : this.inn;
-          if (this.content === 'K' && this.onbaseOut === 3)
-            this.showNextOnbase = true;
-          return;
+          if (this.content === 'K') {
+            this.showNextOnbase = false;
+          }
+          if (this.showNextOnbase === true) return;
         }
         this.showNextOnbase = false;
         const rbi = (() => {
