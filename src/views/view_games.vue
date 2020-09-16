@@ -378,8 +378,9 @@
   display: flex;
   flex-direction: column;
   .row {
-    padding-bottom: 20px;
+    padding-bottom: 5px;
     display: flex;
+    flex-wrap: wrap;
     position: relative;
     &.last {
       margin-bottom: auto;
@@ -393,19 +394,17 @@
       .item {
         cursor: pointer;
         .name {
-          line-height: 24px;
+          padding: 4px 0 0;
+          line-height: 18px;
         }
       }
     }
     &:after {
       content: attr(data-date);
-      display: inline-block;
+      width: 100%;
+      text-align: center;
       text-decoration: underline;
       color: $gray;
-      position: absolute;
-      left: 50%;
-      top: 82px;
-      transform: translateX(-50%);
     }
   }
   .summary-container {
@@ -750,7 +749,7 @@ i.fa {
       color: #fff;
     }
     .row.last {
-      padding-bottom: 20px;
+      padding-bottom: 5px;
     }
     .summary-container {
       margin-top: 10px;
