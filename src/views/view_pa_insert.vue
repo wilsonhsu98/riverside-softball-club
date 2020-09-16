@@ -1312,25 +1312,22 @@ export default {
         );
         this.editGameOrder({
           redirect: () => {
+            const { team, game } = this.$route.params;
             if (this.onbaseOut === 3) {
-              this.$router.push(
-                `/main/games/${this.$route.params.team}/${this.$route.params.game}/edit`,
-              );
+              this.$router.push(`/main/games/${team}/${game}/edit`);
             } else if (
               this.$route.params.order !== 'new' &&
               this.order < this.box.length - 1
             ) {
+              this.resetBasic();
               this.setOrder(this.order + 1);
               this.$router.push(
-                `/main/games/${this.$route.params.team}/${
-                  this.$route.params.game
-                }/${this.order + 1}`,
+                `/main/games/${team}/${game}/${this.order + 1}`,
               );
             } else {
+              this.resetBasic();
               this.setOrder(this.order + 1);
-              this.$router.push(
-                `/main/games/${this.$route.params.team}/${this.$route.params.game}/new`,
-              );
+              this.$router.push(`/main/games/${team}/${game}/new`);
             }
           },
           teamCode: this.$route.params.team,
@@ -1426,17 +1423,7 @@ export default {
         this.revertOnbase();
       }
 
-      this.step = 1;
-      this.content = undefined;
-      this.maxOnbase = undefined;
-      this.rbi = {
-        value: '',
-        one: { disabled: true },
-        two: { disabled: true },
-        three: { disabled: true },
-        four: { disabled: true },
-      };
-      this.location = [];
+      // this.resetBasic();
 
       if (Array.isArray(this.box[0])) {
         const startOrder = this.box[0].slice(-1)[0];
@@ -1783,6 +1770,19 @@ export default {
           this.rbi.value = 1;
         }
       }
+    },
+    resetBasic() {
+      this.step = 1;
+      this.content = undefined;
+      this.maxOnbase = undefined;
+      this.rbi = {
+        value: '',
+        one: { disabled: true },
+        two: { disabled: true },
+        three: { disabled: true },
+        four: { disabled: true },
+      };
+      this.location = [];
     },
   },
   watch: {

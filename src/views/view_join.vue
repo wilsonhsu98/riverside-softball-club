@@ -91,6 +91,9 @@
               }}</span>
               <span v-if="player.name">{{ player.name }}</span>
             </div>
+            <div class="team-player-item"></div>
+            <div class="team-player-item"></div>
+            <div class="team-player-item"></div>
           </div>
           <div class="team-player" v-else>
             <label class="section-header">{{ $t('bind_self') }}</label>
@@ -118,6 +121,9 @@
               }}</span>
               <span>{{ player.name }}</span>
             </div>
+            <div class="team-player-item"></div>
+            <div class="team-player-item"></div>
+            <div class="team-player-item"></div>
             <div v-if="bindPlayer" style="margin-top: 5px;">
               <label>
                 <input type="radio" v-model="choice" value="bind" />
@@ -148,6 +154,9 @@
               }}</span>
               <span v-if="player.name">{{ player.name }}</span>
             </div>
+            <div class="team-player-item"></div>
+            <div class="team-player-item"></div>
+            <div class="team-player-item"></div>
           </div>
           <div class="team-other" v-if="!joined">
             <label class="section-header">{{ $t('ttl_or') }}</label>
@@ -336,6 +345,9 @@
     cursor: pointer;
     vertical-align: middle;
     position: relative;
+    &:empty {
+      height: 0;
+    }
     &__number {
       display: inline-block;
       width: 12px;
