@@ -1440,7 +1440,7 @@ export default {
           this.reJoinPlayer = this.getPlayer(sameOrderPlayers[0]);
         }
 
-        this.checkModalPlayer();
+        this.checkModalPlayer(true);
       }
     },
     checkReJoin(sameOrderPlayers) {
@@ -1458,7 +1458,7 @@ export default {
         if (i === 0 && acc === undefined) return true;
       }, undefined);
     },
-    checkModalPlayer() {
+    checkModalPlayer(reset) {
       const onbasePlayers = [
         { name: this.base.home.name },
         { name: this.base.first.name },
@@ -1490,7 +1490,7 @@ export default {
           item => !shouldNotPrev5.find(sub => sub && sub.name === item.name),
         )
         .map(player => this.getPlayer(player.name));
-      if (!this.maxOnbase) {
+      if (!this.maxOnbase || reset) {
         this.maxOnbase =
           onbasePlayers.filter(item => item.name).length ||
           this.prev5Players.length ||

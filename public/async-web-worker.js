@@ -632,14 +632,14 @@ const execGenStatistics = state => {
       item => item.PA !== '-' && (state.unlimitedPA || item.PA === state.top),
     )
     .sort((a, b) => {
+      if (typeof a[state.sortBy] < typeof b[state.sortBy]) {
+        return -1;
+      }
       if (
         ['AVG', 'OBP', 'SLG', 'OPS', 'AVG_NO', 'AVG_SP', 'AVG_FB'].includes(
           state.sortBy,
         )
       ) {
-        if (typeof a[state.sortBy] < typeof b[state.sortBy]) {
-          return -1;
-        }
         return b[state.sortBy] === a[state.sortBy]
           ? b['PA'] - a['PA']
           : b[state.sortBy] - a[state.sortBy];

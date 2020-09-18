@@ -13,6 +13,7 @@ import Carousel3d from 'vue-carousel-3d';
 import { Plugin } from 'vue-fragment';
 import simplebar from 'simplebar-vue';
 import smoothscroll from 'smoothscroll-polyfill';
+import icon from './components/icon';
 import './css/font-awesome.min.css';
 import './css/font.css';
 import './scss/_base.scss';
@@ -28,6 +29,9 @@ componentsReq.keys().forEach(path => {
       .replace(/(_|\b|-|\.\/|\.vue)*/gi, ''),
     componentsReq(path).default,
   );
+});
+Object.keys(icon).forEach(key => {
+  Vue.component(key, { template: icon[key] });
 });
 Vue.component('vue-tags-input', VueTagsInput);
 Vue.component('vue-draggable', draggable);

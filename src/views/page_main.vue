@@ -407,11 +407,5 @@ export default {
       immediate: true,
     },
   },
-  components: {
-    // https://thenounproject.com/term/carousel/1364849/#_=_
-    carousel: {
-      template: `<svg viewBox="0 0 100 100"><path fill="currentColor" d="M60.163,26.516v42.231H39.792V26.516H60.163 M65.832,20.846H34.123v53.57h31.709V20.846L65.832,20.846z"/><rect fill="currentColor" x="18.08" y="27.188" width="12.684" height="40.886"/><rect fill="currentColor" x="69.189" y="27.188" width="12.686" height="40.886"/><rect fill="currentColor" x="85.232" y="31.549" width="8.513" height="32.164"/><rect fill="currentColor" x="6.208" y="31.549" width="8.513" height="32.164"/></svg>`,
-    },
-  },
 };
 </script>
