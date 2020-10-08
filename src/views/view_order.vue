@@ -4,10 +4,10 @@
       :back="back_"
       :icon="currentTeamIcon"
       :save="edit"
-      :save_label="$t('btn_start_game')"
+      :save_label="$t('btn_next')"
     />
     <div class="container" ref="container">
-      <h1>{{ $t('create_game') }}</h1>
+      <h1>{{ $t('fill_order') }}</h1>
       <div class="condition">
         <div class="condition__group">
           <div class="condition__label">{{ $t('col_period') }}</div>
@@ -330,7 +330,7 @@
       </div>
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
-        <button class="btn" @click="edit">{{ $t('btn_start_game') }}</button>
+        <button class="btn" @click="edit">{{ $t('btn_next') }}</button>
       </div>
     </div>
   </div>
@@ -953,6 +953,11 @@ export default {
 
       // call save action
       this.editGameOrder({
+        redirect: () => {
+          this.$router.push(
+            `/main/games/${this.$route.params.team}/${this.$route.params.game}/position`,
+          );
+        },
         teamCode: this.$route.params.team,
         gameId: this.$route.params.game,
         orders: result.map(name => ({ name })),

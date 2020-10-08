@@ -189,6 +189,36 @@ const actions = {
         commit(rootTypes.LOADING, false);
       });
   },
+  editGamePosition({ commit, dispatch }, data) {
+    const { teamCode, gameId, positions, redirect } = data;
+    commit(rootTypes.LOADING, true);
+    const batch = db.batch();
+    batch.set(
+      db.doc(`teams/${teamCode}/games/${gameId}`),
+      { positions, timestamp },
+      { merge: true },
+    );
+    batch.set(
+      db.doc(`teams/${teamCode}`),
+      { games: { [gameId]: timestamp }, timestamp },
+      { merge: true },
+    );
+    batch
+      .commit()
+      .then(() => {
+        if (typeof redirect === 'function') {
+          redirect();
+        } else {
+          dispatch('setGame', gameId);
+          router.push(`/main/games/${teamCode}/${gameId}`);
+        }
+        commit(rootTypes.LOADING, false);
+      })
+      .catch(error => {
+        console.log('Error editing document:', error);
+        commit(rootTypes.LOADING, false);
+      });
+  },
   deleteGame({ commit }, data) {
     const { teamCode, gameId } = data;
     commit(rootTypes.LOADING, true);

@@ -1,6 +1,7 @@
 <template>
   <div class="root-container">
     <img ref="img" :src="imgSrc" @mousedown="trackXY" :disabled="disabled" />
+    <slot></slot>
   </div>
 </template>
 
