@@ -160,7 +160,6 @@
   }
   &.all-players {
     position: relative;
-    max-width: 0;
     min-height: 400px;
     margin: 0 10px 0 0;
     &:after {
