@@ -380,7 +380,7 @@
           </router-link>
           <button
             class="btn"
-            @click="positions = boxSummary.positions"
+            @click="getPositions"
             :disabled="Object.keys(boxSummary.positions || {}).length === 0"
           >
             {{ $t('btn_gen_position') }}
@@ -925,10 +925,29 @@ export default {
         this.result = 'tie';
       }
     },
+    getPositions() {
+      this.positions = Object.keys(this.boxSummary.positions || {}).reduce(
+        (acc, position) => {
+          return {
+            ...acc,
+            [position]: this.getPlayer(this.boxSummary.positions[position]),
+          };
+        },
+        {},
+      );
+      console.log(this.positions);
+    },
     closePositions(e) {
       if (e.currentTarget === e.target) {
         this.positions = undefined;
       }
+    },
+    getPlayer(name) {
+      return (
+        this.teamInfo.players.find(
+          player => player.name && player.name === name,
+        ) || { name, number: '' }
+      );
     },
   },
   computed: {

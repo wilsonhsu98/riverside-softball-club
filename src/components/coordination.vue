@@ -82,6 +82,15 @@ export default {
               },
             ]
           : []),
+        ...(typeof this.positions === 'object' &&
+        Object.keys(this.positions).length
+          ? Object.keys(this.positions).map(position => {
+              return {
+                var: position,
+                src: this.positions[position].photo,
+              };
+            })
+          : []),
       ].map(item => {
         return new Promise(resolve => {
           const img = new Image();
@@ -685,57 +694,67 @@ export default {
           });
         }
         if (Object.keys(this.positions_).length > 0) {
-ctx.font = `${avatarRadius * 0.6}px Arial`;
+          ctx.font = `${avatarRadius * 0.6}px Arial`;
           ctx.shadowColor = '#000';
           ctx.shadowBlur = (1 / 100) * base;
           const textLocation = {
-            CF: { x: 50, y: 30 },
+            CF: { x: 50, y: 27 },
             FREE: { x: 50, y: 45 },
             RF: { x: 79, y: 40 },
             LF: { x: 21, y: 40 },
-            SS: { x: 35, y: 57 },
-            '2B': { x: 65, y: 57 },
-            '3B': { x: 30, y: 75 },
-            '1B': { x: 70, y: 75 },
+            SS: { x: 33, y: 57 },
+            '2B': { x: 67, y: 57 },
+            '3B': { x: 27, y: 75 },
+            '1B': { x: 73, y: 75 },
             P: { x: 50, y: 75 },
             C: { x: 50, y: 95 },
           };
-          Object.keys(this.positions_)
-            .forEach(key => {
-                  ctx.fillStyle = '#fff';
-                ctx.textAlign = 'center';
-                ctx.fillText(
-                  this.positions_[key],
-                  (textLocation[key].x / 100) * base,
-                  (textLocation[key].y / 100) * base,
-                );
+          Object.keys(this.positions_).forEach(key => {
+            ctx.fillStyle = '#fff';
+            ctx.textAlign = 'center';
+            ctx.fillText(
+              `${this.positions_[key].number} ${this.positions_[key].name}`,
+              (textLocation[key].x / 100) * base,
+              (textLocation[key].y / 100) * base,
+            );
 
-        //                 ctx.save();
-        // ctx.beginPath();
-        // ctx.translate(p.x + clip - avatarRadius, p.y - aBase - avatarRadius);
-        // ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
-        // // if (this.firstImage) {
-        // //   ctx.clip();
-        // //   ctx.drawImage(
-        // //     this.firstImage,
-        // //     0,
-        // //     0,
-        // //     avatarRadius * 2,
-        // //     avatarRadius * 2,
-        // //   );
-        // // } else {
-        //   ctx.fillStyle = avatarBackgroundColor;
-        //   ctx.textAlign = 'center';
-        //   ctx.fill();
-        //   ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
-        //   ctx.fillStyle = avatarBorderColor;
-        //   ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
-        //   ctx.lineWidth = avatarRadius * 0.1;
-        //   ctx.strokeStyle = avatarBorderColor;
-        //   ctx.stroke();
-        // // }
-        // ctx.restore();
-            });
+            ctx.save();
+            ctx.beginPath();
+            ctx.translate(
+              (textLocation[key].x / 100) * base - avatarRadius * 0.8,
+              (textLocation[key].y / 100) * base - avatarRadius * 2.3,
+            );
+            ctx.arc(
+              avatarRadius * 0.8,
+              avatarRadius * 0.8,
+              avatarRadius * 0.8,
+              0,
+              Math.PI * 2,
+              true,
+            );
+            if (this[key]) {
+              ctx.clip();
+              ctx.drawImage(
+                this[key],
+                0,
+                0,
+                avatarRadius * 1.6,
+                avatarRadius * 1.6,
+              );
+            } else {
+              ctx.fillStyle = avatarBackgroundColor;
+              ctx.textAlign = 'center';
+              ctx.fill();
+              ctx.font = `${avatarRadius}px FontAwesome`;
+              ctx.fillStyle = avatarBorderColor;
+              ctx.shadowBlur = 0;
+              ctx.fillText('\uF2C0', avatarRadius * 0.8, avatarRadius * 1.1);
+              ctx.lineWidth = avatarRadius * 0.1;
+              ctx.strokeStyle = avatarBorderColor;
+              ctx.stroke();
+            }
+            ctx.restore();
+          });
         }
         // 個人頭貼
         if (this.avatarImage) {
