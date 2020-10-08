@@ -163,6 +163,7 @@
     position: relative;
     min-height: 400px;
     margin: 0 10px 0 0;
+    flex: 0;
     &:after {
       content: '';
       display: block;
@@ -179,6 +180,7 @@
     border: 0;
     border-radius: 0;
     min-width: auto;
+    font-size: 16px;
     .player {
       z-index: 1;
       overflow: visible;
