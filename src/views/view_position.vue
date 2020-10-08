@@ -153,6 +153,7 @@
   margin: 0 auto;
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   text-align: left;
+  font-size: 0;
 
   legend {
     color: $input_font;
@@ -289,9 +290,11 @@
     border: 2px solid $row_color;
     box-sizing: border-box;
     border-radius: 5px;
+    margin-bottom: 5px;
     padding: 0 10px;
     white-space: nowrap;
     overflow: hidden;
+    font-size: 16px;
     .name {
       text-align: left;
       line-height: 36px;
@@ -330,6 +333,9 @@
         text-align: center;
         flex: 0 0 16px;
       }
+    }
+    &:last-of-type {
+      margin-bottom: 0;
     }
   }
 }
