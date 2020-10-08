@@ -363,6 +363,34 @@
         v-model="tags"
       />
 
+      <div class="field-wrapper" v-if="box.slice(1).length">
+        <div class="three-column chart-btn-container">
+          <router-link
+            :to="{
+              name: 'edit_game_position',
+              params: {
+                team: $route.params.team,
+                game: $route.params.game,
+                mode: 'edit',
+              },
+            }"
+            tag="button"
+            class="btn"
+            >{{ $t('fill_position') }}
+          </router-link>
+          <button
+            class="btn"
+            @click="positions = boxSummary.positions"
+            :disabled="Object.keys(boxSummary.positions || {}).length === 0"
+          >
+            {{ $t('btn_gen_position') }}
+          </button>
+          <button class="btn" @click="" :disabled="true">
+            {{ $t('btn_gen_order') }}
+          </button>
+        </div>
+      </div>
+
       <div v-if="mode === 'edit'" class="field-wrapper delete-btn-container">
         <button class="btn danger" @click="delete_">
           {{ $t('btn_delete_game') }}
@@ -388,6 +416,10 @@
       :fourth_label="$t('ttl_all_player')"
       :select="selectPlayer"
     ></player-modal>
+
+    <div v-if="positions" class="positions-modal" @click="closePositions">
+      <coordination :no_track="true" :positions="positions" />
+    </div>
   </div>
 </template>
 
@@ -509,13 +541,19 @@
       }
     }
   }
-  .two-column {
+  .two-column,
+  .three-column {
     display: flex;
     justify-content: space-between;
     > div {
-      max-width: calc(50% - 5px);
       margin: 0;
     }
+  }
+  .two-column > div {
+    max-width: calc(50% - 5px);
+  }
+  .three-column > button {
+    max-width: calc(33% - 5px);
   }
   .team-versus {
     margin-top: 15px;
@@ -602,6 +640,16 @@
       }
     }
   }
+  .chart-btn-container {
+    margin-top: 15px;
+    .btn {
+      display: block;
+      width: 100%;
+      margin: 0;
+      padding-right: 0;
+      padding-left: 0;
+    }
+  }
   .delete-btn-container {
     display: none;
   }
@@ -615,6 +663,23 @@
   }
 }
 
+.positions-modal {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  &::v-deep {
+    .root-container {
+      top: 50%;
+      left: 50%;
+      transform: translateY(-50%) translateX(-50%);
+      display: inline-block;
+    }
+  }
+}
 @media only screen and (max-width: 760px) {
   .container {
     .delete-btn-container {
@@ -675,6 +740,7 @@ export default {
       gameNote: '',
       youtubeVideos: '',
       gameStatus: 'lock',
+      positions: undefined,
     };
   },
   created() {
@@ -859,11 +925,17 @@ export default {
         this.result = 'tie';
       }
     },
+    closePositions(e) {
+      if (e.currentTarget === e.target) {
+        this.positions = undefined;
+      }
+    },
   },
   computed: {
     ...mapGetters({
       currentTeamIcon: 'currentTeamIcon',
       currentTeam: 'currentTeam',
+      box: 'box',
       boxSummary: 'boxSummary',
       games: 'games',
       gameOptions: 'gameOptions',

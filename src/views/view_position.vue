@@ -409,7 +409,7 @@ export default {
     if (this.boxSummary.game !== this.$route.params.game) {
       this.setGame(this.$route.params.game);
     }
-    this.sourceList = this.resetSource();
+    this.initSetSource();
   },
   methods: {
     ...mapActions({
@@ -641,6 +641,29 @@ export default {
         .map(({ name }) => this.getPlayer(name));
       return [...sourceList];
     },
+    initSetSource() {
+      this.sourceList = this.resetSource();
+
+      if (this.mode === 'edit') {
+        const { positions = {} } = this.boxSummary;
+        Object.keys(positions).forEach((position, index, self) => {
+          const positionIndex = this.POSITION.indexOf(position);
+          if (positionIndex > 0) {
+            this[`order_${positionIndex}`][0] = this.getPlayer(
+              positions[position],
+            );
+          }
+          if (index === self.length - 1) {
+            this.sourceList = this.sourceList.filter(
+              player =>
+                !self
+                  .map(position => positions[position])
+                  .includes(player.name),
+            );
+          }
+        });
+      }
+    },
     getPlayer(name) {
       return (
         this.teamInfo.players.find(
@@ -670,27 +693,7 @@ export default {
   },
   watch: {
     box() {
-      this.sourceList = this.resetSource();
-
-      if (this.mode === 'edit') {
-        const { positions = {} } = this.boxSummary;
-        Object.keys(positions).forEach((position, index, self) => {
-          const positionIndex = this.POSITION.indexOf(position);
-          if (positionIndex > 0) {
-            this[`order_${positionIndex}`][0] = this.getPlayer(
-              positions[position],
-            );
-          }
-          if (index === self.length - 1) {
-            this.sourceList = this.sourceList.filter(
-              player =>
-                !self
-                  .map(position => positions[position])
-                  .includes(player.name),
-            );
-          }
-        });
-      }
+      this.initSetSource();
     },
   },
 };

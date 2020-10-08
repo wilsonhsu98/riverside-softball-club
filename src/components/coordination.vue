@@ -42,6 +42,7 @@ export default {
     'showPercentage',
     'avatar',
     'player',
+    'positions',
   ],
   data() {
     return {
@@ -53,6 +54,7 @@ export default {
       secondImage: '',
       thirdImage: '',
       avatarImage: '',
+      positions_: this.positions || {},
     };
   },
   mounted() {
@@ -681,6 +683,59 @@ export default {
             ctx.strokeStyle = item.borderColor || 'black';
             ctx.stroke();
           });
+        }
+        if (Object.keys(this.positions_).length > 0) {
+ctx.font = `${avatarRadius * 0.6}px Arial`;
+          ctx.shadowColor = '#000';
+          ctx.shadowBlur = (1 / 100) * base;
+          const textLocation = {
+            CF: { x: 50, y: 30 },
+            FREE: { x: 50, y: 45 },
+            RF: { x: 79, y: 40 },
+            LF: { x: 21, y: 40 },
+            SS: { x: 35, y: 57 },
+            '2B': { x: 65, y: 57 },
+            '3B': { x: 30, y: 75 },
+            '1B': { x: 70, y: 75 },
+            P: { x: 50, y: 75 },
+            C: { x: 50, y: 95 },
+          };
+          Object.keys(this.positions_)
+            .forEach(key => {
+                  ctx.fillStyle = '#fff';
+                ctx.textAlign = 'center';
+                ctx.fillText(
+                  this.positions_[key],
+                  (textLocation[key].x / 100) * base,
+                  (textLocation[key].y / 100) * base,
+                );
+
+        //                 ctx.save();
+        // ctx.beginPath();
+        // ctx.translate(p.x + clip - avatarRadius, p.y - aBase - avatarRadius);
+        // ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
+        // // if (this.firstImage) {
+        // //   ctx.clip();
+        // //   ctx.drawImage(
+        // //     this.firstImage,
+        // //     0,
+        // //     0,
+        // //     avatarRadius * 2,
+        // //     avatarRadius * 2,
+        // //   );
+        // // } else {
+        //   ctx.fillStyle = avatarBackgroundColor;
+        //   ctx.textAlign = 'center';
+        //   ctx.fill();
+        //   ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+        //   ctx.fillStyle = avatarBorderColor;
+        //   ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+        //   ctx.lineWidth = avatarRadius * 0.1;
+        //   ctx.strokeStyle = avatarBorderColor;
+        //   ctx.stroke();
+        // // }
+        // ctx.restore();
+            });
         }
         // 個人頭貼
         if (this.avatarImage) {
