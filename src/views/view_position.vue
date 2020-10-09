@@ -235,6 +235,7 @@
       &.drag {
         .player {
           border-style: dotted;
+          margin-bottom: 0;
         }
         .slash {
           border-right-style: dotted;
