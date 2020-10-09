@@ -226,6 +226,13 @@
           @click="setBoxDisplay(item)"
           >{{ $t(`box_display_${item}`) }}</span
         >
+        <span
+          v-if="Object.keys(boxSummary.positions || {}).length"
+          class="gen-position"
+          @click="getPositions"
+        >
+          {{ $t('box_position') }}
+        </span>
       </div>
       <div class="box-table simple" v-if="box.slice(1).length">
         <div
@@ -590,7 +597,11 @@
       ></iframe>
     </div>
     <div v-if="coordinate" class="location-modal" @click="closeLocation">
-      <coordination :values="[coordinate]" :no_track="true" />
+      <coordination :no_track="true" :values="[coordinate]" />
+    </div>
+
+    <div v-if="positions" class="positions-modal" @click="closePositions">
+      <coordination :no_track="true" :positions="positions" />
     </div>
   </div>
 </template>
@@ -604,7 +615,6 @@
     position: sticky;
     z-index: 1;
     top: 106px;
-    width: 100px;
     > span {
       display: inline-block;
       vertical-align: top;
@@ -622,6 +632,14 @@
         border: none;
         background-color: $header_bgcolor;
         color: rgba(255, 255, 255, 0.9);
+      }
+      &.gen-position {
+        width: auto;
+        float: right;
+        padding: 0 5px;
+        background-color: $current_user_bgcolor;
+        border-color: $current_user_bgcolor;
+        color: #fff;
       }
     }
   }
@@ -1113,6 +1131,23 @@
     }
   }
 }
+.positions-modal {
+  position: fixed;
+  z-index: 2;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  &::v-deep {
+    .root-container {
+      top: 50%;
+      left: 50%;
+      transform: translateY(-50%) translateX(-50%);
+      display: inline-block;
+    }
+  }
+}
 .video-container {
   position: relative;
   padding-bottom: 56.25%;
@@ -1321,6 +1356,7 @@ export default {
       gameNote: '',
       gameStatus: 'lock',
       stillCanEdit: false,
+      positions: undefined,
     };
   },
   created() {
@@ -1465,6 +1501,29 @@ export default {
         gameId: this.$route.params.game,
         value,
       });
+    },
+    getPositions() {
+      this.positions = Object.keys(this.boxSummary.positions || {}).reduce(
+        (acc, position) => {
+          return {
+            ...acc,
+            [position]: this.getPlayer(this.boxSummary.positions[position]),
+          };
+        },
+        {},
+      );
+    },
+    closePositions(e) {
+      if (e.currentTarget === e.target) {
+        this.positions = undefined;
+      }
+    },
+    getPlayer(name) {
+      return (
+        this.teamInfo.players.find(
+          player => player.name && player.name === name,
+        ) || { name, number: '' }
+      );
     },
   },
   computed: {

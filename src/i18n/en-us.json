@@ -78,6 +78,7 @@
 	"box_header_player": "Player",
 	"box_display_content": "文字",
 	"box_display_code": "代號",
+	"box_position": "守位圖",
 	"btn_fill_order": "排歐打",
 
 	"create_game": "Create a game",

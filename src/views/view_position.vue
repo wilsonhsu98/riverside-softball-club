@@ -60,7 +60,7 @@
                 v-for="order in ORDER"
                 :key="`order_${order}`"
                 class="order-wrapper"
-                :class="{ drag }"
+                :class="{ drag, 'drag-back': dragBack }"
                 :data-order="order"
               >
                 <div
@@ -239,6 +239,9 @@
         .slash {
           border-right-style: dotted;
         }
+      }
+      &.drag-back {
+        z-index: unset;
       }
       &[data-order='1'] {
         left: calc(50% - 52px);

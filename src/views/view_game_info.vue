@@ -935,7 +935,6 @@ export default {
         },
         {},
       );
-      console.log(this.positions);
     },
     closePositions(e) {
       if (e.currentTarget === e.target) {

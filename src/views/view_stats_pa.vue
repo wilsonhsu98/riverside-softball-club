@@ -235,8 +235,8 @@
                       </simplebar>
                       <coordination
                         v-if="item.locations.length"
-                        :values="item.locations"
                         :no_track="true"
+                        :values="item.locations"
                         :showPercentage="isPercentageMode"
                         fixedSize="144"
                         style="cursor: pointer;"
@@ -309,8 +309,8 @@
       @click="closeLocation"
     >
       <coordination
-        :values="coordinates.values"
         :no_track="true"
+        :values="coordinates.values"
         :showPercentage="isPercentageMode"
         :avatar="coordinates.avatar"
         :player="coordinates.player"
