@@ -596,11 +596,11 @@
         allowfullscreen
       ></iframe>
     </div>
-    <div v-if="coordinate" class="location-modal" @click="closeLocation">
+    <div v-if="coordinate" class="image-modal" @click="closeLocation">
       <coordination :no_track="true" :values="[coordinate]" />
     </div>
 
-    <div v-if="positions" class="positions-modal" @click="closePositions">
+    <div v-if="positions" class="image-modal" @click="closePositions">
       <coordination :no_track="true" :positions="positions" />
     </div>
   </div>
@@ -1114,24 +1114,7 @@
   width: 100px;
   outline: none;
 }
-.location-modal {
-  position: fixed;
-  z-index: 2;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  &::v-deep {
-    .root-container {
-      top: 50%;
-      left: 50%;
-      transform: translateY(-50%) translateX(-50%);
-      display: inline-block;
-    }
-  }
-}
-.positions-modal {
+.image-modal {
   position: fixed;
   z-index: 2;
   top: 0;
@@ -1630,4 +1613,11 @@ export default {
     },
   },
 };
+// <svg width="33" height="44" viewBox="0 0 33 44" version="1.1" xmlns="http://www.w3.org/2000/svg"><title>crack</title><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g fill="#FFF"><g><path d="M.697 5.664L9.094 0 7.989 12.922l10.12 2.746 1.878 14.107 9.728 3.575 2.45 10.193-5.817-6.22-9.547-1.697-3.5-14.623L.645 17.876z"/></g></g></g></svg>
+// background-image: url(//d35aaqx5ub95lt.cloudfront.net/images/skill-crack.svg);
+// background-position: 29% 10%;
+// background-repeat: no-repeat;
+// background-size: 69%;
+// pointer-events: none;
+// transform: rotate(77deg);
 </script>

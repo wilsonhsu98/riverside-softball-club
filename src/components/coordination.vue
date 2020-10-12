@@ -704,9 +704,9 @@ export default {
             LF: { x: 21, y: 40 },
             SS: { x: 33, y: 57 },
             '2B': { x: 67, y: 57 },
-            '3B': { x: 27, y: 75 },
-            '1B': { x: 73, y: 75 },
-            P: { x: 50, y: 75 },
+            '3B': { x: 25, y: 76.5 },
+            '1B': { x: 75, y: 76.5 },
+            P: { x: 50, y: 76.5 },
             C: { x: 50, y: 95 },
           };
           Object.keys(this.positions_).forEach(key => {
