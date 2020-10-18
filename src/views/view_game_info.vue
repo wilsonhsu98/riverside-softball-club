@@ -385,7 +385,7 @@
           >
             {{ $t('btn_gen_position') }}
           </button>
-          <button class="btn" @click="" :disabled="true">
+          <button class="btn" @click="getOrders">
             {{ $t('btn_gen_order') }}
           </button>
         </div>
@@ -417,8 +417,12 @@
       :select="selectPlayer"
     ></player-modal>
 
-    <div v-if="positions" class="positions-modal" @click="closePositions">
+    <div v-if="positions" class="image-modal" @click="closePositions">
       <coordination :no_track="true" :positions="positions" />
+    </div>
+
+    <div v-if="orders" class="image-modal" @click="closeOrders">
+      <starting-player :players="orders" />
     </div>
   </div>
 </template>
@@ -663,7 +667,7 @@
   }
 }
 
-.positions-modal {
+.image-modal {
   position: fixed;
   z-index: 2;
   top: 0;
@@ -741,6 +745,7 @@ export default {
       youtubeVideos: '',
       gameStatus: 'lock',
       positions: undefined,
+      orders: undefined,
     };
   },
   created() {
@@ -939,6 +944,17 @@ export default {
     closePositions(e) {
       if (e.currentTarget === e.target) {
         this.positions = undefined;
+      }
+    },
+    getOrders() {
+      this.orders = this.box
+        .slice(1)
+        .filter(record => !record.hasOwnProperty('altOrder'))
+        .map(({ name }) => this.getPlayer(name));
+    },
+    closeOrders(e) {
+      if (e.currentTarget === e.target) {
+        this.orders = undefined;
       }
     },
     getPlayer(name) {

@@ -647,26 +647,23 @@ export default {
     },
     initSetSource() {
       this.sourceList = this.resetSource();
+      const nameArray = this.sourceList.map(player => player.name);
 
-      if (this.mode === 'edit') {
-        const { positions = {} } = this.boxSummary;
-        Object.keys(positions).forEach((position, index, self) => {
-          const positionIndex = this.POSITION.indexOf(position);
-          if (positionIndex > 0) {
-            this[`order_${positionIndex}`][0] = this.getPlayer(
-              positions[position],
-            );
-          }
-          if (index === self.length - 1) {
-            this.sourceList = this.sourceList.filter(
-              player =>
-                !self
-                  .map(position => positions[position])
-                  .includes(player.name),
-            );
-          }
-        });
-      }
+      const { positions = {} } = this.boxSummary;
+      Object.keys(positions).forEach((position, index, self) => {
+        const positionIndex = this.POSITION.indexOf(position);
+        if (positionIndex > 0 && nameArray.includes(positions[position])) {
+          this[`order_${positionIndex}`][0] = this.getPlayer(
+            positions[position],
+          );
+        }
+        if (index === self.length - 1) {
+          this.sourceList = this.sourceList.filter(
+            player =>
+              !self.map(position => positions[position]).includes(player.name),
+          );
+        }
+      });
     },
     getPlayer(name) {
       return (

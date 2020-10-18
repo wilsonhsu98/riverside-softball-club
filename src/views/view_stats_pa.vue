@@ -860,9 +860,6 @@ export default {
   },
   created() {},
   mounted() {
-    setTimeout(() => {
-      this.lazy = true;
-    }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
     this.detectChartWidth();
@@ -965,6 +962,14 @@ export default {
       userName: 'userName',
       currentTeamIcon: 'currentTeamIcon',
     }),
+  },
+  watch: {
+    list() {
+      this.lazy = false;
+      setTimeout(() => {
+        this.lazy = true;
+      }, 500);
+    },
   },
 };
 </script>
