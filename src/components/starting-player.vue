@@ -71,26 +71,20 @@ export default {
   },
   methods: {
     draw(nameMaxWidth) {
-      // const img = this.$refs.img;
-      // const { width } = img.getBoundingClientRect();
+      const width = 108 + nameMaxWidth;
       const height = this.list.length * 45 - 3;
       const scale = 2;
-      // const base = width * scale;
       const canvas = document.createElement('canvas');
-      canvas.width = (108 + nameMaxWidth) * scale;
+      canvas.width = width * scale;
       canvas.height = height * scale;
       const ctx = canvas.getContext('2d');
 
-      const avatarRadius = 32;
+      const orderWidth = 27 * scale;
+      const avatarRadius = 16 * scale;
+      const diameter = avatarRadius * 2;
       const avatarBackgroundColor = 'rgba(237, 247, 248, 1)'; // $row_odd_bgcolor
       const avatarBorderColor = 'rgba(50, 122, 129, 1)'; // $row_color
       const orderBorderColor = '#ff695e'; // $error_color
-      const orderWidth = 27 * scale;
-
-      // ctx.beginPath();
-      // ctx.fillStyle = 'rgba(0,0,0,0.5)';
-      // ctx.fillRect(0, 0, canvas.width, canvas.height);
-
       const canvasRadius = (x, y, w, h, tl, tr, br, bl, fillStyle) => {
         const r = x + w;
         const b = y + h;
@@ -109,6 +103,10 @@ export default {
         ctx.fill();
         ctx.stroke();
       };
+
+      // ctx.beginPath();
+      // ctx.fillStyle = 'rgba(0,0,0,0.5)';
+      // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       this.list.forEach((player, index) => {
         ctx.save();
@@ -145,7 +143,11 @@ export default {
         ctx.fillStyle = orderBorderColor;
         ctx.font = `${16 * scale}px Arial`;
         ctx.textAlign = 'center';
-        ctx.fillText(index + 1, 29, (avatarRadius * 2 + 26) * index + 54);
+        ctx.fillText(
+          index + 1,
+          14.5 * scale,
+          (diameter + 13 * scale) * index + 27 * scale,
+        );
 
         ctx.beginPath();
         ctx.fillStyle = avatarBorderColor;
@@ -153,8 +155,8 @@ export default {
         ctx.textAlign = 'center';
         ctx.fillText(
           player.number || '?',
-          orderWidth + 26 * scale + avatarRadius * 2,
-          (avatarRadius * 2 + 26) * index + 54,
+          orderWidth + 26 * scale + diameter,
+          (diameter + 13 * scale) * index + 27 * scale,
         );
 
         ctx.beginPath();
@@ -163,25 +165,19 @@ export default {
         ctx.textAlign = 'left';
         ctx.fillText(
           player.name,
-          orderWidth + 36 * scale + avatarRadius * 2,
-          (avatarRadius * 2 + 26) * index + 54,
+          orderWidth + 36 * scale + diameter,
+          (diameter + 13 * scale) * index + 27 * scale,
         );
 
         ctx.beginPath();
         ctx.translate(
           orderWidth + 12 * scale,
-          (avatarRadius * 2 + 26) * index + 10,
+          (diameter + 13 * scale) * index + 5 * scale,
         );
         ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
         if (this[player.name]) {
           ctx.clip();
-          ctx.drawImage(
-            this[player.name],
-            0,
-            0,
-            avatarRadius * 2,
-            avatarRadius * 2,
-          );
+          ctx.drawImage(this[player.name], 0, 0, diameter, diameter);
         } else {
           ctx.fillStyle = avatarBackgroundColor;
           ctx.textAlign = 'center';
