@@ -601,7 +601,11 @@
     </div>
 
     <div v-if="positions" class="image-modal" @click="closePositions">
-      <coordination :no_track="true" :positions="positions" />
+      <coordination
+        :no_track="true"
+        :positions="positions"
+        :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
+      />
     </div>
   </div>
 </template>

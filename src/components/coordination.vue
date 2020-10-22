@@ -2,13 +2,33 @@
   <div class="root-container">
     <img ref="img" :src="imgSrc" @mousedown="trackXY" :disabled="disabled" />
     <slot></slot>
+    <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
   </div>
 </template>
 
 <style lang="scss" scoped>
+@import '../scss/variable';
+
 .root-container {
   position: relative;
   line-height: 0;
+}
+.fa {
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  font-size: 18px;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  margin-left: 5px;
+  color: white;
+  background-color: $current_user_bgcolor;
+  border-radius: 4px;
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
 }
 img {
   width: 400px;
@@ -43,6 +63,7 @@ export default {
     'avatar',
     'player',
     'positions',
+    'fileNamePrefix',
   ],
   data() {
     return {
@@ -878,6 +899,12 @@ export default {
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.draw);
+    },
+    download() {
+      const downloadLink = document.createElement('a');
+      downloadLink.download = `${this.fileNamePrefix}_positions.png`;
+      downloadLink.href = this.imgSrc;
+      downloadLink.click();
     },
   },
   watch: {

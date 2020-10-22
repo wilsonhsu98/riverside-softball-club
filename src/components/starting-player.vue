@@ -1,10 +1,13 @@
 <template>
   <div class="root-container">
     <img :src="imgSrc" />
+    <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
   </div>
 </template>
 
 <style lang="scss" scoped>
+@import '../scss/variable';
+
 .root-container {
   position: relative;
   line-height: 0;
@@ -12,15 +15,28 @@
 img {
   height: 440px;
 }
-@media only screen and (max-width: 760px) {
-  img {
-  }
+.fa {
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  font-size: 18px;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: center;
+  vertical-align: middle;
+  margin-left: 5px;
+  color: white;
+  background-color: $current_user_bgcolor;
+  border-radius: 4px;
+  position: absolute;
+  right: -30px;
+  bottom: 5px;
 }
 </style>
 
 <script>
 export default {
-  props: ['players'],
+  props: ['players', 'fileNamePrefix'],
   data() {
     return {
       list: this.players || [],
@@ -195,6 +211,12 @@ export default {
       });
 
       this.imgSrc = canvas.toDataURL('image/png');
+    },
+    download() {
+      const downloadLink = document.createElement('a');
+      downloadLink.download = `${this.fileNamePrefix}_starting_players.png`;
+      downloadLink.href = this.imgSrc;
+      downloadLink.click();
     },
   },
 };
