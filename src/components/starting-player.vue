@@ -1,7 +1,11 @@
 <template>
   <div class="root-container">
     <img :src="imgSrc" />
-    <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
+    <i
+      v-if="fileNamePrefix && supportDownload"
+      class="fa fa-download"
+      @click="download"
+    ></i>
   </div>
 </template>
 
@@ -41,6 +45,7 @@ export default {
     return {
       list: this.players || [],
       imgSrc: '',
+      supportDownload: !navigator.userAgent.match('CriOS'),
     };
   },
   mounted() {
