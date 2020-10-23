@@ -584,6 +584,9 @@ i.fa {
           height: 100%;
           box-sizing: border-box;
         }
+        .simplebar-track {
+          top: 0;
+        }
       }
     }
     .bar {
