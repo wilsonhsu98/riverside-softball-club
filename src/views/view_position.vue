@@ -12,6 +12,7 @@
       <div class="coordination-wrapper">
         <div class="coordination">
           <vue-draggable
+            :key="`source_${sourceList.length}`"
             tag="fieldset"
             group="people"
             handle=".handle"
@@ -58,7 +59,7 @@
             <div class="players starting-players" ref="coordination">
               <div
                 v-for="order in ORDER"
-                :key="`order_${order}`"
+                :key="`order_${order}_${sourceList.length}`"
                 class="order-wrapper"
                 :class="{ drag, 'drag-back': dragBack }"
                 :data-order="order"
@@ -194,12 +195,13 @@
       border-radius: 5px;
       z-index: 1;
       background-color: rgba(255, 255, 255, 0.5);
+      transition: transform 0.2s;
       .order {
         position: absolute;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
+        top: -20px;
+        right: -10px;
+        bottom: -20px;
+        left: -10px;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -243,6 +245,9 @@
       }
       &.drag-back {
         z-index: unset;
+      }
+      &.touching {
+        transform: scale(1.2);
       }
       &[data-order='1'] {
         left: calc(50% - 52px);
@@ -537,6 +542,11 @@ export default {
             });
           }) || parseInt(toEle.getAttribute('data-order'));
         this.target = this[`order_${this.target_order}`][0];
+
+        document.querySelectorAll('.touching').forEach(node => {
+          node.classList.remove('touching');
+        });
+        toEle.parentElement.classList.add('touching');
       }
 
       if (toEle.className.includes('starting-players')) {
@@ -553,6 +563,11 @@ export default {
           toEle.parentElement.getAttribute('data-order'),
         );
         this.target = this[`order_${this.target_order}`][0];
+
+        document.querySelectorAll('.touching').forEach(node => {
+          node.classList.remove('touching');
+        });
+        toEle.parentElement.parentElement.classList.add('touching');
       }
       // console.log('toele', toEle)
       // console.log('origin', this.origin, event.draggedContext)
@@ -625,13 +640,6 @@ export default {
           combine.includes(player.name),
         );
       }
-
-      this.$nextTick(() => {
-        const element = document.querySelector(
-          `[data-order="${this.target_order}"]`,
-        );
-        scrollTo(element);
-      });
 
       // do nothing if swap in source list
       this.dragBack = false;
