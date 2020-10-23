@@ -1,11 +1,7 @@
 <template>
   <div class="root-container">
     <img :src="imgSrc" />
-    <i
-      v-if="fileNamePrefix && supportDownload"
-      class="fa fa-download"
-      @click="download"
-    ></i>
+    <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
   </div>
 </template>
 
@@ -36,6 +32,11 @@ img {
   right: -30px;
   bottom: 5px;
 }
+@media only screen and (max-width: 760px) {
+  .fa {
+    visibility: hidden;
+  }
+}
 </style>
 
 <script>
@@ -45,7 +46,6 @@ export default {
     return {
       list: this.players || [],
       imgSrc: '',
-      supportDownload: !navigator.userAgent.match('CriOS'),
     };
   },
   mounted() {

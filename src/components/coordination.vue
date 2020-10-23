@@ -2,11 +2,7 @@
   <div class="root-container">
     <img ref="img" :src="imgSrc" @mousedown="trackXY" :disabled="disabled" />
     <slot></slot>
-    <i
-      v-if="fileNamePrefix && supportDownload"
-      class="fa fa-download"
-      @click="download"
-    ></i>
+    <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
   </div>
 </template>
 
@@ -46,6 +42,9 @@ img {
     width: 300px;
     height: 300px;
   }
+  .fa {
+    visibility: hidden;
+  }
 }
 </style>
 
@@ -80,7 +79,6 @@ export default {
       thirdImage: '',
       avatarImage: '',
       positions_: this.positions || {},
-      supportDownload: !navigator.userAgent.match('CriOS'),
     };
   },
   mounted() {
