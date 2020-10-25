@@ -92,8 +92,8 @@ const genGameList = (games, filterGames = []) => {
     .filter((v, i, self) => self.indexOf(v) === i)
     .sort((a, b) => {
       return (
-        parseInt(b.match(/\d/g).join(''), 10) -
-        parseInt(a.match(/\d/g).join(''), 10)
+        parseInt((b.match(/\d/g) || [b]).join(''), 10) -
+        parseInt((a.match(/\d/g) || [a]).join(''), 10)
       );
     })
     .map(item => {
