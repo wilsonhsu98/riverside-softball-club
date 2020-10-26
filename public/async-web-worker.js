@@ -13,8 +13,14 @@ const genStatistics = (players, records, filterPA, filterGames) => {
   // filterPA = filterPA || 10;
   const sortRecords = [...records].sort((a, b) => {
     return (
-      parseInt((b._table.match(/\d/g) || [b._table]).join('') + (b.order + 10), 10) -
-      parseInt((a._table.match(/\d/g) || [a._table]).join('') + (a.order + 10), 10)
+      parseInt(
+        (b._table.match(/\d/g) || [b._table]).join('') + (b.order + 10),
+        10,
+      ) -
+      parseInt(
+        (a._table.match(/\d/g) || [a._table]).join('') + (a.order + 10),
+        10,
+      )
     );
   });
 

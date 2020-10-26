@@ -412,7 +412,11 @@ const mutations = {
         .map(item => ({ period: `${parseInt(item.period)}` })),
     ]
       .filter((value, index, self) => {
-        return self.map(item => item.period).indexOf(value.period) === index;
+        return (
+          value &&
+          value.period !== undefined &&
+          self.map(item => item.period).indexOf(value.period) === index
+        );
       })
       .sort((a, b) => {
         return b.period.localeCompare(a.period);
