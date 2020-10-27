@@ -369,8 +369,8 @@ i.fa {
 }
 
 .sticky-table-wrapper {
-  max-height: calc(100vh - 70px - 20px);
-  max-height: calc(var(--vh, 1vh) * 100 - 70px - 20px);
+  height: calc(100vh - 70px - 20px);
+  height: calc(var(--vh, 1vh) * 100 - 70px - 20px);
   ::-webkit-scrollbar {
     display: none;
   }
@@ -756,8 +756,8 @@ i.fa {
     }
   }
   .sticky-table-wrapper {
-    max-height: calc(100vh - 100px);
-    max-height: calc(var(--vh, 1vh) * 100 - 100px);
+    height: calc(100vh - 100px);
+    height: calc(var(--vh, 1vh) * 100 - 100px);
   }
   .sticky-table {
     .toggle-row:checked + .normal-row .chart {

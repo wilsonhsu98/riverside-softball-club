@@ -35,6 +35,9 @@
               {{ $t('logout_btn') }}
             </button>
           </div>
+          <a href="mailto:riversidesoftballclub.app@gmail.com">{{
+            $t('system_mail')
+          }}</a>
         </div>
       </template>
       <template v-if="isAnonymous === true">

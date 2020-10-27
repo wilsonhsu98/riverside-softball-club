@@ -17,6 +17,9 @@
       <i class="fa fa-user-secret"></i>
       {{ $t('login_anonymous_btn') }}
     </button>
+    <a href="mailto:riversidesoftballclub.app@gmail.com">{{
+      $t('system_mail')
+    }}</a>
   </div>
 </template>
 
