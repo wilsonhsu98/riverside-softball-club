@@ -1,6 +1,7 @@
 <template>
   <loading v-if="loading" :img="loading.img"></loading>
   <div v-else class="login-container">
+    <div></div>
     <button class="signin-btn google" @click="googleLogin">
       {{ $t('login_google_btn') }}
     </button>
@@ -17,9 +18,11 @@
       <i class="fa fa-user-secret"></i>
       {{ $t('login_anonymous_btn') }}
     </button>
-    <a href="mailto:riversidesoftballclub.app@gmail.com">{{
-      $t('system_mail')
-    }}</a>
+    <div>
+      <a href="mailto:riversidesoftballclub.app@gmail.com">{{
+        $t('system_mail')
+      }}</a>
+    </div>
   </div>
 </template>
 
@@ -36,6 +39,9 @@
   justify-content: center;
   align-items: center;
   background-color: #ccc;
+  > div {
+    flex: 1;
+  }
 }
 .signin-btn {
   direction: ltr;
