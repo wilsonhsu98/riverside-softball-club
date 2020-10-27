@@ -74,6 +74,7 @@ const dbInit = teamCode => {
 const types = {
   FETCH_TEAM: 'TEAM/FETCH_TEAM',
   CLEAR_TEAM: 'TEAM/CLEAR_TEAM',
+  SET_KEYWORD: 'TEAM/SET_KEYWORD',
   SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
   FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
 };
@@ -89,6 +90,7 @@ const state = {
     icon: '',
     unlockGames: [],
   },
+  keyword: '',
   teamList: [],
   requests: [],
 };
@@ -102,6 +104,7 @@ const getters = {
       .filter(team => team)
       .sort((a, b) => a.localeCompare(b)),
   ],
+  keyword: state => state.keyword,
   teamList: state => state.teamList,
   requests: state => state.requests,
 };
@@ -538,6 +541,7 @@ const actions = {
     }
   },
   searchTeams({ commit }, { keyword = '', type }) {
+    commit(types.SET_KEYWORD, keyword);
     if (!keyword) {
       switch (type) {
         case 'join':
@@ -578,7 +582,22 @@ const actions = {
                 )
               : false;
           })
-          .sort((a, b) => b.name.localeCompare(a.name));
+          .map(team => {
+            const score = (team.icon ? 2 : 0) + (team.subNames ? 1 : 0);
+            return {
+              ...team,
+              score,
+            };
+          })
+          .sort((a, b) => {
+            if (a.score > b.score) {
+              return -1;
+            } else if (a.score === b.score) {
+              return b.name.localeCompare(a.name);
+            } else {
+              return 1;
+            }
+          });
 
         switch (type) {
           case 'join':
@@ -730,6 +749,9 @@ const mutations = {
       icon: data.icon,
       unlockGames: [...(data.unlockGames || [])],
     };
+  },
+  [types.SET_KEYWORD](state, keyword) {
+    state.keyword = keyword;
   },
   [types.SEARCH_TEAM](state, data) {
     state.teamList = data;

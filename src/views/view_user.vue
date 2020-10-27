@@ -41,7 +41,7 @@
         </div>
       </template>
       <template v-if="isAnonymous === true">
-        <button class="logout-btn" @click="logout">
+        <button class="logout-btn" @click="logout_">
           {{ $t('logout_btn') }}
         </button>
         <div class="search-wrapper">
@@ -279,6 +279,10 @@ export default {
       switchTeam: 'switchTeam',
       searchTeams: 'searchTeams',
     }),
+    logout_() {
+      this.searchTeams({ keyword: '', type: 'anonymous' });
+      this.logout();
+    },
     switchTeam_(teamCode) {
       if (this.currentTeam !== teamCode) {
         this.switchTeam(teamCode);
@@ -296,7 +300,16 @@ export default {
       currentTeam: 'currentTeam',
       teams: 'teams',
       isAnonymous: 'isAnonymous',
+      keyword: 'keyword',
     }),
+  },
+  watch: {
+    keyword: {
+      handler() {
+        this.keyWord = this.keyword;
+      },
+      immediate: true,
+    },
   },
 };
 </script>

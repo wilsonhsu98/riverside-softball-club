@@ -63,7 +63,13 @@
                 $cacheImg(defaultIcon)})`,
             }"
           >
-            <label class="section-header">{{ $t('ttl_team_intro') }}</label>
+            <label
+              class="section-header"
+              ref="label"
+              tabindex="-1"
+              style="outline: none;"
+              >{{ $t('ttl_team_intro') }}</label
+            >
             <p>{{ teamName }}</p>
             <p>{{ otherNames }}</p>
           </div>
@@ -509,6 +515,10 @@ export default {
         this.joined =
           this.players.some(player => player.uid === this.userId) ||
           this.benches.some(player => player.uid === this.userId);
+
+        this.$nextTick(() => {
+          this.$refs.label.focus();
+        });
       }
     },
   },

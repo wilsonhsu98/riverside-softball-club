@@ -110,7 +110,10 @@
       </div>
     </div>
     <div ref="sticky-table-wrapper">
-      <simplebar class="sticky-table-wrapper">
+      <simplebar
+        class="sticky-table-wrapper"
+        :style="{ height: `${tableHeight}px` }"
+      >
         <div class="sticky-table">
           <div class="header-row">
             <template v-for="col in displayedCols">
@@ -369,8 +372,6 @@ i.fa {
 }
 
 .sticky-table-wrapper {
-  height: calc(100vh - 70px - 20px);
-  height: calc(var(--vh, 1vh) * 100 - 70px - 20px);
   ::-webkit-scrollbar {
     display: none;
   }
@@ -756,8 +757,8 @@ i.fa {
     }
   }
   .sticky-table-wrapper {
-    height: calc(100vh - 100px);
-    height: calc(var(--vh, 1vh) * 100 - 100px);
+    height: calc(100vh - 100px) !important;
+    height: calc(var(--vh, 1vh) * 100 - 100px) !important;
   }
   .sticky-table {
     .toggle-row:checked + .normal-row .chart {
@@ -857,6 +858,7 @@ export default {
       },
       lazy: false,
       chartWidth: 0,
+      tableHeight: 0,
       showPercentage: [],
       isPercentageMode: false,
     };
@@ -944,10 +946,11 @@ export default {
       }
     },
     detectChartWidth() {
-      const { width } = this.$refs[
+      const { width, top } = this.$refs[
         'sticky-table-wrapper'
       ].getBoundingClientRect();
       this.chartWidth = width - 152;
+      this.tableHeight = window.innerHeight - top - 20;
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectChartWidth);
@@ -974,6 +977,7 @@ export default {
       this.lazy = false;
       setTimeout(() => {
         this.lazy = true;
+        this.detectChartWidth();
       }, 500);
     },
   },
