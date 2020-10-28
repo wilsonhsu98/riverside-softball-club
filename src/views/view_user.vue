@@ -52,10 +52,7 @@
             v-model="keyWord"
             @enter="value => searchTeams({ keyword: value, type: 'anonymous' })"
           >
-            <i
-              class="fa fa-search"
-              @click="searchTeams({ keyword: keyWord, type: 'anonymous' })"
-            ></i>
+            <i class="fa fa-search" @mousedown="searchTeams_"></i>
           </custom-input>
         </div>
       </template>
@@ -290,6 +287,10 @@ export default {
           this.$router.push(`/main/games/${teamCode}`);
         }
       }
+    },
+    searchTeams_(e) {
+      e.stopPropagation();
+      this.searchTeams({ keyword: this.keyWord, type: 'anonymous' });
     },
   },
   computed: {

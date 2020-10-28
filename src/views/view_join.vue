@@ -24,10 +24,7 @@
         v-model="keyWord"
         @enter="value => searchTeams({ keyword: value, type: 'join' })"
       >
-        <i
-          class="fa fa-search"
-          @click="searchTeams({ keyword: keyWord, type: 'join' })"
-        ></i>
+        <i class="fa fa-search" @mousedown="searchTeams_"></i>
       </custom-input>
 
       <div class="search-result">
@@ -63,19 +60,17 @@
                 $cacheImg(defaultIcon)})`,
             }"
           >
-            <label
-              class="section-header"
-              ref="label"
-              tabindex="-1"
-              style="outline: none;"
-              >{{ $t('ttl_team_intro') }}</label
-            >
+            <label class="section-header" style="outline: none;">{{
+              $t('ttl_team_intro')
+            }}</label>
             <p>{{ teamName }}</p>
             <p>{{ otherNames }}</p>
           </div>
           <p class="team-intro">{{ teamIntro }}</p>
           <div class="team-player" v-if="joined">
-            <label class="section-header">{{ $t('ttl_player_list') }}</label>
+            <label class="section-header" ref="label">{{
+              $t('ttl_player_list')
+            }}</label>
             <div
               class="team-player-item"
               style="cursor: auto;"
@@ -102,7 +97,9 @@
             <div class="team-player-item"></div>
           </div>
           <div class="team-player" v-else>
-            <label class="section-header">{{ $t('bind_self') }}</label>
+            <label class="section-header" ref="label">{{
+              $t('bind_self')
+            }}</label>
             <div
               class="team-player-item"
               :class="{
@@ -408,6 +405,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
+import { scrollTo } from '../libs/utils';
 
 export default {
   data() {
@@ -474,6 +472,10 @@ export default {
       this.bindPlayer = undefined;
       this.choice = '';
     },
+    searchTeams_(e) {
+      e.stopPropagation();
+      this.searchTeams({ keyword: this.keyWord, type: 'join' });
+    },
     bindPlayer_(player) {
       if (player.uid) return;
       if (JSON.stringify(this.bindPlayer) === JSON.stringify(player)) {
@@ -517,7 +519,7 @@ export default {
           this.benches.some(player => player.uid === this.userId);
 
         this.$nextTick(() => {
-          this.$refs.label.focus();
+          scrollTo(this.$refs.label);
         });
       }
     },
