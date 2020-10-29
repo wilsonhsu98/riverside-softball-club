@@ -1,5 +1,6 @@
 <template>
   <vpon
+    v-if="show"
     vpon_ad_test="1"
     vpon_ad_licensy_key="8a80854b6a90b5bc016ad81f018e6539"
     vpon_ad_format="mi"
@@ -14,16 +15,20 @@
 export default {
   props: ['back', 'icon', 'save', 'save_label', 'disabled', 'focus'],
   data() {
-    return {};
+    return {
+      show: false,
+    };
   },
   mounted() {
-    const vpon = document.getElementById('vpon-script');
-    if (vpon) vpon.remove();
-    const head = document.getElementsByTagName('head')[0];
-    const script = document.createElement('script');
-    script.id = 'vpon-script';
-    script.src = `//m.vpon.com/sdk/vpadn-sdk.js?time=${new Date().getTime()}`;
-    head.appendChild(script);
+    if (this.show) {
+      const vpon = document.getElementById('vpon-script');
+      if (vpon) vpon.remove();
+      const head = document.getElementsByTagName('head')[0];
+      const script = document.createElement('script');
+      script.id = 'vpon-script';
+      script.src = `//m.vpon.com/sdk/vpadn-sdk.js?time=${new Date().getTime()}`;
+      head.appendChild(script);
+    }
   },
 };
 </script>

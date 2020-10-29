@@ -344,7 +344,6 @@ export default {
     this.initFromLS();
   },
   mounted() {
-    // console.log(this.$route)
     this.shouldShowAd(this.$route);
   },
   methods: {
