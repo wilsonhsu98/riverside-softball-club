@@ -607,6 +607,7 @@
         :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
       />
     </div>
+    <ad />
   </div>
 </template>
 
