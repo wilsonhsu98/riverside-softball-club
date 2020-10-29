@@ -19,15 +19,13 @@ export default {
     return {};
   },
   mounted() {
-    this.$nextTick(() => {
-      const vpon = document.getElementById('vpon-script');
-      if (vpon) vpon.remove();
-      const head = document.getElementsByTagName('head')[0];
-      const script = document.createElement('script');
-      script.id = 'vpon-script';
-      script.src = `//m.vpon.com/sdk/vpadn-sdk.js?time=${new Date().getTime()}`;
-      head.appendChild(script);
-    });
+    const vpon = document.getElementById('vpon-script');
+    if (vpon) vpon.remove();
+    const head = document.getElementsByTagName('head')[0];
+    const script = document.createElement('script');
+    script.id = 'vpon-script';
+    script.src = `//m.vpon.com/sdk/vpadn-sdk.js?time=${new Date().getTime()}`;
+    head.appendChild(script);
   },
 };
 </script>

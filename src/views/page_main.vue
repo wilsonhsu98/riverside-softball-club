@@ -77,6 +77,7 @@
         <button @click="confirmNo">{{ $t('btn_no') }}</button>
       </div>
     </div>
+    <ad v-if="showAd" :key="showAd" />
   </div>
 </template>
 
@@ -336,10 +337,15 @@ export default {
     return {
       defaultIcon,
       totalRequest: 0,
+      showAd: '',
     };
   },
   created() {
     this.initFromLS();
+  },
+  mounted() {
+    // console.log(this.$route)
+    this.shouldShowAd(this.$route);
   },
   methods: {
     ...mapActions({
@@ -356,6 +362,17 @@ export default {
     confirmNo() {
       this.confirmPromiseReject();
       this.confirm('');
+    },
+    shouldShowAd(currentRoute) {
+      if (
+        ['games', 'game', 'stats_pa', 'stats_item', 'user'].includes(
+          currentRoute.name,
+        )
+      ) {
+        this.showAd = new Date().getTime();
+      } else {
+        this.showAd = '';
+      }
     },
   },
   computed: {
@@ -382,6 +399,7 @@ export default {
         console.log('route2');
         this.listenTeamChange(this.currentTeam);
       }
+      this.shouldShowAd(to);
     },
     currentTeam: {
       handler() {
