@@ -90,9 +90,9 @@
           </p>
         </span>
       </div>
-      <ad />
       <!-- <coordination :values="dots"/> -->
     </div>
+    <ad />
   </div>
 </template>
 
