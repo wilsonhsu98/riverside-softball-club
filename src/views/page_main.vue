@@ -1,83 +1,85 @@
 <template>
-  <div class="main-container">
+  <div>
+    <div class="main-container">
+      <router-view class="content"></router-view>
+      <header>
+        <div class="header-container">
+          <img
+            class="icon"
+            :src="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
+          />
+          <ul class="tab">
+            <li v-if="currentTeam">
+              <router-link
+                :to="{ name: 'games', params: { team: currentTeam } }"
+                active-class="active"
+                :data-label="$t('menu_games')"
+              >
+                <i class="fa fa-table"></i>
+              </router-link>
+            </li>
+            <li v-if="currentTeam">
+              <router-link
+                :to="{ name: 'stats_pa', params: { team: currentTeam } }"
+                active-class="active"
+                :data-label="$t('menu_stats')"
+              >
+                <i class="fa fa-list-ol"></i>
+              </router-link>
+            </li>
+            <li v-if="currentTeam">
+              <router-link
+                :to="{ name: 'stats_item', params: { team: currentTeam } }"
+                active-class="active"
+                :data-label="$t('menu_stats_item')"
+              >
+                <i class="fa carousel"><carousel /></i>
+              </router-link>
+            </li>
+            <li v-if="currentTeam && role === 'manager'">
+              <router-link
+                :to="{ name: 'edit_team', params: { team: currentTeam } }"
+                active-class="active"
+                :data-label="$t('menu_manage')"
+                :data-requests="
+                  teamRequests.length === 0 ? undefined : teamRequests.length
+                "
+              >
+                <i class="fa fa-cog"></i>
+              </router-link>
+            </li>
+            <li>
+              <router-link
+                :to="{ name: 'user' }"
+                active-class="active"
+                :data-label="$t('menu_profile')"
+                :data-requests="totalRequest || undefined"
+              >
+                <i class="fa fa-user"></i>
+              </router-link>
+            </li>
+            <li class="logout_link">
+              <a @click="logout">{{ $t('logout_btn') }}</a>
+            </li>
+          </ul>
+        </div>
+      </header>
+      <loading v-if="loading" :text="loading.text"></loading>
+      <div class="modal" v-if="alertMsg">
+        <div class="dialog">
+          <p class="msg" v-html="alertMsg"></p>
+          <button @click="alert('')">{{ $t('btn_noticed') }}</button>
+        </div>
+      </div>
+      <div class="modal" v-if="confirmMsg">
+        <div class="dialog">
+          <p class="msg" v-html="confirmMsg"></p>
+          <button @click="confirmYes">{{ $t('btn_yes') }}</button>
+          <button @click="confirmNo">{{ $t('btn_no') }}</button>
+        </div>
+      </div>
+    </div>
     <ad v-if="showAd" :key="showAd" />
-    <router-view class="content"></router-view>
-    <header>
-      <div class="header-container">
-        <img
-          class="icon"
-          :src="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
-        />
-        <ul class="tab">
-          <li v-if="currentTeam">
-            <router-link
-              :to="{ name: 'games', params: { team: currentTeam } }"
-              active-class="active"
-              :data-label="$t('menu_games')"
-            >
-              <i class="fa fa-table"></i>
-            </router-link>
-          </li>
-          <li v-if="currentTeam">
-            <router-link
-              :to="{ name: 'stats_pa', params: { team: currentTeam } }"
-              active-class="active"
-              :data-label="$t('menu_stats')"
-            >
-              <i class="fa fa-list-ol"></i>
-            </router-link>
-          </li>
-          <li v-if="currentTeam">
-            <router-link
-              :to="{ name: 'stats_item', params: { team: currentTeam } }"
-              active-class="active"
-              :data-label="$t('menu_stats_item')"
-            >
-              <i class="fa carousel"><carousel /></i>
-            </router-link>
-          </li>
-          <li v-if="currentTeam && role === 'manager'">
-            <router-link
-              :to="{ name: 'edit_team', params: { team: currentTeam } }"
-              active-class="active"
-              :data-label="$t('menu_manage')"
-              :data-requests="
-                teamRequests.length === 0 ? undefined : teamRequests.length
-              "
-            >
-              <i class="fa fa-cog"></i>
-            </router-link>
-          </li>
-          <li>
-            <router-link
-              :to="{ name: 'user' }"
-              active-class="active"
-              :data-label="$t('menu_profile')"
-              :data-requests="totalRequest || undefined"
-            >
-              <i class="fa fa-user"></i>
-            </router-link>
-          </li>
-          <li class="logout_link">
-            <a @click="logout">{{ $t('logout_btn') }}</a>
-          </li>
-        </ul>
-      </div>
-    </header>
-    <loading v-if="loading" :text="loading.text"></loading>
-    <div class="modal" v-if="alertMsg">
-      <div class="dialog">
-        <p class="msg" v-html="alertMsg"></p>
-        <button @click="alert('')">{{ $t('btn_noticed') }}</button>
-      </div>
-    </div>
-    <div class="modal" v-if="confirmMsg">
-      <div class="dialog">
-        <p class="msg" v-html="confirmMsg"></p>
-        <button @click="confirmYes">{{ $t('btn_yes') }}</button>
-        <button @click="confirmNo">{{ $t('btn_no') }}</button>
-      </div>
-    </div>
   </div>
 </template>
 
