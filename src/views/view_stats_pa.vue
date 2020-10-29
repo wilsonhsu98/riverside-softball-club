@@ -319,7 +319,6 @@
         :player="coordinates.player"
       />
     </div>
-    <!-- <ad /> -->
   </div>
 </template>
 

@@ -92,7 +92,6 @@
       </div>
       <!-- <coordination :values="dots"/> -->
     </div>
-    <!-- <ad /> -->
   </div>
 </template>
 
