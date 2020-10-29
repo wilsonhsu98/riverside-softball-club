@@ -1,5 +1,6 @@
 <template>
   <div class="main-container">
+    <ad v-if="showAd" :key="showAd" />
     <router-view class="content"></router-view>
     <header>
       <div class="header-container">
@@ -77,7 +78,6 @@
         <button @click="confirmNo">{{ $t('btn_no') }}</button>
       </div>
     </div>
-    <ad v-if="showAd" :key="showAd" />
   </div>
 </template>
 
