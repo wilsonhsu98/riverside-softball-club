@@ -82,7 +82,7 @@
         </slide>
       </carousel-3d>
     </div>
-    <ad />
+    <!-- <ad /> -->
   </div>
 </template>
 
