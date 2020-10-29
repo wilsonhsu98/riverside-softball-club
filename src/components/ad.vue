@@ -1,7 +1,7 @@
 <template>
   <div>
     <vpon
-      vpon_ad_test="0"
+      vpon_ad_test="1"
       vpon_ad_licensy_key="8a80854b6a90b5bc016ad81f018e6539"
       vpon_ad_format="mi"
       debug="true"
