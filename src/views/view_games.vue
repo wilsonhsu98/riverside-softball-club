@@ -332,6 +332,7 @@
         >
       </div>
     </div>
+    <ad />
   </div>
 </template>
 
