@@ -1,22 +1,22 @@
 <template>
-  <vpon
+  <div>
+    <!-- <vpon
     vpon_ad_test="1"
     vpon_ad_licensy_key="8a80854b6a90b5bc016ad81f018e6539"
     vpon_ad_format="mi"
     debug="true"
   >
-  </vpon>
+  </vpon> -->
+  </div>
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>
 
 <script>
 export default {
   props: ['back', 'icon', 'save', 'save_label', 'disabled', 'focus'],
   data() {
-    return {
-    };
+    return {};
   },
   mounted() {
     const vpon = document.getElementById('vpon-script');
