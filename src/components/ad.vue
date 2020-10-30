@@ -28,12 +28,14 @@ export default {
   data() {
     return {
       show: true,
-      // test
-      bannerKey: '8a80854b6a90b5bc016ad81ebabb6538',
-      fullscreenKey: '8a80854b6a90b5bc016ad81f018e6539',
-      // my
-      // bannerKey: '8a80854b757283cf017576f08a1c25a8'
-      // fullscreenKey: '8a80854b757283cf017576f2367725a9',
+
+      /* test */
+      // bannerKey: '8a80854b6a90b5bc016ad81ebabb6538',
+      // fullscreenKey: '8a80854b6a90b5bc016ad81f018e6539',
+
+      /* my */
+      bannerKey: '8a80854b757283cf017576f08a1c25a8',
+      fullscreenKey: '8a80854b757283cf017576f2367725a9',
     };
   },
   mounted() {
