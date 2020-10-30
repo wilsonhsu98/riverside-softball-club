@@ -77,7 +77,7 @@
         <button @click="confirmNo">{{ $t('btn_no') }}</button>
       </div>
     </div>
-    <ad v-if="showAd" :key="showAd" />
+    <ad v-if="showAd" :key="showAd" :mode="adMode" />
   </div>
 </template>
 
@@ -338,6 +338,7 @@ export default {
       defaultIcon,
       totalRequest: 0,
       showAd: '',
+      adMode: '',
     };
   },
   created() {
@@ -369,8 +370,14 @@ export default {
         )
       ) {
         this.showAd = new Date().getTime();
+        if (currentRoute.name === 'game') {
+          this.adMode = 'fullscreen';
+        } else {
+          this.adMode = 'banner';
+        }
       } else {
         this.showAd = '';
+        this.adMode = '';
       }
     },
   },
