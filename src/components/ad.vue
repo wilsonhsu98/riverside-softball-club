@@ -3,7 +3,7 @@
     <vpon
       v-if="mode === 'banner'"
       vpon_ad_test="0"
-      vpon_ad_licensy_key="8a80854b757283cf017576f08a1c25a8"
+      :vpon_ad_licensy_key="bannerKey"
       vpon_ad_format="320x50_mb"
       vpon_ad_adhesion="bottom"
       debug="true"
@@ -12,7 +12,7 @@
     <vpon
       v-if="mode === 'fullscreen'"
       vpon_ad_test="0"
-      vpon_ad_licensy_key="8a80854b757283cf017576f2367725a9"
+      :vpon_ad_licensy_key="fullscreenKey"
       vpon_ad_format="mi"
       debug="true"
     >
@@ -28,6 +28,12 @@ export default {
   data() {
     return {
       show: true,
+      // test
+      bannerKey: '8a80854b6a90b5bc016ad81ebabb6538',
+      fullscreenKey: '8a80854b6a90b5bc016ad81f018e6539',
+      // my
+      // bannerKey: '8a80854b757283cf017576f08a1c25a8'
+      // fullscreenKey: '8a80854b757283cf017576f2367725a9',
     };
   },
   mounted() {
