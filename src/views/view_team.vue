@@ -759,7 +759,7 @@ export default {
           return;
         }
         this.confirm(this.$t('msg_delete_warning')).then(() => {
-          this.deleteTeam(this.teamCode);
+          this.deleteTeam({ teamCode: this.teamCode });
         });
       } else {
         this.alert(this.$t('msg_not_manager'));

@@ -302,7 +302,8 @@ const actions = {
         console.log('Error getting document:', error);
       });
   },
-  deleteTeam({ commit }, teamCode) {
+  deleteTeam({ commit }, data) {
+    const { teamCode, nextAction } = data;
     // remove role & team (player bench manager), remove team, deny team request
     commit(rootTypes.LOADING, true);
     Promise.all([
@@ -382,8 +383,12 @@ const actions = {
         return batch.commit();
       })
       .then(() => {
-        router.push('/main/user');
         commit(rootTypes.LOADING, false);
+        if (typeof nextAction === 'function') {
+          nextAction();
+        } else {
+          router.push('/main/user');
+        }
       })
       .catch(error => {
         console.log('Error getting document:', error);
@@ -723,6 +728,45 @@ const actions = {
         });
         break;
     }
+  },
+  fetchDummyTeams({ commit }) {
+    const currentTime = new Date();
+    commit(rootTypes.LOADING, true);
+    db.collection('teams')
+      .get()
+      .then(teamCollection => {
+        window.trackRead('searchTeams', teamCollection.docs.length || 1);
+        const filterTeams = teamCollection.docs
+          .map(doc => {
+            const data = doc.data();
+            return {
+              teamCode: doc.id,
+              ...data,
+              timestamp: data.timestamp.toDate(),
+            };
+          })
+          .filter(team => {
+            // noicon 2個月前 only one binding user and is manager
+            const lastTime = new Date(team.timestamp);
+            const playerCount = Object.keys(team.players).filter(name => {
+              return team.players[name].uid;
+            }).length;
+            const managerCount = Object.keys(team.players).filter(name => {
+              return team.players[name].manager && team.players[name].uid;
+            }).length;
+
+            if (
+              !team.icon &&
+              currentTime - lastTime > 86400000 * 30 * 2 &&
+              playerCount === 1 &&
+              managerCount === 1
+            )
+              return true;
+          });
+
+        commit(types.SEARCH_TEAM, filterTeams);
+        commit(rootTypes.LOADING, false);
+      });
   },
 };
 

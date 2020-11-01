@@ -11,3 +11,7 @@ export const GET_URL = parameters => {
   const action = params.action || '';
   return `${baseUrl}?fileId=${fileId}&sheetname=${sheetname}&action=${action}&${new Date().toString()}`;
 };
+
+const DELETE_ANNONYMOUS_USERS_URL =
+  'https://riversidesoftballclub.netlify.com/.netlify/functions/index/delete_anonymous_users';
+export const DELETE_ANNONYMOUS_USERS_URL_PROXY = `https://script.google.com/macros/s/AKfycbzwB6fT7ZHjlNENz9KwYqtOrWm6jV_DSnR5Vzvieyf1eSyIERbS/exec?url=${DELETE_ANNONYMOUS_USERS_URL}`;

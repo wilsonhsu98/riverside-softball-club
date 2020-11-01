@@ -48,6 +48,12 @@ const router = new VueRouter({
       meta: { requiresAuth: false },
     },
     {
+      path: '/management',
+      name: 'management',
+      component: require('./views/page_management').default,
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/main',
       name: 'main',
       component: require('./views/page_main').default,

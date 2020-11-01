@@ -1,11 +1,14 @@
+import axios from 'axios';
 import {
   types as rootTypes,
   getters as rootGetters,
+  actions as rootActions,
   state as rootState,
   promiseImage,
   snapShot,
   snapShotRequest,
 } from '../root';
+import { DELETE_ANNONYMOUS_USERS_URL_PROXY } from '../../constants/index';
 import { types as recordTypes } from './record';
 import record from './record';
 import router from '../../router';
@@ -205,6 +208,13 @@ const actions = {
     window.localStorage.setItem('currentTeam', teamCode);
     commit(rootTypes.SET_AUTH, state.teams);
     commit(recordTypes.RESET_PERIOD);
+  },
+  deleteAnonymousUsers({ commit }) {
+    commit(rootTypes.LOADING, true);
+    axios.get(DELETE_ANNONYMOUS_USERS_URL_PROXY).then(response => {
+      commit(rootTypes.LOADING, false);
+      rootActions.alert({ commit }, response.data.result);
+    });
   },
 };
 
