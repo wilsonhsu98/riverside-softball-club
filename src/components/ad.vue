@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" ref="root" style="display: none;">
+  <div v-if="show" ref="root" >
     <vpon
       v-if="mode === 'bottom_banner'"
       vpon_ad_format="320x50_mb"
@@ -105,7 +105,7 @@ export default {
         if (status !== 0) {
           this.$refs.root.remove();
         } else {
-          this.$refs.root.style.display = 'block';
+          // this.$refs.root.style.display = 'block';
         }
         window[this.callbackMethod] = undefined;
       };
