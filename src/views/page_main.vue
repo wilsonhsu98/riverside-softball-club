@@ -369,7 +369,7 @@ export default {
         this.adMode = 'fullscreen';
       } else {
         window.adCount = (window.adCount || 0) + 1;
-        if (window.adCount % 5 === 1) {
+        if (window.adCount % 5 === 0) {
           console.log('adCount:', window.adCount);
           this.showAd = new Date().getTime();
           this.adMode = 'bottom_banner';
@@ -378,6 +378,19 @@ export default {
           this.adMode = '';
         }
       }
+
+      this.$nextTick(() => {
+        if (document.querySelectorAll('vpon').length) {
+          const vpon = document.getElementById('vpon-script');
+          if (vpon) vpon.remove();
+          const head = document.getElementsByTagName('head')[0];
+          const script = document.createElement('script');
+          script.id = 'vpon-script';
+          script.src = `//m.vpon.com/sdk/vpadn-sdk.js?time=${new Date().getTime()}`;
+          head.appendChild(script);
+        }
+      });
+
       // if (
       //   ['games', 'game', 'stats_pa', 'stats_item', 'user'].includes(
       //     currentRoute.name,

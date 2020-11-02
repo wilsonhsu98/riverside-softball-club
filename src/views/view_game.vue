@@ -569,13 +569,15 @@
         <span class="fa fa-pencil" @click="editOrder"></span>
       </div>
     </div>
-    <div style="text-align: center; margin: 14px;">
+    <div
+      v-if="box.slice(1).length === 0 && role === 'manager'"
+      style="text-align: center; margin: 14px;"
+    >
       <!-- <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
         <i class="fa fa-facebook-square"></i>
         {{ $t('fb_share') }}
       </button> -->
       <router-link
-        v-if="box.slice(1).length === 0 && role === 'manager'"
         :to="{
           name: 'game_order',
           params: { team: $route.params.team, game: $route.params.game },
