@@ -101,14 +101,16 @@ export default {
         'user',
       ].includes(this.mode)
     ) {
+      console.log('~~~mounted', this.mode, this.callbackMethod)
       window[this.callbackMethod] = status => {
         if (status !== 0) {
           this.$refs.root.remove();
         } else {
           this.$refs.root.style.display = 'block';
         }
-        window[this.callbackMethod] = undefined;
+        // window[this.callbackMethod] = undefined;
       };
+      console.log('~~~window.method', window[this.callbackMethod])
     }
   },
 };
