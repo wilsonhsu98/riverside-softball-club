@@ -1,6 +1,7 @@
 <template>
   <div>
     <mobile-header />
+    <ad :mode="'user'" />
     <div class="container">
       <template v-if="isAnonymous === false">
         <img class="avatar" :src="$cacheImg(accountInfo.photo)" />

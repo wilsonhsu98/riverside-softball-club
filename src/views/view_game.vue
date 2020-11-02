@@ -590,6 +590,7 @@
         <pre>{{ gameNote }}</pre>
       </div>
     </div>
+    <ad :mode="'game'" />
     <div class="video-container" v-for="video_id in videoIDs" :key="video_id">
       <iframe
         :src="`https://www.youtube.com/embed/${video_id}`"

@@ -67,6 +67,7 @@
       </div>
     </div>
     <div class="mobile">
+      <ad :mode="'stats_item'" />
       <carousel-3d class="item-container" border="0" :width="200" :height="326">
         <slide
           v-for="(key, index) in ['AVG', 'H', 'HR', 'RBI', 'W']"

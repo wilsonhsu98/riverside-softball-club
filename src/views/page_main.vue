@@ -364,21 +364,35 @@ export default {
       this.confirm('');
     },
     shouldShowAd(currentRoute) {
-      if (
-        ['games', 'game', 'stats_pa', 'stats_item', 'user'].includes(
-          currentRoute.name,
-        )
-      ) {
+      if (currentRoute.name === 'game') {
         this.showAd = new Date().getTime();
-        if (currentRoute.name === 'game') {
-          this.adMode = 'fullscreen';
-        } else {
-          this.adMode = 'banner';
-        }
+        this.adMode = 'fullscreen';
       } else {
-        this.showAd = '';
-        this.adMode = '';
+        window.adCount = (window.adCount || 0) + 1;
+        if (window.adCount % 5 === 1) {
+          console.log('adCount:', window.adCount);
+          this.showAd = new Date().getTime();
+          this.adMode = 'bottom_banner';
+        } else {
+          this.showAd = '';
+          this.adMode = '';
+        }
       }
+      // if (
+      //   ['games', 'game', 'stats_pa', 'stats_item', 'user'].includes(
+      //     currentRoute.name,
+      //   )
+      // ) {
+      //   this.showAd = new Date().getTime();
+      //   if (currentRoute.name === 'game') {
+      //     this.adMode = 'fullscreen';
+      //   } else {
+      //     this.adMode = 'banner';
+      //   }
+      // } else {
+      //   this.showAd = '';
+      //   this.adMode = '';
+      // }
     },
   },
   computed: {

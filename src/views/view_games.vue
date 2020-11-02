@@ -152,6 +152,7 @@
       ref="container"
       :class="{ empty: role === 'manager' && groupGames.length === 0 }"
     >
+      <ad :mode="'games'" />
       <template v-for="(item, i) in groupGames">
         <div
           :class="['row', { last: i === groupGames.length - 1 }]"
