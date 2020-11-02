@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" ref="root" >
+  <div v-if="show" ref="root" style="display: none;">
     <vpon
       v-if="mode === 'bottom_banner'"
       vpon_ad_format="320x50_mb"
@@ -93,8 +93,8 @@ export default {
     if (
       this.show &&
       [
-        'frequencyBannerKey',
-        'gameFullscreenKey',
+        'bottom_banner',
+        'fullscreen',
         'games',
         'game',
         'stats_item',
@@ -105,7 +105,7 @@ export default {
         if (status !== 0) {
           this.$refs.root.remove();
         } else {
-          // this.$refs.root.style.display = 'block';
+          this.$refs.root.style.display = 'block';
         }
         window[this.callbackMethod] = undefined;
       };
