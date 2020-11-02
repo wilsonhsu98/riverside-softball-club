@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" ref="root">
+  <div v-if="show" ref="root" style="display: none;">
     <vpon
       v-if="mode === 'bottom_banner'"
       vpon_ad_format="320x50_mb"
@@ -69,7 +69,7 @@ export default {
     return {
       show: true,
       callbackMethod: `vponCallBackMethod${new Date().getTime()}`,
-      configMode: 'test2', // test1, test2, production
+      configMode: 'test1', // test1, test2, production
       config: {
         test1: {
           adTest: 1,
@@ -104,6 +104,8 @@ export default {
       window[this.callbackMethod] = status => {
         if (status !== 0) {
           this.$refs.root.remove();
+        } else {
+          this.$refs.root.style.display = 'block';
         }
         window[this.callbackMethod] = undefined;
       };
