@@ -2,7 +2,7 @@
   <div v-if="show">
     <vpon
       v-if="mode === 'bottom_banner'"
-      vpon_ad_test="0"
+      :vpon_ad_test="test ? 1 : 0"
       :vpon_ad_licensy_key="frequencyBannerKey"
       vpon_ad_format="320x50_mb"
       vpon_ad_adhesion="bottom"
@@ -12,7 +12,7 @@
     <div class="only-mobile">
       <vpon
         v-if="['games', 'game', 'stats_item', 'user'].includes(mode)"
-        vpon_ad_test="0"
+        :vpon_ad_test="test ? 1 : 0"
         :vpon_ad_licensy_key="keys[mode]"
         vpon_ad_format="320x50_mb"
         debug="true"
@@ -21,7 +21,7 @@
     </div>
     <vpon
       v-if="mode === 'fullscreen'"
-      vpon_ad_test="0"
+      :vpon_ad_test="test ? 1 : 0"
       :vpon_ad_licensy_key="gameFullscreenKey"
       vpon_ad_format="mi"
       debug="true"
@@ -44,6 +44,7 @@ export default {
   data() {
     return {
       show: true,
+      test: true,
 
       /* test */
       keys: {
