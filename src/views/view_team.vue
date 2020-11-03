@@ -611,6 +611,12 @@ export default {
           };
         })
         .filter(v => v.name.trim() !== '');
+      this.benches = this.benches.map(item => {
+        return {
+          ...item,
+          name: item.name.trim() || '',
+        };
+      });
 
       this.teamCode_err = '';
       if (!this.teamCode) {

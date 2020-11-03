@@ -176,6 +176,7 @@
 	"btn_onbase_confirm": "沒錯",
 	"btn_onbase_cancel": "好像不對",
 	"msg_onbase_inn_change": "3人出局 換局",
+	"msg_check_opponent_score": "換對手進攻，請記錄對手分數",
 
 	"create_team": "Create a team",
 	"manage_team": "Manage your team",

@@ -762,6 +762,12 @@ export default {
     ) {
       this.setGame(this.$route.params.game);
     }
+
+    const tempMsg = window.localStorage.getItem('temp_msg');
+    window.localStorage.removeItem('temp_msg');
+    if (tempMsg) {
+      this.alert(tempMsg);
+    }
   },
   methods: {
     ...mapActions({

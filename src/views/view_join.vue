@@ -183,7 +183,7 @@
           {{ $t('btn_cancel') }}
         </button>
         <button
-          v-if="(choice === 'join' && otherPlayer) || choice === 'bind'"
+          v-if="(choice === 'join' && otherPlayer.trim()) || choice === 'bind'"
           class="btn join"
           @click="joinTeam_"
         >

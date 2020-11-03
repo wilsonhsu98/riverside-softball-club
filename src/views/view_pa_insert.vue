@@ -1315,6 +1315,10 @@ export default {
             const { team, game } = this.$route.params;
             if (this.onbaseOut === 3) {
               this.$router.push(`/main/games/${team}/${game}/edit`);
+              window.localStorage.setItem(
+                'temp_msg',
+                this.$t('msg_check_opponent_score'),
+              );
             } else if (
               this.$route.params.order !== 'new' &&
               this.order < this.box.length - 1
