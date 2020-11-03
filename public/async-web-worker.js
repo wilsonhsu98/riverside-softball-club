@@ -314,6 +314,12 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         LEVEL: `${Math.floor(Math.round((h / ab) * 1000) / 100)}/${Math.floor(
           Math.round((tob / pa) * 1000) / 100,
         )}/${Math.floor(Math.round((tb / ab) * 1000) / 100)}`,
+        hNo,
+        abNo,
+        hSP,
+        abSP,
+        hFB,
+        abFB,
       };
     }
   });

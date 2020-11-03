@@ -148,6 +148,62 @@
               </div>
             </template>
           </div>
+          <div class="sum-row">
+            <template v-for="(col, colIndex) in displayedCols">
+              <div
+                v-if="col.name === 'Rank'"
+                :key="`header_${col.name}`"
+                class="cell rank"
+              ></div>
+              <div
+                v-else-if="col.name === 'name'"
+                :key="`header_${col.name}`"
+                class="cell name"
+                style="text-align: left;"
+              >
+                {{ $t('SUM') }}
+              </div>
+              <div
+                v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
+                class="cell advance"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_sum_${colIndex}`"
+              >
+                <div>
+                  {{ formatValue(sum[col.name]) }}
+                </div>
+                <div>{{ `(${sum[col.name.replace('_', '_DESC_')]})` }}</div>
+              </div>
+              <div
+                v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
+                class="cell"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_sum_${colIndex}`"
+              >
+                {{ formatValue(sum[col.name]) }}
+              </div>
+              <div
+                v-else-if="col.name === 'LEVEL'"
+                class="cell"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_sum_${colIndex}`"
+              >
+                {{ sum[col.name] }}
+              </div>
+              <div
+                v-else
+                class="cell"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_sum_${colIndex}`"
+              >
+                <div class="align-right">{{ sum[col.name] }}</div>
+              </div>
+            </template>
+          </div>
           <template v-for="(item, itemIndex) in list">
             <input
               :key="`chk_${item.name}`"
@@ -420,6 +476,42 @@ i.fa {
       }
     }
   }
+  .sum-row {
+    display: table-row;
+    color: $header_color;
+    .cell {
+      background: $header_bgcolor_noalpha;
+      position: sticky;
+      top: 36px;
+      z-index: 4;
+      text-align: center;
+      &:not(.rank):not(.name) {
+        cursor: initial;
+      }
+      > div {
+        height: 36px;
+        white-space: nowrap;
+      }
+      &.rank {
+        width: 1px;
+        z-index: 5;
+        cursor: initial;
+      }
+      &.name {
+        min-width: 110px;
+        padding-left: 0;
+        text-align: center;
+        z-index: 5;
+        cursor: initial;
+      }
+      &:nth-child(2n + 3):not(.sort) {
+        opacity: 1;
+        > div {
+          opacity: 0.6;
+        }
+      }
+    }
+  }
   .toggle-row {
     display: block;
     position: absolute;
@@ -440,10 +532,10 @@ i.fa {
   }
   .normal-row {
     display: table-row;
-    &:nth-child(4n + 3) .cell {
+    &:nth-child(4n + 4) .cell {
       background-color: $row_even_bgcolor;
     }
-    &:nth-child(4n + 1) .cell {
+    &:nth-child(4n + 2) .cell {
       background-color: $row_odd_bgcolor;
     }
     &.current {
@@ -533,19 +625,20 @@ i.fa {
     }
     &.advance > div {
       display: inline-block;
+      vertical-align: middle;
       &:first-child {
         width: 50px;
         text-align: right;
       }
       &:last-child {
         margin-left: 5px;
-        width: 58px;
+        width: 65px;
         text-align: left;
       }
     }
     .align-right {
       margin: auto;
-      width: 20px;
+      width: 30px;
       text-align: right;
       direction: rtl;
     }
@@ -861,6 +954,7 @@ export default {
       tableHeight: 0,
       showPercentage: [],
       isPercentageMode: false,
+      sum: {},
     };
   },
   created() {},
@@ -973,12 +1067,94 @@ export default {
     }),
   },
   watch: {
-    list() {
-      this.lazy = false;
-      setTimeout(() => {
-        this.lazy = true;
-        this.detectChartWidth();
-      }, 500);
+    list: {
+      handler() {
+        this.sum = this.list.reduce(
+          (acc, record, index, self) => {
+            if (index === self.length - 1) {
+              return {
+                ...acc,
+                AVG: Math.round((acc.H / acc.AB) * 1000) / 1000,
+                AVG_NO: acc.abNo
+                  ? Math.round((acc.hNo / acc.abNo) * 1000) / 1000
+                  : '-',
+                AVG_DESC_NO: `${acc.abNo}-${acc.hNo}`,
+                AVG_SP: acc.abSP
+                  ? Math.round((acc.hSP / acc.abSP) * 1000) / 1000
+                  : '-',
+                AVG_DESC_SP: `${acc.abSP}-${acc.hSP}`,
+                AVG_FB: acc.abFB
+                  ? Math.round((acc.hFB / acc.abFB) * 1000) / 1000
+                  : '-',
+                AVG_DESC_FB: `${acc.abFB}-${acc.hFB}`,
+                OBP: Math.round((acc.TOB / acc.PA) * 1000) / 1000,
+                SLG: Math.round((acc.TB / acc.AB) * 1000) / 1000,
+                OPS:
+                  Math.round((acc.TOB / acc.PA + acc.TB / acc.AB) * 1000) /
+                  1000,
+                LEVEL: `${Math.floor(
+                  Math.round((acc.H / acc.AB) * 1000) / 100,
+                )}/${Math.floor(
+                  Math.round((acc.TOB / acc.PA) * 1000) / 100,
+                )}/${Math.floor(Math.round((acc.TB / acc.AB) * 1000) / 100)}`,
+              };
+            }
+            return {
+              PA: acc.PA + record.PA,
+              AB: acc.AB + record.AB,
+              H: acc.H + record.H,
+              TB: acc.TB + record.TB,
+              TOB: acc.TOB + record.TOB,
+              R: acc.R + record.R,
+              RBI: acc.RBI + record.RBI,
+              '1H': acc['1H'] + record['1H'],
+              '2H': acc['2H'] + record['2H'],
+              '3H': acc['3H'] + record['3H'],
+              HR: acc.HR + record.HR,
+              K: acc.K + record.K,
+              BB: acc.BB + record.BB,
+              SF: acc.SF + record.SF,
+              DP: acc.DP + record.DP,
+              hNo: acc.hNo + record.hNo,
+              abNo: acc.abNo + record.abNo,
+              hSP: acc.hSP + record.hSP,
+              abSP: acc.abSP + record.abSP,
+              hFB: acc.hFB + record.hFB,
+              abFB: acc.abFB + record.abFB,
+            };
+          },
+          {
+            PA: 0,
+            AB: 0,
+            H: 0,
+            TB: 0,
+            TOB: 0,
+            R: 0,
+            RBI: 0,
+            '1H': 0,
+            '2H': 0,
+            '3H': 0,
+            HR: 0,
+            K: 0,
+            BB: 0,
+            SF: 0,
+            DP: 0,
+            hNo: 0,
+            abNo: 0,
+            hSP: 0,
+            abSP: 0,
+            hFB: 0,
+            abFB: 0,
+          },
+        );
+
+        this.lazy = false;
+        setTimeout(() => {
+          this.lazy = true;
+          this.detectChartWidth();
+        }, 500);
+      },
+      immediate: true,
     },
   },
 };
