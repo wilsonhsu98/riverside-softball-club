@@ -416,7 +416,7 @@
     bottom: 20px;
     background: none;
     display: flex;
-    z-index: 10001;
+    /* z-index: 10001; */
     .result {
       margin-left: 5px;
       width: 44px;
@@ -442,7 +442,7 @@
     position: sticky;
     bottom: 20px;
     background: none;
-    z-index: 10001;
+    /* z-index: 10001; */
     span {
       display: inline-block;
       width: 50px;

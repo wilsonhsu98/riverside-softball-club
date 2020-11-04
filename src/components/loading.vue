@@ -1,10 +1,8 @@
 <template>
   <div class="loading-mask">
-    <div
-      v-if="img"
-      class="logo"
-      :style="`background-image: url(${$cacheImg(defaultIcon)})`"
-    ></div>
+    <div v-if="img" class="logo">
+      <img :src="$cacheImg(defaultIcon)" />
+    </div>
     <div v-else class="sk-cube-grid">
       <div class="sk-cube sk-cube1"></div>
       <div class="sk-cube sk-cube2"></div>
@@ -33,11 +31,33 @@
 }
 
 .logo {
-  background: 50% 50% no-repeat;
-  background-size: 320px auto;
   height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
   /* height: -webkit-fill-available; */
+  img {
+    width: 320px;
+    display: inline-block;
+    vertical-align: middle;
+    animation-name: spin;
+    animation-duration: 2000ms;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+  }
+  &:after {
+    content: '';
+    height: 100%;
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-mask {
