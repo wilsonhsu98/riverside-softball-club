@@ -34,6 +34,7 @@
   height: 100vh;
   height: calc(var(--vh, 1vh) * 100);
   /* height: -webkit-fill-available; */
+  text-align: center;
   img {
     width: 320px;
     display: inline-block;
