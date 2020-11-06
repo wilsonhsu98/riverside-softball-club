@@ -660,10 +660,14 @@ export default {
       const { positions = {} } = this.boxSummary;
       Object.keys(positions).forEach((position, index, self) => {
         const positionIndex = this.POSITION.indexOf(position);
-        if (positionIndex > 0 && nameArray.includes(positions[position])) {
-          this[`order_${positionIndex}`][0] = this.getPlayer(
-            positions[position],
-          );
+        if (positionIndex > 0) {
+          if (nameArray.includes(positions[position])) {
+            this[`order_${positionIndex}`][0] = this.getPlayer(
+              positions[position],
+            );
+          } else {
+            this[`order_${positionIndex}`] = [];
+          }
         }
         if (index === self.length - 1) {
           this.sourceList = this.sourceList.filter(
@@ -701,8 +705,11 @@ export default {
     }),
   },
   watch: {
-    box() {
-      this.initSetSource();
+    box: {
+      handler() {
+        this.initSetSource();
+      },
+      immediate: true,
     },
   },
 };

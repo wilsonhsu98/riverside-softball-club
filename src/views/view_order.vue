@@ -889,9 +889,10 @@ export default {
     window.localStorage.removeItem('temp_order');
     if (tempOrder) {
       tempOrder.split(',').forEach((name, index, self) => {
-        const find = this.sourceList.find(player => player.name === name);
-        if (find) {
-          this[`order_${index + 1}`][0] = find;
+        if (!this.hiddenList.find(player => player.name === name)) {
+          this[`order_${index + 1}`][0] = this.sourceList.find(
+            player => player.name === name,
+          ) || { name };
         }
         if (index === self.length - 1) {
           this.sourceList = this.sourceList.filter(
