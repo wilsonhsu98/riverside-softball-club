@@ -828,9 +828,13 @@ export default {
       );
     },
     back_() {
-      this.$router.push(
-        `/main/games/${this.$route.params.team}/${this.$route.params.game}`,
-      );
+      if (this.$route.params.game) {
+        this.$router.push(
+          `/main/games/${this.$route.params.team}/${this.$route.params.game}`,
+        );
+      } else {
+        this.$router.push(`/main/games/${this.$route.params.team}`);
+      }
     },
     edit_() {
       if (this.gameStatus === 'lock' && this.mode === 'edit') {
