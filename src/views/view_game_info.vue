@@ -828,7 +828,7 @@ export default {
       );
     },
     back_() {
-      if (this.$route.params.game) {
+      if (this.mode === 'edit') {
         this.$router.push(
           `/main/games/${this.$route.params.team}/${this.$route.params.game}`,
         );
