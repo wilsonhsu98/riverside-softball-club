@@ -69,7 +69,7 @@ export default {
     return {
       show: true,
       callbackMethod: `vponCallBackMethod${new Date().getTime()}`,
-      configMode: 'production', // test1, test2, production
+      configMode: 'test1', // test1, test2, production
       config: {
         test1: {
           adTest: 1,

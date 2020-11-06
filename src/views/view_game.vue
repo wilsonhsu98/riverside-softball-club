@@ -262,7 +262,11 @@
           </div>
           <div class="records">
             <div class="records-flex">
-              <template v-for="(record, recordIndex) in item.content">
+              <template
+                v-for="(record, recordIndex) in hideLastColumn
+                  ? item.content.slice(0, item.content.length - 1)
+                  : item.content"
+              >
                 <div
                   class="record"
                   v-if="record === undefined || !record.content"
@@ -1345,6 +1349,7 @@ export default {
       gameStatus: 'lock',
       stillCanEdit: false,
       positions: undefined,
+      hideLastColumn: false,
     };
   },
   created() {
@@ -1513,6 +1518,29 @@ export default {
         ) || { name, number: '' }
       );
     },
+    checkLastColumn() {
+      if (
+        this.box.length &&
+        !(this.role === 'manager' && this.gameStatus === 'unlock')
+      ) {
+        const first = this.box.slice(1)[0].content[
+          this.box.slice(1)[0].content.length - 1
+        ] || { content: '' };
+        const second = this.box.slice(1)[1].content[
+          this.box.slice(1)[1].content.length - 1
+        ] || { content: '' };
+        if (
+          first.content === 'new' ||
+          (this.box.slice(1)[1].altOrder === 1 && second.content === 'new')
+        ) {
+          this.hideLastColumn = true;
+        } else {
+          this.hideLastColumn = false;
+        }
+      } else {
+        this.hideLastColumn = false;
+      }
+    },
   },
   computed: {
     ...mapGetters({
@@ -1602,6 +1630,7 @@ export default {
         )
           ? 'unlock'
           : 'lock';
+        this.checkLastColumn();
       },
       immediate: true,
     },
@@ -1613,6 +1642,7 @@ export default {
         ) {
           this.stillCanEdit = true;
         }
+        this.checkLastColumn();
       },
       immediate: true,
     },
