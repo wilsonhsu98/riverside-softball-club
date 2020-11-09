@@ -148,7 +148,7 @@
               </div>
             </template>
           </div>
-          <div class="sum-row">
+          <div class="sum-row" v-if="sum.pa > 0">
             <template v-for="(col, colIndex) in displayedCols">
               <div
                 v-if="col.name === 'Rank'"
