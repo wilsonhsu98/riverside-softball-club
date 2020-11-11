@@ -55,6 +55,14 @@ button {
 	}
 }
 
+a.link {
+	color: $ng;
+	text-decoration: none;
+	&:hover {
+		text-decoration: underline;
+	}
+}
+
 input[type=number]::-webkit-inner-spin-button,
 input[type=number]::-webkit-outer-spin-button {
 	-webkit-appearance: none;

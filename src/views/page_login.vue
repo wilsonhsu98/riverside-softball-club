@@ -19,9 +19,16 @@
       {{ $t('login_anonymous_btn') }}
     </button>
     <div>
-      <a href="mailto:riversidesoftballclub.app@gmail.com">{{
+      <a class="link" href="mailto:riversidesoftballclub.app@gmail.com">{{
         $t('system_mail')
       }}</a>
+      <a
+        class="link"
+        style="margin-left: 5px;"
+        href="https://docs.google.com/forms/d/e/1FAIpQLSf82txQ_Cqc9GheIU6EPCj3f3xtMc5qI6PF8OB-x6XzuvngFA/viewform"
+        target="_blank"
+        >{{ $t('system_feedback') }}</a
+      >
     </div>
   </div>
 </template>
