@@ -462,7 +462,8 @@ i.fa {
         cursor: initial;
       }
       &.name {
-        min-width: 110px;
+        width: 110px;
+        /* min-width: 110px; */
         padding-left: 0;
         text-align: center;
         z-index: 5;
@@ -625,7 +626,7 @@ i.fa {
     }
     &.advance > div {
       display: inline-block;
-      vertical-align: middle;
+      vertical-align: top;
       &:first-child {
         width: 50px;
         text-align: right;
