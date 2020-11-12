@@ -175,6 +175,8 @@
               :key="`game_${sub.game}`"
               :container="$refs.container"
               @show="setGame(sub.game)"
+              @auto-hide="focus_game = ''"
+              @close-group="focus_game = ''"
             >
               <div class="item">
                 <div v-if="unlockGames.includes(sub.game)" class="result">
