@@ -1,10 +1,10 @@
 <template>
   <div>
     <mobile-header
-      :back="back_"
       :icon="currentTeamIcon"
-      :save="edit"
       :save_label="$t('btn_next')"
+      @back="back_"
+      @save="edit"
     />
     <div class="container" ref="container">
       <h1>{{ $t('fill_order') }}</h1>

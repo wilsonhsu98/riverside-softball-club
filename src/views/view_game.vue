@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mobile-header :back="back_" :icon="currentTeamIcon" />
+    <mobile-header :icon="currentTeamIcon" @back="back_" />
     <div class="gamebox-container" ref="container">
       <div class="box-summary">
         <template v-if="version !== 'import' && topBottom">
@@ -395,17 +395,15 @@
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
+                    :style="{ cursor: !!record.location ? 'pointer' : 'auto' }"
+                    @click="record.location && setLocation(record)"
                   >
                     {{
                       record.content !== 'new'
                         ? formatContent_(record.content, record.location)
                         : ''
                     }}
-                    <div
-                      v-if="record.location"
-                      class="location-trigger"
-                      @click="setLocation(record)"
-                    >
+                    <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
                     </div>
                     <div
@@ -591,17 +589,15 @@
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
+                    :style="{ cursor: !!record.location ? 'pointer' : 'auto' }"
+                    @click="record.location && setLocation(record)"
                   >
                     {{
                       record.content !== 'new'
                         ? formatContent_(record.content, record.location)
                         : ''
                     }}
-                    <div
-                      v-if="record.location"
-                      class="location-trigger"
-                      @click="setLocation(record)"
-                    >
+                    <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
                     </div>
                     <div
@@ -1122,7 +1118,6 @@
     right: 0;
     bottom: 0;
     left: 0;
-    cursor: pointer;
     .fa-map-marker {
       position: absolute;
       left: 1px;
@@ -1530,32 +1525,18 @@ export default {
     setLocation(record) {
       this.coordinate = {
         ...record.location,
-        onbase: {
-          0: {
-            ...record.onbase[0],
-            ...(record.onbase[0].name
-              ? { photo: this.getPlayer(record.onbase[0].name).photo }
-              : undefined),
-          },
-          1: {
-            ...record.onbase[1],
-            ...(record.onbase[1].name
-              ? { photo: this.getPlayer(record.onbase[1].name).photo }
-              : undefined),
-          },
-          2: {
-            ...record.onbase[2],
-            ...(record.onbase[2].name
-              ? { photo: this.getPlayer(record.onbase[2].name).photo }
-              : undefined),
-          },
-          3: {
-            ...record.onbase[3],
-            ...(record.onbase[3].name
-              ? { photo: this.getPlayer(record.onbase[3].name).photo }
-              : undefined),
-          },
-        },
+        onbase: Array.apply(null, Array(4)).reduce(
+          (acc, undefined, i) => ({
+            ...acc,
+            [i]: {
+              ...record.onbase[i],
+              ...(record.onbase[i].name
+                ? { photo: this.getPlayer(record.onbase[i].name).photo }
+                : undefined),
+            },
+          }),
+          {},
+        ),
       };
     },
     closeLocation(e) {

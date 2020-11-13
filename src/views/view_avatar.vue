@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mobile-header :back="back_" :save="edit_" />
+    <mobile-header @back="back_" @save="edit_" />
     <div class="container">
       <h1>{{ $t('edit_avatar') }}</h1>
       <div class="avatar-container">

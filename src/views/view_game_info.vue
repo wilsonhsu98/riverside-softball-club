@@ -1,10 +1,10 @@
 <template>
   <div>
     <mobile-header
-      :back="$route.params.team ? back_ : undefined"
       :icon="$route.params.team ? currentTeamIcon : undefined"
-      :save="edit_"
       :save_label="mode === 'edit' ? undefined : $t('btn_fill_order')"
+      @back="$route.params.team ? back_() : undefined"
+      @save="edit_"
     />
     <div class="container" ref="container">
       <h1>{{ mode === 'edit' ? $t('edit_game') : $t('create_game') }}</h1>

@@ -1,9 +1,9 @@
 <template>
   <div>
     <mobile-header
-      :back="back_"
       :icon="$route.params.team ? currentTeamIcon : undefined"
-      :save="editTeam_"
+      @back="back_"
+      @save="editTeam_"
     />
     <div class="container" ref="container">
       <h1>{{ $route.params.team ? $t('manage_team') : $t('create_team') }}</h1>

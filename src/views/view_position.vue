@@ -1,10 +1,10 @@
 <template>
   <div>
     <mobile-header
-      :back="back_"
       :icon="currentTeamIcon"
-      :save="edit"
       :save_label="mode === 'edit' ? $t('btn_update') : $t('btn_start_game')"
+      @back="back_"
+      @save="edit"
     />
     <div class="container">
       <h1>{{ $t('fill_position') }}</h1>

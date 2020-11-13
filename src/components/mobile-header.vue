@@ -1,10 +1,10 @@
 <template>
   <header>
-    <i v-if="back" class="fa fa-arrow-left" @click="back_"></i>
+    <i v-if="_events.back" class="fa fa-arrow-left" @click="back_"></i>
     <span v-else></span>
     <img class="icon" :src="$cacheImg(icon) || $cacheImg(defaultIcon)" />
     <div
-      v-if="save"
+      v-if="_events.save"
       :class="['save-btn', { disabled: disabled, focus: focus }]"
       @click="save_"
     >
@@ -87,7 +87,8 @@ header {
 import defaultIcon from '../images/icon.png';
 
 export default {
-  props: ['back', 'icon', 'save', 'save_label', 'disabled', 'focus'],
+  props: ['icon', 'save_label', 'disabled', 'focus'],
+  emits: ['back', 'save'],
   data() {
     return {
       defaultIcon,
@@ -95,13 +96,11 @@ export default {
   },
   methods: {
     back_() {
-      if (typeof this.back === 'function') {
-        this.back();
-      }
+      this.$emit('back');
     },
     save_() {
-      if (typeof this.save === 'function' && this.disabled !== true) {
-        this.save();
+      if (this.disabled !== true) {
+        this.$emit('save');
       }
     },
   },

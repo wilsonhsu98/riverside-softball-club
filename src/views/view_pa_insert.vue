@@ -1,11 +1,11 @@
 <template>
   <div>
     <mobile-header
-      :back="back_"
       :icon="currentTeamIcon"
-      :save="edit_"
       :disabled="content ? false : true"
       :focus="false"
+      @back="back_"
+      @save="edit_"
     />
     <div class="container" ref="container">
       <h1>{{ $t('add_pa') }}</h1>

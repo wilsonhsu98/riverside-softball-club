@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mobile-header :back="back_" />
+    <mobile-header @back="back_" />
     <div class="container">
       <h1>{{ $t('join_team') }}</h1>
 

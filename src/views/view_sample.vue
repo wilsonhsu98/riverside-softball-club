@@ -1,9 +1,9 @@
 <template>
   <div>
     <mobile-header
-      :back="$route.params.team ? back_ : undefined"
       :icon="$route.params.team ? currentTeamIcon : undefined"
-      :save="edit_"
+      @back="$route.params.team ? back_() : undefined"
+      @save="edit_"
     />
     <div class="container"></div>
   </div>
