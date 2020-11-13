@@ -126,8 +126,15 @@
               {{ other }}
             </div>
             <div v-if="role === 'manager'" class="action">
+              <i
+                v-if="editable"
+                class="fa batch"
+                :class="{ on: batchEdit }"
+                @click="toggleBatchEdit(batchEdit)"
+                >{{ $t('btn_batch_edit') }}</i
+              >
               <router-link
-                v-if="gameStatus === 'unlock'"
+                v-if="editable"
                 :to="{
                   name: 'edit_game_info',
                   params: {
@@ -186,8 +193,15 @@
               }}
             </template>
             <div v-if="role === 'manager'" class="action">
+              <i
+                v-if="editable"
+                class="fa batch"
+                :class="{ on: batchEdit }"
+                @click="toggleBatchEdit(batchEdit)"
+                >{{ $t('btn_batch_edit') }}</i
+              >
               <router-link
-                v-if="gameStatus === 'unlock'"
+                v-if="editable"
                 :to="{
                   name: 'edit_game_info',
                   params: {
@@ -255,6 +269,28 @@
                 onerror="this.style.display='none'"
               />
               {{ item.name }}
+              <div
+                v-if="editable && batchEdit"
+                class="edit-mask editable"
+                style="padding-left: 50px;"
+                @click="changePlayer(item.name)"
+              >
+                <i
+                  class="fa fa-pencil"
+                  :style="
+                    `
+                        animation-delay: -${(
+                          Math.random() * (0 - 1) +
+                          1
+                        ).toFixed(2)}s;
+                        animation-duration: ${(
+                          Math.random() * (0 - 1) +
+                          1
+                        ).toFixed(2)}s;
+                      `
+                  "
+                ></i>
+              </div>
             </span>
           </div>
           <div v-if="boxSummary.e" class="error">
@@ -275,7 +311,7 @@
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <span class="inn">{{ record.innChange }}</span>
                   <router-link
-                    v-if="role === 'manager' && gameStatus === 'unlock'"
+                    v-if="editable"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -434,6 +470,28 @@
                 onerror="this.style.display='none'"
               />
               {{ item.name }}
+              <div
+                v-if="editable && batchEdit"
+                class="edit-mask editable"
+                style="padding-left: 53px;"
+                @click="changePlayer(item.name)"
+              >
+                <i
+                  class="fa fa-pencil"
+                  :style="
+                    `
+                        animation-delay: -${(
+                          Math.random() * (0 - 1) +
+                          1
+                        ).toFixed(2)}s;
+                        animation-duration: ${(
+                          Math.random() * (0 - 1) +
+                          1
+                        ).toFixed(2)}s;
+                      `
+                  "
+                ></i>
+              </div>
             </span>
           </div>
           <div v-if="boxSummary.e" class="error">
@@ -449,7 +507,7 @@
                 ></div>
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <router-link
-                    v-if="role === 'manager' && gameStatus === 'unlock'"
+                    v-if="editable"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -566,10 +624,7 @@
           <span class="summary">{{ item.summary }}</span>
         </div>
       </div>
-      <div
-        class="button-container"
-        v-if="stillCanEdit && role === 'manager' && gameStatus === 'unlock'"
-      >
+      <div class="button-container" v-if="stillCanEditOrder && editable">
         <span class="fa fa-pencil" @click="editOrder"></span>
       </div>
     </div>
@@ -601,6 +656,16 @@
         allowfullscreen
       ></iframe>
     </div>
+
+    <player-modal
+      name="player"
+      :current="currentPlayer"
+      :current_label="$t('ttl_current_option')"
+      :fourth="possiblePlayers"
+      :fourth_label="$t('ttl_all_players')"
+      :select="selectPlayer"
+    ></player-modal>
+
     <div v-if="coordinate" class="image-modal" @click="closeLocation">
       <coordination :no_track="true" :values="[coordinate]" />
     </div>
@@ -685,12 +750,27 @@
         border-radius: 4px;
       }
       &.fa-lock,
-      &.fa-unlock {
+      &.fa-unlock-alt {
         font-size: 28px;
       }
       &.fa-info-circle {
         font-size: 28px;
         color: $input_font;
+      }
+      &.batch {
+        box-sizing: border-box;
+        width: auto;
+        padding: 0 5px;
+        color: $current_user_bgcolor;
+        background-color: white;
+        border: 2px solid $current_user_bgcolor;
+        border-radius: 4px;
+        font-size: 14px;
+        line-height: 22px;
+        &.on {
+          color: white;
+          background-color: $current_user_bgcolor;
+        }
       }
     }
     &.game-note {
@@ -907,17 +987,6 @@
           &.new {
             background-color: $current_user_bgcolor;
           }
-          &.editable {
-            cursor: pointer;
-            @media (hover: hover) and (pointer: fine) {
-              &:hover {
-                opacity: 0.8;
-              }
-            }
-            &:active {
-              opacity: 0.8;
-            }
-          }
         }
       }
     }
@@ -1095,6 +1164,54 @@
         content: '';
       }
     }
+  }
+  .edit-mask {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    color: $row_color;
+    font-size: 20px;
+  }
+  .player-records:nth-child(2n) .edit-mask .fa-pencil {
+    animation: shake1 infinite;
+    transform-origin: 50% 10%;
+  }
+  .player-records:nth-child(2n-1) .edit-mask .fa-pencil {
+    animation: shake2 infinite alternate;
+    transform-origin: 30% 5%;
+  }
+  .editable {
+    cursor: pointer;
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+    &:active {
+      opacity: 0.8;
+    }
+  }
+}
+@keyframes shake1 {
+  0% {
+    transform: rotate(-1deg);
+    animation-timing-function: ease-in;
+  }
+  50% {
+    transform: rotate(1.5deg);
+    animation-timing-function: ease-out;
+  }
+}
+@keyframes shake2 {
+  0% {
+    transform: rotate(1deg);
+    animation-timing-function: ease-in;
+  }
+  50% {
+    transform: rotate(-1.5deg);
+    animation-timing-function: ease-out;
   }
 }
 .share-btn {
@@ -1347,9 +1464,13 @@ export default {
       videoIDs: [],
       gameNote: '',
       gameStatus: 'lock',
-      stillCanEdit: false,
+      editable: false,
+      stillCanEditOrder: false,
       positions: undefined,
       hideLastColumn: false,
+      currentPlayer: undefined,
+      possiblePlayers: [],
+      batchEdit: false,
     };
   },
   created() {
@@ -1366,6 +1487,7 @@ export default {
       toggleLoading: 'toggleLoading',
       setBoxDisplay: 'setBoxDisplay',
       toggleGameStatus: 'toggleGameStatus',
+      editGameOrder: 'editGameOrder',
     }),
     screenshot() {
       this.toggleLoading(true);
@@ -1412,49 +1534,25 @@ export default {
           0: {
             ...record.onbase[0],
             ...(record.onbase[0].name
-              ? {
-                  photo: (
-                    this.teamInfo.players.find(
-                      player => player.name === record.onbase[0].name,
-                    ) || {}
-                  ).photo,
-                }
+              ? { photo: this.getPlayer(record.onbase[0].name).photo }
               : undefined),
           },
           1: {
             ...record.onbase[1],
             ...(record.onbase[1].name
-              ? {
-                  photo: (
-                    this.teamInfo.players.find(
-                      player => player.name === record.onbase[1].name,
-                    ) || {}
-                  ).photo,
-                }
+              ? { photo: this.getPlayer(record.onbase[1].name).photo }
               : undefined),
           },
           2: {
             ...record.onbase[2],
             ...(record.onbase[2].name
-              ? {
-                  photo: (
-                    this.teamInfo.players.find(
-                      player => player.name === record.onbase[2].name,
-                    ) || {}
-                  ).photo,
-                }
+              ? { photo: this.getPlayer(record.onbase[2].name).photo }
               : undefined),
           },
           3: {
             ...record.onbase[3],
             ...(record.onbase[3].name
-              ? {
-                  photo: (
-                    this.teamInfo.players.find(
-                      player => player.name === record.onbase[3].name,
-                    ) || {}
-                  ).photo,
-                }
+              ? { photo: this.getPlayer(record.onbase[3].name).photo }
               : undefined),
           },
         },
@@ -1494,6 +1592,7 @@ export default {
         gameId: this.$route.params.game,
         value,
       });
+      this.batchEdit = !value;
     },
     getPositions() {
       this.positions = Object.keys(this.boxSummary.positions || {}).reduce(
@@ -1519,10 +1618,7 @@ export default {
       );
     },
     checkLastColumn() {
-      if (
-        this.box.length &&
-        !(this.role === 'manager' && this.gameStatus === 'unlock')
-      ) {
+      if (this.box.length && !this.editable) {
         const first = this.box.slice(1)[0].content[
           this.box.slice(1)[0].content.length - 1
         ] || { content: '' };
@@ -1540,6 +1636,44 @@ export default {
       } else {
         this.hideLastColumn = false;
       }
+    },
+    toggleBatchEdit(value) {
+      this.batchEdit = !value;
+    },
+    changePlayer(name) {
+      this.currentPlayer = this.getPlayer(name);
+      this.$modal.show('player');
+    },
+    selectPlayer(player) {
+      const orders = this.boxSummary.contents.map(content => ({
+        ...content,
+        name:
+          content.name === this.currentPlayer.name ? player.name : content.name,
+        ...(content.onbase && Array.isArray(content.onbase)
+          ? {
+              onbase: content.onbase.map(onbase => ({
+                ...onbase,
+                ...(onbase.name
+                  ? {
+                      name:
+                        onbase.name === this.currentPlayer.name
+                          ? player.name
+                          : onbase.name,
+                    }
+                  : undefined),
+              })),
+            }
+          : undefined),
+      }));
+      this.editGameOrder({
+        redirect: () => {
+          this.batchEdit = false;
+          this.$modal.hide('player');
+        },
+        teamCode: this.$route.params.team,
+        gameId: this.$route.params.game,
+        orders,
+      });
     },
   },
   computed: {
@@ -1628,8 +1762,14 @@ export default {
         this.gameStatus = this.teamInfo.unlockGames.includes(
           this.$route.params.game,
         )
-          ? 'unlock'
+          ? 'unlock-alt'
           : 'lock';
+        this.editable =
+          this.role === 'manager' && this.gameStatus === 'unlock-alt';
+        const startedPlayer = this.box.slice(1).map(row => row.name);
+        this.possiblePlayers = this.teamInfo.players.filter(
+          player => !startedPlayer.includes(player.name),
+        );
         this.checkLastColumn();
       },
       immediate: true,
@@ -1640,7 +1780,7 @@ export default {
           this.box.length &&
           this.box.slice(1)[0].content[0].content === 'new'
         ) {
-          this.stillCanEdit = true;
+          this.stillCanEditOrder = true;
         }
         this.checkLastColumn();
       },

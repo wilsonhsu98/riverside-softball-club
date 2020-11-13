@@ -413,7 +413,7 @@
       :current_label="$t('ttl_current_option')"
       :clear="clearPlayer"
       :fourth="teamInfo.players"
-      :fourth_label="$t('ttl_all_player')"
+      :fourth_label="$t('ttl_all_players')"
       :select="selectPlayer"
     ></player-modal>
 
@@ -904,11 +904,7 @@ export default {
     },
     changePlayer(mode) {
       if (['coach', 'recorder', 'pitcher', 'mvp'].includes(mode)) {
-        this.currentPlayer = this[mode]
-          ? this.teamInfo.players.find(
-              player => player.name && player.name === this[mode],
-            ) || { name: this[mode] }
-          : '';
+        this.currentPlayer = this[mode] ? this.getPlayer(this[mode]) : '';
       }
       this.$modal.show('player');
       this.changeMode = mode;
