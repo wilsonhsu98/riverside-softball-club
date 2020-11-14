@@ -310,6 +310,9 @@
           </template>
         </div>
       </template>
+      <div class="no-game" v-if="groupGames.length === 0">
+        {{ $t('box_empty') }}
+      </div>
       <div
         class="summary-container"
         v-if="gamesResult.win || gamesResult.lose || gamesResult.tie"
@@ -777,6 +780,10 @@ i.fa {
         bottom: 10px;
         right: 0;
       }
+    }
+    .no-game {
+      text-align: center;
+      color: $row_color;
     }
   }
 }

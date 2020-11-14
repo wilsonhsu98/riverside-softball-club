@@ -63,6 +63,7 @@
 	"RBI_note": "打點相同，打席數較少者排序在前",
 	"W_note": "系統沒有更進階數據，勝投僅供參考",
 	"btn_view_box": "觀看盒子",
+	"box_empty": "還沒有比賽",
 	"box_group": "%{g}組",
 	"box_opponent": "V.S. %{opponent}",
 	"box_forgot_opponent": "對手不記得了",

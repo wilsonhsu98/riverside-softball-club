@@ -34,7 +34,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
           ? true
           : filterGames.includes(item._table);
       })
-      .filter(item => item.name === name)
+      .filter(item => item.name === name && item.content)
       .slice(0, filterPA)
       .map(item => {
         const onbase = (() => {
