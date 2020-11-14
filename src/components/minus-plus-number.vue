@@ -95,6 +95,7 @@
 <script>
 export default {
   props: ['value', 'disabled'],
+  emits: ['change'],
   data() {
     return {
       val: this.value,

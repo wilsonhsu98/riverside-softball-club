@@ -122,6 +122,7 @@
 <script>
 export default {
   props: ['player', 'editable'],
+  emits: ['click', 'edit'],
   data() {
     return {
       name: this.player.name || '',

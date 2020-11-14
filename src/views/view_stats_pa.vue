@@ -953,7 +953,6 @@ export default {
       lazy: false,
       chartWidth: 0,
       tableHeight: 0,
-      showPercentage: [],
       isPercentageMode: false,
       sum: {},
     };

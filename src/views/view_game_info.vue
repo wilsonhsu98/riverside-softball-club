@@ -411,10 +411,10 @@
       name="player"
       :current="currentPlayer"
       :current_label="$t('ttl_current_option')"
-      :clear="clearPlayer"
       :fourth="teamInfo.players"
       :fourth_label="$t('ttl_all_players')"
-      :select="selectPlayer"
+      @clear="clearPlayer"
+      @select="selectPlayer"
     ></player-modal>
 
     <div v-if="positions" class="image-modal" @click="closePositions">

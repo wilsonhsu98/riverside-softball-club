@@ -68,6 +68,7 @@ export default {
     'positions',
     'fileNamePrefix',
   ],
+  emits: ['change'],
   data() {
     return {
       xy: this.values || [],

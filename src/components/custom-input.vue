@@ -388,6 +388,7 @@ export default {
     'multiple', // v-select
     'options', // v-select
   ],
+  emits: ['input', 'enter'],
   data() {
     return {
       focused: false,

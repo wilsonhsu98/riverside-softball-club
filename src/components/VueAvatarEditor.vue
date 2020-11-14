@@ -1,6 +1,7 @@
 <template>
   <div>
     <vue-avatar
+      ref="vueavatar"
       :image="image"
       :width="width"
       :height="height"
@@ -10,7 +11,6 @@
       :color="color"
       :scale="scale"
       :canMoveOutOfBound="canMoveOutOfBound"
-      ref="vueavatar"
       @vue-avatar-editor:image-ready="onImageReady"
     >
     </vue-avatar>
@@ -135,8 +135,6 @@ input[type='range']:focus::-ms-fill-upper {
 </style>
 
 <script>
-// import VueAvatar from './VueAvatar.vue';
-
 export default {
   props: {
     zoomText: {
@@ -188,6 +186,7 @@ export default {
       default: false,
     },
   },
+  emits: ['finished'],
   data() {
     return {
       rotation: 0,
@@ -203,7 +202,7 @@ export default {
       this.rotation += value;
     },
     finished() {
-      return this.$emit('finished', this.$refs.vueavatar.getImageScaled());
+      this.$emit('finished', this.$refs.vueavatar.getImageScaled());
     },
   },
 };

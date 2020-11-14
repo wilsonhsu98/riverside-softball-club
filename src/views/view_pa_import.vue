@@ -176,12 +176,12 @@
       name="player"
       :current="currentPlayer"
       :current_label="$t('ttl_current_player')"
-      :clear="'runner' === changeMode ? clearPlayer : undefined"
       :second="reJoinPlayer"
       :second_label="$t('ttl_rejoin_player')"
       :fourth="benchPlayers"
       :fourth_label="$t('ttl_bench_player')"
-      :select="selectPlayer"
+      @clear="'runner' === changeMode ? clearPlayer() : undefined"
+      @select="selectPlayer"
     ></player-modal>
   </div>
 </template>

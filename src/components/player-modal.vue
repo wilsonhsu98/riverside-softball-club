@@ -18,7 +18,7 @@
               @edit="select_"
             />
             <i
-              v-if="typeof clear === 'function' && current"
+              v-if="_events.clear && current"
               class="fa fa-times"
               @click="clear_"
             ></i>
@@ -215,28 +215,23 @@ export default {
     'name',
     'current',
     'current_label',
-    'clear',
     'second',
     'second_label',
     'third',
     'third_label',
     'fourth',
     'fourth_label',
-    'select',
   ],
+  emits: ['clear', 'select'],
   data() {
     return {};
   },
   methods: {
     clear_() {
-      if (typeof this.clear === 'function') {
-        this.clear();
-      }
+      this.$emit('clear');
     },
     select_(player) {
-      if (typeof this.select === 'function') {
-        this.select(player);
-      }
+      this.$emit('select', player);
     },
   },
 };

@@ -194,7 +194,7 @@
             </template>
             <div v-if="role === 'manager'" class="action">
               <i
-                v-if="editable"
+                v-if="editable && box.slice(1).length"
                 class="fa batch"
                 :class="{ on: batchEdit }"
                 @click="toggleBatchEdit(batchEdit)"
@@ -659,7 +659,7 @@
       :current_label="$t('ttl_current_option')"
       :fourth="possiblePlayers"
       :fourth_label="$t('ttl_all_players')"
-      :select="selectPlayer"
+      @select="selectPlayer"
     ></player-modal>
 
     <div v-if="coordinate" class="image-modal" @click="closeLocation">

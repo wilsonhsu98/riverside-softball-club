@@ -31,13 +31,13 @@
       </div>
       <vue-avatar-editor
         class="avatar-editor"
-        @finished="genImage"
         :hasRadius="true"
         :hasRotation="true"
         :width="400"
         :height="400"
         :zoomText="$t('zoom')"
         :finishText="$t('gen_img')"
+        @finished="genImage"
       />
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>

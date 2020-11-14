@@ -243,18 +243,18 @@
       name="player"
       :current="currentPlayer"
       :current_label="$t('ttl_current_player')"
-      :clear="
-        ['first', 'second', 'third'].includes(changeMode)
-          ? clearPlayer
-          : undefined
-      "
       :second="reJoinPlayer"
       :second_label="$t('ttl_rejoin_player')"
       :third="['first', 'second', 'third'].includes(changeMode) && prev5Players"
       :third_label="$t('ttl_prev5_player')"
       :fourth="benchPlayers"
       :fourth_label="$t('ttl_bench_player')"
-      :select="selectPlayer"
+      @clear="
+        ['first', 'second', 'third'].includes(changeMode)
+          ? clearPlayer()
+          : undefined
+      "
+      @select="selectPlayer"
     ></player-modal>
   </div>
 </template>
