@@ -216,7 +216,7 @@
             />
             <div
               class="normal-row"
-              :class="{ current: item.name === userName }"
+              :class="{ current: item.data.uid === userId }"
               :key="`div_${item.name}`"
             >
               <template v-for="(col, colIndex) in displayedCols">
@@ -1062,7 +1062,7 @@ export default {
       list: 'genStatistics',
       displayedCols: 'displayedCols',
       lastUpdate: 'lastUpdate',
-      userName: 'userName',
+      userId: 'userId',
       currentTeamIcon: 'currentTeamIcon',
     }),
   },
@@ -1071,35 +1071,7 @@ export default {
       handler() {
         this.sum = this.list.reduce(
           (acc, record, index, self) => {
-            if (index === self.length - 1) {
-              return {
-                ...acc,
-                AVG: Math.round((acc.H / acc.AB) * 1000) / 1000,
-                AVG_NO: acc.abNo
-                  ? Math.round((acc.hNo / acc.abNo) * 1000) / 1000
-                  : '-',
-                AVG_DESC_NO: `${acc.abNo}-${acc.hNo}`,
-                AVG_SP: acc.abSP
-                  ? Math.round((acc.hSP / acc.abSP) * 1000) / 1000
-                  : '-',
-                AVG_DESC_SP: `${acc.abSP}-${acc.hSP}`,
-                AVG_FB: acc.abFB
-                  ? Math.round((acc.hFB / acc.abFB) * 1000) / 1000
-                  : '-',
-                AVG_DESC_FB: `${acc.abFB}-${acc.hFB}`,
-                OBP: Math.round((acc.TOB / acc.PA) * 1000) / 1000,
-                SLG: Math.round((acc.TB / acc.AB) * 1000) / 1000,
-                OPS:
-                  Math.round((acc.TOB / acc.PA + acc.TB / acc.AB) * 1000) /
-                  1000,
-                LEVEL: `${Math.floor(
-                  Math.round((acc.H / acc.AB) * 1000) / 100,
-                )}/${Math.floor(
-                  Math.round((acc.TOB / acc.PA) * 1000) / 100,
-                )}/${Math.floor(Math.round((acc.TB / acc.AB) * 1000) / 100)}`,
-              };
-            }
-            return {
+            const sum = {
               PA: acc.PA + record.PA,
               AB: acc.AB + record.AB,
               H: acc.H + record.H,
@@ -1122,6 +1094,35 @@ export default {
               hFB: acc.hFB + record.hFB,
               abFB: acc.abFB + record.abFB,
             };
+            if (index === self.length - 1) {
+              return {
+                ...sum,
+                AVG: Math.round((sum.H / sum.AB) * 1000) / 1000,
+                AVG_NO: sum.abNo
+                  ? Math.round((sum.hNo / sum.abNo) * 1000) / 1000
+                  : '-',
+                AVG_DESC_NO: `${sum.abNo}-${sum.hNo}`,
+                AVG_SP: sum.abSP
+                  ? Math.round((sum.hSP / sum.abSP) * 1000) / 1000
+                  : '-',
+                AVG_DESC_SP: `${sum.abSP}-${sum.hSP}`,
+                AVG_FB: sum.abFB
+                  ? Math.round((sum.hFB / sum.abFB) * 1000) / 1000
+                  : '-',
+                AVG_DESC_FB: `${sum.abFB}-${sum.hFB}`,
+                OBP: Math.round((sum.TOB / sum.PA) * 1000) / 1000,
+                SLG: Math.round((sum.TB / sum.AB) * 1000) / 1000,
+                OPS:
+                  Math.round((sum.TOB / sum.PA + sum.TB / sum.AB) * 1000) /
+                  1000,
+                LEVEL: `${Math.floor(
+                  Math.round((sum.H / sum.AB) * 1000) / 100,
+                )}/${Math.floor(
+                  Math.round((sum.TOB / sum.PA) * 1000) / 100,
+                )}/${Math.floor(Math.round((sum.TB / sum.AB) * 1000) / 100)}`,
+              };
+            }
+            return sum;
           },
           {
             PA: 0,
