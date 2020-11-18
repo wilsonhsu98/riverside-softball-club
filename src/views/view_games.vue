@@ -152,7 +152,7 @@
       ref="container"
       :class="{ empty: role === 'manager' && groupGames.length === 0 }"
     >
-      <ad :mode="'games'" />
+      <ad :mode="'games'" class="ad" />
       <template v-for="(item, i) in groupGames">
         <div
           :class="['row', { last: i === groupGames.length - 1 }]"
@@ -752,6 +752,10 @@ i.fa {
     box-shadow: none;
     min-height: calc(100vh - 100px);
     min-height: calc(var(--vh, 1vh) * 100 - 100px);
+    .ad {
+      margin-top: -10px;
+      margin-bottom: 10px;
+    }
     .row .cell .result,
     .row:after {
       color: #fff;
