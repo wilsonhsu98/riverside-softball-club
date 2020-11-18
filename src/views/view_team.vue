@@ -132,11 +132,7 @@
             v-if="player && player.uid && player.photo"
             :src="$cacheImg(player.photo)"
             class="binded"
-            :onerror="
-              `this.setAttribute('data-alt', '${player.name.slice(0, 1)}${
-                player.number
-              }');`
-            "
+            onerror="this.style.visibility = 'hidden'"
           />
           <span v-if="player && player.uid">{{ $t('binded') }}</span>
           <i
@@ -221,11 +217,7 @@
             v-if="player && player.uid && player.photo"
             :src="$cacheImg(player.photo)"
             class="binded"
-            :onerror="
-              `this.setAttribute('data-alt', '${player.name.slice(0, 1)}${
-                player.number
-              }');`
-            "
+            onerror="this.style.visibility = 'hidden'"
           />
           <i
             v-if="container"

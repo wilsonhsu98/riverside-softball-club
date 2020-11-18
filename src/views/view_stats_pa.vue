@@ -234,19 +234,20 @@
                   class="cell name"
                 >
                   <div class="player">
-                    <div class="img img-fallback" style="border-width: 1px">
+                    <!-- <div class="img img-fallback" style="border-width: 1px">
                       <i class="fa fa-user-o"></i>
-                    </div>
+                    </div> -->
+                    <span
+                      class="img img-photo"
+                      :data-alt="
+                        `${item.name.slice(0, 1)}${item.data.number || ''}`
+                      "
+                    />
                     <img
                       v-if="item.data.photo"
                       class="img img-photo"
                       :src="$cacheImg(item.data.photo)"
-                      :onerror="
-                        `this.setAttribute('data-alt', '${item.name.slice(
-                          0,
-                          1,
-                        )}${item.data.number}');`
-                      "
+                      onerror="this.style.display = 'none'"
                     />
                     {{ item.name }}
                   </div>

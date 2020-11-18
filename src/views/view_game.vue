@@ -259,18 +259,18 @@
               item.altOrder ? $t('PH') : item.order
             }}</span>
             <span class="name">
-              <span class="img img-fallback" style="border-width: 1px">
+              <!-- <span class="img img-fallback" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
-              </span>
+              </span> -->
+              <span
+                class="img img-photo"
+                :data-alt="`${item.name.slice(0, 1)}${item.data.number || ''}`"
+              />
               <img
                 v-if="item.data.photo"
                 class="img img-photo"
                 :src="$cacheImg(item.data.photo)"
-                :onerror="
-                  `this.setAttribute('data-alt', '${item.name.slice(0, 1)}${
-                    item.data.number
-                  }');`
-                "
+                onerror="this.style.display = 'none'"
               />
               {{ item.name }}
               <div
@@ -462,18 +462,18 @@
               item.altOrder ? $t('PH') : item.order
             }}</span>
             <span class="name">
-              <span class="img img-fallback" style="border-width: 1px">
+              <!-- <span class="img img-fallback" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
-              </span>
+              </span> -->
+              <span
+                class="img img-photo"
+                :data-alt="`${item.name.slice(0, 1)}${item.data.number || ''}`"
+              />
               <img
                 v-if="item.data.photo"
                 class="img img-photo"
                 :src="$cacheImg(item.data.photo)"
-                :onerror="
-                  `this.setAttribute('data-alt', '${item.name.slice(0, 1)}${
-                    item.data.number
-                  }');`
-                "
+                onerror="this.style.display = 'none'"
               />
               {{ item.name }}
               <div
