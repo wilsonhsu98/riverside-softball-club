@@ -234,14 +234,19 @@
                   class="cell name"
                 >
                   <div class="player">
-                    <div class="img" style="border-width: 1px">
+                    <div class="img img-fallback" style="border-width: 1px">
                       <i class="fa fa-user-o"></i>
                     </div>
                     <img
                       v-if="item.data.photo"
-                      class="img"
+                      class="img img-photo"
                       :src="$cacheImg(item.data.photo)"
-                      onerror="this.style.display='none'"
+                      :onerror="
+                        `this.setAttribute('data-alt', '${item.name.slice(
+                          0,
+                          1,
+                        )}${item.data.number}');`
+                      "
                     />
                     {{ item.name }}
                   </div>
@@ -599,8 +604,30 @@ i.fa {
           left: 0;
           text-align: center;
           line-height: 26px;
-          .fa-user-o {
-            font-size: 20px;
+          &-fallback {
+            .fa-user-o {
+              font-size: 20px;
+              vertical-align: middle;
+            }
+          }
+          &-photo {
+            text-indent: -32px;
+            overflow: hidden;
+            &:after {
+              content: attr(data-alt);
+              line-height: 32px;
+              position: absolute;
+              top: 0;
+              right: 0;
+              bottom: 0;
+              left: 0;
+              background-color: $row_color;
+              color: #fff;
+              border-radius: 50%;
+              text-align: center;
+              text-indent: 0;
+              font-size: 12px;
+            }
           }
         }
       }

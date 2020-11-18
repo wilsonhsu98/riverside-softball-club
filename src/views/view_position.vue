@@ -34,14 +34,19 @@
               ></i>
               <span class="name">
                 <span class="avatar">
-                  <span class="img" style="border-width: 1px">
+                  <span class="img img-fallback" style="border-width: 1px">
                     <i class="fa fa-user-o"></i>
                   </span>
                   <img
                     v-if="player.photo"
-                    class="img"
+                    class="img img-photo"
                     :src="$cacheImg(player.photo)"
-                    onerror="this.style.display='none'"
+                    :onerror="
+                      `this.setAttribute('data-alt', '${player.name.slice(
+                        0,
+                        1,
+                      )}${player.number}');`
+                    "
                   />
                 </span>
                 <span class="number">{{ player.number || '?' }}</span>
@@ -96,14 +101,22 @@
                     ></i>
                     <span class="name">
                       <span class="avatar">
-                        <span class="img" style="border-width: 1px">
+                        <span
+                          class="img img-fallback"
+                          style="border-width: 1px"
+                        >
                           <i class="fa fa-user-o"></i>
                         </span>
                         <img
                           v-if="player.photo"
-                          class="img"
+                          class="img img-photo"
                           :src="$cacheImg(player.photo)"
-                          onerror="this.style.display='none'"
+                          :onerror="
+                            `this.setAttribute('data-alt', '${player.name.slice(
+                              0,
+                              1,
+                            )}${player.number}');`
+                          "
                         />
                       </span>
                       <span class="number">{{ player.number || '?' }}</span>
@@ -334,8 +347,30 @@
         left: 0;
         text-align: center;
         line-height: 26px;
-        .fa-user-o {
-          font-size: 20px;
+        &-fallback {
+          .fa-user-o {
+            font-size: 20px;
+            vertical-align: middle;
+          }
+        }
+        &-photo {
+          text-indent: -32px;
+          overflow: hidden;
+          &:after {
+            content: attr(data-alt);
+            line-height: 32px;
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            background-color: $row_color;
+            color: #fff;
+            border-radius: 50%;
+            text-align: center;
+            text-indent: 0;
+            font-size: 12px;
+          }
         }
       }
       .number {

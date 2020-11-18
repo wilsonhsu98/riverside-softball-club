@@ -132,6 +132,11 @@
             v-if="player && player.uid && player.photo"
             :src="$cacheImg(player.photo)"
             class="binded"
+            :onerror="
+              `this.setAttribute('data-alt', '${player.name.slice(0, 1)}${
+                player.number
+              }');`
+            "
           />
           <span v-if="player && player.uid">{{ $t('binded') }}</span>
           <i
@@ -216,6 +221,11 @@
             v-if="player && player.uid && player.photo"
             :src="$cacheImg(player.photo)"
             class="binded"
+            :onerror="
+              `this.setAttribute('data-alt', '${player.name.slice(0, 1)}${
+                player.number
+              }');`
+            "
           />
           <i
             v-if="container"
@@ -351,6 +361,24 @@
     vertical-align: middle;
     margin: 0 3px 0 12px;
     border-radius: 50%;
+    position: relative;
+    text-indent: -28px;
+    overflow: hidden;
+    &:after {
+      content: attr(data-alt);
+      line-height: 28px;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      background-color: $row_color;
+      color: #fff;
+      border-radius: 50%;
+      text-align: center;
+      text-indent: 0;
+      font-size: 12px;
+    }
   }
   .player {
     max-width: $max_width;

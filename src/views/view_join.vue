@@ -78,14 +78,18 @@
               :key="`search_${i}`"
               v-for="(player, i) in players"
             >
-              <span class="img" style="border-width: 1px">
+              <span class="img img-fallback" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
               <img
                 v-if="player.photo"
-                class="img"
+                class="img img-photo"
                 :src="$cacheImg(player.photo)"
-                onerror="this.style.display='none'"
+                :onerror="
+                  `this.setAttribute('data-alt', '${player.name.slice(0, 1)}${
+                    player.number
+                  }');`
+                "
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
@@ -110,14 +114,18 @@
               @click="bindPlayer_(player)"
               v-for="(player, i) in players"
             >
-              <span class="img" style="border-width: 1px">
+              <span class="img img-fallback" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
               <img
                 v-if="player.photo"
-                class="img"
+                class="img img-photo"
                 :src="$cacheImg(player.photo)"
-                onerror="this.style.display='none'"
+                :onerror="
+                  `this.setAttribute('data-alt', '${player.name.slice(0, 1)}${
+                    player.number
+                  }');`
+                "
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
@@ -143,14 +151,18 @@
               :key="`search_${i}`"
               v-for="(player, i) in benches"
             >
-              <span class="img" style="border-width: 1px">
+              <span class="img img-fallback" style="border-width: 1px">
                 <i class="fa fa-user-o"></i>
               </span>
               <img
                 v-if="player.photo"
-                class="img"
+                class="img img-photo"
                 :src="$cacheImg(player.photo)"
-                onerror="this.style.display='none'"
+                :onerror="
+                  `this.setAttribute('data-alt', '${player.name.slice(0, 1)}${
+                    player.number
+                  }');`
+                "
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
@@ -378,9 +390,40 @@
       left: 0;
       text-align: center;
       line-height: 18px;
-      .fa-user-o {
-        font-size: 16px;
-        vertical-align: middle;
+      &-fallback {
+        .fa-user-o {
+          font-size: 16px;
+          vertical-align: middle;
+        }
+      }
+      &-photo {
+        text-indent: -24px;
+        overflow: hidden;
+        &:before {
+          content: '';
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          background-color: $row_color;
+          border-radius: 50%;
+        }
+        &:after {
+          content: attr(data-alt);
+          line-height: 24px;
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          color: #fff;
+          text-align: center;
+          text-indent: 0;
+          font-size: 12px;
+          transform: scale(0.7);
+          transform-origin: center;
+        }
       }
     }
   }
