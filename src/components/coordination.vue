@@ -49,6 +49,7 @@ img {
 </style>
 
 <script>
+import { getNameNumber } from '../libs/utils';
 import ballIcon from '../images/icon_100.png';
 const colorMappging = {
   red: '#ef1010',
@@ -192,7 +193,7 @@ export default {
       const aBase = base * 0.02;
       const rotateBase = base * 0.034;
       const avatarRadius = base * 0.07;
-      const avatarBackgroundColor = 'rgba(237, 247, 248, 1)'; // $row_odd_bgcolor
+      // const avatarBackgroundColor = 'rgba(237, 247, 248, 1)'; // $row_odd_bgcolor
       const avatarBorderColor = 'rgba(50, 122, 129, 1)'; // $row_color
 
       // background
@@ -413,11 +414,28 @@ export default {
             avatarRadius * 2,
           );
         } else {
-          ctx.fillStyle = avatarBackgroundColor;
-          ctx.fill();
-          ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          // ctx.fillStyle = avatarBackgroundColor;
+          // ctx.fill();
+          // ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          // ctx.fillStyle = avatarBorderColor;
+          // ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          // ctx.lineWidth = avatarRadius * 0.1;
+          // ctx.strokeStyle = avatarBorderColor;
+          // ctx.stroke();
           ctx.fillStyle = avatarBorderColor;
-          ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          ctx.textAlign = 'center';
+          ctx.fill();
+          ctx.font = `${16 * scale}px Arial`;
+          ctx.fillStyle = '#fff';
+          ctx.shadowBlur = 0;
+          ctx.fillText(
+            getNameNumber({
+              name: this.xy[0].onbase[0].name,
+              number: this.xy[0].onbase[0].number,
+            }),
+            avatarRadius * 1,
+            avatarRadius * 1.25,
+          );
           ctx.lineWidth = avatarRadius * 0.1;
           ctx.strokeStyle = avatarBorderColor;
           ctx.stroke();
@@ -462,11 +480,28 @@ export default {
             avatarRadius * 2,
           );
         } else {
-          ctx.fillStyle = avatarBackgroundColor;
-          ctx.fill();
-          ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          // ctx.fillStyle = avatarBackgroundColor;
+          // ctx.fill();
+          // ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          // ctx.fillStyle = avatarBorderColor;
+          // ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          // ctx.lineWidth = avatarRadius * 0.1;
+          // ctx.strokeStyle = avatarBorderColor;
+          // ctx.stroke();
           ctx.fillStyle = avatarBorderColor;
-          ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          ctx.textAlign = 'center';
+          ctx.fill();
+          ctx.font = `${16 * scale}px Arial`;
+          ctx.fillStyle = '#fff';
+          ctx.shadowBlur = 0;
+          ctx.fillText(
+            getNameNumber({
+              name: this.xy[0].onbase[1].name,
+              number: this.xy[0].onbase[1].number,
+            }),
+            avatarRadius * 1,
+            avatarRadius * 1.25,
+          );
           ctx.lineWidth = avatarRadius * 0.1;
           ctx.strokeStyle = avatarBorderColor;
           ctx.stroke();
@@ -501,11 +536,28 @@ export default {
             avatarRadius * 2,
           );
         } else {
-          ctx.fillStyle = avatarBackgroundColor;
-          ctx.fill();
-          ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          // ctx.fillStyle = avatarBackgroundColor;
+          // ctx.fill();
+          // ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          // ctx.fillStyle = avatarBorderColor;
+          // ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          // ctx.lineWidth = avatarRadius * 0.1;
+          // ctx.strokeStyle = avatarBorderColor;
+          // ctx.stroke();
           ctx.fillStyle = avatarBorderColor;
-          ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          ctx.textAlign = 'center';
+          ctx.fill();
+          ctx.font = `${16 * scale}px Arial`;
+          ctx.fillStyle = '#fff';
+          ctx.shadowBlur = 0;
+          ctx.fillText(
+            getNameNumber({
+              name: this.xy[0].onbase[2].name,
+              number: this.xy[0].onbase[2].number,
+            }),
+            avatarRadius * 1,
+            avatarRadius * 1.25,
+          );
           ctx.lineWidth = avatarRadius * 0.1;
           ctx.strokeStyle = avatarBorderColor;
           ctx.stroke();
@@ -540,11 +592,28 @@ export default {
             avatarRadius * 2,
           );
         } else {
-          ctx.fillStyle = avatarBackgroundColor;
-          ctx.fill();
-          ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          // ctx.fillStyle = avatarBackgroundColor;
+          // ctx.fill();
+          // ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
+          // ctx.fillStyle = avatarBorderColor;
+          // ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          // ctx.lineWidth = avatarRadius * 0.1;
+          // ctx.strokeStyle = avatarBorderColor;
+          // ctx.stroke();
           ctx.fillStyle = avatarBorderColor;
-          ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
+          ctx.textAlign = 'center';
+          ctx.fill();
+          ctx.font = `${16 * scale}px Arial`;
+          ctx.fillStyle = '#fff';
+          ctx.shadowBlur = 0;
+          ctx.fillText(
+            getNameNumber({
+              name: this.xy[0].onbase[3].name,
+              number: this.xy[0].onbase[3].number,
+            }),
+            avatarRadius * 1,
+            avatarRadius * 1.25,
+          );
           ctx.lineWidth = avatarRadius * 0.1;
           ctx.strokeStyle = avatarBorderColor;
           ctx.stroke();
@@ -767,13 +836,30 @@ export default {
                 avatarRadius * 1.6,
               );
             } else {
-              ctx.fillStyle = avatarBackgroundColor;
+              // ctx.fillStyle = avatarBackgroundColor;
+              // ctx.textAlign = 'center';
+              // ctx.fill();
+              // ctx.font = `${avatarRadius}px FontAwesome`;
+              // ctx.fillStyle = avatarBorderColor;
+              // ctx.shadowBlur = 0;
+              // ctx.fillText('\uF2C0', avatarRadius * 0.8, avatarRadius * 1.1);
+              // ctx.lineWidth = avatarRadius * 0.1;
+              // ctx.strokeStyle = avatarBorderColor;
+              // ctx.stroke();
+              ctx.fillStyle = avatarBorderColor;
               ctx.textAlign = 'center';
               ctx.fill();
-              ctx.font = `${avatarRadius}px FontAwesome`;
-              ctx.fillStyle = avatarBorderColor;
+              ctx.font = `${14 * scale}px Arial`;
+              ctx.fillStyle = '#fff';
               ctx.shadowBlur = 0;
-              ctx.fillText('\uF2C0', avatarRadius * 0.8, avatarRadius * 1.1);
+              ctx.fillText(
+                getNameNumber({
+                  name: this.positions_[key].name,
+                  number: this.positions_[key].number,
+                }),
+                avatarRadius * 0.8,
+                avatarRadius * 1.05,
+              );
               ctx.lineWidth = avatarRadius * 0.1;
               ctx.strokeStyle = avatarBorderColor;
               ctx.stroke();

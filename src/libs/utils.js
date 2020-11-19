@@ -274,10 +274,40 @@ const unionOrIntersect = (type, conditions = [], games = []) => {
   return games;
 };
 
+const getNameNumber = ({ name = '', number = '' }) => {
+  const tempName = (() => {
+    if (name.length === 2) {
+      if (['小', '大', '阿'].includes(name[0])) {
+        return name[1].toUpperCase();
+      }
+      return name[0].toUpperCase();
+    }
+    return name
+      .slice(0, 1)
+      .toUpperCase()
+      .replace(/[A-Z]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xfee0));
+  })();
+  const tempNum = number
+    ? `${number}`.length === 1
+      ? `${number}`.replace(/[0-9]/g, s =>
+          String.fromCharCode(s.charCodeAt(0) + 0xfee0),
+        )
+      : number
+    : '';
+  return `${tempName}${tempNum}`;
+};
+
 export default {
   parseGame,
   genGameList,
   unionOrIntersect,
 };
 
-export { cacheImg, scrollTo, formatContent, formatColor, getShuffledArr };
+export {
+  cacheImg,
+  scrollTo,
+  formatContent,
+  formatColor,
+  getShuffledArr,
+  getNameNumber,
+};

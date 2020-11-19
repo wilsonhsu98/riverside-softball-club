@@ -40,6 +40,8 @@ img {
 </style>
 
 <script>
+import { getNameNumber } from '../libs/utils';
+
 export default {
   props: ['players', 'fileNamePrefix'],
   data() {
@@ -200,13 +202,27 @@ export default {
           ctx.clip();
           ctx.drawImage(this[player.name], 0, 0, diameter, diameter);
         } else {
-          ctx.fillStyle = avatarBackgroundColor;
+          // ctx.fillStyle = avatarBackgroundColor;
+          // ctx.textAlign = 'center';
+          // ctx.fill();
+          // ctx.font = `${avatarRadius * 1.4}px FontAwesome`;
+          // ctx.fillStyle = avatarBorderColor;
+          // ctx.shadowBlur = 0;
+          // ctx.fillText('\uF2C0', avatarRadius, avatarRadius * 1.4);
+          // ctx.lineWidth = avatarRadius * 0.1;
+          // ctx.strokeStyle = avatarBorderColor;
+          // ctx.stroke();
+          ctx.fillStyle = avatarBorderColor;
           ctx.textAlign = 'center';
           ctx.fill();
-          ctx.font = `${avatarRadius * 1.4}px FontAwesome`;
-          ctx.fillStyle = avatarBorderColor;
+          ctx.font = `${14 * scale}px Arial`;
+          ctx.fillStyle = '#fff';
           ctx.shadowBlur = 0;
-          ctx.fillText('\uF2C0', avatarRadius, avatarRadius * 1.4);
+          ctx.fillText(
+            getNameNumber({ name: player.name, number: player.number }),
+            avatarRadius,
+            avatarRadius * 1.3,
+          );
           ctx.lineWidth = avatarRadius * 0.1;
           ctx.strokeStyle = avatarBorderColor;
           ctx.stroke();

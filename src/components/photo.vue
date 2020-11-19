@@ -9,7 +9,7 @@
         small: size === 'small',
         medium: size === 'medium',
       }"
-      :data-alt="`${shortName}${num}`"
+      :data-alt="nameNumber"
     />
     <img
       v-if="photo"
@@ -126,29 +126,13 @@
 </style>
 
 <script>
+import { getNameNumber } from '../libs/utils';
+
 export default {
   props: ['name', 'number', 'photo', 'size'],
   computed: {
-    num() {
-      return this.number
-        ? `${this.number}`.length === 1
-          ? `${this.number}`.replace(/[0-9]/g, s =>
-              String.fromCharCode(s.charCodeAt(0) + 0xfee0),
-            )
-          : this.number
-        : '';
-    },
-    shortName() {
-      if (this.name.length === 2) {
-        if (['小', '大', '阿'].includes(this.name[0])) {
-          return this.name[1].toUpperCase();
-        }
-        return this.name[0].toUpperCase();
-      }
-      return this.name
-        .slice(0, 1)
-        .toUpperCase()
-        .replace(/[A-Z]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xfee0));
+    nameNumber() {
+      return getNameNumber({ name: this.name, number: this.number });
     },
   },
 };

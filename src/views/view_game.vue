@@ -1504,7 +1504,7 @@ export default {
             [i]: {
               ...record.onbase[i],
               ...(record.onbase[i].name
-                ? { photo: this.getPlayer(record.onbase[i].name).photo }
+                ? this.getPlayer(record.onbase[i].name)
                 : undefined),
             },
           }),
