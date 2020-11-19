@@ -363,7 +363,7 @@
         v-model="tags"
       />
 
-      <div class="field-wrapper" v-if="box.slice(1).length">
+      <div class="field-wrapper" v-if="mode === 'edit' && box.slice(1).length">
         <div class="three-column chart-btn-container">
           <router-link
             :to="{
