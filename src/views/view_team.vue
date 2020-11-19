@@ -128,12 +128,20 @@
             />
             <span>{{ $t('manager') }}</span>
           </label>
-          <img
+          <photo
+            v-if="player && player.uid && player.photo"
+            class="binded"
+            :photo="player.photo"
+            :name="player.name"
+            :number="player.number"
+            size="medium"
+          />
+          <!-- <img
             v-if="player && player.uid && player.photo"
             :src="$cacheImg(player.photo)"
             class="binded"
             onerror="this.style.visibility = 'hidden'"
-          />
+          /> -->
           <span v-if="player && player.uid">{{ $t('binded') }}</span>
           <i
             v-if="player.uid !== userId"
@@ -213,12 +221,20 @@
             v-model.number.lazy="player.number"
           />
           <label v-if="player && player.uid" style="width: 57px;"> </label>
-          <img
+          <photo
+            v-if="player && player.uid && player.photo"
+            class="binded"
+            :photo="player.photo"
+            :name="player.name"
+            :number="player.number"
+            size="medium"
+          />
+          <!-- <img
             v-if="player && player.uid && player.photo"
             :src="$cacheImg(player.photo)"
             class="binded"
             onerror="this.style.visibility = 'hidden'"
-          />
+          /> -->
           <i
             v-if="container"
             class="fa fa-commenting-o"
@@ -350,26 +366,10 @@
   .binded {
     width: 28px;
     height: 28px;
-    vertical-align: middle;
     margin: 0 3px 0 12px;
-    border-radius: 50%;
     position: relative;
-    text-indent: -28px;
-    overflow: hidden;
-    &:after {
-      content: attr(data-alt);
-      line-height: 28px;
-      position: absolute;
+    &::v-deep .img {
       top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      background-color: $row_color;
-      color: #fff;
-      border-radius: 50%;
-      text-align: center;
-      text-indent: 0;
-      font-size: 12px;
     }
   }
   .player {

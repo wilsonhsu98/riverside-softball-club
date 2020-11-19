@@ -78,18 +78,11 @@
               :key="`search_${i}`"
               v-for="(player, i) in players"
             >
-              <!-- <span class="img img-fallback" style="border-width: 1px">
-                <i class="fa fa-user-o"></i>
-              </span> -->
-              <span
-                class="img img-photo"
-                :data-alt="`${player.name.slice(0, 1)}${player.number}`"
-              />
-              <img
-                v-if="player.photo"
-                class="img img-photo"
-                :src="$cacheImg(player.photo)"
-                onerror="this.style.display = 'none'"
+              <photo
+                :photo="player.photo"
+                :name="player.name"
+                :number="player.number"
+                size="small"
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
@@ -114,18 +107,11 @@
               @click="bindPlayer_(player)"
               v-for="(player, i) in players"
             >
-              <!-- <span class="img img-fallback" style="border-width: 1px">
-                <i class="fa fa-user-o"></i>
-              </span> -->
-              <span
-                class="img img-photo"
-                :data-alt="`${player.name.slice(0, 1)}${player.number}`"
-              />
-              <img
-                v-if="player.photo"
-                class="img img-photo"
-                :src="$cacheImg(player.photo)"
-                onerror="this.style.display = 'none'"
+              <photo
+                :photo="player.photo"
+                :name="player.name"
+                :number="player.number"
+                size="small"
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
@@ -151,18 +137,11 @@
               :key="`search_${i}`"
               v-for="(player, i) in benches"
             >
-              <!-- <span class="img img-fallback" style="border-width: 1px">
-                <i class="fa fa-user-o"></i>
-              </span> -->
-              <span
-                class="img img-photo"
-                :data-alt="`${player.name.slice(0, 1)}${player.number}`"
-              />
-              <img
-                v-if="player.photo"
-                class="img img-photo"
-                :src="$cacheImg(player.photo)"
-                onerror="this.style.display = 'none'"
+              <photo
+                :photo="player.photo"
+                :name="player.name"
+                :number="player.number"
+                size="small"
               />
               <span v-if="player.number" class="team-player-item__number">{{
                 player.number
@@ -372,64 +351,14 @@
     &.binded {
       color: #c5c5c5;
       cursor: not-allowed;
-      .img {
+      &::v-deep .img {
         border-color: #c5c5c5;
-      }
-    }
-    .img {
-      display: inline-block;
-      width: 24px;
-      height: 24px;
-      border: 0 solid $row_color;
-      box-sizing: border-box;
-      border-radius: 50%;
-      background: 50% 50% no-repeat;
-      background-size: 24px auto;
-      position: absolute;
-      top: 1px;
-      left: 0;
-      text-align: center;
-      line-height: 18px;
-      &-fallback {
-        .fa-user-o {
-          font-size: 16px;
-          vertical-align: middle;
-        }
-      }
-      &-photo {
-        text-indent: -24px;
-        overflow: hidden;
-        &:before {
-          content: '';
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          background-color: $row_color;
-          border-radius: 50%;
-        }
-        &:after {
-          content: attr(data-alt);
-          line-height: 24px;
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          color: #fff;
-          text-align: center;
-          text-indent: 0;
-          font-size: 12px;
-          transform: scale(0.7);
-          transform-origin: center;
-        }
       }
     }
   }
   .current {
     color: $active_bgcolor;
-    .img {
+    &::v-deep .img {
       border-color: $active_bgcolor;
     }
   }

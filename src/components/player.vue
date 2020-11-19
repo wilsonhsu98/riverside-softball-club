@@ -2,18 +2,10 @@
   <div class="player" @click="select">
     <span class="name">
       <span class="avatar">
-        <!-- <span class="img img-fallback" style="border-width: 1px">
-          <i class="fa fa-user-o"></i>
-        </span> -->
-        <span
-          class="img img-photo"
-          :data-alt="`${player.name.slice(0, 1)}${player.number}`"
-        />
-        <img
-          v-if="player.photo"
-          class="img img-photo"
-          :src="$cacheImg(player.photo)"
-          onerror="this.style.display = 'none'"
+        <photo
+          :photo="player.photo"
+          :name="player.name"
+          :number="player.number"
         />
       </span>
       <span class="number">{{ player.number || '?' }}</span>
@@ -67,46 +59,6 @@
       vertical-align: top;
       margin-right: 4px;
       flex: 0 0 32px;
-    }
-    .img {
-      display: inline-block;
-      width: 32px;
-      height: 32px;
-      border: 0 solid $row_color;
-      box-sizing: border-box;
-      border-radius: 50%;
-      background: 50% 50% no-repeat;
-      background-size: 32px auto;
-      position: absolute;
-      top: 2px;
-      left: 0;
-      text-align: center;
-      line-height: 26px;
-      &-fallback {
-        .fa-user-o {
-          font-size: 20px;
-          vertical-align: middle;
-        }
-      }
-      &-photo {
-        text-indent: -32px;
-        overflow: hidden;
-        &:after {
-          content: attr(data-alt);
-          line-height: 32px;
-          position: absolute;
-          top: 0;
-          right: 0;
-          bottom: 0;
-          left: 0;
-          background-color: $row_color;
-          color: #fff;
-          border-radius: 50%;
-          text-align: center;
-          text-indent: 0;
-          font-size: 12px;
-        }
-      }
     }
     .number {
       display: inline-block;
