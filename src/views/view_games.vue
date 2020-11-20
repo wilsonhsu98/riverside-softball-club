@@ -876,11 +876,9 @@ const queryFields = [
 
 export default {
   data() {
-    const focus_game = window.localStorage.getItem('focus_game');
-    window.localStorage.removeItem('focus_game');
     return {
       container: null,
-      focus_game,
+      focus_game: '',
       version: '',
       inn: 0,
       scores: [],
@@ -904,6 +902,11 @@ export default {
   mounted() {
     this.container = this.$refs.container;
     document.addEventListener(clickEvent, this.collapseSearch, true);
+    const focus_game = window.localStorage.getItem('focus_game');
+    window.localStorage.removeItem('focus_game');
+    setTimeout(() => {
+      this.focus_game = focus_game;
+    }, 500);
   },
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
