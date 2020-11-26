@@ -173,7 +173,6 @@
       </div>
     </div>
     <player-modal
-      name="player"
       :current="currentPlayer"
       :current_label="$t('ttl_current_player')"
       :second="reJoinPlayer"

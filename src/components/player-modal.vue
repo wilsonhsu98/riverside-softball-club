@@ -1,6 +1,6 @@
 <template>
   <modal
-    :name="name"
+    name="player"
     :adaptive="true"
     :maxWidth="400"
     :minHeight="400"
@@ -212,7 +212,6 @@
 <script>
 export default {
   props: [
-    'name',
     'current',
     'current_label',
     'second',

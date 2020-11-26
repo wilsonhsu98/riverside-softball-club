@@ -361,7 +361,7 @@ const displayGame = (players, records, errors, role) => {
             : false,
         };
       })();
-      const { name, inn, rbi, location, onbase } = item;
+      const { name, inn, rbi, location, onbase, video } = item;
       const newItem = {
         name,
         inn,
@@ -372,6 +372,7 @@ const displayGame = (players, records, errors, role) => {
         out,
         location,
         onbase,
+        video,
         color: contentColor(item.content),
         // 換局
         ...(shouldSetInnChange && {

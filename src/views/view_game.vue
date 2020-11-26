@@ -271,21 +271,7 @@
                 style="padding-left: 50px;"
                 @click="changePlayer(item.name)"
               >
-                <i
-                  class="fa fa-pencil"
-                  :style="
-                    `
-                        animation-delay: -${(
-                          Math.random() * (0 - 1) +
-                          1
-                        ).toFixed(2)}s;
-                        animation-duration: ${(
-                          Math.random() * (0 - 1) +
-                          1
-                        ).toFixed(2)}s;
-                      `
-                  "
-                ></i>
+                <i class="fa fa-pencil" :style="genAnimationShuffle()"></i>
               </div>
             </span>
           </div>
@@ -352,6 +338,9 @@
                     <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
                     </div>
+                    <div v-if="record.video" class="location-trigger">
+                      <i class="fa fa-video-camera"></i>
+                    </div>
                     <div
                       v-if="
                         record.onbase &&
@@ -392,7 +381,7 @@
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
                     :style="{ cursor: !!record.location ? 'pointer' : 'auto' }"
-                    @click="record.location && setLocation(record)"
+                    @click="setLocationVideo(record)"
                   >
                     {{
                       record.content !== 'new'
@@ -401,6 +390,9 @@
                     }}
                     <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
+                    </div>
+                    <div v-if="record.video" class="location-trigger">
+                      <i class="fa fa-video-camera"></i>
                     </div>
                     <div
                       v-if="
@@ -414,6 +406,21 @@
                         ],
                       ]"
                     ></div>
+                    <div
+                      v-if="editVideoMode && item.data.uid === userId"
+                      class="edit-mask editable"
+                      @click="
+                        e => {
+                          pickVideo(record.order, record.video);
+                          e.stopPropagation();
+                        }
+                      "
+                    >
+                      <i
+                        class="fa fa-video-camera"
+                        :style="genAnimationShuffle()"
+                      ></i>
+                    </div>
                   </span>
                 </div>
               </template>
@@ -466,21 +473,7 @@
                 style="padding-left: 53px;"
                 @click="changePlayer(item.name)"
               >
-                <i
-                  class="fa fa-pencil"
-                  :style="
-                    `
-                        animation-delay: -${(
-                          Math.random() * (0 - 1) +
-                          1
-                        ).toFixed(2)}s;
-                        animation-duration: ${(
-                          Math.random() * (0 - 1) +
-                          1
-                        ).toFixed(2)}s;
-                      `
-                  "
-                ></i>
+                <i class="fa fa-pencil" :style="genAnimationShuffle()"></i>
               </div>
             </span>
           </div>
@@ -542,6 +535,9 @@
                     <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
                     </div>
+                    <div v-if="record.video" class="location-trigger">
+                      <i class="fa fa-video-camera"></i>
+                    </div>
                     <div
                       v-if="
                         record.onbase &&
@@ -582,7 +578,7 @@
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
                     :style="{ cursor: !!record.location ? 'pointer' : 'auto' }"
-                    @click="record.location && setLocation(record)"
+                    @click="setLocationVideo(record)"
                   >
                     {{
                       record.content !== 'new'
@@ -591,6 +587,9 @@
                     }}
                     <div v-if="record.location" class="location-trigger">
                       <i class="fa fa-map-marker"></i>
+                    </div>
+                    <div v-if="record.video" class="location-trigger">
+                      <i class="fa fa-video-camera"></i>
                     </div>
                     <div
                       v-if="
@@ -604,6 +603,21 @@
                         ],
                       ]"
                     ></div>
+                    <div
+                      v-if="editVideoMode && item.data.uid === userId"
+                      class="edit-mask editable"
+                      @click="
+                        e => {
+                          pickVideo(record.order, record.video);
+                          e.stopPropagation();
+                        }
+                      "
+                    >
+                      <i
+                        class="fa fa-video-camera"
+                        :style="genAnimationShuffle()"
+                      ></i>
+                    </div>
                   </span>
                 </div>
               </template>
@@ -614,6 +628,13 @@
       </div>
       <div class="button-container" v-if="stillCanEditOrder && editable">
         <span class="fa fa-pencil" @click="editOrder"></span>
+      </div>
+      <div class="button-container" v-if="editVideo && !editable">
+        <span
+          class="fa fa-video-camera"
+          :class="{ off: !editVideoMode }"
+          @click="toggleEditVideoMode(editVideoMode)"
+        ></span>
       </div>
     </div>
     <div style="text-align: center; margin: 14px;">
@@ -646,7 +667,6 @@
     </div>
 
     <player-modal
-      name="player"
       :current="currentPlayer"
       :current_label="$t('ttl_current_option')"
       :fourth="possiblePlayers"
@@ -654,16 +674,46 @@
       @select="selectPlayer"
     ></player-modal>
 
-    <div v-if="coordinate" class="image-modal" @click="closeLocation">
-      <coordination :no_track="true" :values="[coordinate]" />
+    <video-modal
+      :videos="videoIDs"
+      :video="video"
+      :start="start"
+      :end="end"
+      :order="videoOrder"
+      @close="editVideoMode = false"
+      @clear="saveVideo"
+      @save="saveVideo"
+    ></video-modal>
+
+    <div
+      v-if="coordinate || shortVideo"
+      class="image-modal"
+      @click="closeLocationVideo"
+    >
+      <div>
+        <coordination
+          v-if="coordinate"
+          :no_track="true"
+          :values="[coordinate]"
+        />
+        <iframe
+          v-if="shortVideo"
+          :src="
+            `https://www.youtube.com/embed/${shortVideo.videoID}?start=${shortVideo.start}&end=${shortVideo.end}&rel=0`
+          "
+          allowfullscreen
+        ></iframe>
+      </div>
     </div>
 
     <div v-if="positions" class="image-modal" @click="closePositions">
-      <coordination
-        :no_track="true"
-        :positions="positions"
-        :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
-      />
+      <div>
+        <coordination
+          :no_track="true"
+          :positions="positions"
+          :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -825,12 +875,14 @@
     background: none;
     span {
       display: inline-block;
+      box-sizing: border-box;
       width: 50px;
       height: 50px;
-      line-height: 50px;
+      line-height: 46px;
       color: #fff;
       border-radius: 50%;
       background-color: $current_user_bgcolor;
+      border: 2px solid $current_user_bgcolor;
       margin: 0;
       font-size: 30px;
       outline: none;
@@ -838,6 +890,10 @@
       cursor: pointer;
       box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
         0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
+      &.off {
+        background-color: #fff;
+        color: $current_user_bgcolor;
+      }
     }
   }
   span {
@@ -1098,6 +1154,13 @@
       transform-origin: bottom left;
       transform: scale(0.7);
     }
+    .fa-video-camera {
+      position: absolute;
+      left: 50%;
+      bottom: 1px;
+      transform-origin: bottom left;
+      transform: scale(0.6) translateX(-50%);
+    }
   }
   .onbase {
     display: inline-block;
@@ -1142,11 +1205,11 @@
     color: $row_color;
     font-size: 20px;
   }
-  .player-records:nth-child(2n) .edit-mask .fa-pencil {
+  .player-records:nth-child(2n) .edit-mask .fa {
     animation: shake1 infinite;
     transform-origin: 50% 10%;
   }
-  .player-records:nth-child(2n-1) .edit-mask .fa-pencil {
+  .player-records:nth-child(2n-1) .edit-mask .fa {
     animation: shake2 infinite alternate;
     transform-origin: 30% 5%;
   }
@@ -1167,21 +1230,21 @@
 }
 @keyframes shake1 {
   0% {
-    transform: rotate(-1deg);
+    transform: rotate(-3deg);
     animation-timing-function: ease-in;
   }
   50% {
-    transform: rotate(1.5deg);
+    transform: rotate(3.5deg);
     animation-timing-function: ease-out;
   }
 }
 @keyframes shake2 {
   0% {
-    transform: rotate(1deg);
+    transform: rotate(3deg);
     animation-timing-function: ease-in;
   }
   50% {
-    transform: rotate(-1.5deg);
+    transform: rotate(-3.5deg);
     animation-timing-function: ease-out;
   }
 }
@@ -1211,9 +1274,9 @@
   width: 100px;
   outline: none;
 }
-.image-modal {
+/* .image-modal {
   position: fixed;
-  z-index: 2;
+  z-index: 3;
   top: 0;
   right: 0;
   bottom: 0;
@@ -1226,6 +1289,27 @@
       transform: translateY(-50%) translateX(-50%);
       display: inline-block;
     }
+  }
+} */
+.image-modal {
+  position: fixed;
+  z-index: 3;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  > div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    display: inline-block;
+  }
+  iframe {
+    width: 100%;
+    height: 100%;
+    border: 0 none;
   }
 }
 .video-container {
@@ -1362,8 +1446,13 @@
         padding: 2px 4px;
       }
     }
-    .location-trigger .fa-map-marker {
-      transform: scale(0.8);
+    .location-trigger {
+      .fa-map-marker {
+        transform: scale(0.8);
+      }
+      .fa-video-camera {
+        transform: scale(0.8) translateX(-50%);
+      }
     }
     .onbase {
       height: 8px;
@@ -1437,11 +1526,18 @@ export default {
       gameStatus: 'lock',
       editable: false,
       stillCanEditOrder: false,
+      editVideo: false,
       positions: undefined,
       hideLastColumn: false,
       currentPlayer: undefined,
       possiblePlayers: [],
       batchEdit: false,
+      editVideoMode: false,
+      video: '',
+      start: 0,
+      end: 0,
+      videoOrder: 0,
+      shortVideo: undefined,
     };
   },
   created() {
@@ -1498,26 +1594,32 @@ export default {
     sumByInn(scores, inn) {
       return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
     },
-    setLocation(record) {
-      this.coordinate = {
-        ...record.location,
-        onbase: Array.apply(null, Array(4)).reduce(
-          (acc, undefined, i) => ({
-            ...acc,
-            [i]: {
-              ...record.onbase[i],
-              ...(record.onbase[i].name
-                ? this.getPlayer(record.onbase[i].name)
-                : undefined),
-            },
-          }),
-          {},
-        ),
-      };
+    setLocationVideo(record) {
+      if (record.location) {
+        this.coordinate = {
+          ...record.location,
+          onbase: Array.apply(null, Array(4)).reduce(
+            (acc, undefined, i) => ({
+              ...acc,
+              [i]: {
+                ...record.onbase[i],
+                ...(record.onbase[i].name
+                  ? this.getPlayer(record.onbase[i].name)
+                  : undefined),
+              },
+            }),
+            {},
+          ),
+        };
+      }
+      if (record.video) {
+        this.shortVideo = record.video;
+      }
     },
-    closeLocation(e) {
+    closeLocationVideo(e) {
       if (e.currentTarget === e.target) {
         this.coordinate = undefined;
+        this.shortVideo = undefined;
       }
     },
     formatContent_(content, location = {}) {
@@ -1550,6 +1652,7 @@ export default {
         value,
       });
       this.batchEdit = !value;
+      this.editVideoMode = false;
     },
     getPositions() {
       this.positions = Object.keys(this.boxSummary.positions || {}).reduce(
@@ -1594,6 +1697,22 @@ export default {
         this.hideLastColumn = false;
       }
     },
+    checkEditVideo() {
+      if (this.videoIDs.length) {
+        if (
+          this.box
+            .slice(1)
+            .some(
+              row =>
+                row.data.uid === this.userId &&
+                row.content.length &&
+                row.content.some(item => item.content),
+            )
+        ) {
+          this.editVideo = true;
+        }
+      }
+    },
     toggleBatchEdit(value) {
       this.batchEdit = !value;
     },
@@ -1632,6 +1751,50 @@ export default {
         orders,
       });
     },
+    toggleEditVideoMode(value) {
+      this.editVideoMode = !value;
+    },
+    pickVideo(order, video = {}) {
+      const { videoID = '', start = 0, end = 0 } = video;
+      this.video = videoID;
+      this.start = start;
+      this.end = end;
+      this.videoOrder = order;
+      this.$modal.show('video');
+    },
+    saveVideo(video) {
+      const { order, videoID, start, end } = video;
+      const orders = this.boxSummary.contents.map(content => {
+        const { video: video_, ...others } = content;
+        return {
+          ...others,
+          ...(content.order === order && videoID
+            ? {
+                video: {
+                  ...video_,
+                  videoID,
+                  start,
+                  end,
+                },
+              }
+            : undefined),
+        };
+      });
+      this.editGameOrder({
+        redirect: () => {
+          this.$modal.hide('video');
+        },
+        teamCode: this.$route.params.team,
+        gameId: this.$route.params.game,
+        orders,
+      });
+    },
+    genAnimationShuffle() {
+      return `
+        animation-delay: -${(Math.random() * (0 - 1) + 1).toFixed(2)}s;
+        animation-duration: ${(Math.random() * (0 - 1) + 1).toFixed(2)}s;
+      `;
+    },
   },
   computed: {
     ...mapGetters({
@@ -1642,6 +1805,7 @@ export default {
       role: 'role',
       teamInfo: 'teamInfo',
       boxDisplay: 'boxDisplay',
+      userId: 'userId',
     }),
   },
   watch: {
@@ -1710,6 +1874,8 @@ export default {
             .map(item => item.trim())
             .filter(item => !!item);
           this.gameNote = gameNote;
+
+          this.checkEditVideo();
         }
       },
       immediate: true,
@@ -1740,6 +1906,7 @@ export default {
           this.stillCanEditOrder = true;
         }
         this.checkLastColumn();
+        this.checkEditVideo();
       },
       immediate: true,
     },

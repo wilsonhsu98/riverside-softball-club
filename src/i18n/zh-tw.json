@@ -82,6 +82,10 @@
 	"box_display_code": "代號",
 	"box_position": "守位圖",
 	"btn_fill_order": "排歐打",
+	"ttl_start": "起始",
+	"ttl_end": "結束",
+	"ttl_range": "長度",
+	"opt_video": "第{n}部影片",
 
 	"create_game": "新增比賽",
 	"edit_game": "修改比賽",
@@ -226,6 +230,7 @@
 	"ttl_anonymous_search": "搜尋結果(可點選切換)",
 
 	"btn_update": "儲存",
+	"btn_clear_save": "清空後儲存",
 	"btn_cancel": "取消",
 	"btn_insert": "新增",
 	"btn_delete_game": "刪除比賽",
