@@ -51,7 +51,7 @@ const router = new VueRouter({
       path: '/management',
       name: 'management',
       component: require('./views/page_management').default,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: false },
     },
     {
       path: '/main',
@@ -178,6 +178,12 @@ router.beforeEach((to, from, next) => {
     next({ path: '/login' });
   } else if (to.path === '/login' && store.getters.token) {
     next({ path: from.path });
+  } else if (to.path === '/management') {
+    if (store.getters.userName === '徐偉鈞') {
+      next();
+    } else {
+      next({ path: from.path });
+    }
   } else {
     next();
   }

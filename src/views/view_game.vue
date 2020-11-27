@@ -696,13 +696,15 @@
           :no_track="true"
           :values="[coordinate]"
         />
-        <iframe
-          v-if="shortVideo"
-          :src="
-            `https://www.youtube.com/embed/${shortVideo.videoID}?start=${shortVideo.start}&end=${shortVideo.end}&rel=0`
-          "
-          allowfullscreen
-        ></iframe>
+        <div class="iframe">
+          <iframe
+            v-if="shortVideo"
+            :src="
+              `https://www.youtube.com/embed/${shortVideo.videoID}?start=${shortVideo.start}&end=${shortVideo.end}&rel=0`
+            "
+            allowfullscreen
+          ></iframe>
+        </div>
       </div>
     </div>
 
@@ -1287,12 +1289,22 @@
     top: 50%;
     left: 50%;
     transform: translateY(-50%) translateX(-50%);
-    display: inline-block;
+    display: flex;
+    flex-direction: column;
+  }
+  .iframe {
+    background-color: black;
+    &:after {
+      content: '';
+      height: 100%;
+      display: inline-block;
+      vertical-align: middle;
+    }
   }
   iframe {
-    width: 100%;
-    height: 100%;
     border: 0 none;
+    display: inline-block;
+    vertical-align: middle;
   }
 }
 .video-container {
@@ -1467,6 +1479,9 @@
     .sticky-display-btn {
       top: 86px;
     }
+  }
+  .image-modal > div {
+    flex-direction: row;
   }
 }
 </style>
