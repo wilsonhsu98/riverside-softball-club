@@ -1779,6 +1779,8 @@ export default {
                   end,
                 },
               }
+            : video_
+            ? { video: video_ }
             : undefined),
         };
       });

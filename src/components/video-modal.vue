@@ -2,8 +2,6 @@
   <modal
     name="video"
     :adaptive="true"
-    :maxWidth="400"
-    :minHeight="400"
     @opened="opened"
     @closed="closed"
     class="modal-wrapper"
@@ -96,6 +94,13 @@
   background-color: rgba(0, 0, 0, 0.5);
   ::v-deep .v--modal-box {
     border-radius: 10px;
+    position: fixed;
+    top: 20px !important;
+    bottom: 20px !important;
+    height: auto !important;
+    left: 20px !important;
+    right: 20px !important;
+    width: auto !important;
   }
   .slider {
     margin: 0 20px;
