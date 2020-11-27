@@ -22,6 +22,7 @@
       }"
     ></div>
     <vue-range-slider
+      ref="slider"
       class="slider"
       v-model="value"
       :max="max"
@@ -188,6 +189,12 @@ export default {
       isOpen: false,
     };
   },
+  mounted() {
+    window.addEventListener('resize', this.requestAnimationFrame);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.requestAnimationFrame);
+  },
   methods: {
     opened() {
       this.isOpen = true;
@@ -295,6 +302,14 @@ export default {
         start: this.start_,
         end: this.end_,
       });
+    },
+    refreshSlider() {
+      setTimeout(() => {
+        this.$refs.slider.refresh();
+      }, 100);
+    },
+    requestAnimationFrame() {
+      window.requestAnimationFrame(this.refreshSlider);
     },
   },
   watch: {

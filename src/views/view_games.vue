@@ -152,10 +152,13 @@
       ref="container"
       :class="{ empty: role === 'manager' && groupGames.length === 0 }"
     >
-      <ad :mode="'games'" class="ad" />
+      <ad :mode="'games'" />
       <template v-for="(item, i) in groupGames">
         <div
-          :class="['row', { last: i === groupGames.length - 1 }]"
+          :class="[
+            'row',
+            { first: i === 0, last: i === groupGames.length - 1 },
+          ]"
           :data-date="item.date"
           :key="`date_${item.date}`"
         >
@@ -746,19 +749,18 @@ i.fa {
     }
   }
   .container {
-    padding: 10px 0 0;
+    padding: 0;
     margin: 0;
     background-color: transparent;
     box-shadow: none;
     min-height: calc(100vh - 100px);
     min-height: calc(var(--vh, 1vh) * 100 - 100px);
-    .ad {
-      margin-top: -10px;
-      margin-bottom: 10px;
-    }
     .row .cell .result,
     .row:after {
       color: #fff;
+    }
+    .row.first {
+      margin-top: 10px;
     }
     .row.last {
       padding-bottom: 5px;
@@ -786,6 +788,7 @@ i.fa {
       }
     }
     .no-game {
+      margin-top: 10px;
       text-align: center;
       color: $row_color;
     }
