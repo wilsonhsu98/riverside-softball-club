@@ -1294,6 +1294,10 @@
   }
   .iframe {
     background-color: black;
+    text-align: center;
+    &:empty {
+      height: 0;
+    }
     &:after {
       content: '';
       height: 100%;
