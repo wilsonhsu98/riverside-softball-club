@@ -242,10 +242,13 @@
         >
         <span
           v-if="Object.keys(boxSummary.positions || {}).length"
-          class="gen-position"
+          class="gen-graphic"
           @click="getPositions"
         >
           {{ $t('box_position') }}
+        </span>
+        <span class="gen-graphic" @click="getOrders">
+          {{ $t('box_order') }}
         </span>
       </div>
       <div class="box-table simple" v-if="box.slice(1).length">
@@ -717,6 +720,15 @@
         />
       </div>
     </div>
+
+    <div v-if="orders" class="image-modal" @click="closeOrders">
+      <div>
+        <starting-player
+          :players="orders"
+          :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
+        />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -747,9 +759,10 @@
         background-color: $header_bgcolor;
         color: rgba(255, 255, 255, 0.9);
       }
-      &.gen-position {
+      &.gen-graphic {
         width: auto;
         float: right;
+        margin-left: 3px;
         padding: 0 5px;
         background-color: $current_user_bgcolor;
         border-color: $current_user_bgcolor;
@@ -1530,6 +1543,7 @@ export default {
       stillCanEditOrder: false,
       editVideo: false,
       positions: undefined,
+      orders: undefined,
       hideLastColumn: false,
       currentPlayer: undefined,
       possiblePlayers: [],
@@ -1670,6 +1684,17 @@ export default {
     closePositions(e) {
       if (e.currentTarget === e.target) {
         this.positions = undefined;
+      }
+    },
+    getOrders() {
+      this.orders = this.box
+        .slice(1)
+        .filter(record => !record.hasOwnProperty('altOrder'))
+        .map(({ name }) => this.getPlayer(name));
+    },
+    closeOrders(e) {
+      if (e.currentTarget === e.target) {
+        this.orders = undefined;
       }
     },
     getPlayer(name) {
