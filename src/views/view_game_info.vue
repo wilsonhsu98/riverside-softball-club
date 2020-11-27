@@ -417,18 +417,22 @@
     ></player-modal>
 
     <div v-if="positions" class="image-modal" @click="closePositions">
-      <coordination
-        :no_track="true"
-        :positions="positions"
-        :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
-      />
+      <div>
+        <coordination
+          :no_track="true"
+          :positions="positions"
+          :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
+        />
+      </div>
     </div>
 
     <div v-if="orders" class="image-modal" @click="closeOrders">
-      <starting-player
-        :players="orders"
-        :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
-      />
+      <div>
+        <starting-player
+          :players="orders"
+          :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -675,19 +679,18 @@
 
 .image-modal {
   position: fixed;
-  z-index: 2;
+  z-index: 3;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  &::v-deep {
-    .root-container {
-      top: 50%;
-      left: 50%;
-      transform: translateY(-50%) translateX(-50%);
-      display: inline-block;
-    }
+  > div {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+    display: inline-block;
   }
 }
 @media only screen and (max-width: 760px) {

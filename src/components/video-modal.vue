@@ -29,6 +29,8 @@
       :tooltip-merge="tooltipMerge"
       :enable-cross="enableCross"
       :formatter="formatter"
+      :process-style="{ backgroundColor: '#00b5a3' }"
+      :tooltip-style="{ backgroundColor: '#00b5a3', borderColor: '#00b5a3' }"
       @slide-end="slideEnd"
     ></vue-range-slider>
     <div class="control-container">
