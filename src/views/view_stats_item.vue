@@ -82,6 +82,7 @@
           />
         </slide>
       </carousel-3d>
+      <ad :mode="'stats_item300x250'" />
     </div>
   </div>
 </template>
@@ -322,6 +323,9 @@ i.fa {
     display: block;
     .carousel-3d-slide {
       background-color: transparent;
+    }
+    .item-container {
+      margin: 10px auto;
     }
     .item-container__table {
       margin: 10px;

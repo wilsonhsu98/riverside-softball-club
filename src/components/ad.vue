@@ -30,7 +30,7 @@
       >
       </vpon>
       <vpon
-        v-if="['user300x250'].includes(mode)"
+        v-if="['stats_item300x250', 'user300x250'].includes(mode)"
         vpon_ad_format="300x250_mb"
         :vpon_ad_test="config[configMode].adTest"
         :vpon_ad_licensy_key="config[configMode].keys[mode]"
@@ -62,6 +62,7 @@ export default {
         user: '8a80854b6a90b5bc016ad81ebabb6538',
         user300x250: '8a80854b6a90b5bc016ad81ebabb6538',
         stats_item: '8a80854b6a90b5bc016ad81ebabb6538',
+        stats_item300x250: '8a80854b6a90b5bc016ad81ebabb6538',
         games: '8a80854b6a90b5bc016ad81ebabb6538',
         game: '8a80854b6a90b5bc016ad81ebabb6538',
       },
@@ -75,6 +76,7 @@ export default {
         user: '8a80854b757283cf0175832e7a115a9a',
         user300x250: '8a80854b75ab2b010176188a368b6337',
         stats_item: '8a80854b757283cf0175832d9e455a99',
+        stats_item300x250: '8a80854b75ab2b0101761d9fe0087c12',
         games: '8a80854b757283cf0175832c30e55a98',
         game: '8a80854b757283cf0175832fe7685a9b',
       },
@@ -115,6 +117,7 @@ export default {
         'games',
         'game',
         'stats_item',
+        'stats_item300x250',
         'user',
         'user300x250',
       ].includes(this.mode)
