@@ -364,7 +364,7 @@ export default {
       this.confirm('');
     },
     shouldShowAd(currentRoute) {
-      if (['game', 'stats_pa', 'edit_team'].inlcudes(currentRoute.name)) {
+      if (['game', 'stats_pa', 'edit_team'].includes(currentRoute.name)) {
         this.showAd = new Date().getTime();
         this.adMode = `${currentRoute.name}_f`;
       } else {
