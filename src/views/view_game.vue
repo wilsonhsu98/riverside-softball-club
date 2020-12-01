@@ -64,7 +64,7 @@
                 {{
                   opponentScores[index] !== undefined
                     ? opponentScores[index]
-                    : topBottom === 'top'
+                    : topBottom === 'top' && index + 1 === inn
                     ? 'X'
                     : '?'
                 }}
