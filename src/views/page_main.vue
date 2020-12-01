@@ -364,9 +364,9 @@ export default {
       this.confirm('');
     },
     shouldShowAd(currentRoute) {
-      if (currentRoute.name === 'game') {
+      if (['game', 'stats_pa', 'edit_team'].inlcudes(currentRoute.name)) {
         this.showAd = new Date().getTime();
-        this.adMode = 'fullscreen';
+        this.adMode = `${currentRoute.name}_f`;
       } else {
         window.adCount = (window.adCount || 0) + 1;
         if (window.adCount % 5 === 0) {

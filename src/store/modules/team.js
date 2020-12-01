@@ -746,7 +746,6 @@ const actions = {
             };
           })
           .filter(team => {
-            // noicon 2個月前 only one binding user and is manager
             const lastTime = new Date(team.timestamp);
             const playerCount = Object.keys(team.players).filter(name => {
               return team.players[name].uid;
@@ -756,10 +755,10 @@ const actions = {
             }).length;
 
             if (
-              !team.icon &&
-              currentTime - lastTime > 86400000 * 30 * 2 &&
-              playerCount === 1 &&
-              managerCount === 1
+              // !team.icon && // noicon
+              currentTime - lastTime > 86400000 * 30 * 1 && // 1個月前
+              playerCount === 1 && // only one binding user
+              managerCount === 1 // is manager
             )
               return true;
           });

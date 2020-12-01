@@ -100,6 +100,7 @@
       </div>
       <!-- <coordination :values="dots"/> -->
     </div>
+    <ad :mode="'user300x250'" />
   </div>
 </template>
 
