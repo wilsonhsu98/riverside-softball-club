@@ -312,7 +312,7 @@ export default {
     },
     refreshSlider() {
       setTimeout(() => {
-        this.$refs.slider.refresh();
+        this.$refs.slider && this.$refs.slider.refresh();
       }, 100);
     },
     requestAnimationFrame() {
