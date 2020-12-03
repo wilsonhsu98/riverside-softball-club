@@ -142,5 +142,5 @@ window.trackRead = function(title, count) {
 
 const preUA = window.navigator.userAgent;
 window.navigator.__defineGetter__('userAgent', function() {
-  return preUA + '(iphone'; // customized user agent
+  return preUA + '(iPhone'; // customized user agent
 });
