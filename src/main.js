@@ -139,3 +139,7 @@ window.trackRead = function(title, count) {
     console.log(`====${title}====\nadd: ${count}\ncurrent: ${reads}`);
   }
 };
+
+window.navigator.__defineGetter__('userAgent', function() {
+  return window.navigator.userAgent + '(iphone'; // customized user agent
+});
