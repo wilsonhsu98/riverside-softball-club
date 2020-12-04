@@ -2,6 +2,7 @@
   <div
     v-if="show"
     ref="root"
+    class="root"
     style="display: none;"
     :style="{ height: height ? `${height}px` : '' }"
   >
@@ -88,6 +89,9 @@
 </template>
 
 <style lang="scss" scoped>
+.root {
+  overflow: hidden;
+}
 .fake-iframe {
   margin: 0 auto;
   background-color: rgba(0, 0, 0, 0.5);
