@@ -107,6 +107,9 @@
     transform: translate(-50%, -50%);
   }
 }
+[vpon_ad_format='mi'] > div {
+  z-index: 2;
+}
 @media only screen and (min-width: 761px) {
   .only-mobile {
     display: none;
