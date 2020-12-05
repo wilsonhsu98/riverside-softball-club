@@ -154,7 +154,7 @@ export default {
       local: false,
       show: true,
       callbackMethod: `vponCallBackMethod${new Date().getTime()}`,
-      configMode: 'test1', // test1, test2, production
+      configMode: 'production', // test1, test2, production
       config: {
         test1: {
           adTest: 1,
