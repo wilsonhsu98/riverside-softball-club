@@ -858,7 +858,7 @@ export default {
                   number: this.positions_[key].number,
                 }),
                 avatarRadius * 0.8,
-                avatarRadius * 1.05,
+                avatarRadius * 1,
               );
               ctx.lineWidth = avatarRadius * 0.1;
               ctx.strokeStyle = avatarBorderColor;
