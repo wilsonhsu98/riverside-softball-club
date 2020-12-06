@@ -19,6 +19,7 @@
         medium: size === 'medium',
       }"
       :src="$cacheImg(photo)"
+      onload="this.style.display = 'inline-block'"
       onerror="this.style.display = 'none'"
     />
   </div>
