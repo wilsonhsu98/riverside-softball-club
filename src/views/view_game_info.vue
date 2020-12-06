@@ -1,9 +1,9 @@
 <template>
   <div>
     <mobile-header
-      :icon="$route.params.team ? currentTeamIcon : undefined"
+      :icon="currentTeamIcon"
       :save_label="mode === 'edit' ? undefined : $t('btn_fill_order')"
-      @back="$route.params.team ? back_() : undefined"
+      @back="back_"
       @save="edit_"
     />
     <div class="container" ref="container">

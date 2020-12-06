@@ -1,10 +1,6 @@
 <template>
   <div>
-    <mobile-header
-      :icon="$route.params.team ? currentTeamIcon : undefined"
-      @back="$route.params.team ? back_() : undefined"
-      @save="edit_"
-    />
+    <mobile-header :icon="currentTeamIcon" @back="back_" @save="edit_" />
     <div class="container"></div>
   </div>
 </template>

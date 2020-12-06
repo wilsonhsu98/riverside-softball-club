@@ -356,10 +356,10 @@
       :third_label="$t('ttl_prev5_player')"
       :fourth="benchPlayers"
       :fourth_label="$t('ttl_bench_player')"
-      @clear="
-        ['first', 'second', 'third'].includes(changeMode)
-          ? clearPlayer()
-          : undefined
+      v-on="
+        ['first', 'second', 'third'].includes(changeMode) && {
+          clear: clearPlayer,
+        }
       "
       @select="selectPlayer"
     ></player-modal>

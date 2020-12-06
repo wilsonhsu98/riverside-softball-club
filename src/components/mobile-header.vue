@@ -1,11 +1,11 @@
 <template>
   <header>
-    <i v-if="_events.back" class="fa fa-arrow-left" @click="back_"></i>
+    <i v-if="$listeners.back" class="fa fa-arrow-left" @click="back_"></i>
     <span v-else></span>
     <img class="icon" :src="$cacheImg(icon) || $cacheImg(defaultIcon)" />
     <div
-      v-if="_events.save"
-      :class="['save-btn', { disabled: disabled, focus: focus }]"
+      v-if="$listeners.save"
+      :class="['save-btn', { disabled, focus }]"
       @click="save_"
     >
       {{ save_label || $t('btn_update') }}

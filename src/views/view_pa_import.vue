@@ -179,7 +179,7 @@
       :second_label="$t('ttl_rejoin_player')"
       :fourth="benchPlayers"
       :fourth_label="$t('ttl_bench_player')"
-      @clear="'runner' === changeMode ? clearPlayer() : undefined"
+      v-on="['runner'].includes(changeMode) && { clear: clearPlayer }"
       @select="selectPlayer"
     ></player-modal>
   </div>

@@ -18,7 +18,7 @@
               @edit="select_"
             />
             <i
-              v-if="_events.clear && current"
+              v-if="$listeners.clear && current"
               class="fa fa-times"
               @click="clear_"
             ></i>
