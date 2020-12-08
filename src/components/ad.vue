@@ -201,7 +201,6 @@ export default {
         } else {
           this.$refs.root.style.display = 'block';
         }
-        window[callbackMethod] = undefined;
       };
       if (this.local) {
         this.$refs.root.style.display = 'block';
@@ -218,6 +217,9 @@ export default {
         }
       }
     }
+  },
+  beforeDestroy() {
+    window[this.callbackMethod] = undefined;
   },
 };
 </script>
