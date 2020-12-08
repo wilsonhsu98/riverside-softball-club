@@ -54,9 +54,12 @@ const actions = {
         const uid = playerDoc.id;
         const { teamRoles } = playerDoc.data();
         const nameObj = teams
-          .map(team => team.data())
-          .reduce((acc, team) => {
-            acc[team.name] = (
+          .map(team => ({
+            teamCode: team.id,
+            team: team.data(),
+          }))
+          .reduce((acc, { teamCode, team }) => {
+            acc[teamCode] = (
               Object.keys(team.players)
                 .map(name => ({
                   name,
