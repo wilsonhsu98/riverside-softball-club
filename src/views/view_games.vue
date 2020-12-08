@@ -470,7 +470,7 @@
     }
   }
   &.empty {
-    padding-top: 70px;
+    /* padding-top: 70px; */
     .button-container {
       margin-top: 0;
     }
