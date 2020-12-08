@@ -150,11 +150,26 @@ const actions = {
                         .doc(teamCode)
                         .get()
                         .then(teamsDoc => {
-                          resolve({
-                            role: teamRoles[teamCode],
-                            teamCode: teamCode,
-                            ...teamsDoc.data(),
-                          });
+                          if (teamsDoc.exists) {
+                            resolve({
+                              role: teamRoles[teamCode],
+                              teamCode: teamCode,
+                              ...teamsDoc.data(),
+                            });
+                          } else {
+                            setTimeout(() => {
+                              db.collection('teams')
+                                .doc(teamCode)
+                                .get()
+                                .then(teamsDoc => {
+                                  resolve({
+                                    role: teamRoles[teamCode],
+                                    teamCode: teamCode,
+                                    ...teamsDoc.data(),
+                                  });
+                                });
+                            }, 100);
+                          }
                         });
                     });
                   }),
