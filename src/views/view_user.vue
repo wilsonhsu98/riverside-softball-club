@@ -279,14 +279,19 @@ export default {
     };
   },
   created() {},
+  beforeDestroy() {
+    if (!this.isAnonymous && !this.userId) {
+      this.searchTeams({ keyword: '', type: 'anonymous' });
+    }
+  },
   methods: {
     ...mapActions({
       logout: 'logout',
       switchTeam: 'switchTeam',
       searchTeams: 'searchTeams',
+      searchDemo: 'searchDemo',
     }),
     logout_() {
-      this.searchTeams({ keyword: '', type: 'anonymous' });
       this.logout();
     },
     switchTeam_(teamCode) {
@@ -317,6 +322,14 @@ export default {
     keyword: {
       handler() {
         this.keyWord = this.keyword;
+      },
+      immediate: true,
+    },
+    isAnonymous: {
+      handler() {
+        if (this.isAnonymous) {
+          this.searchDemo();
+        }
       },
       immediate: true,
     },

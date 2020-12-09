@@ -73,6 +73,7 @@ const dbInit = teamCode => {
 
 const types = {
   FETCH_TEAM: 'TEAM/FETCH_TEAM',
+  FETCH_DEMO_TEAM: 'TEAM/FETCH_DEMO_TEAM',
   CLEAR_TEAM: 'TEAM/CLEAR_TEAM',
   SET_KEYWORD: 'TEAM/SET_KEYWORD',
   SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
@@ -90,6 +91,7 @@ const state = {
     icon: '',
     unlockGames: [],
   },
+  demoTeam: undefined,
   keyword: '',
   teamList: [],
   requests: [],
@@ -545,7 +547,29 @@ const actions = {
       commit(rootTypes.SET_TEAMICON, '');
     }
   },
-  searchTeams({ commit }, { keyword = '', type }) {
+  searchDemo({ commit, state }) {
+    if (!state.demoTeam) {
+      db.collection('teams')
+        .doc('DEMO')
+        .get()
+        .then(doc => {
+          window.trackRead('searchDemoTeam', 1);
+          const data = doc.data();
+          const demoTeam = {
+            teamCode: doc.id,
+            icon: data.icon,
+            name: data.name,
+            subNames: data.subNames,
+            keyword: `${data.name}${
+              data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
+            }`,
+          };
+          commit(types.FETCH_DEMO_TEAM, demoTeam);
+          commit(userTypes.FETCH_TEAMS, [demoTeam]);
+        });
+    }
+  },
+  searchTeams({ commit, state }, { keyword = '', type }) {
     commit(types.SET_KEYWORD, keyword);
     if (!keyword) {
       switch (type) {
@@ -553,7 +577,7 @@ const actions = {
           commit(types.SEARCH_TEAM, []);
           break;
         case 'anonymous':
-          commit(userTypes.FETCH_TEAMS, []);
+          commit(userTypes.FETCH_TEAMS, state.demoTeam ? [state.demoTeam] : []);
           break;
       }
       return;
@@ -577,6 +601,7 @@ const actions = {
             };
           })
           .filter(team => {
+            if (team.teamCode === 'DEMO') return false;
             if (['*', '＊'].includes(keyword)) return true;
             return keyword
               ? team.keyword.match(
@@ -609,7 +634,12 @@ const actions = {
             commit(types.SEARCH_TEAM, filterTeams);
             break;
           case 'anonymous':
-            commit(userTypes.FETCH_TEAMS, filterTeams);
+            commit(
+              userTypes.FETCH_TEAMS,
+              state.demoTeam && ['*', '＊'].includes(keyword)
+                ? [state.demoTeam, ...filterTeams]
+                : filterTeams,
+            );
             break;
         }
         commit(rootTypes.LOADING, false);
@@ -792,6 +822,9 @@ const mutations = {
       icon: data.icon,
       unlockGames: [...(data.unlockGames || [])],
     };
+  },
+  [types.FETCH_DEMO_TEAM](state, data) {
+    state.demoTeam = data;
   },
   [types.SET_KEYWORD](state, keyword) {
     state.keyword = keyword;
