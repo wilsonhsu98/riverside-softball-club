@@ -72,6 +72,7 @@ Vue.use({
   },
 });
 Vue.config.productionTip = false;
+Vue.config.ignoredElements = [/^vpon/];
 // Vue.config.devtools = false;
 
 // Vue.config.errorHandler = function(err, vm, info) {
@@ -139,8 +140,3 @@ window.trackRead = function(title, count) {
     console.log(`====${title}====\nadd: ${count}\ncurrent: ${reads}`);
   }
 };
-
-// const preUA = window.navigator.userAgent;
-// window.navigator.__defineGetter__('userAgent', function() {
-//   return preUA + '(iPhone'; // customized user agent
-// });

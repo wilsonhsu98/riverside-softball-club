@@ -88,7 +88,7 @@ const parseGame = arr => {
 const genGameList = (games, filterGames = []) => {
   const temp = games
     .filter(item => filterGames.includes(item.game))
-    .map(item => item.game.substr(0, 8))
+    .map(item => item.game.split('-')[0])
     .filter((v, i, self) => self.indexOf(v) === i)
     .sort((a, b) => {
       return (
@@ -101,7 +101,7 @@ const genGameList = (games, filterGames = []) => {
         date: item,
         games: games.filter(
           sub =>
-            sub.game.substr(0, 8) === item && filterGames.includes(sub.game),
+            sub.game.split('-')[0] === item && filterGames.includes(sub.game),
         ),
       };
     });
