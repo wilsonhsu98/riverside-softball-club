@@ -134,6 +134,11 @@
   .info-wrapper {
     flex: 1 0 280px;
     padding: 0 10px;
+    .info {
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
   }
   .team {
     position: relative;
@@ -202,7 +207,7 @@
     }
   }
   .btn-container {
-    margin: 8px -5px 0;
+    margin: 0 -5px;
     display: flex;
     button {
       flex: 0;
