@@ -136,6 +136,7 @@ export default {
         game: '8a80854b6a90b5bc016ad81ebabb6538',
       },
       frequencyBannerKey: '8a80854b6a90b5bc016ad81ebabb6538',
+      debug: true,
     };
     const prodKey = {
       keys: {
@@ -150,6 +151,7 @@ export default {
         game: '8a80854b757283cf0175832fe7685a9b',
       },
       frequencyBannerKey: '8a80854b757283cf017576f08a1c25a8',
+      debug: false,
     };
 
     return {
@@ -161,17 +163,14 @@ export default {
         test1: {
           adTest: 1,
           ...testKey,
-          debug: true,
         },
         test2: {
           adTest: 0,
           ...testKey,
-          debug: true,
         },
         production: {
           adTest: 0,
           ...prodKey,
-          debug: true,
         },
       },
       scale: undefined,
