@@ -78,6 +78,7 @@ const types = {
   SET_KEYWORD: 'TEAM/SET_KEYWORD',
   SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
   FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
+  CACHE_TEAMS: 'TEAM/CACHE_TEAMS',
 };
 
 const state = {
@@ -95,6 +96,7 @@ const state = {
   keyword: '',
   teamList: [],
   requests: [],
+  cacheTeamsResponse: undefined,
 };
 
 const getters = {
@@ -583,67 +585,76 @@ const actions = {
       return;
     }
     commit(rootTypes.LOADING, true);
-    db.collection('teams')
-      .get()
-      .then(teamCollection => {
-        window.trackRead('searchTeams', teamCollection.docs.length || 1);
-        const filterTeams = teamCollection.docs
-          .map(doc => {
-            const data = doc.data();
-            return {
-              teamCode: doc.id,
-              icon: data.icon,
-              name: data.name,
-              subNames: data.subNames,
-              keyword: `${data.name}${
-                data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
-              }`,
-            };
-          })
-          .filter(team => {
-            if (team.teamCode === 'DEMO') return false;
-            if (['*', '＊'].includes(keyword)) return true;
-            return keyword
-              ? team.keyword.match(
-                  new RegExp(
-                    keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-                    'ig',
-                  ),
-                )
-              : false;
-          })
-          .map(team => {
-            const score = (team.icon ? 2 : 0) + (team.subNames ? 1 : 0);
-            return {
-              ...team,
-              score,
-            };
-          })
-          .sort((a, b) => {
-            if (a.score > b.score) {
-              return -1;
-            } else if (a.score === b.score) {
-              return b.name.localeCompare(a.name);
-            } else {
-              return 1;
-            }
+    new Promise(resolve => {
+      if (state.cacheTeamsResponse) {
+        resolve(state.cacheTeamsResponse);
+      } else {
+        db.collection('teams')
+          .get()
+          .then(teamCollection => {
+            window.trackRead('searchTeams', teamCollection.docs.length || 1);
+            const filterTeams = teamCollection.docs.map(doc => {
+              const data = doc.data();
+              return {
+                teamCode: doc.id,
+                icon: data.icon,
+                name: data.name,
+                subNames: data.subNames,
+                keyword: `${data.name}${
+                  data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
+                }`,
+              };
+            });
+            commit(types.CACHE_TEAMS, filterTeams);
+            resolve(filterTeams);
           });
+      }
+    }).then(teams => {
+      const filterTeams = teams
+        .filter(team => {
+          if (['*', '＊'].includes(keyword)) return true;
+          return keyword
+            ? team.keyword.match(
+                new RegExp(
+                  keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+                  'ig',
+                ),
+              )
+            : false;
+        })
+        .map(team => {
+          const score =
+            team.teamCode === 'DEMO'
+              ? 10
+              : (team.icon ? 2 : 0) + (team.subNames ? 1 : 0);
+          return {
+            ...team,
+            score,
+          };
+        })
+        .sort((a, b) => {
+          if (a.score > b.score) {
+            return -1;
+          } else if (a.score === b.score) {
+            return b.name.localeCompare(a.name);
+          } else {
+            return 1;
+          }
+        });
 
-        switch (type) {
-          case 'join':
-            commit(types.SEARCH_TEAM, filterTeams);
-            break;
-          case 'anonymous':
-            commit(
-              userTypes.FETCH_TEAMS,
-              state.demoTeam && ['*', '＊'].includes(keyword)
-                ? [state.demoTeam, ...filterTeams]
-                : filterTeams,
-            );
-            break;
-        }
-        commit(rootTypes.LOADING, false);
-      });
+      switch (type) {
+        case 'join':
+          commit(
+            types.SEARCH_TEAM,
+            filterTeams.filter(team => team.teamCode !== 'DEMO'),
+          );
+          break;
+        case 'anonymous':
+          commit(userTypes.FETCH_TEAMS, filterTeams);
+          break;
+      }
+      commit(rootTypes.LOADING, false);
+    });
   },
   requestJoin({ commit }, data) {
     commit(rootTypes.LOADING, true);
@@ -834,6 +845,9 @@ const mutations = {
   },
   [types.FETCH_REQUESTS](state, data) {
     state.requests = data;
+  },
+  [types.CACHE_TEAMS](state, data) {
+    state.cacheTeamsResponse = data;
   },
 };
 
