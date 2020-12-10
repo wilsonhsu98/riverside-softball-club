@@ -151,6 +151,7 @@ export default {
   methods: {
     draw() {
       const img = this.$refs.img;
+      if (!img) return;
       const { width } = img.getBoundingClientRect();
 
       if (this.fixedSize) {

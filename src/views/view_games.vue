@@ -186,7 +186,7 @@
                   ?
                 </div>
                 <div v-else :class="`result ${sub.result}`">
-                  {{ (sub.result && sub.result.substr(0, 1)) || '?' }}
+                  {{ (sub.result && sub.result.slice(0, 1)) || '?' }}
                 </div>
                 <div class="name">{{ sub.opponent || sub.game }}</div>
               </div>

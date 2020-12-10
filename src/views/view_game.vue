@@ -39,7 +39,7 @@
                   v-if="gameStatus === 'lock'"
                   :class="`result-icon ${result}`"
                 >
-                  {{ (result && result.substr(0, 1)) || '?' }}
+                  {{ (result && result.slice(0, 1)) || '?' }}
                 </div>
                 <div v-else class="result-icon">?</div>
               </div>

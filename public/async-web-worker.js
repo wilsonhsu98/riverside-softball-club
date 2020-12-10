@@ -75,7 +75,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
               color: contentColor(item.content),
             };
           })
-          .concat(game.substr(4));
+          .concat(game.slice(-6));
       });
     const calc = top.reduce(
       (acc, item) => {

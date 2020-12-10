@@ -47,14 +47,20 @@
               <i class="fa fa-cog"></i>
             </router-link>
           </li>
-          <li>
+          <li :class="{ home: isAnonymous }">
             <router-link
               :to="{ name: 'user' }"
               active-class="active"
-              :data-label="$t('menu_profile')"
+              :data-label="isAnonymous ? $t('menu_home') : $t('menu_profile')"
               :data-requests="totalRequest || undefined"
             >
-              <i class="fa fa-user"></i>
+              <i
+                class="fa"
+                :class="{
+                  'fa-home': isAnonymous,
+                  'fa-user': !isAnonymous,
+                }"
+              ></i>
             </router-link>
           </li>
           <li class="logout_link">
@@ -120,6 +126,9 @@ header {
     width: calc(100% - 66px);
     > li {
       display: inline-block;
+      &.home {
+        order: -1;
+      }
     }
     .logout_link {
       margin-left: auto;
@@ -257,6 +266,9 @@ header {
       background: none;
       margin: 0;
       width: 100%;
+      > li.home {
+        order: 1;
+      }
       .logout_link {
         display: none;
       }
@@ -420,6 +432,7 @@ export default {
       confirmMsg: 'confirmMsg',
       confirmPromiseResolve: 'confirmPromiseResolve',
       confirmPromiseReject: 'confirmPromiseReject',
+      isAnonymous: 'isAnonymous',
     }),
   },
   watch: {
