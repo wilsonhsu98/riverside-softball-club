@@ -179,7 +179,11 @@ router.beforeEach((to, from, next) => {
   } else if (to.path === '/login' && store.getters.token) {
     next({ path: from.path });
   } else if (to.path === '/management') {
-    if (store.getters.userName === '徐偉鈞') {
+    if (
+      ['Ac1JwgNSkdctBkdoiOC0Fgn3mqE2', '6CMMLMg6adPL3CyUWkWbPzIAYN62'].includes(
+        store.getters.userId,
+      )
+    ) {
       next();
     } else {
       next({ path: from.path });

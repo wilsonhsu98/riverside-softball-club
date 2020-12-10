@@ -46,6 +46,19 @@
             target="_blank"
             >{{ $t('system_feedback') }}</a
           >
+          <a
+            v-if="
+              [
+                'Ac1JwgNSkdctBkdoiOC0Fgn3mqE2',
+                '6CMMLMg6adPL3CyUWkWbPzIAYN62',
+              ].includes(userId)
+            "
+            class="link"
+            style="margin-left: 5px;"
+            href="#/management"
+            target="_blank"
+            >後台</a
+          >
         </div>
       </template>
       <template v-if="isAnonymous === true">
