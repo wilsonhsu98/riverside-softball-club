@@ -99,18 +99,20 @@ if (window.localStorage.getItem('version') !== version.toString()) {
   window.indexedDB.deleteDatabase(process.env.VUE_APP_PROJECTNAME);
 }
 
-new Promise(resolve => {
-  resolve(
-    new Vue({
-      el: '#app',
-      store,
-      router,
-      i18n,
-    }),
-  );
-}).then(() => {
-  store.dispatch('chkLoginStatus');
-});
+const render = () => {
+  new Promise(resolve => {
+    resolve(
+      new Vue({
+        el: '#app',
+        store,
+        router,
+        i18n,
+      }),
+    );
+  }).then(() => {
+    store.dispatch('chkLoginStatus');
+  });
+};
 
 const resetVH = () => {
   const vh = window.innerHeight * 0.01;
@@ -122,6 +124,21 @@ const resetVH = () => {
 };
 resetVH();
 window.addEventListener('resize', () => window.requestAnimationFrame(resetVH));
+if (navigator.userAgent.match(/crios/gi)) {
+  const input = document.createElement('INPUT');
+  input.type = 'text';
+  input.style =
+    'width: 0; height: 0; border: none; background: none; box-sizing: border-box; padding: 0;';
+  document.body.appendChild(input);
+  input.focus();
+  setTimeout(() => {
+    input.blur();
+    document.body.removeChild(input);
+    render();
+  }, 100);
+} else {
+  render();
+}
 smoothscroll.polyfill();
 
 document.title = 'Riverside Softball Club';
