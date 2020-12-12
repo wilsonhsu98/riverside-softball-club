@@ -376,9 +376,15 @@ export default {
       this.confirm('');
     },
     shouldShowAd(currentRoute) {
-      if (['game', 'stats_pa', 'edit_team'].includes(currentRoute.name)) {
+      if (['stats_pa', 'edit_team'].includes(currentRoute.name)) {
         this.showAd = new Date().getTime();
         this.adMode = `${currentRoute.name}_f`;
+      } else if (
+        currentRoute.name === 'game' &&
+        !this.teamInfo.unlockGames.includes(this.$route.params.game)
+      ) {
+        this.showAd = new Date().getTime();
+        this.adMode = 'game_f';
       } else {
         window.adCount = (window.adCount || 0) + 1;
         if (window.adCount % 5 === 0) {
@@ -425,6 +431,7 @@ export default {
       loading: 'loading',
       currentTeam: 'currentTeam',
       role: 'role',
+      teamInfo: 'teamInfo',
       currentTeamIcon: 'currentTeamIcon',
       teamRequests: 'teamRequests',
       teams: 'teams',
