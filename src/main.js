@@ -134,7 +134,9 @@ if (navigator.userAgent.match(/crios/gi)) {
   setTimeout(() => {
     input.blur();
     document.body.removeChild(input);
-    render();
+    setTimeout(() => {
+      render();
+    }, 50);
   }, 100);
 } else {
   render();
