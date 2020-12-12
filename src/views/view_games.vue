@@ -1012,7 +1012,7 @@ export default {
     },
     teamInfo: {
       handler() {
-        this.unlockGames = this.teamInfo.unlockGames;
+        this.unlockGames = this.teamInfo.unlockGames || [];
       },
       immediate: true,
     },
