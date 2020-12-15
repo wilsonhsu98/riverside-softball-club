@@ -66,7 +66,7 @@
             <p>{{ teamName }}</p>
             <p>{{ otherNames }}</p>
           </div>
-          <p class="team-intro">{{ teamIntro }}</p>
+          <p class="team-intro" v-html="teamIntro.replace(/\n/g, '<br/>')" />
           <div class="team-player" v-if="joined">
             <label class="section-header" ref="label">{{
               $t('ttl_player_list')
@@ -255,7 +255,7 @@
     margin-right: 3px;
     vertical-align: top;
     &:last-child {
-      margin-right: 0;
+      margin-right: auto;
     }
     &__name {
       margin: 0;
@@ -265,6 +265,10 @@
   }
   .team-wrapper {
     margin-top: 10px;
+    margin-right: -3px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
   }
   .section-header {
     position: absolute;

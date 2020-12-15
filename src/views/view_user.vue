@@ -148,7 +148,7 @@
     margin-right: 3px;
     vertical-align: top;
     &:last-child {
-      margin-right: 0;
+      margin-right: auto;
     }
     .fa-check {
       position: absolute;
@@ -186,9 +186,12 @@
     border: 2px solid $input_border;
     border-radius: 4px;
     margin-top: 12px;
-    padding: 10px 5px 5px;
+    padding: 10px 2px 5px 5px;
     position: relative;
     box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
     label {
       background-color: #fff;
       color: $input_font;
