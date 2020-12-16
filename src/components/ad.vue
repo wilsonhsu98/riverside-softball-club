@@ -67,7 +67,7 @@
           <vpon
             v-if="['games', 'game', 'stats_item', 'user'].includes(mode)"
             vpon_ad_format="320x50_mb"
-            is_rotate="true"
+            is_rotate="false"
             :vpon_ad_test="config[configMode].adTest"
             :vpon_ad_licensy_key="config[configMode].keys[mode]"
             :debug="config[configMode].debug"
@@ -77,7 +77,7 @@
           <vpon
             v-if="['stats_item300x250', 'user300x250'].includes(mode)"
             vpon_ad_format="300x250_mb"
-            is_rotate="true"
+            is_rotate="false"
             :vpon_ad_test="config[configMode].adTest"
             :vpon_ad_licensy_key="config[configMode].keys[mode]"
             :debug="config[configMode].debug"
