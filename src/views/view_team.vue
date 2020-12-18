@@ -634,7 +634,7 @@ export default {
       this.benches = this.benches.map(item => {
         return {
           ...item,
-          name: item.name.trim() || '',
+          name: (item.name || '').trim(),
         };
       });
 
