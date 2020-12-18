@@ -11,6 +11,7 @@ import { types as userTypes } from './user';
 import { actions as recordActions, types as recordTypes } from './record';
 import { db, auth, fieldValue, timestamp } from '../../firebase';
 import router from '../../router';
+import { formatDate } from '../../libs/utils';
 import { openDB } from 'idb';
 
 const dbInit = teamCode => {
@@ -77,6 +78,7 @@ const types = {
   CLEAR_TEAM: 'TEAM/CLEAR_TEAM',
   SET_KEYWORD: 'TEAM/SET_KEYWORD',
   SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
+  SEARCH_RECENT_GAMES: 'TEAM/SEARCH_RECENT_GAMES',
   FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
   CACHE_TEAMS: 'TEAM/CACHE_TEAMS',
 };
@@ -95,6 +97,7 @@ const state = {
   demoTeam: undefined,
   keyword: '',
   teamList: [],
+  recentGames: [],
   requests: [],
   cacheTeamsResponse: undefined,
 };
@@ -110,6 +113,7 @@ const getters = {
   ],
   keyword: state => state.keyword,
   teamList: state => state.teamList,
+  recentGames: state => state.recentGames,
   requests: state => state.requests,
 };
 
@@ -777,34 +781,80 @@ const actions = {
       .get()
       .then(teamCollection => {
         window.trackRead('searchTeams', teamCollection.docs.length || 1);
-        const filterTeams = teamCollection.docs
-          .map(doc => {
-            const data = doc.data();
-            return {
-              teamCode: doc.id,
-              ...data,
-              timestamp: data.timestamp.toDate(),
-            };
-          })
-          .filter(team => {
-            const lastTime = new Date(team.timestamp);
-            const playerCount = Object.keys(team.players).filter(name => {
-              return team.players[name].uid;
-            }).length;
-            const managerCount = Object.keys(team.players).filter(name => {
-              return team.players[name].manager && team.players[name].uid;
-            }).length;
+        const allTeams = teamCollection.docs.map(doc => {
+          const data = doc.data();
+          return {
+            teamCode: doc.id,
+            ...data,
+            timestamp: data.timestamp.toDate(),
+          };
+        });
 
-            if (
-              // !team.icon && // noicon
-              currentTime - lastTime > 86400000 * 30 * 1 && // 1個月前
-              playerCount === 1 && // only one binding user
-              managerCount === 1 // is manager
-            )
-              return true;
-          });
+        const today = formatDate(new Date());
+        const nextDay = formatDate(
+          new Date(new Date().setDate(new Date().getDate() + 1)),
+        );
+        const next2Days = formatDate(
+          new Date(new Date().setDate(new Date().getDate() + 2)),
+        );
+        const recentGames = allTeams
+          .filter(
+            t =>
+              typeof t.games === 'object' &&
+              Object.keys(t.games).some(g =>
+                [today, nextDay, next2Days].includes(g.split('-')[0]),
+              ),
+          )
+          .map(t => ({
+            name: t.name,
+            today: Object.keys(t.games).filter(g =>
+              [today].includes(g.split('-')[0]),
+            ).length,
+            nextDay: Object.keys(t.games).filter(g =>
+              [nextDay].includes(g.split('-')[0]),
+            ).length,
+            next2Days: Object.keys(t.games).filter(g =>
+              [next2Days].includes(g.split('-')[0]),
+            ).length,
+          }));
+        const sum = recentGames.reduce(
+          (acc, current) => {
+            return {
+              ...acc,
+              today: acc.today + current.today,
+              nextDay: acc.nextDay + current.nextDay,
+              next2Days: acc.next2Days + current.next2Days,
+            };
+          },
+          {
+            name: 'HEADER_SUM_TOTAL',
+            today: 0,
+            nextDay: 0,
+            next2Days: 0,
+            col: [today, nextDay, next2Days],
+          },
+        );
+
+        const filterTeams = allTeams.filter(team => {
+          const lastTime = new Date(team.timestamp);
+          const playerCount = Object.keys(team.players).filter(name => {
+            return team.players[name].uid;
+          }).length;
+          const managerCount = Object.keys(team.players).filter(name => {
+            return team.players[name].manager && team.players[name].uid;
+          }).length;
+
+          if (
+            // !team.icon && // noicon
+            currentTime - lastTime > 86400000 * 30 * 1 && // 1個月前
+            playerCount === 1 && // only one binding user
+            managerCount === 1 // is manager
+          )
+            return true;
+        });
 
         commit(types.SEARCH_TEAM, filterTeams);
+        commit(types.SEARCH_RECENT_GAMES, [sum, ...recentGames]);
         commit(rootTypes.LOADING, false);
       });
   },
@@ -842,6 +892,9 @@ const mutations = {
   },
   [types.SEARCH_TEAM](state, data) {
     state.teamList = data;
+  },
+  [types.SEARCH_RECENT_GAMES](state, data) {
+    state.recentGames = data;
   },
   [types.FETCH_REQUESTS](state, data) {
     state.requests = data;

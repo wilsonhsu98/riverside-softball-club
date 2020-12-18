@@ -710,6 +710,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { formatDate } from '../libs/utils';
 
 export default {
   data() {
@@ -785,15 +786,6 @@ export default {
       } else if (e.target.value.length > 1) {
         e.target.value = e.target.value.slice(0, 1);
       }
-    },
-    formatDate(dateVal) {
-      return dateVal
-        .toLocaleDateString('zh-TW', {
-          year: 'numeric',
-          month: '2-digit',
-          day: '2-digit',
-        })
-        .replace(/\//g, '');
     },
     validate() {
       this.gameId_err = '';
@@ -1063,7 +1055,7 @@ export default {
       immediate: true,
     },
     date() {
-      this.gameDate = this.formatDate(this.date);
+      this.gameDate = formatDate(this.date);
       this.gamePostfix =
         this.games
           .filter(item => item.game.includes(this.gameDate))

@@ -297,6 +297,16 @@ const getNameNumber = ({ name = '', number = '' }) => {
   return `${tempName}${tempNum}`;
 };
 
+const formatDate = dateVal => {
+  return dateVal
+    .toLocaleDateString('zh-TW', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    })
+    .replace(/\//g, '');
+};
+
 export default {
   parseGame,
   genGameList,
@@ -310,4 +320,5 @@ export {
   formatColor,
   getShuffledArr,
   getNameNumber,
+  formatDate,
 };

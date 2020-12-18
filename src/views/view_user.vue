@@ -55,7 +55,7 @@
             "
             class="link"
             style="margin-left: 5px;"
-            href="#/management"
+            :href="`#/management?${new Date().getTime()}`"
             target="_blank"
             >後台</a
           >

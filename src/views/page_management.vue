@@ -23,6 +23,48 @@
       Delete Unuse Teams
     </button>
     <div v-else>There is no team can be deleted</div>
+    <template v-if="recentGames.length">
+      <hr />
+      <table>
+        <thead>
+          <tr
+            :key="row.name"
+            v-for="row in recentGames.filter(
+              r => r.name === 'HEADER_SUM_TOTAL',
+            )"
+          >
+            <th></th>
+            <th>今天{{ row.col[0] }}</th>
+            <th>明天{{ row.col[1] }}</th>
+            <th>後天{{ row.col[2] }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            :key="row.name"
+            v-for="row in recentGames.filter(
+              r => r.name === 'HEADER_SUM_TOTAL',
+            )"
+          >
+            <td>總計</td>
+            <td>{{ row.today }}</td>
+            <td>{{ row.nextDay }}</td>
+            <td>{{ row.next2Days }}</td>
+          </tr>
+          <tr
+            :key="row.name"
+            v-for="row in recentGames.filter(
+              r => r.name !== 'HEADER_SUM_TOTAL',
+            )"
+          >
+            <td>{{ row.name }}</td>
+            <td>{{ row.today }}</td>
+            <td>{{ row.nextDay }}</td>
+            <td>{{ row.next2Days }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </template>
     <loading v-if="loading"></loading>
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
@@ -47,6 +89,13 @@
   }
   label {
     line-height: 30px;
+  }
+  table {
+    margin: 0 auto;
+    th,
+    td {
+      padding: 0 5px;
+    }
   }
 }
 .modal {
@@ -139,6 +188,7 @@ export default {
       loading: 'loading',
       alertMsg: 'alertMsg',
       teamList: 'teamList',
+      recentGames: 'recentGames',
     }),
   },
 };
