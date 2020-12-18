@@ -205,16 +205,16 @@ export default {
         this.$refs.root.style.display = 'block';
       }
 
-      if (document.body.clientWidth <= 414) {
-        if (['games', 'game', 'stats_item', 'user'].includes(this.mode)) {
-          this.scale = document.body.clientWidth / 320;
-          this.height = 50 * this.scale;
-        }
-        if (['stats_item300x250', 'user300x250'].includes(this.mode)) {
-          this.scale = document.body.clientWidth / 300;
-          this.height = 250 * this.scale;
-        }
-      }
+      // if (document.body.clientWidth <= 414) {
+      //   if (['games', 'game', 'stats_item', 'user'].includes(this.mode)) {
+      //     this.scale = document.body.clientWidth / 320;
+      //     this.height = 50 * this.scale;
+      //   }
+      //   if (['stats_item300x250', 'user300x250'].includes(this.mode)) {
+      //     this.scale = document.body.clientWidth / 300;
+      //     this.height = 250 * this.scale;
+      //   }
+      // }
     }
   },
   beforeDestroy() {
