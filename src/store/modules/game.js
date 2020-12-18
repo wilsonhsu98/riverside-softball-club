@@ -106,16 +106,22 @@ const actions = {
           db.doc(`teams/${teamCode}`),
           {
             games: { [newId]: timestamp },
-            ...(prevGameDoc
-              ? {}
-              : { unlockGames: fieldValue.arrayUnion(newId) }),
+            unlockGames: fieldValue.arrayUnion(newId),
             timestamp,
           },
           { merge: true },
         );
         if (prevGameDoc) {
-          const refPrevGameDoc = db.doc(`teams/${teamCode}/games/${prevId}`);
-          batch.delete(refPrevGameDoc);
+          batch.delete(db.doc(`teams/${teamCode}/games/${prevId}`));
+          batch.set(
+            db.doc(`teams/${teamCode}`),
+            {
+              games: { [prevId]: fieldValue.delete() },
+              unlockGames: fieldValue.arrayRemove(prevId),
+              timestamp,
+            },
+            { merge: true },
+          );
         }
         return batch.commit();
       })
