@@ -13,6 +13,7 @@ import Carousel3d from 'vue-carousel-3d';
 import { Plugin } from 'vue-fragment';
 import simplebar from 'simplebar-vue';
 import VueRangeSlider from 'vue-range-component';
+import { VueSvgGauge } from 'vue-svg-gauge';
 import smoothscroll from 'smoothscroll-polyfill';
 import icon from './components/icon';
 import './css/font-awesome.min.css';
@@ -40,6 +41,7 @@ Vue.component('vue-draggable', draggable);
 Vue.component('v-select', vSelect);
 Vue.component('simplebar', simplebar);
 Vue.component('vue-range-slider', VueRangeSlider);
+Vue.component('vue-svg-gauge', VueSvgGauge);
 const tootipConfig = {
   defaultTrigger: 'hover focus click',
   disposeTimeout: 1000,

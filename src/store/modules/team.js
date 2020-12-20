@@ -11,7 +11,7 @@ import { types as userTypes } from './user';
 import { actions as recordActions, types as recordTypes } from './record';
 import { db, auth, fieldValue, timestamp } from '../../firebase';
 import router from '../../router';
-import { formatDate } from '../../libs/utils';
+import { evaluateTeamScore, formatDate } from '../../libs/utils';
 import { openDB } from 'idb';
 
 const dbInit = teamCode => {
@@ -79,6 +79,7 @@ const types = {
   SET_KEYWORD: 'TEAM/SET_KEYWORD',
   SEARCH_TEAM: 'TEAM/SEARCH_TEAM',
   SEARCH_RECENT_GAMES: 'TEAM/SEARCH_RECENT_GAMES',
+  SEARCH_ALL_TEAM: 'TEAM/SEARCH_ALL_TEAM',
   FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
   CACHE_TEAMS: 'TEAM/CACHE_TEAMS',
 };
@@ -89,6 +90,8 @@ const state = {
     teamName: '',
     teamIntro: '',
     otherNames: '',
+    score: undefined,
+    scoreKVP: {},
     players: [{}],
     benches: [{}],
     icon: '',
@@ -98,6 +101,7 @@ const state = {
   keyword: '',
   teamList: [],
   recentGames: [],
+  allTeams: [],
   requests: [],
   cacheTeamsResponse: undefined,
 };
@@ -114,13 +118,15 @@ const getters = {
   keyword: state => state.keyword,
   teamList: state => state.teamList,
   recentGames: state => state.recentGames,
+  allTeams: state => state.allTeams,
   requests: state => state.requests,
 };
 
 const actions = {
   editTeam({ commit }, data) {
+    const { code: teamCode, nextAction } = data;
     commit(rootTypes.LOADING, true);
-    const refTeamDoc = db.collection('teams').doc(data.code);
+    const refTeamDoc = db.collection('teams').doc(teamCode);
     const refPlayerDoc = db.collection('accounts').doc(auth.currentUser.uid);
     Promise.all([
       promiseImage(data.icon, 'icon'),
@@ -143,9 +149,9 @@ const actions = {
                 db.collection('accounts').doc(player.uid),
                 {
                   teamRoles: {
-                    [data.code]: player.manager ? 'manager' : 'player',
+                    [teamCode]: player.manager ? 'manager' : 'player',
                   },
-                  teams: fieldValue.arrayUnion(data.code),
+                  teams: fieldValue.arrayUnion(teamCode),
                 },
                 { merge: true },
               );
@@ -154,8 +160,8 @@ const actions = {
               batch.set(
                 refPlayerDoc,
                 {
-                  teamRoles: { [data.code]: 'manager' },
-                  teams: fieldValue.arrayUnion(data.code),
+                  teamRoles: { [teamCode]: 'manager' },
+                  teams: fieldValue.arrayUnion(teamCode),
                 },
                 { merge: true },
               );
@@ -189,9 +195,9 @@ const actions = {
                     db.collection('accounts').doc(prePlayer.uid),
                     {
                       teamRoles: {
-                        [data.code]: 'bench',
+                        [teamCode]: 'bench',
                       },
-                      teams: fieldValue.arrayUnion(data.code),
+                      teams: fieldValue.arrayUnion(teamCode),
                     },
                     { merge: true },
                   );
@@ -216,9 +222,9 @@ const actions = {
                   db.collection('accounts').doc(prePlayer.uid),
                   {
                     teamRoles: {
-                      [data.code]: fieldValue.delete(),
+                      [teamCode]: fieldValue.delete(),
                     },
-                    teams: fieldValue.arrayRemove(data.code),
+                    teams: fieldValue.arrayRemove(teamCode),
                   },
                   { merge: true },
                 );
@@ -228,9 +234,9 @@ const actions = {
                   db.collection('accounts').doc(prePlayer.uid),
                   {
                     teamRoles: {
-                      [data.code]: 'player',
+                      [teamCode]: 'player',
                     },
-                    teams: fieldValue.arrayUnion(data.code),
+                    teams: fieldValue.arrayUnion(teamCode),
                   },
                   { merge: true },
                 );
@@ -294,6 +300,7 @@ const actions = {
               players,
               benches,
               timestamp,
+              ...(data.isNew ? { createTime: timestamp } : undefined),
             },
             { merge: true },
           );
@@ -301,10 +308,92 @@ const actions = {
         }
       })
       .then(res => {
+        commit(rootTypes.LOADING, false);
+        if (typeof nextAction === 'function') {
+          nextAction();
+        }
         if (res !== false && data.isNew) {
           router.push('/main/user');
         }
+      })
+      .catch(error => {
+        console.log('Error getting document:', error);
+      });
+  },
+  editTeamScore({ commit }, data) {
+    const { teamCode, score, scoreKVP, nextAction } = data;
+    commit(rootTypes.LOADING, true);
+    new Promise(resolve => {
+      if (score && scoreKVP) {
+        resolve({ score, scoreKVP });
+      } else {
+        Promise.all([
+          db
+            .collection('teams')
+            .doc(teamCode)
+            .get(),
+          db.collection(`teams/${teamCode}/games`).get(),
+        ]).then(res => {
+          const [teamDoc, gameCollection] = res;
+          window.trackRead('editTeamScore: team doc', 1);
+          window.trackRead(
+            'editTeamScore: games in the team',
+            gameCollection.docs.length || 1,
+          );
+          const data = teamDoc.data();
+          const {
+            benches: benches_ = {},
+            players: players_ = {},
+          } = teamDoc.data();
+          const players = Object.keys(players_).map(name => ({
+            name,
+            manager: players_[name].manager,
+            number: players_[name].number,
+            uid: players_[name].uid,
+            photo: players_[name].photo,
+          }));
+          const benches = Object.keys(benches_).map(uid => ({
+            uid,
+            msg: benches_[uid].msg,
+            photo: benches_[uid].photo,
+          }));
+
+          const teamInfo = {
+            teamCode: teamDoc.id,
+            teamName: data.name,
+            teamIntro: data.intro,
+            otherNames: data.subNames,
+            players: players.sort((a, b) => a.number - b.number),
+            benches: benches.sort((a, b) => a.number - b.number),
+            icon: data.icon,
+            unlockGames: [...(data.unlockGames || [])],
+          };
+          const games = gameCollection.docs.map(doc => doc.data());
+          const records = [].concat(
+            ...gameCollection.docs.map(doc => doc.data().orders).filter(r => r),
+          );
+          resolve(
+            evaluateTeamScore({
+              teamInfo,
+              games,
+              records,
+            }),
+          );
+        });
+      }
+    })
+      .then(({ score, scoreKVP }) => {
+        console.log(teamCode, score);
+        return db
+          .collection('teams')
+          .doc(teamCode)
+          .set({ score, scoreKVP }, { merge: true });
+      })
+      .then(() => {
         commit(rootTypes.LOADING, false);
+        if (typeof nextAction === 'function') {
+          nextAction();
+        }
       })
       .catch(error => {
         console.log('Error getting document:', error);
@@ -607,6 +696,7 @@ const actions = {
                 keyword: `${data.name}${
                   data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
                 }`,
+                score: data.score,
               };
             });
             commit(types.CACHE_TEAMS, filterTeams);
@@ -627,13 +717,9 @@ const actions = {
             : false;
         })
         .map(team => {
-          const score =
-            team.teamCode === 'DEMO'
-              ? 10
-              : (team.icon ? 2 : 0) + (team.subNames ? 1 : 0);
           return {
             ...team,
-            score,
+            score: team.teamCode === 'DEMO' ? 101 : team.score,
           };
         })
         .sort((a, b) => {
@@ -855,6 +941,7 @@ const actions = {
 
         commit(types.SEARCH_TEAM, filterTeams);
         commit(types.SEARCH_RECENT_GAMES, [sum, ...recentGames]);
+        commit(types.SEARCH_ALL_TEAM, allTeams);
         commit(rootTypes.LOADING, false);
       });
   },
@@ -867,6 +954,8 @@ const mutations = {
       teamName: '',
       teamIntro: '',
       otherNames: '',
+      score: undefined,
+      scoreKVP: {},
       players: [{}],
       benches: [{}],
       icon: '',
@@ -878,6 +967,8 @@ const mutations = {
       teamName: data.name,
       teamIntro: data.intro,
       otherNames: data.subNames,
+      score: data.score,
+      scoreKVP: data.scoreKVP,
       players: [...data.players].sort((a, b) => a.number - b.number),
       benches: [...data.benches].sort((a, b) => a.number - b.number),
       icon: data.icon,
@@ -895,6 +986,9 @@ const mutations = {
   },
   [types.SEARCH_RECENT_GAMES](state, data) {
     state.recentGames = data;
+  },
+  [types.SEARCH_ALL_TEAM](state, data) {
+    state.allTeams = data;
   },
   [types.FETCH_REQUESTS](state, data) {
     state.requests = data;

@@ -38,10 +38,12 @@
             @click="searchTeam_(team.teamCode)"
             :key="`team_${team.teamCode}`"
           >
-            <img
-              :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)"
-              style="height: 50px;"
-            />
+            <div :data-score="team.score">
+              <img
+                :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)"
+                style="height: 50px;"
+              />
+            </div>
             <p class="team__name">{{ team.name }}</p>
             <p
               class="team__name"
@@ -59,6 +61,9 @@
               backgroundImage: `url(${$cacheImg(icon) ||
                 $cacheImg(defaultIcon)})`,
             }"
+            :data-score="
+              teamScore ? `${$t('ttl_score')} ${teamScore}` : undefined
+            "
           >
             <label class="section-header" style="outline: none;">{{
               $t('ttl_team_intro')
@@ -262,6 +267,28 @@
       font-size: 12px;
       line-height: 14px;
     }
+    div[data-score] {
+      display: inline-block;
+      position: relative;
+      &:after {
+        content: attr(data-score);
+        position: absolute;
+        z-index: 1;
+        left: -3px;
+        top: -3px;
+        height: 18px;
+        padding: 0 3px;
+        min-width: 18px;
+        line-height: 18px;
+        font-size: 12px;
+        background-color: $dark_gray;
+        border-radius: 9px;
+        box-sizing: border-box;
+        text-align: center;
+        color: #fff;
+        opacity: 0.8;
+      }
+    }
   }
   .team-wrapper {
     margin-top: 10px;
@@ -299,6 +326,24 @@
       &:last-child {
         margin-bottom: 0;
       }
+    }
+    &[data-score]:after {
+      content: attr(data-score);
+      position: absolute;
+      z-index: 1;
+      right: 0;
+      top: 10px;
+      height: 18px;
+      padding: 0 8px;
+      min-width: 18px;
+      line-height: 18px;
+      font-size: 12px;
+      background-color: $dark_gray;
+      border-radius: 9px;
+      box-sizing: border-box;
+      text-align: center;
+      color: #fff;
+      opacity: 0.8;
     }
   }
   .team-intro {
@@ -391,6 +436,7 @@ export default {
       teamName: '',
       teamIntro: '',
       otherNames: '',
+      teamScore: undefined,
       players: [],
       benches: [],
       icon: '',
@@ -486,6 +532,7 @@ export default {
         this.teamName = this.teamInfo.teamName;
         this.teamIntro = this.teamInfo.teamIntro;
         this.otherNames = this.teamInfo.otherNames;
+        this.teamScore = this.teamInfo.score;
         this.icon = this.teamInfo.icon;
         this.players = [...this.teamInfo.players];
         this.benches = [...this.teamInfo.benches];

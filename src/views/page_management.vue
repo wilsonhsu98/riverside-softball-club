@@ -65,6 +65,10 @@
         </tbody>
       </table>
     </template>
+    <hr />
+    <button @click="batchEvaluateTeamScore">
+      Batch Evaluate Team Score
+    </button>
     <loading v-if="loading"></loading>
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
@@ -163,6 +167,7 @@ export default {
       'deleteAnonymousUsers',
       'fetchDummyTeams',
       'deleteTeam',
+      'editTeamScore',
     ]),
     deleteUnuseTeams() {
       this.checkedTeams
@@ -182,14 +187,34 @@ export default {
           this.fetchDummyTeams();
         });
     },
+    batchEvaluateTeamScore() {
+      this.allTeams
+        .map(t => t.teamCode)
+        .reduce((acc, teamCode) => {
+          return acc.then(() => {
+            return new Promise(resolve => {
+              this.editTeamScore({
+                teamCode: teamCode,
+                nextAction: () => {
+                  resolve();
+                },
+              });
+            });
+          });
+        }, Promise.resolve())
+        .then(() => {
+          this.alert('完成');
+        });
+    },
   },
   computed: {
-    ...mapGetters({
-      loading: 'loading',
-      alertMsg: 'alertMsg',
-      teamList: 'teamList',
-      recentGames: 'recentGames',
-    }),
+    ...mapGetters([
+      'loading',
+      'alertMsg',
+      'teamList',
+      'recentGames',
+      'allTeams',
+    ]),
   },
 };
 </script>

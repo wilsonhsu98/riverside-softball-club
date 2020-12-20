@@ -96,11 +96,19 @@
           "
           :key="`team_${team.teamCode}`"
         >
-          <i v-if="team.teamCode === currentTeam" class="fa fa-check" />
-          <img
-            :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)"
-            style="height: 50px;"
-          />
+          <div
+            :data-score="
+              team.teamCode === 'DEMO' || isAnonymous !== true
+                ? undefined
+                : team.score
+            "
+          >
+            <img
+              :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)"
+              style="height: 50px;"
+            />
+            <i v-if="team.teamCode === currentTeam" class="fa fa-check" />
+          </div>
           <p class="team__name">{{ team.name }}</p>
           <p
             class="team__name"
@@ -149,6 +157,29 @@
     vertical-align: top;
     &:last-child {
       margin-right: auto;
+    }
+
+    div[data-score] {
+      display: inline-block;
+      position: relative;
+      &:after {
+        content: attr(data-score);
+        position: absolute;
+        z-index: 1;
+        left: -3px;
+        top: -3px;
+        height: 18px;
+        padding: 0 3px;
+        min-width: 18px;
+        line-height: 18px;
+        font-size: 12px;
+        background-color: $dark_gray;
+        border-radius: 9px;
+        box-sizing: border-box;
+        text-align: center;
+        color: #fff;
+        opacity: 0.8;
+      }
     }
     .fa-check {
       position: absolute;

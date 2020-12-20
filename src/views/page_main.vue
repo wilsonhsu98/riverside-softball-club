@@ -124,6 +124,7 @@ header {
     height: 100%;
     line-height: 70px;
     width: calc(100% - 66px);
+    vertical-align: middle;
     > li {
       display: inline-block;
       &.home {

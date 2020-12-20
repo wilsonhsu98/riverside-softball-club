@@ -297,6 +297,165 @@ const getNameNumber = ({ name = '', number = '' }) => {
   return `${tempName}${tempNum}`;
 };
 
+const basicCount = 19;
+const scoreMapping = [
+  {
+    key: 'teamIcon',
+    checkFunc: ({ teamInfo = {} }) => (teamInfo.icon ? 1 : 0),
+    percent: 10,
+  },
+  {
+    key: '10Players',
+    checkFunc: ({ teamInfo = { players: [] } }) =>
+      Math.min(teamInfo.players.length, 10) / 10,
+    percent: 10,
+    max: 10,
+  },
+  {
+    key: '10BindingPlayers',
+    checkFunc: ({ teamInfo = { players: [] } }) =>
+      Math.min(teamInfo.players.filter(player => player.uid).length, 10) / 10,
+    percent: 10,
+    max: 10,
+  },
+  {
+    key: '10CompletedGames',
+    checkFunc: ({ teamInfo = {}, games = [] }) =>
+      Math.min(games.length - (teamInfo.unlockGames || []).length, 10) / 10,
+    percent: 10,
+    max: 10,
+  },
+  {
+    key: 'teamIntro',
+    checkFunc: ({ teamInfo = {} }) => (teamInfo.teamIntro ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'teamOtherNames',
+    checkFunc: ({ teamInfo = {} }) => (teamInfo.otherNames ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gamePeriod',
+    checkFunc: ({ games = [] }) => (games.some(g => g.period) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameLeague',
+    checkFunc: ({ games = [] }) => (games.some(g => g.league) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameGroup',
+    checkFunc: ({ games = [] }) => (games.some(g => g.group) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameType',
+    checkFunc: ({ games = [] }) => (games.some(g => g.gameType) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gamePlace',
+    checkFunc: ({ games = [] }) => (games.some(g => g.place) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameTopBottom',
+    checkFunc: ({ games = [] }) => (games.some(g => g.topBottom) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameCoach',
+    checkFunc: ({ games = [] }) => (games.some(g => g.coach) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameRecorder',
+    checkFunc: ({ games = [] }) => (games.some(g => g.recorder) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameTags',
+    checkFunc: ({ games = [] }) =>
+      games.some(g => Array.isArray(g.tags) && g.tags.length) ? 1 : 0,
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gamePitcher',
+    checkFunc: ({ games = [] }) => (games.some(g => g.pitcher) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameResult',
+    checkFunc: ({ games = [] }) => (games.some(g => g.result) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameOpponentScores',
+    checkFunc: ({ games = [] }) =>
+      games.some(
+        g => Array.isArray(g.opponentScores) && g.opponentScores.length,
+      )
+        ? 1
+        : 0,
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameMvp',
+    checkFunc: ({ games = [] }) => (games.some(g => g.mvp) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameNote',
+    checkFunc: ({ games = [] }) => (games.some(g => g.gameNote) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gamePositions',
+    checkFunc: ({ games = [] }) =>
+      games.some(
+        g =>
+          typeof g.positions === 'object' &&
+          Object.keys(g.positions).length === 10,
+      )
+        ? 1
+        : 0,
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameVideo',
+    desc: 'game video',
+    checkFunc: ({ games = [] }) => (games.some(g => g.youtubeVideos) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gamePersonalVideo',
+    checkFunc: ({ records = [] }) =>
+      [...records].reverse().some(r => typeof r.video === 'object') ? 1 : 0,
+    percent: 60 / basicCount,
+  },
+];
+const evaluateTeamScore = ({ teamInfo = {}, games = [], records = [] }) => {
+  const { score, scoreKVP } = scoreMapping.reduce(
+    (acc, item) => {
+      const s = item.checkFunc({ teamInfo, games, records }) * item.percent;
+      return {
+        score: acc.score + s,
+        scoreKVP: {
+          ...acc.scoreKVP,
+          [item.key]: item.max ? s === item.max : !!s,
+        },
+      };
+    },
+    { score: 0, scoreKVP: {} },
+  );
+  return {
+    score: Math.min(100, Math.round(score)),
+    scoreKVP,
+  };
+};
+
 const formatDate = dateVal => {
   return dateVal
     .toLocaleDateString('zh-TW', {
@@ -320,5 +479,7 @@ export {
   formatColor,
   getShuffledArr,
   getNameNumber,
+  evaluateTeamScore,
+  scoreMapping,
   formatDate,
 };

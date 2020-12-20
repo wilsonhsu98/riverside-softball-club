@@ -6,7 +6,16 @@
       @save="editTeam_"
     />
     <div class="container" ref="container">
-      <h1>{{ $route.params.team ? $t('manage_team') : $t('create_team') }}</h1>
+      <h1>
+        {{ $route.params.team ? $t('manage_team') : $t('create_team') }}
+        <div
+          v-if="$route.params.team && teamScore"
+          class="score"
+          @click="showScore"
+        >
+          {{ `${$t('ttl_score')} ${teamScore}` }}
+        </div>
+      </h1>
 
       <div
         class="request"
@@ -272,6 +281,42 @@
         </button>
       </div>
     </div>
+
+    <modal
+      name="score"
+      :adaptive="true"
+      :maxWidth="400"
+      :minHeight="400"
+      class="modal-wrapper"
+    >
+      <h1>{{ $t('ttl_score_report') }}</h1>
+      <div class="gauge-wrapper">
+        <vue-svg-gauge :value="teamScore" :min="0" :max="100">
+          <div class="inner-text">
+            {{ teamScore }}
+          </div>
+        </vue-svg-gauge>
+      </div>
+      <div class="score-list">
+        <div
+          :key="key"
+          v-for="key in scoreMapping.map(s => s.key)"
+          class="score-item"
+        >
+          <i
+            class="fa"
+            :class="{
+              'fa-check-square-o': teamScoreKVP[key],
+              'fa-square-o': !teamScoreKVP[key],
+            }"
+          />
+          {{ $t(`desc_score_${key}`) }}
+        </div>
+      </div>
+      <button @click="reEvaluateTeamScore">
+        {{ $t('btn_evaluate') }}
+      </button>
+    </modal>
   </div>
 </template>
 
@@ -345,6 +390,30 @@
       .fa {
         bottom: 0;
       }
+    }
+  }
+  h1 {
+    max-width: $max_width;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    .score {
+      position: absolute;
+      z-index: 1;
+      right: 0;
+      top: 1px;
+      height: 22px;
+      padding: 0 8px;
+      min-width: 18px;
+      line-height: 22px;
+      font-size: 14px;
+      background-color: $dark_gray;
+      border-radius: 9px;
+      box-sizing: border-box;
+      text-align: center;
+      color: #fff;
+      opacity: 0.8;
+      cursor: pointer;
     }
   }
   .field-wrapper {
@@ -574,11 +643,85 @@
     }
   }
 }
+
+.modal-wrapper {
+  background-color: rgba(0, 0, 0, 0.5);
+  ::v-deep .v--modal-box {
+    border-radius: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+  }
+  h1 {
+    font-size: 18px;
+    font-weight: normal;
+    margin: 0;
+    text-align: center;
+    text-decoration: underline;
+  }
+  .gauge-wrapper {
+    margin-top: 15px;
+    height: 100px;
+  }
+  .inner-text {
+    width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 5px;
+    font-size: 30px;
+  }
+  .score-list {
+    flex: 1;
+    overflow: auto;
+    margin: 15px 0;
+    .score-item {
+      padding-left: 30px;
+      line-height: 25px;
+      position: relative;
+      .fa {
+        position: absolute;
+        left: 5px;
+        top: 4px;
+        font-size: 20px;
+      }
+    }
+  }
+  button {
+    background-color: $header_bgcolor;
+    margin: 0;
+    padding: 10px 15px;
+    outline: none;
+  }
+}
+
+@media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
+  .modal-wrapper::v-deep .v--modal-box {
+    position: fixed;
+    top: 80px !important;
+    bottom: 80px !important;
+    height: auto !important;
+    left: 20px !important;
+    right: 20px !important;
+    width: auto !important;
+  }
+}
+@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
+  .modal-wrapper::v-deep .v--modal-box {
+    position: fixed;
+    top: 20px !important;
+    bottom: 20px !important;
+    height: auto !important;
+    left: 60px !important;
+    right: 60px !important;
+    width: auto !important;
+  }
+}
 </style>
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import transparentPng from '../images/transparent.png';
+import { evaluateTeamScore, scoreMapping } from '../libs/utils';
 
 export default {
   data() {
@@ -590,12 +733,15 @@ export default {
       teamName_err: '',
       teamIntro: '',
       otherNames: '',
+      teamScore: undefined,
+      teamScoreKVP: {},
       players: [{}],
       benches: [],
       players_err: '',
       icon: '',
       iconEdit: false,
       transparentPng,
+      scoreMapping,
     };
   },
   created() {},
@@ -606,6 +752,7 @@ export default {
   methods: {
     ...mapActions({
       editTeam: 'editTeam',
+      editTeamScore: 'editTeamScore',
       handleRequest: 'handleRequest',
       deleteTeam: 'deleteTeam',
       alert: 'alert',
@@ -720,6 +867,18 @@ export default {
             preBenches: !this.$route.params.team ? [] : this.teamInfo.benches,
             icon: this.icon,
             isNew: !this.$route.params.team,
+            nextAction: () => {
+              const { score, scoreKVP } = evaluateTeamScore({
+                teamInfo: this.teamInfo,
+                games: this.games,
+                records: this.records,
+              });
+              this.editTeamScore({
+                teamCode: this.teamCode,
+                score,
+                scoreKVP,
+              });
+            },
           });
         } else {
           setTimeout(() => {
@@ -791,6 +950,21 @@ export default {
         this.alert(this.$t('msg_not_manager'));
       }
     },
+    showScore() {
+      this.$modal.show('score');
+    },
+    reEvaluateTeamScore() {
+      const { score, scoreKVP } = evaluateTeamScore({
+        teamInfo: this.teamInfo,
+        games: this.games,
+        records: this.records,
+      });
+      this.editTeamScore({
+        teamCode: this.teamCode,
+        score,
+        scoreKVP,
+      });
+    },
   },
   computed: {
     ...mapGetters({
@@ -798,6 +972,8 @@ export default {
       teamInfo: 'teamInfo',
       currentTeamIcon: 'currentTeamIcon',
       teamRequests: 'teamRequests',
+      games: 'games',
+      records: 'records',
     }),
   },
   watch: {
@@ -808,6 +984,8 @@ export default {
           this.teamName = this.teamInfo.teamName;
           this.teamIntro = this.teamInfo.teamIntro;
           this.otherNames = this.teamInfo.otherNames;
+          this.teamScore = this.teamInfo.score;
+          this.teamScoreKVP = this.teamInfo.scoreKVP;
 
           this.icon = this.teamInfo.icon;
           this.players = this.teamInfo.players.map(player => {
