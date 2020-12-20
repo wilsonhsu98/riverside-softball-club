@@ -666,9 +666,8 @@
   .inner-text {
     width: 100%;
     text-align: center;
-    position: absolute;
-    bottom: 5px;
     font-size: 30px;
+    padding-top: 63px;
   }
   .score-list {
     flex: 1;
