@@ -103,10 +103,7 @@
                 : team.score
             "
           >
-            <img
-              :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)"
-              style="height: 50px;"
-            />
+            <img :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)" />
             <i v-if="team.teamCode === currentTeam" class="fa fa-check" />
           </div>
           <p class="team__name">{{ team.name }}</p>
@@ -158,7 +155,6 @@
     &:last-child {
       margin-right: auto;
     }
-
     div[data-score] {
       display: inline-block;
       position: relative;
@@ -180,6 +176,10 @@
         color: #fff;
         opacity: 0.8;
       }
+    }
+    img {
+      height: 50px;
+      width: 50px;
     }
     .fa-check {
       position: absolute;

@@ -39,10 +39,7 @@
             :key="`team_${team.teamCode}`"
           >
             <div :data-score="team.score">
-              <img
-                :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)"
-                style="height: 50px;"
-              />
+              <img :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)" />
             </div>
             <p class="team__name">{{ team.name }}</p>
             <p
@@ -61,10 +58,10 @@
               backgroundImage: `url(${$cacheImg(icon) ||
                 $cacheImg(defaultIcon)})`,
             }"
-            :data-score="
-              teamScore ? `${$t('ttl_score')} ${teamScore}` : undefined
-            "
           >
+            <div v-if="teamScore" class="score" @click="showScore">
+              {{ `${$t('ttl_score')} ${teamScore}` }}
+            </div>
             <label class="section-header" style="outline: none;">{{
               $t('ttl_team_intro')
             }}</label>
@@ -187,6 +184,11 @@
         </button>
       </div>
     </div>
+    <team-score-modal
+      :title="$t('ttl_score_team', { team: teamName })"
+      :teamScore="teamScore"
+      :teamScoreKVP="teamScoreKVP"
+    />
   </div>
 </template>
 
@@ -289,6 +291,10 @@
         opacity: 0.8;
       }
     }
+    img {
+      height: 50px;
+      width: 50px;
+    }
   }
   .team-wrapper {
     margin-top: 10px;
@@ -327,8 +333,7 @@
         margin-bottom: 0;
       }
     }
-    &[data-score]:after {
-      content: attr(data-score);
+    .score {
       position: absolute;
       z-index: 1;
       right: 0;
@@ -344,10 +349,13 @@
       text-align: center;
       color: #fff;
       opacity: 0.8;
+      cursor: pointer;
     }
   }
   .team-intro {
     margin: 0 0 10px 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .team-player,
   .team-other {
@@ -437,6 +445,7 @@ export default {
       teamIntro: '',
       otherNames: '',
       teamScore: undefined,
+      teamScoreKVP: {},
       players: [],
       benches: [],
       icon: '',
@@ -514,6 +523,9 @@ export default {
         action: 'delete',
       });
     },
+    showScore() {
+      this.$modal.show('score');
+    },
   },
   computed: {
     ...mapGetters({
@@ -533,6 +545,7 @@ export default {
         this.teamIntro = this.teamInfo.teamIntro;
         this.otherNames = this.teamInfo.otherNames;
         this.teamScore = this.teamInfo.score;
+        this.teamScoreKVP = this.teamInfo.scoreKVP;
         this.icon = this.teamInfo.icon;
         this.players = [...this.teamInfo.players];
         this.benches = [...this.teamInfo.benches];

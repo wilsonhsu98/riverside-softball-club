@@ -216,6 +216,7 @@
 	"tip_bench": "若給予非正式球員名字，便成為正式球員|將非正式球員刪除，該球員等同於被請出球隊",
 	"ttl_score": "完整度",
 	"ttl_score_report": "球隊完整度報告",
+	"ttl_score_team": "《%{team}》完整度",
 	"btn_evaluate": "重新診斷",
 	"desc_score_10BindingPlayers": "至少有10名綁定球員",
 	"desc_score_10CompletedGames": "完成10場比賽記錄",

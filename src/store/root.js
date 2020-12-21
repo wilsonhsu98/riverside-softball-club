@@ -206,8 +206,7 @@ const actions = {
           commit(types.SET_TOKEN, user.refreshToken);
           commit(types.SET_USERNAME, user.uid);
           commit(types.SET_ANONYMOUS, true);
-          // go to main page
-          router.push('/main/stats_pa');
+          router.push('/main/user');
           commit(types.LOADING, false);
           return;
         }
@@ -332,30 +331,31 @@ const actions = {
     auth
       .signOut()
       .then(() => {
-        let promise = new Promise(resolve => {
-          resolve();
-        });
-        if (state.isAnonymous) {
-          promise = promise
-            .then(() => {
-              return axios.post(
+        return new Promise(resolve => {
+          if (state.isAnonymous) {
+            axios
+              .post(
                 `https://securetoken.googleapis.com/v1/token?key=${config.firebase.apiKey}`,
                 {
                   grant_type: 'refresh_token',
                   refresh_token: getters.token,
                 },
-              );
-            })
-            .then(res => {
-              return axios.post(
-                `https://www.googleapis.com/identitytoolkit/v3/relyingparty/deleteAccount?key=${config.firebase.apiKey}`,
-                {
-                  idToken: res.data.id_token,
-                },
-              );
-            });
-        }
-        return promise.then(() => {
+              )
+              .then(res =>
+                axios.post(
+                  `https://www.googleapis.com/identitytoolkit/v3/relyingparty/deleteAccount?key=${config.firebase.apiKey}`,
+                  {
+                    idToken: res.data.id_token,
+                  },
+                ),
+              )
+              .then(res => {
+                resolve(res);
+              });
+          } else {
+            resolve();
+          }
+        }).then(() => {
           commit(types.CLEAN_TOKEN);
           commit(types.LOADING, false);
         });
