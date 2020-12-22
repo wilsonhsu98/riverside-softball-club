@@ -936,7 +936,9 @@ export default {
     }
     setTimeout(() => {
       this.focus_game = focus_game;
-      this.block = false;
+      setTimeout(() => {
+        this.block = false;
+      }, 300);
     }, 500);
   },
   beforeDestroy() {
