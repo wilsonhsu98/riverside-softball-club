@@ -150,171 +150,186 @@
     <div
       class="container"
       ref="container"
-      :class="{ empty: role === 'manager' && groupGames.length === 0 }"
+      :class="{
+        block,
+        empty:
+          role === 'manager' &&
+          Array.isArray(groupGames_) &&
+          groupGames_.length === 0,
+      }"
     >
       <ad :mode="'games'" />
-      <template v-for="(item, i) in groupGames">
-        <div
-          :class="[
-            'row',
-            { first: i === 0, last: i === groupGames.length - 1 },
-          ]"
-          :data-date="item.date"
-          :key="`date_${item.date}`"
-        >
-          <template v-for="sub in item.games">
-            <v-popover
-              v-if="container"
-              placement="bottom"
-              trigger="click"
-              offset="0"
-              class="cell"
-              :delay="{ show: 100, hide: 0 }"
-              :popoverClass="
-                `box-tip ${unlockGames.includes(sub.game) ? '' : sub.result}`
-              "
-              :open="sub.game === focus_game"
-              :autoHide="true"
-              :key="`game_${sub.game}`"
-              :container="$refs.container"
-              @show="setGame(sub.game)"
-              @auto-hide="focus_game = ''"
-              @close-group="focus_game = ''"
-            >
-              <div class="item">
-                <div v-if="unlockGames.includes(sub.game)" class="result">
-                  ?
-                </div>
-                <div v-else :class="`result ${sub.result}`">
-                  {{ (sub.result && sub.result.slice(0, 1)) || '?' }}
-                </div>
-                <div class="name">{{ sub.opponent || sub.game }}</div>
-              </div>
-              <template slot="popover">
-                <template v-if="version !== 'import' && topBottom">
-                  <div class="team-versus">
-                    <div class="team-name">
-                      <div class="name">
-                        {{ topBottom === 'top' ? useTeam : opponent }}
-                      </div>
-                      <div class="score">
-                        {{
-                          topBottom === 'top'
-                            ? sumByInn(scores, inn)
-                            : sumByInn(opponentScores, inn)
-                        }}
-                      </div>
-                    </div>
-                    <div class="versus">:</div>
-                    <div class="team-name">
-                      <div class="score">
-                        {{
-                          topBottom === 'bot'
-                            ? sumByInn(scores, inn)
-                            : sumByInn(opponentScores, inn)
-                        }}
-                      </div>
-                      <div class="name">
-                        {{ topBottom === 'bot' ? useTeam : opponent }}
-                      </div>
-                    </div>
+      <template v-if="Array.isArray(groupGames_)">
+        <template v-for="(item, i) in groupGames_">
+          <div
+            :class="[
+              'row',
+              { first: i === 0, last: i === groupGames.length - 1 },
+            ]"
+            :data-date="item.date"
+            :key="`date_${item.date}`"
+          >
+            <template v-for="sub in item.games">
+              <v-popover
+                v-if="container"
+                placement="bottom"
+                trigger="click"
+                offset="0"
+                class="cell"
+                :delay="{ show: 100, hide: 0 }"
+                :popoverClass="
+                  `box-tip ${unlockGames.includes(sub.game) ? '' : sub.result}`
+                "
+                :open="sub.game === focus_game"
+                :autoHide="true"
+                :key="`game_${sub.game}`"
+                :container="$refs.container"
+                @show="setGame(sub.game)"
+                @auto-hide="focus_game = ''"
+                @close-group="focus_game = ''"
+              >
+                <div class="item">
+                  <div v-if="unlockGames.includes(sub.game)" class="result">
+                    ?
                   </div>
-                  <div class="box">
-                    <div class="team">
-                      <div class="cell">&nbsp;</div>
-                      <div class="cell">
-                        {{ topBottom === 'top' ? useTeam : opponent }}
-                      </div>
-                      <div class="cell">
-                        {{ topBottom === 'bot' ? useTeam : opponent }}
-                      </div>
-                    </div>
-                    <div class="gap"></div>
-                    <div
-                      v-for="(undefined, index) in Array.apply(
-                        null,
-                        Array(inn),
-                      )"
-                      :key="index"
-                      class="inn"
-                    >
-                      <div>{{ index + 1 }}</div>
-                      <div class="cell" v-if="topBottom === 'top'">
-                        {{ scores[index] !== undefined ? scores[index] : '?' }}
-                      </div>
-                      <div class="cell">
-                        {{
-                          opponentScores[index] !== undefined
-                            ? opponentScores[index]
-                            : topBottom === 'top' && index + 1 === inn
-                            ? 'X'
-                            : '?'
-                        }}
-                      </div>
-                      <div class="cell" v-if="topBottom === 'bot'">
-                        {{ scores[index] !== undefined ? scores[index] : 'X' }}
-                      </div>
-                    </div>
-                    <div class="inn" style="margin-left: auto;">
-                      <div class="cell">R</div>
-                      <div class="cell" v-if="topBottom === 'top'">
-                        {{ score }}
-                      </div>
-                      <div class="cell">
-                        {{ opponentScore }}
-                      </div>
-                      <div class="cell" v-if="topBottom === 'bot'">
-                        {{ score }}
-                      </div>
-                    </div>
-                    <div class="inn">
-                      <div class="cell">H</div>
-                      <div class="cell" v-if="topBottom === 'top'">
-                        {{ hit }}
-                      </div>
-                      <div class="cell">?</div>
-                      <div class="cell" v-if="topBottom === 'bot'">
-                        {{ hit }}
-                      </div>
-                    </div>
+                  <div v-else :class="`result ${sub.result}`">
+                    {{ (sub.result && sub.result.slice(0, 1)) || '?' }}
                   </div>
-                </template>
-                <template v-else>
-                  <div v-if="sub.league && sub.group">
-                    {{
-                      `${sub.league} ${$t('box_group', {
-                        g: sub.group.replace(/group|組/gi, ''),
-                      })}`
-                    }}
-                    <template v-if="sub.period">
-                      {{ `(${sub.period})` }}
-                    </template>
-                    <div>{{ sub.game }}</div>
-                    <div>
+                  <div class="name">{{ sub.opponent || sub.game }}</div>
+                </div>
+                <template slot="popover">
+                  <template v-if="version !== 'import' && topBottom">
+                    <div class="team-versus">
+                      <div class="team-name">
+                        <div class="name">
+                          {{ topBottom === 'top' ? useTeam : opponent }}
+                        </div>
+                        <div class="score">
+                          {{
+                            topBottom === 'top'
+                              ? sumByInn(scores, inn)
+                              : sumByInn(opponentScores, inn)
+                          }}
+                        </div>
+                      </div>
+                      <div class="versus">:</div>
+                      <div class="team-name">
+                        <div class="score">
+                          {{
+                            topBottom === 'bot'
+                              ? sumByInn(scores, inn)
+                              : sumByInn(opponentScores, inn)
+                          }}
+                        </div>
+                        <div class="name">
+                          {{ topBottom === 'bot' ? useTeam : opponent }}
+                        </div>
+                      </div>
+                    </div>
+                    <div class="box">
+                      <div class="team">
+                        <div class="cell">&nbsp;</div>
+                        <div class="cell">
+                          {{ topBottom === 'top' ? useTeam : opponent }}
+                        </div>
+                        <div class="cell">
+                          {{ topBottom === 'bot' ? useTeam : opponent }}
+                        </div>
+                      </div>
+                      <div class="gap"></div>
+                      <div
+                        v-for="(undefined, index) in Array.apply(
+                          null,
+                          Array(inn),
+                        )"
+                        :key="index"
+                        class="inn"
+                      >
+                        <div>{{ index + 1 }}</div>
+                        <div class="cell" v-if="topBottom === 'top'">
+                          {{
+                            scores[index] !== undefined ? scores[index] : '?'
+                          }}
+                        </div>
+                        <div class="cell">
+                          {{
+                            opponentScores[index] !== undefined
+                              ? opponentScores[index]
+                              : topBottom === 'top' && index + 1 === inn
+                              ? 'X'
+                              : '?'
+                          }}
+                        </div>
+                        <div class="cell" v-if="topBottom === 'bot'">
+                          {{
+                            scores[index] !== undefined ? scores[index] : 'X'
+                          }}
+                        </div>
+                      </div>
+                      <div class="inn" style="margin-left: auto;">
+                        <div class="cell">R</div>
+                        <div class="cell" v-if="topBottom === 'top'">
+                          {{ score }}
+                        </div>
+                        <div class="cell">
+                          {{ opponentScore }}
+                        </div>
+                        <div class="cell" v-if="topBottom === 'bot'">
+                          {{ score }}
+                        </div>
+                      </div>
+                      <div class="inn">
+                        <div class="cell">H</div>
+                        <div class="cell" v-if="topBottom === 'top'">
+                          {{ hit }}
+                        </div>
+                        <div class="cell">?</div>
+                        <div class="cell" v-if="topBottom === 'bot'">
+                          {{ hit }}
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div v-if="sub.league && sub.group">
                       {{
-                        sub.opponent
-                          ? $t('box_opponent', { opponent: sub.opponent })
-                          : $t('box_forgot_opponent')
+                        `${sub.league} ${$t('box_group', {
+                          g: sub.group.replace(/group|組/gi, ''),
+                        })}`
                       }}
+                      <template v-if="sub.period">
+                        {{ `(${sub.period})` }}
+                      </template>
+                      <div>{{ sub.game }}</div>
+                      <div>
+                        {{
+                          sub.opponent
+                            ? $t('box_opponent', { opponent: sub.opponent })
+                            : $t('box_forgot_opponent')
+                        }}
+                      </div>
                     </div>
-                  </div>
+                  </template>
+                  <router-link
+                    :to="{
+                      name: 'game',
+                      params: { team: $route.params.team, game: sub.game },
+                    }"
+                    tag="button"
+                    class="link-btn"
+                    >{{ $t('btn_view_box') }}
+                  </router-link>
                 </template>
-                <router-link
-                  :to="{
-                    name: 'game',
-                    params: { team: $route.params.team, game: sub.game },
-                  }"
-                  tag="button"
-                  class="link-btn"
-                  >{{ $t('btn_view_box') }}
-                </router-link>
-              </template>
-            </v-popover>
-          </template>
+              </v-popover>
+            </template>
+          </div>
+        </template>
+        <div class="no-game" v-if="groupGames_.length === 0">
+          {{ $t('box_empty') }}
         </div>
       </template>
-      <div class="no-game" v-if="groupGames.length === 0">
-        {{ $t('box_empty') }}
+      <div class="no-game" v-else>
+        loading...
       </div>
       <div
         class="summary-container"
@@ -474,6 +489,9 @@
     .button-container {
       margin-top: 0;
     }
+  }
+  &.block {
+    pointer-events: none;
   }
   .team-versus {
     margin: 3px 0 10px;
@@ -899,16 +917,26 @@ export default {
       selectedField: '',
       fieldOptions: [],
       conditions: [],
+      groupGames_: undefined,
+      block: false,
     };
   },
-  created() {},
+  created() {
+    if (this.groupGames.length) {
+      this.groupGames_ = this.groupGames;
+    }
+  },
   mounted() {
     this.container = this.$refs.container;
     document.addEventListener(clickEvent, this.collapseSearch, true);
     const focus_game = window.localStorage.getItem('focus_game');
     window.localStorage.removeItem('focus_game');
+    if (focus_game) {
+      this.block = true;
+    }
     setTimeout(() => {
       this.focus_game = focus_game;
+      this.block = false;
     }, 500);
   },
   beforeDestroy() {
@@ -1015,6 +1043,9 @@ export default {
         this.unlockGames = this.teamInfo.unlockGames || [];
       },
       immediate: true,
+    },
+    groupGames() {
+      this.groupGames_ = this.groupGames || [];
     },
     selectedField: {
       handler() {

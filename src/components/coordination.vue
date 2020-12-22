@@ -3,6 +3,9 @@
     <img ref="img" :src="imgSrc" @mousedown="trackXY" :disabled="disabled" />
     <slot></slot>
     <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
+    <div v-if="no_track" class="mobile-download">
+      {{ $t('msg_mobile_download') }}
+    </div>
   </div>
 </template>
 
@@ -37,6 +40,16 @@ img {
     cursor: not-allowed;
   }
 }
+.mobile-download {
+  display: none;
+  color: #fff;
+  white-space: nowrap;
+  line-height: 20px;
+  margin-top: 5px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
 @media only screen and (max-width: 760px) {
   img {
     width: 300px;
@@ -44,6 +57,9 @@ img {
   }
   .fa {
     visibility: hidden;
+  }
+  .mobile-download {
+    display: block;
   }
 }
 </style>

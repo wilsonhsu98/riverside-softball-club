@@ -2,6 +2,7 @@
   <div class="root-container">
     <img :src="imgSrc" />
     <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
+    <div class="mobile-download">{{ $t('msg_mobile_download') }}</div>
   </div>
 </template>
 
@@ -32,9 +33,22 @@ img {
   right: -30px;
   bottom: 5px;
 }
+.mobile-download {
+  display: none;
+  color: #fff;
+  white-space: nowrap;
+  line-height: 20px;
+  margin-top: 5px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
 @media only screen and (max-width: 760px) {
   .fa {
     visibility: hidden;
+  }
+  .mobile-download {
+    display: block;
   }
 }
 </style>
