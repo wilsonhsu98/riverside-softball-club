@@ -35,9 +35,9 @@
       </div>
     </div>
     <button
-      v-if="$listeners.evaluate"
+      v-if="$listeners.evaluate && teamScore < 100"
       @click="evaluate_"
-      :disabled="score === 100 || block"
+      :disabled="block"
     >
       {{ $t('btn_evaluate') }}
     </button>
