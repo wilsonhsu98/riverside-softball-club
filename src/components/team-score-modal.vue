@@ -2,16 +2,20 @@
   <modal
     name="score"
     :adaptive="true"
+    @opened="opened"
     :maxWidth="400"
     :minHeight="400"
     class="modal-wrapper"
   >
     <h1>{{ title || $t('ttl_score_report') }}</h1>
     <div class="gauge-wrapper">
-      <vue-svg-gauge :value="teamScore" :min="0" :max="100">
-        <div class="inner-text">
-          {{ teamScore }}
-        </div>
+      <vue-svg-gauge
+        :value="score"
+        :min="0"
+        :max="100"
+        :transitionDuration="duration"
+      >
+        <div class="inner-text" ref="score" />
       </vue-svg-gauge>
     </div>
     <div class="score-list">
@@ -33,7 +37,7 @@
     <button
       v-if="$listeners.evaluate"
       @click="evaluate_"
-      :disabled="teamScore === 100"
+      :disabled="score === 100 || block"
     >
       {{ $t('btn_evaluate') }}
     </button>
@@ -72,6 +76,9 @@
     flex: 1;
     overflow: auto;
     margin: 15px 0;
+    &:last-child {
+      margin-bottom: 0;
+    }
     .score-item {
       padding-left: 30px;
       line-height: 25px;
@@ -118,6 +125,8 @@
 
 <script>
 import { scoreMapping } from '../libs/utils';
+import { CountUp } from 'countup.js';
+const duration = 1000;
 
 export default {
   props: ['title', 'teamScore', 'teamScoreKVP'],
@@ -125,11 +134,36 @@ export default {
   data() {
     return {
       scoreMapping,
+      score: 0,
+      duration,
+      block: false,
+      countUp: undefined,
     };
   },
   methods: {
+    animation(emit) {
+      this.countUp.reset();
+      this.score = 0;
+      this.block = true;
+      if (typeof emit === 'function') emit();
+      setTimeout(() => {
+        this.countUp.update(this.teamScore);
+        this.score = this.teamScore;
+        this.duration = duration;
+        setTimeout(() => {
+          this.duration = 0;
+          this.block = false;
+        }, duration);
+      }, 500);
+    },
+    opened() {
+      this.countUp = new CountUp(this.$refs.score, this.teamScore);
+      this.animation();
+    },
     evaluate_() {
-      this.$emit('evaluate');
+      this.animation(() => {
+        this.$emit('evaluate');
+      });
     },
   },
 };

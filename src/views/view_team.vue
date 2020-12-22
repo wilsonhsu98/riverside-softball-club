@@ -9,7 +9,7 @@
       <h1>
         {{ $route.params.team ? $t('manage_team') : $t('create_team') }}
         <div
-          v-if="$route.params.team && teamScore"
+          v-if="$route.params.team && teamScore !== undefined"
           class="score"
           @click="showScore"
         >
