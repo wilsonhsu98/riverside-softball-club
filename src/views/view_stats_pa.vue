@@ -1049,29 +1049,13 @@ export default {
       handler() {
         this.sum = this.list.reduce(
           (acc, record, index, self) => {
-            const sum = {
-              PA: acc.PA + record.PA,
-              AB: acc.AB + record.AB,
-              H: acc.H + record.H,
-              TB: acc.TB + record.TB,
-              TOB: acc.TOB + record.TOB,
-              R: acc.R + record.R,
-              RBI: acc.RBI + record.RBI,
-              '1H': acc['1H'] + record['1H'],
-              '2H': acc['2H'] + record['2H'],
-              '3H': acc['3H'] + record['3H'],
-              HR: acc.HR + record.HR,
-              K: acc.K + record.K,
-              BB: acc.BB + record.BB,
-              SF: acc.SF + record.SF,
-              DP: acc.DP + record.DP,
-              hNo: acc.hNo + record.hNo,
-              abNo: acc.abNo + record.abNo,
-              hSP: acc.hSP + record.hSP,
-              abSP: acc.abSP + record.abSP,
-              hFB: acc.hFB + record.hFB,
-              abFB: acc.abFB + record.abFB,
-            };
+            const sum = Object.keys(acc).reduce(
+              (accObj, k) => ({
+                ...accObj,
+                [k]: acc[k] + (Number.isInteger(record[k]) ? record[k] : 0),
+              }),
+              {},
+            );
             if (index === self.length - 1) {
               return {
                 ...sum,
