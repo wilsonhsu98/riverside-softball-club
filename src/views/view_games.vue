@@ -154,8 +154,8 @@
         block,
         empty:
           role === 'manager' &&
-          Array.isArray(groupGames_) &&
-          groupGames_.length === 0,
+          ((Array.isArray(groupGames_) && groupGames_.length === 0) ||
+            groupGames_ === undefined),
       }"
     >
       <ad :mode="'games'" />
@@ -345,7 +345,10 @@
           {{ gamesResult.tie }}
         </div>
       </div>
-      <div class="button-container" v-if="role === 'manager'">
+      <div
+        class="button-container"
+        v-if="role === 'manager' && Array.isArray(groupGames_)"
+      >
         <router-link
           :to="{
             name: 'create_game_info',
