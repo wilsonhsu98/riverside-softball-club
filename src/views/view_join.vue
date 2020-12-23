@@ -123,7 +123,7 @@
             <div class="team-player-item"></div>
             <div class="team-player-item"></div>
             <div class="team-player-item"></div>
-            <div v-if="bindPlayer" style="margin-top: 5px;">
+            <div v-if="bindPlayer" style="margin-top: 5px; width: 100%;">
               <label>
                 <input type="radio" v-model="choice" value="bind" />
                 {{ $t('msg_join_bind', { name: bindPlayer.name }) }}
