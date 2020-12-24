@@ -207,7 +207,10 @@ const actions = {
                                 id: doc.id,
                               };
                             })
-                            .filter(request => request.status !== 'denied')
+                            .filter(
+                              request =>
+                                !['denied', 'deleted'].includes(request.status),
+                            )
                             .sort((a, b) => b.timestamp - a.timestamp),
                         });
                       });

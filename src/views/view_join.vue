@@ -13,8 +13,11 @@
         <p>{{ $t('msg_request_join', { team: request.teamName }) }}</p>
         <p class="request-msg">{{ request.msg }}</p>
         <p>{{ new Date(request.timestamp).toLocaleString() }}</p>
-        <p v-if="request.status === 'denied'" class="request-denied">
-          {{ $t('msg_denied') }}
+        <p
+          v-if="['denied', 'deleted'].includes(request.status) === 'denied'"
+          class="request-denied"
+        >
+          {{ $t(`msg_${request.status}`) }}
         </p>
       </div>
 

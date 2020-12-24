@@ -251,6 +251,7 @@
 	"msg_just_join": "I can not find my name, but I still want to join the team, my name is ",
 	"msg_request_join": "Request to join %{team}",
 	"msg_denied": "Denied",
+	"msg_deleted": "The team is gone",
 
 	"anonymous_join": "刺探軍情",
 	"ttl_anonymous_search": "搜尋結果(可點選切換)",

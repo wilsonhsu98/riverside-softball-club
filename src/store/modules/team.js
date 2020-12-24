@@ -461,7 +461,7 @@ const actions = {
           batch.set(
             doc.ref,
             {
-              status: 'denied',
+              status: 'deleted',
               timestamp,
             },
             { merge: true },

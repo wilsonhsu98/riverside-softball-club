@@ -255,6 +255,7 @@
 	"msg_just_join": "我找不到名字，但我還是想加入球隊，我是",
 	"msg_request_join": "尋求加入%{team}",
 	"msg_denied": "被拒絕",
+	"msg_deleted": "球隊已不存在",
 
 	"anonymous_join": "刺探軍情",
 	"ttl_anonymous_search": "搜尋結果(可點選切換)",
