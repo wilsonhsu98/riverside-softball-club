@@ -275,5 +275,6 @@
 	"msg_no_option": "Sorry, no matching options",
 	"vc-year": "",
 	"system_mail": "System Mail",
-	"system_feedback": "Feedback"
+	"system_feedback": "Feedback",
+	"system_manual": "Manual"
 }

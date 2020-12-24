@@ -36,9 +36,18 @@
               {{ $t('logout_btn') }}
             </button>
           </div>
-          <a class="link" href="mailto:riversidesoftballclub.app@gmail.com">{{
-            $t('system_mail')
-          }}</a>
+          <a
+            class="link"
+            href="https://drive.google.com/file/d/1fDA9vLOH772eTkzBO5aFfTuSJgh1zuo7/view?usp=sharing"
+            target="_blank"
+            >{{ $t('system_manual') }}</a
+          >
+          <a
+            class="link"
+            href="mailto:riversidesoftballclub.app@gmail.com"
+            style="margin-left: 5px;"
+            >{{ $t('system_mail') }}</a
+          >
           <a
             class="link"
             style="margin-left: 5px;"
