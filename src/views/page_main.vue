@@ -84,10 +84,10 @@
       </div>
     </div>
     <ad v-if="showAd" :key="showAd" :mode="adMode" />
-    <div
+    <!-- <div
       class="preload"
       style="font-family: icomoon; height: 0; visibility: hidden;"
-    />
+    /> -->
   </div>
 </template>
 
