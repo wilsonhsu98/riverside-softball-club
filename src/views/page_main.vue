@@ -84,10 +84,7 @@
       </div>
     </div>
     <ad v-if="showAd" :key="showAd" :mode="adMode" />
-    <!-- <div
-      class="preload"
-      style="font-family: icomoon; height: 0; visibility: hidden;"
-    /> -->
+    <div class="preload" />
   </div>
 </template>
 
@@ -233,8 +230,13 @@ header {
     }
   }
 }
-.preload:before {
-  content: '\e901';
+.preload {
+  font-family: icomoon;
+  height: 0;
+  visibility: hidden;
+  &:before {
+    content: '\e901';
+  }
 }
 @media only screen and (max-width: 990px) {
   header .header-container,
