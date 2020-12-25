@@ -84,6 +84,9 @@
       </div>
     </div>
     <ad v-if="showAd" :key="showAd" :mode="adMode" />
+    <div style="font-family: icomoon; height: 0; visibility: hidden;">
+      preload
+    </div>
   </div>
 </template>
 
