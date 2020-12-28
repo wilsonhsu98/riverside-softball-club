@@ -1,11 +1,11 @@
 <template>
   <div class="root-container">
-    <img ref="img" :src="imgSrc" @mousedown="trackXY" :disabled="disabled" />
-    <slot></slot>
-    <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
     <div v-if="no_track" class="mobile-download">
       {{ $t('msg_mobile_download') }}
     </div>
+    <img ref="img" :src="imgSrc" @mousedown="trackXY" :disabled="disabled" />
+    <slot></slot>
+    <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
   </div>
 </template>
 
@@ -45,7 +45,7 @@ img {
   color: #fff;
   white-space: nowrap;
   line-height: 20px;
-  margin-top: 5px;
+  margin-top: -20px;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);

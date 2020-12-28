@@ -358,7 +358,7 @@
   .team-intro {
     margin: 0 0 10px 0;
     overflow: hidden;
-    text-overflow: ellipsis;
+    word-break: break-word;
   }
   .team-player,
   .team-other {

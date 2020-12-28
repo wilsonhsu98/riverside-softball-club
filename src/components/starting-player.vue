@@ -1,8 +1,8 @@
 <template>
   <div class="root-container">
+    <div class="mobile-download">{{ $t('msg_mobile_download') }}</div>
     <img :src="imgSrc" />
     <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
-    <div class="mobile-download">{{ $t('msg_mobile_download') }}</div>
   </div>
 </template>
 
@@ -38,7 +38,7 @@ img {
   color: #fff;
   white-space: nowrap;
   line-height: 20px;
-  margin-top: 5px;
+  margin-top: -20px;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);

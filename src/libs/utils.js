@@ -276,7 +276,7 @@ const unionOrIntersect = (type, conditions = [], games = []) => {
 
 const getNameNumber = ({ name = '', number = '' }) => {
   const tempName = (() => {
-    if (name.length === 2) {
+    if (name.length >= 2) {
       if (['小', '大', '阿', '老'].includes(name[0])) {
         return name[1].toUpperCase();
       }

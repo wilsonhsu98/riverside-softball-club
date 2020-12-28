@@ -939,10 +939,10 @@ export default {
   mounted() {
     setTimeout(() => {
       this.lazy = true;
+      this.detectChartWidth();
     }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
-    this.detectChartWidth();
   },
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
