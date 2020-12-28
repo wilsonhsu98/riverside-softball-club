@@ -943,7 +943,7 @@ export default {
     }, 500);
     setTimeout(() => {
       this.detectChartWidth();
-    }, 2000);
+    }, 3000);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
   },
@@ -1121,7 +1121,7 @@ export default {
         }, 500);
         setTimeout(() => {
           this.detectChartWidth();
-        }, 2000);
+        }, 3000);
       },
       immediate: true,
     },
