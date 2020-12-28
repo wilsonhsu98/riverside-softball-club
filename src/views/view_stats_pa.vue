@@ -941,6 +941,9 @@ export default {
       this.lazy = true;
       this.detectChartWidth();
     }, 500);
+    setTimeout(() => {
+      this.detectChartWidth();
+    }, 1000);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
   },
@@ -1116,6 +1119,9 @@ export default {
           this.lazy = true;
           this.detectChartWidth();
         }, 500);
+        setTimeout(() => {
+          this.detectChartWidth();
+        }, 1000);
       },
       immediate: true,
     },
