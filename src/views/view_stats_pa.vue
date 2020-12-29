@@ -110,10 +110,9 @@
       </div>
     </div>
     <div ref="sticky-table-wrapper">
-      <div
+      <simplebar
         class="sticky-table-wrapper"
         :style="{ height: `${tableHeight}px` }"
-        id="sticky-table-wrapper"
       >
         <div class="sticky-table">
           <div class="header-row">
@@ -357,7 +356,7 @@
             </div>
           </template>
         </div>
-      </div>
+      </simplebar>
     </div>
     <div
       v-if="coordinates.values.length > 0"
@@ -911,7 +910,6 @@ i.fa {
 </style>
 
 <script>
-import SimpleBar from 'simplebar';
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
 const clickEvent = (() => {
@@ -1025,9 +1023,6 @@ export default {
       ].getBoundingClientRect();
       this.chartWidth = width - 152;
       this.tableHeight = window.innerHeight - top - 20;
-      setTimeout(() => {
-      new SimpleBar(document.querySelector('#sticky-table-wrapper'));
-      },300);
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectChartWidth);
