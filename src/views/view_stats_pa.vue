@@ -103,7 +103,7 @@
               :data-long="`${$t('col_update')} `"
               :data-short="`${$t('col_update_short')} `"
             >
-              {{ `${new Date(lastUpdate).toLocaleString()} ${tableHeight}` }}
+              {{ new Date(lastUpdate).toLocaleString() }}
             </div>
           </template>
         </div>
@@ -939,11 +939,10 @@ export default {
   mounted() {
     setTimeout(() => {
       this.lazy = true;
-      console.log('~~~mounted');
-      this.detectChartWidth();
     }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
+    this.detectChartWidth();
   },
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
@@ -1023,10 +1022,7 @@ export default {
         'sticky-table-wrapper'
       ].getBoundingClientRect();
       this.chartWidth = width - 152;
-      setTimeout(() => {
-        this.tableHeight = window.innerHeight - top - 20;
-        console.log(this.tableHeight);
-      }, 500);
+      this.tableHeight = window.innerHeight - top - 20;
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectChartWidth);
@@ -1118,7 +1114,6 @@ export default {
         this.lazy = false;
         setTimeout(() => {
           this.lazy = true;
-          console.log('~~~list');
           this.detectChartWidth();
         }, 500);
       },
