@@ -126,9 +126,9 @@ const resetVH = () => {
 };
 resetVH();
 window.addEventListener('resize', () => window.requestAnimationFrame(resetVH));
-window.addEventListener('dblclick', () => {
-  alert(document.documentElement.style.getPropertyValue('--vh'));
-});
+// window.addEventListener('dblclick', () => {
+//   alert(document.documentElement.style.getPropertyValue('--vh'));
+// });
 if (navigator.userAgent.match(/crios/gi)) {
   const input = document.createElement('INPUT');
   input.type = 'text';
