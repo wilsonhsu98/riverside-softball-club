@@ -325,7 +325,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
   });
 };
 
-const displayGame = (players, records, errors, role) => {
+const displayGame = (players, records, errors = [], role) => {
   const assumedOrder = 12;
   return records.reduce(
     (acc, item, i, self) => {
