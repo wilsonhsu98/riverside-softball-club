@@ -103,7 +103,7 @@
               :data-long="`${$t('col_update')} `"
               :data-short="`${$t('col_update_short')} `"
             >
-              {{ new Date(lastUpdate).toLocaleString() }}
+              {{ `${new Date(lastUpdate).toLocaleString()} ${tableHeight}` }}
             </div>
           </template>
         </div>
@@ -941,9 +941,6 @@ export default {
       this.lazy = true;
       this.detectChartWidth();
     }, 500);
-    setTimeout(() => {
-      this.detectChartWidth();
-    }, 3000);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
   },
@@ -1119,9 +1116,6 @@ export default {
           this.lazy = true;
           this.detectChartWidth();
         }, 500);
-        setTimeout(() => {
-          this.detectChartWidth();
-        }, 3000);
       },
       immediate: true,
     },
