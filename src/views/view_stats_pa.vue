@@ -939,6 +939,7 @@ export default {
   mounted() {
     setTimeout(() => {
       this.lazy = true;
+      console.log('~~~mounted');
       this.detectChartWidth();
     }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
@@ -1022,7 +1023,10 @@ export default {
         'sticky-table-wrapper'
       ].getBoundingClientRect();
       this.chartWidth = width - 152;
-      this.tableHeight = window.innerHeight - top - 20;
+      setTimeout(() => {
+        this.tableHeight = window.innerHeight - top - 20;
+        console.log(this.tableHeight);
+      }, 500);
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectChartWidth);
@@ -1114,6 +1118,7 @@ export default {
         this.lazy = false;
         setTimeout(() => {
           this.lazy = true;
+          console.log('~~~list');
           this.detectChartWidth();
         }, 500);
       },
