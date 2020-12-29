@@ -116,32 +116,31 @@ const render = () => {
   });
 };
 
+let preVH;
 const resetVH = () => {
-  console.log('resetVH')
-  const vh = window.innerHeight * 0.01;
-  document.documentElement.style.setProperty('--vh', `${vh}px`);
-  // setTimeout(() => {
-  //   const vh = window.innerHeight * 0.01;
-  //   document.documentElement.style.setProperty('--vh', `${vh}px`);
-  // }, 1000);
+  const VH = window.innerHeight * 0.01;
+  if (preVH !== VH) {
+    document.documentElement.style.setProperty('--vh', `${VH}px`);
+    preVH = VH;
+  }
 };
 resetVH();
 const vhChangeEventTypes = [
-  "scroll",
-  "resize",
-  "fullscreenchange",
-  "fullscreenerror",
-  "touchcancel",
-  "touchend",
-  "touchmove",
-  "touchstart",
-  "mozbrowserscroll",
-  "mozbrowserscrollareachanged",
-  "mozbrowserscrollviewchange",
-  "mozbrowserresize",
-  "MozScrolledAreaChanged",
-  "mozbrowserresize",
-  "orientationchange"
+  'scroll',
+  'resize',
+  'fullscreenchange',
+  'fullscreenerror',
+  'touchcancel',
+  'touchend',
+  'touchmove',
+  'touchstart',
+  'mozbrowserscroll',
+  'mozbrowserscrollareachanged',
+  'mozbrowserscrollviewchange',
+  'mozbrowserresize',
+  'MozScrolledAreaChanged',
+  'mozbrowserresize',
+  'orientationchange',
 ];
 vhChangeEventTypes.forEach(type => {
   window.addEventListener(type, () => window.requestAnimationFrame(resetVH));
