@@ -1025,7 +1025,9 @@ export default {
       ].getBoundingClientRect();
       this.chartWidth = width - 152;
       this.tableHeight = window.innerHeight - top - 20;
+      setTimeout(() => {
       new SimpleBar(document.querySelector('#sticky-table-wrapper'));
+      },300);
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectChartWidth);
