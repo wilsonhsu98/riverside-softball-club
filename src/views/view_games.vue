@@ -927,6 +927,12 @@ export default {
   created() {
     if (this.groupGames.length) {
       this.groupGames_ = this.groupGames;
+    } else {
+      setTimeout(() => {
+        if (this.groupGames.length === 0) {
+          this.groupGames_ = [];
+        }
+      }, 1000);
     }
   },
   mounted() {

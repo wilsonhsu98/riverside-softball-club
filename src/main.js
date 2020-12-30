@@ -116,6 +116,7 @@ const render = () => {
   });
 };
 
+// https://aryedoveidelman.com/fixing_vh_units_on_mobile_once_and_for_all
 let preVH;
 const resetVH = () => {
   const VH = window.innerHeight * 0.01;
