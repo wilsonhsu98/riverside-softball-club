@@ -25,17 +25,14 @@ export default {
   },
   created() {},
   methods: {
-    ...mapActions({}),
+    ...mapActions([]),
     back_() {
       this.$router.back();
     },
     edit_() {},
   },
   computed: {
-    ...mapGetters({
-      currentTeamIcon: 'currentTeamIcon',
-      currentTeam: 'currentTeam',
-    }),
+    ...mapGetters(['currentTeamIcon', 'currentTeam']),
   },
 };
 </script>

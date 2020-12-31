@@ -154,9 +154,9 @@
     label {
       background-color: #fff;
       font-size: $input_font_size - 2;
-      top: -$input_font_size/2;
+      top: (-$input_font_size + 2)/2;
       padding: 0 4px;
-      left: 8px;
+      left: 10px;
       right: auto;
       line-height: $input_font_size;
     }

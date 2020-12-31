@@ -130,7 +130,7 @@ const router = new VueRouter({
           meta: { requiresAuth: true },
         },
         {
-          path: 'user/avatar',
+          path: 'user_avatar',
           name: 'avatar',
           component: require('./views/view_avatar').default,
           meta: { requiresAuth: true },
@@ -151,6 +151,12 @@ const router = new VueRouter({
           path: 'join_team',
           name: 'join_team',
           component: require('./views/view_join').default,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: 'leave_team',
+          name: 'leave_team',
+          component: require('./views/view_leave').default,
           meta: { requiresAuth: true },
         },
       ],

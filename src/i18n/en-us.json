@@ -243,6 +243,10 @@
 	"desc_score_teamIntro": "有輸入球隊簡介",
 	"desc_score_teamOtherNames": "有輸入球隊其他隊名",
 
+	"edit_avatar": "編輯頭像",
+	"zoom": "縮放",
+	"gen_img": "產生圖片",
+
 	"join_team": "Join a team",
 	"ttl_search_team": "Search team",
 	"ttl_or": "or",
@@ -252,6 +256,11 @@
 	"msg_request_join": "Request to join %{team}",
 	"msg_denied": "Denied",
 	"msg_deleted": "The team is gone",
+
+	"leave_team": "退出球隊",
+	"ttl_belongs_team": "目前所屬球隊(可點選退出)",
+	"msg_leave_warning": "確定退出球隊？",
+	"msg_disallowed_leave": "您是球隊管理者，不可擅自離隊<br/>請先至[管理]解除管理者身份",
 
 	"anonymous_join": "刺探軍情",
 	"ttl_anonymous_search": "搜尋結果(可點選切換)",
@@ -268,6 +277,7 @@
 	"btn_no": "那算了",
 	"btn_prev": "上一步",
 	"btn_next": "下一步",
+	"btn_seldom": "不會常用的功能",
 	"ttl_switch_team": "Current teams (tap to switch)",
 	"ttl_current_team": "Current team",
 	"required": "Required column",

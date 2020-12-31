@@ -4,7 +4,14 @@
     <ad :mode="'user'" />
     <div class="container">
       <template v-if="isAnonymous === false">
-        <img class="avatar" :src="$cacheImg(accountInfo.photo)" />
+        <div class="avatar">
+          <img :src="$cacheImg(accountInfo.photo)" />
+          <router-link
+            :to="{ path: 'user_avatar' }"
+            tag="i"
+            class="fa fa-camera"
+          />
+        </div>
         <div class="info-wrapper">
           <div class="info">{{ accountInfo.name }}</div>
           <div class="info" v-if="accountInfo.email">
@@ -17,20 +24,21 @@
                 collapse
             "
           >
-            <router-link :to="{ path: 'user/avatar' }" tag="button">
-              {{ $t('edit_avatar') }}
-            </router-link>
-            <button class="fa fa-ellipsis-h" @click="collapse = false"></button>
+            <button @click="collapse = false">{{ $t('btn_seldom') }}</button>
           </div>
           <div class="btn-container" v-else>
-            <router-link :to="{ path: 'user/avatar' }" tag="button">
-              {{ $t('edit_avatar') }}
-            </router-link>
             <router-link :to="{ path: 'join_team' }" tag="button">
               {{ $t('join_team') }}
             </router-link>
             <router-link :to="{ path: 'create_team' }" tag="button">
               {{ $t('create_team') }}
+            </router-link>
+            <router-link
+              v-if="teams.length > 0"
+              :to="{ path: 'leave_team' }"
+              tag="button"
+            >
+              {{ $t('leave_team') }}
             </router-link>
             <button class="logout-btn" @click="logout">
               {{ $t('logout_btn') }}
@@ -140,10 +148,30 @@
   align-content: flex-start;
   justify-content: center;
   .avatar {
-    border-radius: 50%;
+    width: 100px;
     height: 100px;
     display: block;
     margin: 0 auto;
+    position: relative;
+    > img {
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+    }
+    i.fa {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      color: white;
+      background-color: $current_user_bgcolor;
+      border-radius: 4px;
+      font-size: 14px;
+      width: 26px;
+      height: 26px;
+      text-align: center;
+      line-height: 26px;
+      cursor: pointer;
+    }
   }
   .info-wrapper {
     flex: 1 0 280px;
@@ -346,12 +374,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      logout: 'logout',
-      switchTeam: 'switchTeam',
-      searchTeams: 'searchTeams',
-      searchDemo: 'searchDemo',
-    }),
+    ...mapActions(['logout', 'switchTeam', 'searchTeams', 'searchDemo']),
     logout_() {
       this.logout();
     },
@@ -369,15 +392,15 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      userId: 'userId',
-      accountInfo: 'accountInfo',
-      currentTeamIcon: 'currentTeamIcon',
-      currentTeam: 'currentTeam',
-      teams: 'teams',
-      isAnonymous: 'isAnonymous',
-      keyword: 'keyword',
-    }),
+    ...mapGetters([
+      'userId',
+      'accountInfo',
+      'currentTeamIcon',
+      'currentTeam',
+      'teams',
+      'isAnonymous',
+      'keyword',
+    ]),
   },
   watch: {
     keyword: {

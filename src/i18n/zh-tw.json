@@ -257,6 +257,11 @@
 	"msg_denied": "被拒絕",
 	"msg_deleted": "球隊已不存在",
 
+	"leave_team": "退出球隊",
+	"ttl_belongs_team": "目前所屬球隊(可點選退出)",
+	"msg_leave_warning": "確定退出球隊？",
+	"msg_disallowed_leave": "您是球隊管理者，不可擅自離隊<br/>請先至[管理]解除管理者身份",
+
 	"anonymous_join": "刺探軍情",
 	"ttl_anonymous_search": "搜尋結果(可點選切換)",
 
@@ -272,6 +277,7 @@
 	"btn_no": "那算了",
 	"btn_prev": "上一步",
 	"btn_next": "下一步",
+	"btn_seldom": "不會常用的功能",
 	"ttl_switch_team": "目前球隊(可點選切換)",
 	"ttl_current_team": "目前球隊",
 	"required": "必填欄位",

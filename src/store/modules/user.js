@@ -176,7 +176,7 @@ const actions = {
                 ).then(teams => {
                   window.trackRead(
                     'fetchUser: user belongs teams',
-                    teams.length,
+                    teams.length || 1,
                   );
                   commit(
                     types.FETCH_TEAMS,

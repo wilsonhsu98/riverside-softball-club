@@ -588,7 +588,7 @@ const actions = {
                 ).then(gameDocs => {
                   window.trackRead(
                     'listenTeamChange: games need to update',
-                    gameDocs.length,
+                    gameDocs.length || 1,
                   );
                   const setGames = gameDocs.map(gameDoc => {
                     return idbKeyval.set(gameDoc.id, {
@@ -943,6 +943,88 @@ const actions = {
         commit(types.SEARCH_RECENT_GAMES, [sum, ...recentGames]);
         commit(types.SEARCH_ALL_TEAM, allTeams);
         commit(rootTypes.LOADING, false);
+      });
+  },
+  leaveFromTeam({ commit }, data) {
+    const { teamCode, nextAction } = data;
+    const uid = auth.currentUser.uid;
+    commit(rootTypes.LOADING, true);
+    const refTeamDoc = db.collection('teams').doc(teamCode);
+    const refPlayerDoc = db.collection('accounts').doc(uid);
+
+    Promise.all([refTeamDoc.get(), refPlayerDoc.get()])
+      .then(res => {
+        const [teamDoc, playerDoc] = res;
+        const team = teamDoc.data();
+        const player = playerDoc.data();
+        window.trackRead('leaveFromTeam: team doc', 1);
+        window.trackRead('leaveFromTeam: current player doc', 1);
+
+        if (player.teamRoles[teamCode] === 'player') {
+          const batch = db.batch();
+
+          batch.set(
+            refPlayerDoc,
+            {
+              teamRoles: {
+                [teamCode]: fieldValue.delete(),
+              },
+              teams: fieldValue.arrayRemove(teamCode),
+            },
+            { merge: true },
+          );
+
+          // is player
+          const name = Object.keys(team.players).find(
+            name => team.players[name].uid === uid,
+          );
+          if (name) {
+            // unbind player
+            batch.set(
+              refTeamDoc,
+              {
+                players: {
+                  [name]: {
+                    photo: fieldValue.delete(),
+                    uid: fieldValue.delete(),
+                  },
+                },
+              },
+              { merge: true },
+            );
+          }
+
+          // is bench
+          if (team.benches[uid] !== undefined) {
+            // remove from bench
+            batch.set(
+              refTeamDoc,
+              {
+                benches: {
+                  [uid]: fieldValue.delete(),
+                },
+              },
+              { merge: true },
+            );
+          }
+          return batch.commit();
+        }
+        if (player.teamRoles[teamCode] === 'manager') {
+          rootActions.alert({ commit }, i18n.t('msg_disallowed_leave'));
+          return false;
+        }
+      })
+      .then(res => {
+        commit(rootTypes.LOADING, false);
+        if (res !== false) {
+          if (typeof nextAction === 'function') {
+            nextAction();
+          }
+          router.push('/main/user');
+        }
+      })
+      .catch(error => {
+        console.log('Error getting document:', error);
       });
   },
 };
