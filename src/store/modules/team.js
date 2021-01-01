@@ -960,7 +960,7 @@ const actions = {
         window.trackRead('leaveFromTeam: team doc', 1);
         window.trackRead('leaveFromTeam: current player doc', 1);
 
-        if (player.teamRoles[teamCode] === 'player') {
+        if (['player', 'bench'].includes(player.teamRoles[teamCode])) {
           const batch = db.batch();
 
           batch.set(
