@@ -6,7 +6,7 @@ import {
   // state as rootState,
   // promiseImage,
 } from '../root';
-import { db, fieldValue, timestamp } from '../../firebase';
+import { db, auth, fieldValue, timestamp } from '../../firebase';
 import router from '../../router';
 
 // const types = {
@@ -99,6 +99,15 @@ const actions = {
             gameNote,
             youtubeVideos,
             timestamp,
+            ...(!prevId
+              ? {
+                  createInfo: {
+                    creator: auth.currentUser.uid,
+                    location: window.location.href,
+                    data,
+                  },
+                }
+              : undefined),
           },
           { merge: true },
         );
