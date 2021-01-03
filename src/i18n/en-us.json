@@ -151,6 +151,9 @@
 
 	"add_pa": "新增打席",
 	"edit_pa": "編輯打席",
+	"btn_change_inn": "換局",
+	"btn_change_runner": "換跑者",
+	"btn_change_batter": "換打者",
 	"desc_inn": "局",
 	"desc_order": "全隊第 %{n} 打席",
 	"desc_out": "目前 %{n} 出局",
