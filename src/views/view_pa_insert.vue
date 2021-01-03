@@ -14,6 +14,14 @@
           <label>{{ $t('ttl_current_pa') }}</label>
         </div>
         <div :class="['current-desc', { show: base['home'].name }]">
+          <div class="tip-btn-container">
+            <button @click="highlight('inn')">{{ $t('btn_change_inn') }}</button
+            ><button @click="highlight('runner')">
+              {{ $t('btn_change_runner') }}</button
+            ><button @click="highlight('batter')">
+              {{ $t('btn_change_batter') }}
+            </button>
+          </div>
           <div class="summary">
             <div class="box">
               <div class="team">
@@ -40,7 +48,7 @@
               </div>
             </div>
             <div class="inn-out-onbase">
-              <div class="onbase">
+              <div class="onbase" ref="runner">
                 <div
                   v-for="(b, bi) in ['second', 'first', 'third']"
                   :key="`onbase_${bi}`"
@@ -57,7 +65,7 @@
                 ></div>
               </div>
               <div class="inn-out">
-                <div class="inn" @click="showSetInn = true">
+                <div class="inn" @click="showSetInn = true" ref="inn">
                   <span>{{ inn }}</span>
                   <div
                     v-if="topBottom"
@@ -96,6 +104,7 @@
               })
             }}</span>
             <player
+              ref="batter"
               @click="changePlayer('home')"
               :player="getPlayer(base['home'].name)"
             />
@@ -409,6 +418,17 @@
         </button>
       </div>
     </div>
+    <div
+      v-show="spotlight"
+      class="spotlight"
+      @click="
+        spotlight = undefined;
+        spotlightIcon = undefined;
+      "
+    >
+      <i class="fa fa-hand-o-right" :style="spotlightIcon" />
+      <div class="focus" :style="spotlight" />
+    </div>
   </div>
 </template>
 
@@ -436,6 +456,18 @@
     visibility: hidden;
     &.show {
       visibility: visible;
+    }
+    .tip-btn-container {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      button {
+        width: 32%;
+        padding: 5px 0;
+        margin: 0;
+        background-color: $header_bgcolor;
+        outline: none;
+      }
     }
     .summary {
       display: flex;
@@ -1016,6 +1048,26 @@
   }
 }
 
+.spotlight {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  .fa-hand-o-right {
+    position: absolute;
+    color: $active_bgcolor;
+    z-index: 1;
+    font-size: 28px;
+    transform: rotate(45deg);
+  }
+  .focus {
+    position: absolute;
+    box-shadow: 0px 0px 0px 99999px rgba(50, 50, 50, 0.8);
+  }
+}
+
 @media only screen and (max-width: 760px) {
   .container {
     .step-bar {
@@ -1054,6 +1106,7 @@
 </style>
 
 <script>
+import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
 import { formatContent, formatColor } from '../libs/utils';
 
@@ -1116,6 +1169,9 @@ export default {
       onbasePlayers: [],
       onbaseInn: 1,
       onbaseOut: 0,
+      spotlight: undefined,
+      spotlightIcon: undefined,
+      spotlightTimer: undefined,
     };
   },
   created() {
@@ -1787,6 +1843,26 @@ export default {
       };
       this.location = [];
     },
+    highlight(ref) {
+      const el =
+        this.$refs[ref] instanceof Vue ? this.$refs[ref].$el : this.$refs[ref];
+      const { top, left, width, height: h } = el.getBoundingClientRect();
+      const height = ref === 'runner' ? h - 20 : h;
+      this.spotlight = {
+        top: `${top + window.pageYOffset - 5}px`,
+        left: `${left + window.pageXOffset - 5}px`,
+        width: `${width + 10}px`,
+        height: `${height + 10}px`,
+      };
+      this.spotlightIcon = {
+        top: `${top + window.pageYOffset - 35}px`,
+        left: `${left + window.pageXOffset - 35}px`,
+      };
+      this.spotlightTimer = setTimeout(() => {
+        this.spotlight = undefined;
+        this.spotlightIcon = undefined;
+      }, 3000);
+    },
   },
   watch: {
     box() {
@@ -1850,6 +1926,16 @@ export default {
         setTimeout(() => {
           this.step = 3;
         }, 500);
+      }
+    },
+    spotlight() {
+      if (this.spotlight) {
+        document
+          .querySelector('.content')
+          .style.setProperty('position', 'static');
+      } else {
+        clearTimeout(this.spotlightTimer);
+        document.querySelector('.content').style.setProperty('position', '');
       }
     },
   },
