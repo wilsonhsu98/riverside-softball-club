@@ -151,7 +151,7 @@ export default {
         game: '8a80854b757283cf0175832fe7685a9b',
       },
       frequencyBannerKey: '8a80854b757283cf017576f08a1c25a8',
-      debug: false,
+      debug: true,
     };
 
     return {
