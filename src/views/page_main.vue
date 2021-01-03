@@ -397,8 +397,8 @@ export default {
         this.adMode = 'game_f';
       } else {
         window.adCount = (window.adCount || 0) + 1;
-        if (window.adCount % 5 === 0) {
-          console.log('adCount:', window.adCount);
+        if (window.adCount % 1 === 0) {
+          // console.log('adCount:', window.adCount);
           this.showAd = new Date().getTime();
           this.adMode = 'bottom_banner';
         } else {
