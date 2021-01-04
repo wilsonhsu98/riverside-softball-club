@@ -101,7 +101,11 @@ export default {
       this.$router.back();
     },
     leaveFromTeam_(teamCode) {
-      this.confirm(this.$t('msg_leave_warning')).then(() => {
+      this.confirm({
+        msg: this.$t('msg_leave_warning'),
+        y: this.$t('btn_leave_y'),
+        n: this.$t('btn_leave_n'),
+      }).then(() => {
         this.leaveFromTeam({
           teamCode,
         });

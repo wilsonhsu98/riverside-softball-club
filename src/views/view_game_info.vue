@@ -889,7 +889,7 @@ export default {
         this.alert(this.$t('msg_lock_warning'));
         return;
       }
-      this.confirm(this.$t('msg_delete_warning')).then(() => {
+      this.confirm({ msg: this.$t('msg_delete_warning') }).then(() => {
         this.deleteGame({
           teamCode: this.$route.params.team,
           gameId: this.prevId,

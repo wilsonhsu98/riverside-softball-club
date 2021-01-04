@@ -79,8 +79,8 @@
     <div class="modal" v-if="confirmMsg">
       <div class="dialog">
         <p class="msg" v-html="confirmMsg"></p>
-        <button @click="confirmYes">{{ $t('btn_yes') }}</button>
-        <button @click="confirmNo">{{ $t('btn_no') }}</button>
+        <button @click="confirmYes">{{ confirmMsgY || $t('btn_yes') }}</button>
+        <button @click="confirmNo">{{ confirmMsgN || $t('btn_no') }}</button>
       </div>
     </div>
     <ad v-if="showAd" :key="showAd" :mode="adMode" />
@@ -379,11 +379,11 @@ export default {
     }),
     confirmYes() {
       this.confirmPromiseResolve();
-      this.confirm('');
+      this.confirm(undefined);
     },
     confirmNo() {
       this.confirmPromiseReject();
-      this.confirm('');
+      this.confirm(undefined);
     },
     shouldShowAd(currentRoute) {
       if (['stats_pa', 'edit_team'].includes(currentRoute.name)) {
@@ -437,20 +437,22 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      loading: 'loading',
-      currentTeam: 'currentTeam',
-      role: 'role',
-      teamInfo: 'teamInfo',
-      currentTeamIcon: 'currentTeamIcon',
-      teamRequests: 'teamRequests',
-      teams: 'teams',
-      alertMsg: 'alertMsg',
-      confirmMsg: 'confirmMsg',
-      confirmPromiseResolve: 'confirmPromiseResolve',
-      confirmPromiseReject: 'confirmPromiseReject',
-      isAnonymous: 'isAnonymous',
-    }),
+    ...mapGetters([
+      'loading',
+      'currentTeam',
+      'role',
+      'teamInfo',
+      'currentTeamIcon',
+      'teamRequests',
+      'teams',
+      'alertMsg',
+      'confirmMsg',
+      'confirmMsgY',
+      'confirmMsgN',
+      'confirmPromiseResolve',
+      'confirmPromiseReject',
+      'isAnonymous',
+    ]),
   },
   watch: {
     $route(to, from) {

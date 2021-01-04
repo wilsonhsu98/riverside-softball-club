@@ -49,6 +49,8 @@ const state = {
   currentTeamIcon: '',
   alertMsg: '',
   confirmMsg: '',
+  confirmMsgY: '',
+  confirmMsgN: '',
   confirmPromiseResolve: () => {},
   confirmPromiseReject: () => {},
 };
@@ -74,6 +76,8 @@ const getters = {
   },
   alertMsg: state => state.alertMsg,
   confirmMsg: state => state.confirmMsg,
+  confirmMsgY: state => state.confirmMsgY,
+  confirmMsgN: state => state.confirmMsgN,
   confirmPromiseResolve: state => state.confirmPromiseResolve,
   confirmPromiseReject: state => state.confirmPromiseReject,
 };
@@ -372,13 +376,13 @@ const actions = {
   alert({ commit }, msg) {
     commit(types.ALERT, msg);
   },
-  confirm({ commit }, msg) {
-    if (msg) {
+  confirm({ commit }, msgObj) {
+    if (typeof msgObj === 'object' && msgObj.msg) {
       return new Promise((resolve, reject) => {
-        commit(types.CONFIRM, { msg, resolve, reject });
+        commit(types.CONFIRM, { ...msgObj, resolve, reject });
       });
     } else {
-      commit(types.CONFIRM, { msg });
+      commit(types.CONFIRM, {});
     }
   },
 };
@@ -460,8 +464,13 @@ const mutations = {
   [types.ALERT](state, msg = '') {
     state.alertMsg = msg;
   },
-  [types.CONFIRM](state, { msg = '', resolve = () => {}, reject = () => {} }) {
+  [types.CONFIRM](
+    state,
+    { msg = '', y = '', n = '', resolve = () => {}, reject = () => {} },
+  ) {
     state.confirmMsg = msg;
+    state.confirmMsgY = y;
+    state.confirmMsgN = n;
     state.confirmPromiseResolve = resolve;
     state.confirmPromiseReject = reject;
   },

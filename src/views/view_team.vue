@@ -838,7 +838,7 @@ export default {
           this.alert(this.$t('msg_delete_team_condition'));
           return;
         }
-        this.confirm(this.$t('msg_delete_warning')).then(() => {
+        this.confirm({ msg: this.$t('msg_delete_warning') }).then(() => {
           this.deleteTeam({ teamCode: this.teamCode });
         });
       } else {

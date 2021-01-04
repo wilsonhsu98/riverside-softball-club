@@ -263,6 +263,8 @@
 	"leave_team": "退出球隊",
 	"ttl_belongs_team": "目前所屬球隊(可點選退出)",
 	"msg_leave_warning": "確定退出球隊？",
+	"btn_leave_y": "馬上退",
+	"btn_leave_n": "再想想",
 	"msg_disallowed_leave": "您是球隊管理者，不可擅自離隊<br/>請先至[管理]解除管理者身份",
 
 	"anonymous_join": "刺探軍情",
