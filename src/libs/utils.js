@@ -432,10 +432,9 @@ const scoreMapping = [
   {
     key: 'gamePersonalVideo',
     checkFunc: ({ records = [] }) => {
-      console.log([...records])
-      console.log([...records].reverse())
-      console.log([...records].reverse().some(r => typeof r.video === 'object'))
-      return [...records].reverse().some(r => typeof r.video === 'object') ? 1 : 0;
+      return [...records].reverse().some(r => typeof r.video === 'object')
+        ? 1
+        : 0;
     },
     percent: 60 / basicCount,
   },

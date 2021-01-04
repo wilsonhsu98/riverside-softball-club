@@ -763,7 +763,7 @@ export default {
             icon: this.icon,
             isNew: !this.$route.params.team,
             nextAction: () => {
-              console.log('editTeam_', this.records)
+              console.log('editTeam_', this.records);
               const { score, scoreKVP } = evaluateTeamScore({
                 teamInfo: this.teamInfo,
                 games: this.games,
@@ -850,7 +850,7 @@ export default {
       this.$modal.show('score');
     },
     reEvaluateTeamScore() {
-      console.log('reEvaluateTeamScore', this.records)
+      console.log('reEvaluateTeamScore', this.records);
       const { score, scoreKVP } = evaluateTeamScore({
         teamInfo: this.teamInfo,
         games: this.games,
