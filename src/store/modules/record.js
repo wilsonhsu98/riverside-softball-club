@@ -163,7 +163,7 @@ const getters = {
   records: state => {
     console.log('getter', state.records);
     return state.records
-  };
+  },
   gamesResult: state =>
     state.conditionGames
       .filter(item =>
