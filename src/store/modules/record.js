@@ -160,6 +160,10 @@ const getters = {
     };
   },
   games: state => state.games,
+  records: state => {
+    console.log('getter', state.records);
+    return state.records
+  };
   gamesResult: state =>
     state.conditionGames
       .filter(item =>
@@ -472,6 +476,7 @@ const mutations = {
     state.players = data;
   },
   [types.GET_RECORDS](state, data) {
+    console.log('types.GET_RECORDS', data)
     state.records = data;
   },
   [types.SET_PERIOD](state, data) {
