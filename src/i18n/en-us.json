@@ -151,7 +151,7 @@
 
 	"add_pa": "新增打席",
 	"edit_pa": "編輯打席",
-	"btn_change_inn": "換局",
+	"btn_change_inn": "手動換局",
 	"btn_change_runner": "換跑者",
 	"btn_change_batter": "換打者",
 	"desc_inn": "局",
@@ -267,7 +267,7 @@
 	"btn_leave_n": "再想想",
 	"msg_disallowed_leave": "您是球隊管理者，不可擅自離隊<br/>請先至[管理]解除管理者身份",
 
-	"anonymous_join": "刺探軍情",
+	"anonymous_join": "刺探敵情",
 	"ttl_anonymous_search": "搜尋結果(可點選切換)",
 
 	"btn_update": "Save",
@@ -282,7 +282,7 @@
 	"btn_no": "那算了",
 	"btn_prev": "上一步",
 	"btn_next": "下一步",
-	"btn_seldom": "不會常用的功能",
+	"btn_seldom": "不常用的功能",
 	"ttl_switch_team": "Current teams (tap to switch)",
 	"ttl_current_team": "Current team",
 	"required": "Required column",

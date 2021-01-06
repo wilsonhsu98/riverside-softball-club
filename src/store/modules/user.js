@@ -142,7 +142,10 @@ const actions = {
             const currentTeamsContext = JSON.stringify(teamRoles);
             if (currentTeamsContext !== preTeamsContext) {
               preTeamsContext = currentTeamsContext;
-              if (typeof teamRoles === 'object' && Object.keys(teamRoles).length) {
+              if (
+                typeof teamRoles === 'object' &&
+                Object.keys(teamRoles).length
+              ) {
                 Promise.all(
                   Object.keys(teamRoles).map(teamCode => {
                     return new Promise(resolve => {
