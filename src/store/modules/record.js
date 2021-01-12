@@ -75,6 +75,7 @@ const state = {
   otherConditions: [],
   unionOrIntersect: 'union',
   conditionGames: [],
+  reseting: true,
 };
 
 const getters = {
@@ -185,6 +186,7 @@ const getters = {
         { win: 0, lose: 0, tie: 0 },
       ),
   groupGames: state => {
+    if (state.reseting) return undefined;
     return utils.genGameList(
       state.conditionGames,
       (state.period.find(item => item.select) || { games: [] }).games,
@@ -412,6 +414,7 @@ const mutations = {
       state.otherConditions = JSON.parse(pref_other_conditions);
   },
   [types.RESET_PERIOD](state) {
+    state.reseting = true;
     state.period = [{ period: 'period_all', select: true }];
     state.otherConditions = [];
   },
@@ -466,6 +469,7 @@ const mutations = {
     const select = period.map(item => item.period).includes(prevSelect)
       ? prevSelect
       : 'period_all';
+    state.reseting = false;
     state.period = period.map(item => ({
       ...item,
       select: item.period === select,

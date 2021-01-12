@@ -15,10 +15,18 @@
         </div>
         <div :class="['current-desc', { show: base['home'].name }]">
           <div class="tip-btn-container">
-            <button @click="highlight('inn')">{{ $t('btn_change_inn') }}</button
-            ><button @click="highlight('runner')">
-              {{ $t('btn_change_runner') }}</button
-            ><button @click="highlight('batter')">
+            <button @click="highlight('inn')">
+              {{ $t('btn_change_inn') }}
+            </button>
+            <button
+              @click="highlight('runner')"
+              :disabled="
+                !['second', 'first', 'third'].some(b => !!base[b].name)
+              "
+            >
+              {{ $t('btn_change_runner') }}
+            </button>
+            <button @click="highlight('batter')">
               {{ $t('btn_change_batter') }}
             </button>
           </div>
@@ -62,7 +70,7 @@
                   @click="
                     (isBaseNotFulled() || base[b].name) && changePlayer(b)
                   "
-                ></div>
+                />
               </div>
               <div class="inn-out">
                 <div class="inn" @click="showSetInn = true" ref="inn">

@@ -924,17 +924,6 @@ export default {
       block: false,
     };
   },
-  created() {
-    if (this.groupGames.length) {
-      this.groupGames_ = this.groupGames;
-    } else {
-      setTimeout(() => {
-        if (this.groupGames.length === 0) {
-          this.groupGames_ = [];
-        }
-      }, 1000);
-    }
-  },
   mounted() {
     this.container = this.$refs.container;
     document.addEventListener(clickEvent, this.collapseSearch, true);
@@ -1055,8 +1044,11 @@ export default {
       },
       immediate: true,
     },
-    groupGames() {
-      this.groupGames_ = this.groupGames || [];
+    groupGames: {
+      handler() {
+        this.groupGames_ = this.groupGames;
+      },
+      immediate: true,
     },
     selectedField: {
       handler() {

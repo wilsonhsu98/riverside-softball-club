@@ -192,7 +192,9 @@
                   :autoHide="true"
                   :container="$refs.container"
                   @apply-show="setSimplebar(`chart-inner_${player.name}`)"
-                  @apply-hide="resetSimplebarWidth(`chart-inner_${player.name}`)"
+                  @apply-hide="
+                    resetSimplebarWidth(`chart-inner_${player.name}`)
+                  "
                 >
                   <!-- This will be the popover target (for the events and position) -->
                   <div class="tip-trigger"></div>
