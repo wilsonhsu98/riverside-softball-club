@@ -187,10 +187,12 @@
                   popoverClass="info"
                   offset="14"
                   class="tip"
-                  delay="300"
+                  delay="0"
+                  disposeTimeout="0"
                   :autoHide="true"
                   :container="$refs.container"
-                  @show="setSimplebar(`chart-inner_${player.name}`)"
+                  @apply-show="setSimplebar(`chart-inner_${player.name}`)"
+                  @apply-hide="resetSimplebarWidth(`chart-inner_${player.name}`)"
                 >
                   <!-- This will be the popover target (for the events and position) -->
                   <div class="tip-trigger"></div>
@@ -681,11 +683,17 @@
   font-size: 12px;
   margin-bottom: 5px;
   padding-top: 5px;
+  overflow: hidden;
   .chart-inner {
     white-space: nowrap;
     direction: rtl;
     ::-webkit-scrollbar {
       display: none;
+    }
+    &::v-deep {
+      .simplebar-track {
+        top: 0;
+      }
     }
   }
   .bar {
@@ -1257,9 +1265,17 @@ export default {
       this.highlight = [];
     },
     setSimplebar(id) {
-      setTimeout(() => {
-        new SimpleBar(document.querySelector(`#${id}`));
-      }, 300);
+      const target = document.querySelector(`#${id}`);
+      const { width: pWidth } = target.parentElement.getBoundingClientRect();
+      const { width } = target.getBoundingClientRect();
+      target.style.maxWidth = `${pWidth}px`;
+      target.style.width = `${width}px`;
+      this[`#${id}`] = new SimpleBar(target);
+    },
+    resetSimplebarWidth(id) {
+      if (this[`#${id}`]) this[`#${id}`].unMount();
+      const target = document.querySelector(`#${id}`);
+      target.style.maxWidth = 'none';
     },
   },
   computed: {
