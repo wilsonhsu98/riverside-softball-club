@@ -158,7 +158,7 @@
               <div
                 class="player"
                 v-for="player in sourceList"
-                :key="player.name"
+                :key="`${player.name}${chartResetkey}`"
               >
                 <i
                   class="handle"
@@ -192,9 +192,7 @@
                   :autoHide="true"
                   :container="$refs.container"
                   @apply-show="setSimplebar(`chart-inner_${player.name}`)"
-                  @apply-hide="
-                    resetSimplebarWidth(`chart-inner_${player.name}`)
-                  "
+                  @apply-hide="resetSimplebarWidth()"
                 >
                   <!-- This will be the popover target (for the events and position) -->
                   <div class="tip-trigger"></div>
@@ -863,6 +861,8 @@ export default {
       clickCount: 0,
       clickTimer: null,
       highlight: [],
+      currentSimplebar: undefined,
+      chartResetkey: new Date().getTime(),
     };
   },
   created() {
@@ -888,6 +888,10 @@ export default {
   },
   mounted() {
     this.container = this.$refs.container;
+    window.addEventListener('resize', this.requestAnimationFrame);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.requestAnimationFrame);
   },
   methods: {
     ...mapActions({
@@ -1272,12 +1276,25 @@ export default {
       const { width } = target.getBoundingClientRect();
       target.style.maxWidth = `${pWidth}px`;
       target.style.width = `${width}px`;
-      this[`#${id}`] = new SimpleBar(target);
+      this.currentSimplebar = new SimpleBar(target);
     },
-    resetSimplebarWidth(id) {
-      if (this[`#${id}`]) this[`#${id}`].unMount();
-      const target = document.querySelector(`#${id}`);
-      target.style.maxWidth = 'none';
+    resetSimplebarWidth() {
+      this.chartResetkey = new Date().getTime();
+      if (this.currentSimplebar) {
+        this.currentSimplebar = undefined;
+      }
+    },
+    reCalculate() {
+      if (this.currentSimplebar) {
+        const target = this.currentSimplebar.el;
+        const { width: pWidth } = target.parentElement.getBoundingClientRect();
+        target.style.maxWidth = `${pWidth}px`;
+        target.style.width = `${pWidth}px`;
+        this.currentSimplebar = new SimpleBar(target);
+      }
+    },
+    requestAnimationFrame() {
+      window.requestAnimationFrame(this.reCalculate);
     },
   },
   computed: {
