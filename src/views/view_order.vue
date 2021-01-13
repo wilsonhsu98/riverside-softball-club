@@ -132,7 +132,7 @@
             class="flex"
             :style="{
               minHeight:
-                sourceList.length > 11
+                sourceList.length > 9
                   ? `${(dragBack ? sourceList.length + 1 : sourceList.length) *
                       45 +
                       77}px`
@@ -267,7 +267,7 @@
             class="flex"
             :style="{
               minHeight:
-                ORDER.length > 11 ? `${ORDER.length * 45 + 65}px` : 'auto',
+                ORDER.length > 9 ? `${ORDER.length * 45 + 65}px` : 'auto',
             }"
           >
             <vue-draggable
@@ -481,7 +481,7 @@
 }
 .flex-container {
   display: flex;
-  min-height: 590px;
+  min-height: 515px;
   .flex {
     flex: 1;
     position: relative;
