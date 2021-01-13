@@ -131,7 +131,7 @@
           <div
             class="flex"
             :style="{
-              height:
+              minHeight:
                 sourceList.length > 11
                   ? `${(dragBack ? sourceList.length + 1 : sourceList.length) *
                       45 +
@@ -263,7 +263,13 @@
             </vue-draggable>
           </div>
           <div class="separater"></div>
-          <div class="flex">
+          <div
+            class="flex"
+            :style="{
+              minHeight:
+                ORDER.length > 11 ? `${ORDER.length * 45 + 65}px` : 'auto',
+            }"
+          >
             <vue-draggable
               tag="fieldset"
               group="people"
@@ -317,6 +323,14 @@
                   </div>
                 </vue-draggable>
               </template>
+              <div class="add-remove">
+                <i
+                  class="fa fa-minus-circle"
+                  :disabled="orderCount < 10"
+                  @click="minus"
+                ></i>
+                <i class="fa fa-plus-circle" @click="plus"></i>
+              </div>
             </vue-draggable>
           </div>
         </div>
@@ -641,6 +655,18 @@
       float: right;
     }
   }
+  .add-remove {
+    color: $active_bgcolor;
+    display: flex;
+    > .fa:first-child {
+      margin: 0 3px 0 auto;
+    }
+    > .fa[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  }
 }
 .handle {
   position: absolute;
@@ -835,12 +861,15 @@ import { scrollTo, getShuffledArr } from '../libs/utils';
 
 export default {
   data() {
-    const ORDER = Array(12)
+    const orderCount = 10;
+    const ORDER = Array(orderCount)
       .fill(undefined)
       .map((undefined, i) => i + 1);
     const order_x = ORDER.reduce((acc, number) => {
-      acc[`order_${number}`] = [];
-      return acc;
+      return {
+        ...acc,
+        [`order_${number}`]: [],
+      };
     }, {});
     return {
       container: null,
@@ -851,6 +880,7 @@ export default {
       sourceList: [],
       ...order_x,
       ORDER,
+      orderCount,
       divider: 0,
       sortBy_: '',
       extra: '',
@@ -871,17 +901,20 @@ export default {
     const tempOrder = window.localStorage.getItem('temp_order');
     window.localStorage.removeItem('temp_order');
     if (tempOrder) {
-      tempOrder.split(',').forEach((name, index, self) => {
-        if (!this.hiddenList.find(player => player.name === name)) {
-          this[`order_${index + 1}`][0] = this.sourceList.find(
-            player => player.name === name,
-          ) || { name };
-        }
-        if (index === self.length - 1) {
-          this.sourceList = this.sourceList.filter(
-            player => !self.includes(player.name),
-          );
-        }
+      this.orderCount = tempOrder.split(',').length;
+      this.$nextTick(() => {
+        tempOrder.split(',').forEach((name, index, self) => {
+          if (!this.hiddenList.find(player => player.name === name)) {
+            this[`order_${index + 1}`][0] = this.sourceList.find(
+              player => player.name === name,
+            ) || { name };
+          }
+          if (index === self.length - 1) {
+            this.sourceList = this.sourceList.filter(
+              player => !self.includes(player.name),
+            );
+          }
+        });
       });
     }
   },
@@ -1249,8 +1282,7 @@ export default {
     },
     fill10(source) {
       this.sourceList = this.ORDER.filter(
-        order =>
-          this[`order_${order}`].length === 0 && ![11, 12].includes(order),
+        order => this[`order_${order}`].length === 0 && order <= 10,
       ).reduce((acc, order, index) => {
         if (source[index]) {
           this[`order_${order}`][0] = source[index];
@@ -1285,6 +1317,14 @@ export default {
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.resetSimplebar);
+    },
+    minus() {
+      if (this.orderCount > 9) {
+        this.orderCount -= 1;
+      }
+    },
+    plus() {
+      this.orderCount += 1;
     },
   },
   computed: {
@@ -1323,6 +1363,24 @@ export default {
     },
     sortBy() {
       this.sortBy_ = this.sortBy;
+    },
+    orderCount(next, prev) {
+      const ORDER = Array(this.orderCount)
+        .fill(undefined)
+        .map((undefined, i) => i + 1);
+      ORDER.forEach(number => {
+        this[`order_${number}`] =
+          Array.isArray(this[`order_${number}`]) &&
+          this[`order_${number}`].length
+            ? this[`order_${number}`]
+            : [];
+      });
+      if (next < prev) {
+        this[`order_${prev}`] = [];
+      }
+      this.highlight = [];
+      this.ORDER = ORDER;
+      this.doResetSource();
     },
   },
 };
