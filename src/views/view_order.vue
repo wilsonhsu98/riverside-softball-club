@@ -192,7 +192,6 @@
                   :autoHide="true"
                   :container="$refs.container"
                   @apply-show="setSimplebar(`chart-inner_${player.name}`)"
-                  @apply-hide="resetSimplebarWidth()"
                 >
                   <!-- This will be the popover target (for the events and position) -->
                   <div class="tip-trigger"></div>
@@ -1278,23 +1277,14 @@ export default {
       target.style.width = `${width}px`;
       this.currentSimplebar = new SimpleBar(target);
     },
-    resetSimplebarWidth() {
+    resetSimplebar() {
       this.chartResetkey = new Date().getTime();
       if (this.currentSimplebar) {
         this.currentSimplebar = undefined;
       }
     },
-    reCalculate() {
-      if (this.currentSimplebar) {
-        const target = this.currentSimplebar.el;
-        const { width: pWidth } = target.parentElement.getBoundingClientRect();
-        target.style.maxWidth = `${pWidth}px`;
-        target.style.width = `${pWidth}px`;
-        this.currentSimplebar = new SimpleBar(target);
-      }
-    },
     requestAnimationFrame() {
-      window.requestAnimationFrame(this.reCalculate);
+      window.requestAnimationFrame(this.resetSimplebar);
     },
   },
   computed: {
