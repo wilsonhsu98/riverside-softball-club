@@ -5,6 +5,9 @@ const contentColor = content => {
   if (['BB', 'SF'].includes(content)) {
     return 'yellow';
   }
+  if (content === 'UNKNOWN') {
+    return 'gray';
+  }
   return 'blue';
 };
 const innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
@@ -34,7 +37,10 @@ const genStatistics = (players, records, filterPA, filterGames) => {
           ? true
           : filterGames.includes(item._table);
       })
-      .filter(item => item.name === name && item.content)
+      .filter(
+        item =>
+          item.name === name && item.content && item.content !== 'UNKNOWN',
+      )
       .slice(0, filterPA)
       .map(item => {
         const onbase = (() => {
@@ -65,7 +71,12 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       .filter((v, i, self) => self.indexOf(v) === i)
       .map(game => {
         return sortRecords
-          .filter(item => item._table === game && item.name === name)
+          .filter(
+            item =>
+              item._table === game &&
+              item.name === name &&
+              item.content !== 'UNKNOWN',
+          )
           .map(item => {
             return {
               name: item.name,

@@ -211,7 +211,14 @@
                 {{ $t(item) }}
               </span>
               <span style="cursor: auto;"></span>
-              <span style="cursor: auto;"></span>
+              <span
+                :key="`item_${item}`"
+                v-for="item in ['UNKNOWN']"
+                :class="['gray', { select: content === item }]"
+                @click="toggle('content', item)"
+              >
+                {{ $t(item) }}
+              </span>
             </div>
           </div>
         </div>
@@ -644,6 +651,9 @@
           &.blue {
             background-color: $ng;
           }
+          &.gray {
+            background-color: $gray;
+          }
           &.current {
             animation: currentContent 1s linear infinite;
           }
@@ -789,6 +799,13 @@
         border: 3px solid $ng;
         &.select {
           background-color: $ng;
+        }
+      }
+      &.gray {
+        color: $gray;
+        border: 3px solid $gray;
+        &.select {
+          background-color: $gray;
         }
       }
       &.rbi {
@@ -1093,11 +1110,6 @@
       span {
         width: calc((100vw - 30px - 12px) / 5);
         max-width: 58px;
-        &.gray,
-        &.run.alt {
-          width: calc((100vw - 30px - 6px) / 5 * 2);
-          max-width: 119px;
-        }
       }
     }
     .single-col .coordination {
@@ -1223,6 +1235,7 @@ export default {
       );
     },
     validate() {
+      if (this.content === 'UNKNOWN') return true;
       const rule = {
         third: {
           back: ['second', 'first', 'home'],
@@ -1289,7 +1302,7 @@ export default {
       if (this.content && this.validate()) {
         if (
           this.showNextOnbase === false &&
-          !['BB', 'HR'].includes(this.content)
+          !['BB', 'HR', 'UNKNOWN'].includes(this.content)
         ) {
           this.showNextOnbase = true;
           this.onbasePlayers = ['first', 'second', 'third'].reduce((acc, b) => {
@@ -1918,6 +1931,8 @@ export default {
         }
         if (['BB', 'K'].includes(this.content)) {
           this.step = 3;
+        } else if (this.content === 'UNKNOWN') {
+          this.step = 1;
         } else {
           this.step = 2;
         }

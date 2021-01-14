@@ -171,6 +171,9 @@ const formatColor = content => {
   if (['BB', 'SF'].includes(content)) {
     return 'yellow';
   }
+  if (content === 'UNKNOWN') {
+    return 'gray';
+  }
   return 'blue';
 };
 
@@ -485,4 +488,5 @@ export {
   evaluateTeamScore,
   scoreMapping,
   formatDate,
+  innArray,
 };

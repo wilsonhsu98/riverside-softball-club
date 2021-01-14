@@ -106,7 +106,14 @@
               {{ $t(item) }}
             </span>
             <span style="cursor: auto;"></span>
-            <span style="cursor: auto;"></span>
+            <span
+              :key="`item_${item}`"
+              v-for="item in ['UNKNOWN']"
+              :class="['gray', { select: content === item }]"
+              @click="toggle('content', item)"
+            >
+              {{ $t(item) }}
+            </span>
             <span
               :class="[
                 'rbi',
@@ -339,6 +346,13 @@
         border: 3px solid $ng;
         &.select {
           background-color: $ng;
+        }
+      }
+      &.gray {
+        color: $gray;
+        border: 3px solid $gray;
+        &.select {
+          background-color: $gray;
         }
       }
       &.rbi {
@@ -629,6 +643,7 @@ export default {
       );
     },
     validate() {
+      if (this.content === 'UNKNOWN') return true;
       const rule = {
         third: {
           back: ['second', 'first', 'home'],

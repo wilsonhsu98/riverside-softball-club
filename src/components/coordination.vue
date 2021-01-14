@@ -138,7 +138,7 @@ export default {
           const img = new Image();
           const timer = setTimeout(() => {
             resolve();
-          }, 1000);
+          }, 500);
           img.crossOrigin = 'Anonymous';
           img.onload = () => {
             this[item.var] = img;
