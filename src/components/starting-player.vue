@@ -78,18 +78,24 @@ export default {
       ].map(item => {
         return new Promise(resolve => {
           const img = new Image();
+          const timer = setTimeout(() => {
+            resolve();
+          }, 1000);
           img.crossOrigin = 'Anonymous';
           img.onload = () => {
             this[item.var] = img;
             resolve();
+            clearTimeout(timer);
           };
           img.onerror = () => {
             resolve();
+            clearTimeout(timer);
           };
           if (item.src) {
             img.src = this.$cacheImg(item.src);
           } else {
             resolve();
+            clearTimeout(timer);
           }
         });
       }),
