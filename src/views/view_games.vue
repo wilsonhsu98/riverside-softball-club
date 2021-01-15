@@ -194,6 +194,7 @@
                   </div>
                   <div v-else :class="`result ${sub.result}`">
                     {{ (sub.result && sub.result.slice(0, 1)) || '?' }}
+                    <i v-if="sub.youtubeVideos" class="fa fa-video-camera"></i>
                   </div>
                   <div class="name">{{ sub.opponent || sub.game }}</div>
                 </div>
@@ -391,6 +392,7 @@
   background-color: #ccc;
   color: #fff;
   text-align: center;
+  position: relative;
   &.win {
     background-color: $hit;
   }
@@ -399,6 +401,14 @@
   }
   &.lose {
     background-color: $ng;
+  }
+  .fa-video-camera {
+    position: absolute;
+    right: -8px;
+    bottom: -8px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    color: $row_color;
+    font-size: 16px;
   }
 }
 .container {
