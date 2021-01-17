@@ -1639,6 +1639,9 @@ export default {
       }
     },
     formatContent_(content, location = {}) {
+      if (content === 'UNKNOWN') {
+        return this.boxDisplay === 'code' ? '？' : this.$t(content);
+      }
       switch (this.boxDisplay) {
         case 'code':
           return formatContent(this.boxDisplay, content, location.location);
@@ -1733,7 +1736,7 @@ export default {
               row =>
                 row.data.uid === this.userId &&
                 row.content.length &&
-                row.content.some(item => item.content),
+                row.content.some(item => item && item.content),
             )
         ) {
           this.editVideo = true;
