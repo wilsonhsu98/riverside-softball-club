@@ -192,55 +192,84 @@ const getters = {
       (state.period.find(item => item.select) || { games: [] }).games,
     );
   },
-  gameOptions: state =>
-    state.games.reduce(
-      (acc, item, i, self) => {
-        if (i === self.length - 1) {
-          return {
-            opponent: [...new Set(acc.opponent.concat(item.opponent))]
-              .filter(item => item)
-              .sort((a, b) => a.localeCompare(b), 'zh-TW'),
-            league: [...new Set(acc.league.concat(item.league))]
-              .filter(item => item)
-              .sort((a, b) => a.localeCompare(b), 'zh-TW'),
-            group: [...new Set(acc.group.concat(item.group))]
-              .filter(item => item)
-              .sort((a, b) => a.localeCompare(b), 'zh-TW'),
-            period: [...new Set(acc.period.concat(item.period))]
-              .filter(item => item)
-              .sort((a, b) => b.localeCompare(a), 'zh-TW'),
-            coach: [...new Set(acc.coach.concat(item.coach))]
-              .filter(item => item)
-              .sort((a, b) => b.localeCompare(a), 'zh-TW'),
-            recorder: [...new Set(acc.recorder.concat(item.recorder))]
-              .filter(item => item)
-              .sort((a, b) => b.localeCompare(a), 'zh-TW'),
-            tags: [...new Set(acc.tags.concat(item.tags))]
-              .filter(item => item)
-              .sort((a, b) => b.localeCompare(a), 'zh-TW'),
-          };
+  gameOptions: state => {
+    const concat = (acc, item, col) => {
+      const values = [].concat(item[col]);
+      return values.reduce((acc, text) => {
+        const find = acc.find(prev => prev.text === text);
+        if (find) {
+          return [
+            ...acc.filter(prev => prev.text !== text),
+            { text, count: find.count + 1 },
+          ];
+        } else if (text) {
+          return acc.concat({ text, count: 1 });
         } else {
-          return {
-            opponent: acc.opponent.concat(item.opponent),
-            league: acc.league.concat(item.league),
-            group: acc.group.concat(item.group),
-            period: acc.period.concat(item.period),
-            coach: acc.coach.concat(item.coach),
-            recorder: acc.recorder.concat(item.recorder),
-            tags: acc.tags.concat(item.tags),
-          };
+          return acc;
         }
-      },
-      {
-        opponent: [],
-        league: [],
-        group: [],
-        period: [],
-        coach: [],
-        recorder: [],
-        tags: [],
-      },
-    ),
+      }, acc[col]);
+    };
+    const filterGames = (
+      state.period.find(item => item.select) || { games: [] }
+    ).games;
+    return state.games
+      .filter(item => filterGames.includes(item.game))
+      .reduce(
+        (acc, item, i, self) => {
+          if (i === self.length - 1) {
+            return {
+              opponent: concat(acc, item, 'opponent').sort(
+                (a, b) => a.text.localeCompare(b.text),
+                'zh-TW',
+              ),
+              league: concat(acc, item, 'league').sort(
+                (a, b) => a.text.localeCompare(b.text),
+                'zh-TW',
+              ),
+              group: concat(acc, item, 'group').sort(
+                (a, b) => a.text.localeCompare(b.text),
+                'zh-TW',
+              ),
+              period: concat(acc, item, 'period').sort(
+                (a, b) => a.text.localeCompare(b.text),
+                'zh-TW',
+              ),
+              coach: concat(acc, item, 'coach').sort(
+                (a, b) => a.text.localeCompare(b.text),
+                'zh-TW',
+              ),
+              recorder: concat(acc, item, 'recorder').sort(
+                (a, b) => a.text.localeCompare(b.text),
+                'zh-TW',
+              ),
+              tags: concat(acc, item, 'tags').sort(
+                (a, b) => a.text.localeCompare(b.text),
+                'zh-TW',
+              ),
+            };
+          } else {
+            return {
+              opponent: concat(acc, item, 'opponent'),
+              league: concat(acc, item, 'league'),
+              group: concat(acc, item, 'group'),
+              period: concat(acc, item, 'period'),
+              coach: concat(acc, item, 'coach'),
+              recorder: concat(acc, item, 'recorder'),
+              tags: concat(acc, item, 'tags'),
+            };
+          }
+        },
+        {
+          opponent: [],
+          league: [],
+          group: [],
+          period: [],
+          coach: [],
+          recorder: [],
+          tags: [],
+        },
+      );
+  },
   game: state => state.game,
   periodGames: state => state.period.find(item => item.select).games || [],
   itemStats: state => state.itemStats,

@@ -243,7 +243,7 @@
       <custom-input
         type="select"
         taggable
-        :options="gameOptions.period"
+        :options="gameOptions.period.map(({ text }) => text)"
         :name="$t('ttl_period')"
         :placeholder="$t('pla_period')"
         v-model="period"
@@ -261,7 +261,7 @@
           <custom-input
             type="select"
             taggable
-            :options="gameOptions.opponent"
+            :options="gameOptions.opponent.map(({ text }) => text)"
             :name="$t('ttl_opponent')"
             :error="opponent_err"
             v-model="opponent"
@@ -274,14 +274,14 @@
           <custom-input
             type="select"
             taggable
-            :options="gameOptions.league"
+            :options="gameOptions.league.map(({ text }) => text)"
             :name="$t('ttl_league')"
             v-model="league"
           />
           <custom-input
             type="select"
             taggable
-            :options="gameOptions.group"
+            :options="gameOptions.group.map(({ text }) => text)"
             :name="$t('ttl_group')"
             v-model="group"
           />
@@ -357,7 +357,7 @@
         type="select"
         taggable
         multiple
-        :options="gameOptions.tags"
+        :options="gameOptions.tags.map(({ text }) => text)"
         :name="$t('ttl_game_tag')"
         :placeholder="$t('pla_game_tag')"
         v-model="tags"

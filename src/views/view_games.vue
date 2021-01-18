@@ -999,6 +999,119 @@ export default {
       this.conditions = [];
       this.setOtherConditions(this.conditions);
     },
+    refreshCondition() {
+      const { color, invertColor } =
+        this.queryFields.find(({ field }) => field === this.selectedField) ||
+        {};
+      switch (this.selectedField) {
+        case 'use_team':
+          this.fieldOptions = this.teamNames.map(teamName => ({
+            text: teamName,
+            value: `useTeam:${teamName}`,
+            color,
+            invertColor,
+          }));
+          break;
+        case 'opponent':
+          this.fieldOptions = this.gameOptions.opponent.map(
+            ({ text, count }) => ({
+              text: `${text}(${count})`,
+              value: `${this.selectedField}:${text}`,
+              color,
+              invertColor,
+            }),
+          );
+          break;
+        case 'league':
+          this.fieldOptions = this.gameOptions.league.map(
+            ({ text, count }) => ({
+              text: `${text}(${count})`,
+              value: `${this.selectedField}:${text}`,
+              color,
+              invertColor,
+            }),
+          );
+          break;
+        case 'group':
+          this.fieldOptions = this.gameOptions.group.map(({ text, count }) => ({
+            text: `${text}(${count})`,
+            value: `${this.selectedField}:${text}`,
+            color,
+            invertColor,
+          }));
+          break;
+        case 'game_type':
+          this.fieldOptions = [
+            { text: this.$t('ttl_fun'), value: `gameType:fun` },
+            {
+              text: this.$t('ttl_regular'),
+              value: `gameType:regular`,
+            },
+            {
+              text: this.$t('ttl_playoff'),
+              value: `gameType:playoff`,
+            },
+          ].map(item => ({
+            ...item,
+            color,
+            invertColor,
+          }));
+          break;
+        case 'place':
+          this.fieldOptions = [
+            { text: this.$t('ttl_1st'), value: `${this.selectedField}:1` },
+            { text: this.$t('ttl_3rd'), value: `${this.selectedField}:3` },
+            {
+              text: this.$t('ttl_home'),
+              value: `${this.selectedField}:4`,
+            },
+          ].map(item => ({
+            ...item,
+            color,
+            invertColor,
+          }));
+          break;
+        case 'top_bot':
+          this.fieldOptions = [
+            { text: this.$t('ttl_top'), value: `topBottom:top` },
+            { text: this.$t('ttl_bot'), value: `topBottom:bot` },
+          ].map(item => ({
+            ...item,
+            color,
+            invertColor,
+          }));
+          break;
+        case 'coach':
+          this.fieldOptions = this.gameOptions.coach.map(({ text, count }) => ({
+            text: `${text}(${count})`,
+            value: `coach:${text}`,
+            color,
+            invertColor,
+          }));
+          break;
+        case 'recorder':
+          this.fieldOptions = this.gameOptions.recorder.map(
+            ({ text, count }) => ({
+              text: `${text}(${count})`,
+              value: `recorder:${text}`,
+              color,
+              invertColor,
+            }),
+          );
+          break;
+        case 'game_tag':
+          this.fieldOptions = this.gameOptions.tags.map(({ text, count }) => ({
+            text: `${text}(${count})`,
+            value: `tags:${text}`,
+            color,
+            invertColor,
+          }));
+          break;
+        default:
+          this.fieldOptions = [];
+          break;
+      }
+    },
   },
   computed: {
     ...mapGetters({
@@ -1057,116 +1170,13 @@ export default {
     groupGames: {
       handler() {
         this.groupGames_ = this.groupGames;
+        this.refreshCondition();
       },
       immediate: true,
     },
     selectedField: {
       handler() {
-        const { color, invertColor } =
-          this.queryFields.find(({ field }) => field === this.selectedField) ||
-          {};
-        switch (this.selectedField) {
-          case 'use_team':
-            this.fieldOptions = this.teamNames.map(teamName => ({
-              text: teamName,
-              value: `useTeam:${teamName}`,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'opponent':
-            this.fieldOptions = this.gameOptions.opponent.map(opponent => ({
-              text: opponent,
-              value: `${this.selectedField}:${opponent}`,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'league':
-            this.fieldOptions = this.gameOptions.league.map(league => ({
-              text: league,
-              value: `${this.selectedField}:${league}`,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'group':
-            this.fieldOptions = this.gameOptions.group.map(group => ({
-              text: group,
-              value: `${this.selectedField}:${group}`,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'game_type':
-            this.fieldOptions = [
-              { text: this.$t('ttl_fun'), value: `gameType:fun` },
-              {
-                text: this.$t('ttl_regular'),
-                value: `gameType:regular`,
-              },
-              {
-                text: this.$t('ttl_playoff'),
-                value: `gameType:playoff`,
-              },
-            ].map(item => ({
-              ...item,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'place':
-            this.fieldOptions = [
-              { text: this.$t('ttl_1st'), value: `${this.selectedField}:1` },
-              { text: this.$t('ttl_3rd'), value: `${this.selectedField}:3` },
-              {
-                text: this.$t('ttl_home'),
-                value: `${this.selectedField}:4`,
-              },
-            ].map(item => ({
-              ...item,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'top_bot':
-            this.fieldOptions = [
-              { text: this.$t('ttl_top'), value: `topBottom:top` },
-              { text: this.$t('ttl_bot'), value: `topBottom:bot` },
-            ].map(item => ({
-              ...item,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'coach':
-            this.fieldOptions = this.gameOptions.coach.map(name => ({
-              text: name,
-              value: `coach:${name}`,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'recorder':
-            this.fieldOptions = this.gameOptions.recorder.map(name => ({
-              text: name,
-              value: `recorder:${name}`,
-              color,
-              invertColor,
-            }));
-            break;
-          case 'game_tag':
-            this.fieldOptions = this.gameOptions.tags.map(tag => ({
-              text: tag,
-              value: `tags:${tag}`,
-              color,
-              invertColor,
-            }));
-            break;
-          default:
-            this.fieldOptions = [];
-            break;
-        }
+        this.refreshCondition();
       },
       immediate: true,
     },
