@@ -12,7 +12,7 @@
           :value="team.teamCode"
           v-model="checkedTeams"
         />
-        {{ team.name }}
+        {{ `${team.name}(${team.score})` }}
       </label>
     </div>
     <button

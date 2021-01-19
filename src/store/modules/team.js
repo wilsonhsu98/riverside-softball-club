@@ -921,24 +921,26 @@ const actions = {
           },
         );
 
-        const filterTeams = allTeams.filter(team => {
-          const lastTime = new Date(team.timestamp);
-          const playerCount = Object.keys(team.players).filter(name => {
-            return team.players[name].uid;
-          }).length;
-          const managerCount = Object.keys(team.players).filter(name => {
-            return team.players[name].manager && team.players[name].uid;
-          }).length;
+        const filterTeams = allTeams
+          .filter(team => {
+            const lastTime = new Date(team.timestamp);
+            const playerCount = Object.keys(team.players).filter(name => {
+              return team.players[name].uid;
+            }).length;
+            const managerCount = Object.keys(team.players).filter(name => {
+              return team.players[name].manager && team.players[name].uid;
+            }).length;
 
-          if (
-            // !team.icon && // noicon
-            currentTime - lastTime > 86400000 * 30 * 1 && // 1個月前
-            playerCount === 1 && // only one binding user
-            managerCount === 1 && // is manager
-            team.teamCode !== 'DEMO'
-          )
-            return true;
-        });
+            if (
+              // !team.icon && // noicon
+              currentTime - lastTime > 86400000 * 30 * 1 && // 1個月前
+              playerCount === 1 && // only one binding user
+              managerCount === 1 && // is manager
+              team.teamCode !== 'DEMO'
+            )
+              return true;
+          })
+          .sort((a, b) => a.score - b.score);
 
         commit(types.SEARCH_TEAM, filterTeams);
         commit(types.SEARCH_RECENT_GAMES, [sum, ...recentGames]);
