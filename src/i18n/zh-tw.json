@@ -4,6 +4,7 @@
 	"login_google_btn": "使用Google帳號登入",
 	"login_github_btn": "使用Github帳號登入",
 	"login_anonymous_btn": "匿名路過",
+	"msg_login_before_join": "請先登入系統<br>之後會引導您加入球隊",
 	"logout_btn": "登出",
 	"fb_share": "分享",
 	"menu_games": "盒子",
@@ -246,6 +247,9 @@
 	"desc_score_teamIcon": "上傳球隊LOGO",
 	"desc_score_teamIntro": "有輸入球隊簡介",
 	"desc_score_teamOtherNames": "有輸入球隊其他隊名",
+	"btn_copy_link": "複製加入連結",
+	"btn_qrcode": "QR Code",
+	"msg_copy_success": "複製成功",
 
 	"edit_avatar": "編輯頭像",
 	"zoom": "縮放",

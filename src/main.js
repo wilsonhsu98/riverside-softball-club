@@ -14,6 +14,7 @@ import { Plugin } from 'vue-fragment';
 import simplebar from 'simplebar-vue';
 import VueRangeSlider from 'vue-range-component';
 import { VueSvgGauge } from 'vue-svg-gauge';
+import VueQrcodeReader from 'vue-qrcode-reader';
 import smoothscroll from 'smoothscroll-polyfill';
 import icon from './components/icon';
 import './css/font-awesome.min.css';
@@ -67,6 +68,7 @@ Vue.use(VCalendar, {
 Vue.use(VModal);
 Vue.use(Carousel3d);
 Vue.use(Plugin);
+Vue.use(VueQrcodeReader);
 Vue.use({
   install() {
     Vue.cacheImg = cacheImg;

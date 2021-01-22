@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
+import i18n from './i18n';
 import store from './store';
 
 const originalPush = VueRouter.prototype.push;
@@ -186,6 +187,10 @@ router.beforeEach((to, from, next) => {
     store.getters.token === ''
   ) {
     next({ path: '/login' });
+    if (to.name === 'join_team') {
+      store.dispatch('alert', i18n.t('msg_login_before_join'));
+      window.localStorage.setItem('next_url', JSON.stringify(to));
+    }
   } else if (to.path === '/login' && store.getters.token) {
     next({ path: from.path });
   } else if (to.path === '/management') {

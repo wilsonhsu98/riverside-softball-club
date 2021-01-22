@@ -2,33 +2,37 @@
   <div>
     <mobile-header @back="back_" />
     <div class="container">
-      <h1>{{ $t('join_team') }}</h1>
+      <h1>
+        {{ $t('join_team') }}
+        <div class="scanner" @click="showScanner"><scanner /></div>
+      </h1>
 
-      <div
-        class="request"
-        :key="`request_${request.teamCode}`"
-        v-for="request in requests"
-      >
-        <i class="fa fa-times" @click="deleteRequest_(request.id)"></i>
-        <p>{{ $t('msg_request_join', { team: request.teamName }) }}</p>
-        <p class="request-msg">{{ request.msg }}</p>
-        <p>{{ new Date(request.timestamp).toLocaleString() }}</p>
-        <p
-          v-if="['denied', 'deleted'].includes(request.status) === 'denied'"
-          class="request-denied"
+      <template v-if="!redirectMode">
+        <div
+          class="request"
+          :key="`request_${request.teamCode}`"
+          v-for="request in requests"
         >
-          {{ $t(`msg_${request.status}`) }}
-        </p>
-      </div>
-
-      <custom-input
-        class="field-wrapper"
-        :name="$t('ttl_search_team')"
-        v-model="keyWord"
-        @enter="value => searchTeams({ keyword: value, type: 'join' })"
-      >
-        <i class="fa fa-search" @mousedown="searchTeams_"></i>
-      </custom-input>
+          <i class="fa fa-times" @click="deleteRequest_(request.id)"></i>
+          <p>{{ $t('msg_request_join', { team: request.teamName }) }}</p>
+          <p class="request-msg">{{ request.msg }}</p>
+          <p>{{ new Date(request.timestamp).toLocaleString() }}</p>
+          <p
+            v-if="['denied', 'deleted'].includes(request.status) === 'denied'"
+            class="request-denied"
+          >
+            {{ $t(`msg_${request.status}`) }}
+          </p>
+        </div>
+        <custom-input
+          class="field-wrapper"
+          :name="$t('ttl_search_team')"
+          v-model="keyWord"
+          @enter="value => searchTeams({ keyword: value, type: 'join' })"
+        >
+          <i class="fa fa-search" @mousedown="searchTeams_"></i>
+        </custom-input>
+      </template>
 
       <div class="search-result">
         <div
@@ -192,6 +196,11 @@
       :teamScore="teamScore"
       :teamScoreKVP="teamScoreKVP"
     />
+    <div class="modal" v-if="isShowScanner" @click="closeScanner">
+      <div class="cam">
+        <qrcode-stream @decode="onDecode"></qrcode-stream>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -199,6 +208,21 @@
 @import '../scss/variable';
 
 .container {
+  h1 {
+    max-width: $max_width;
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+    .scanner {
+      position: absolute;
+      z-index: 1;
+      right: 0;
+      top: 1px;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+    }
+  }
   .request {
     background-color: $input_font;
     color: #fff;
@@ -423,6 +447,23 @@
     }
   }
 }
+.modal {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  > .cam {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+  }
+}
 
 @media only screen and (max-width: 760px) {
   .btn-container {
@@ -459,10 +500,16 @@ export default {
       choice: '',
       defaultIcon,
       selected: '',
+      redirectMode: !!this.$route.query.teamCode,
+      isShowScanner: false,
     };
   },
   created() {
-    this.fetchPersonalRequests(this.userId);
+    if (this.redirectMode) {
+      this.searchTeam_(this.$route.query.teamCode);
+    } else {
+      this.fetchPersonalRequests(this.userId);
+    }
   },
   mounted() {},
   beforeDestroy() {
@@ -473,16 +520,20 @@ export default {
     this.disconnectPersonalRequests();
   },
   methods: {
-    ...mapActions({
-      fetchTeamInfo: 'fetchTeamInfo',
-      searchTeams: 'searchTeams',
-      requestJoin: 'requestJoin',
-      disconnectPersonalRequests: 'disconnectPersonalRequests',
-      fetchPersonalRequests: 'fetchPersonalRequests',
-      handleRequest: 'handleRequest',
-    }),
+    ...mapActions([
+      'fetchTeamInfo',
+      'searchTeams',
+      'requestJoin',
+      'disconnectPersonalRequests',
+      'fetchPersonalRequests',
+      'handleRequest',
+    ]),
     back_() {
-      this.$router.back();
+      if (this.redirectMode) {
+        this.$router.push('/main/user');
+      } else {
+        this.$router.back();
+      }
     },
     joinTeam_() {
       const obj = {};
@@ -529,18 +580,44 @@ export default {
     showScore() {
       this.$modal.show('score');
     },
+    showScanner() {
+      this.isShowScanner = true;
+    },
+    closeScanner(e) {
+      if (e.currentTarget === e.target) {
+        this.isShowScanner = false;
+      }
+    },
+    onDecode(result) {
+      if (result.match(/main\/join_team\?teamCode=/)) {
+        const teamCode = result.replace(
+          /.*main\/join_team\?teamCode=(.*)/,
+          '$1',
+        );
+        if (teamCode !== this.$route.query.teamCode) {
+          this.$router.replace(`/main/join_team?teamCode=${teamCode}`);
+        }
+        this.isShowScanner = false;
+      }
+    },
   },
   computed: {
-    ...mapGetters({
-      teamInfo: 'teamInfo',
-      teamList: 'teamList',
-      currentTeam: 'currentTeam',
-      accountInfo: 'accountInfo',
-      userId: 'userId',
-      requests: 'requests',
-    }),
+    ...mapGetters([
+      'teamInfo',
+      'teamList',
+      'currentTeam',
+      'accountInfo',
+      'userId',
+      'requests',
+    ]),
   },
   watch: {
+    $route(to) {
+      if (to.query.teamCode) {
+        this.redirectMode = true;
+        this.searchTeam_(to.query.teamCode);
+      }
+    },
     teamInfo() {
       if (this.selected === this.teamInfo.teamCode) {
         this.teamCode = this.teamInfo.teamCode;

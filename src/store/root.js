@@ -147,7 +147,14 @@ const actions = {
           .then(() => {
             userActions.fetchUser({ commit });
             // commit(types.SET_USERNAME, snapshot.docs[0].id);
-            router.push('/main/user');
+            const next =
+              JSON.parse(window.localStorage.getItem('next_url')) || {};
+            if (next.hasOwnProperty('fullPath')) {
+              router.push(next);
+              window.localStorage.removeItem('next_url');
+            } else {
+              router.push('/main/user');
+            }
             commit(types.LOADING, false);
           });
       }
@@ -307,7 +314,14 @@ const actions = {
           .then(() => {
             userActions.fetchUser({ commit });
             if (router.history.current.path === '/login') {
-              router.push('/main/user');
+              const next =
+                JSON.parse(window.localStorage.getItem('next_url')) || {};
+              if (next.hasOwnProperty('fullPath')) {
+                router.push(next);
+                window.localStorage.removeItem('next_url');
+              } else {
+                router.push('/main/user');
+              }
             }
             commit(types.LOADING, false);
           });
@@ -416,6 +430,7 @@ const mutations = {
     const version = window.localStorage.getItem('version');
     const currentTeam = window.localStorage.getItem('currentTeam');
     const idb = window.localStorage.getItem('idb');
+    const nextUrl = window.localStorage.getItem('next_url');
     window.localStorage.clear();
     state.token = '';
     state.userId = '';
@@ -427,6 +442,7 @@ const mutations = {
     window.localStorage.setItem('version', forceVersion || version);
     if (currentTeam) window.localStorage.setItem('currentTeam', currentTeam);
     if (idb) window.localStorage.setItem('idb', idb);
+    if (nextUrl) window.localStorage.setItem('next_url', nextUrl);
     router.push('/login');
   },
   [types.SET_AUTH](state, auth = []) {

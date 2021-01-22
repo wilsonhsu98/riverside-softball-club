@@ -39,6 +39,12 @@
         >{{ $t('system_feedback') }}</a
       >
     </div>
+    <div class="modal" v-if="alertMsg">
+      <div class="dialog">
+        <p class="msg" v-html="alertMsg"></p>
+        <button @click="alert('')">{{ $t('btn_noticed') }}</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -139,6 +145,51 @@
     margin-bottom: 0;
   }
 }
+.modal {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  .dialog {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 260px;
+    text-align: center;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px -2px rgba(27, 33, 58, 0.4);
+    padding: 15px;
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .msg {
+    margin: 0 0 15px;
+    text-align: left;
+    width: 100%;
+    &::v-deep {
+      ul {
+        margin: 0;
+        padding-inline-start: 25px;
+      }
+    }
+  }
+  button {
+    background-color: $header_bgcolor;
+    padding: 10px;
+    margin: 0;
+    outline: none;
+    flex: 1;
+    &:nth-of-type(2) {
+      margin-left: 10px;
+    }
+  }
+}
 </style>
 
 <script>
@@ -154,19 +205,18 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      anonymousLogin: 'anonymousLogin',
-      googleLogin: 'googleLogin',
-      fbLogin: 'fbLogin',
-      githubLogin: 'githubLogin',
-      lineLogin: 'lineLogin',
-      lineLoginRedirect: 'lineLoginRedirect',
-    }),
+    ...mapActions([
+      'anonymousLogin',
+      'googleLogin',
+      'fbLogin',
+      'githubLogin',
+      'lineLogin',
+      'lineLoginRedirect',
+      'alert',
+    ]),
   },
   computed: {
-    ...mapGetters({
-      loading: 'loading',
-    }),
+    ...mapGetters(['loading', 'alertMsg']),
   },
 };
 </script>

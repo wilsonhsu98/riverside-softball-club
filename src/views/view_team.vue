@@ -45,6 +45,15 @@
         v-model="teamCode"
       />
 
+      <div class="top-btn-container field-wrapper">
+        <button class="btn" @click="copy">
+          {{ $t('btn_copy_link') }}&nbsp;<copy-link />
+        </button>
+        <button class="btn" @click="genQrCode">
+          {{ $t('btn_qrcode') }}&nbsp;<i class="fa fa-qrcode" />
+        </button>
+      </div>
+
       <custom-input
         :name="$t('ttl_team_name')"
         :error="teamName_err"
@@ -286,6 +295,9 @@
       :teamScoreKVP="teamScoreKVP"
       @evaluate="reEvaluateTeamScore"
     />
+    <div class="modal" v-if="qrCodeImg" @click="closeQRCode">
+      <img :src="qrCodeImg" />
+    </div>
   </div>
 </template>
 
@@ -453,6 +465,34 @@
       display: inline-block;
     }
   }
+  .top-btn-container {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+    width: 100%;
+    position: sticky;
+    top: 80px;
+    z-index: 2;
+    margin-top: 8px;
+    .btn {
+      width: calc(50% - 4px);
+      height: 39px;
+      line-height: 39px;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      svg {
+        display: inline-block;
+        vertical-align: middle;
+        height: 26px;
+        position: relative;
+        top: -1px;
+      }
+    }
+  }
   .delete-btn-container {
     display: none;
   }
@@ -574,9 +614,28 @@
     }
   }
 }
+.modal {
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  > img {
+    width: 300px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
+  }
+}
 
 @media only screen and (max-width: 760px) {
   .container {
+    .top-btn-container {
+      top: 60px;
+    }
     .delete-btn-container {
       display: block;
       margin-top: 15px;
@@ -618,6 +677,8 @@
 import { mapGetters, mapActions } from 'vuex';
 import transparentPng from '../images/transparent.png';
 import { evaluateTeamScore } from '../libs/utils';
+import copy from 'copy-to-clipboard';
+import QRCode from 'qrcode';
 
 export default {
   data() {
@@ -637,6 +698,7 @@ export default {
       icon: '',
       iconEdit: false,
       transparentPng,
+      qrCodeImg: undefined,
     };
   },
   created() {},
@@ -645,14 +707,14 @@ export default {
   },
   beforeDestroy() {},
   methods: {
-    ...mapActions({
-      editTeam: 'editTeam',
-      editTeamScore: 'editTeamScore',
-      handleRequest: 'handleRequest',
-      deleteTeam: 'deleteTeam',
-      alert: 'alert',
-      confirm: 'confirm',
-    }),
+    ...mapActions([
+      'editTeam',
+      'editTeamScore',
+      'handleRequest',
+      'deleteTeam',
+      'alert',
+      'confirm',
+    ]),
     checkNumber(e) {
       if (!e.target.validity.valid) {
         e.target.value = '';
@@ -865,16 +927,34 @@ export default {
         });
       }
     },
+    inviteLink() {
+      return `${window.location.origin}/#/main/join_team?teamCode=${this.teamCode}`;
+    },
+    copy() {
+      if (copy(this.inviteLink())) {
+        this.alert(this.$t('msg_copy_success'));
+      }
+    },
+    genQrCode() {
+      QRCode.toDataURL(this.inviteLink(), (err, url) => {
+        this.qrCodeImg = url;
+      });
+    },
+    closeQRCode(e) {
+      if (e.currentTarget === e.target) {
+        this.qrCodeImg = undefined;
+      }
+    },
   },
   computed: {
-    ...mapGetters({
-      userId: 'userId',
-      teamInfo: 'teamInfo',
-      currentTeamIcon: 'currentTeamIcon',
-      teamRequests: 'teamRequests',
-      games: 'games',
-      records: 'records',
-    }),
+    ...mapGetters([
+      'userId',
+      'teamInfo',
+      'currentTeamIcon',
+      'teamRequests',
+      'games',
+      'records',
+    ]),
   },
   watch: {
     teamInfo: {
