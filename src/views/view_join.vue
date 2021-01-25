@@ -599,10 +599,10 @@ export default {
           if (teamCode !== this.$route.query.teamCode) {
             this.$router.replace(`/main/join_team?teamCode=${teamCode}`);
           }
+          this.isShowScanner = false;
         } else {
           this.alert(this.$t('msg_not_valid_invited_url'));
         }
-        this.isShowScanner = false;
       }
     },
   },
