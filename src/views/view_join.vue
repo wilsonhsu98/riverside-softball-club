@@ -591,7 +591,6 @@ export default {
     },
     onDecode(result) {
       if (result) {
-        console.log(result);
         if (result.match(/main\/join_team\?teamCode=/)) {
           const teamCode = result.replace(
             /.*main\/join_team\?teamCode=(.*)/,
