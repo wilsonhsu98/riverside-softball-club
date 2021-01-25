@@ -264,6 +264,7 @@
 	"msg_request_join": "Request to join %{team}",
 	"msg_denied": "Denied",
 	"msg_deleted": "The team is gone",
+	"msg_not_valid_invited_url": "這不是加入連結",
 
 	"leave_team": "退出球隊",
 	"ttl_belongs_team": "目前所屬球隊(可點選退出)",

@@ -527,6 +527,7 @@ export default {
       'disconnectPersonalRequests',
       'fetchPersonalRequests',
       'handleRequest',
+      'alert',
     ]),
     back_() {
       if (this.redirectMode) {
@@ -589,13 +590,18 @@ export default {
       }
     },
     onDecode(result) {
-      if (result.match(/main\/join_team\?teamCode=/)) {
-        const teamCode = result.replace(
-          /.*main\/join_team\?teamCode=(.*)/,
-          '$1',
-        );
-        if (teamCode !== this.$route.query.teamCode) {
-          this.$router.replace(`/main/join_team?teamCode=${teamCode}`);
+      if (result) {
+        console.log(result);
+        if (result.match(/main\/join_team\?teamCode=/)) {
+          const teamCode = result.replace(
+            /.*main\/join_team\?teamCode=(.*)/,
+            '$1',
+          );
+          if (teamCode !== this.$route.query.teamCode) {
+            this.$router.replace(`/main/join_team?teamCode=${teamCode}`);
+          }
+        } else {
+          this.alert(this.$t('msg_not_valid_invited_url'));
         }
         this.isShowScanner = false;
       }
