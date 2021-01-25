@@ -942,12 +942,12 @@ export default {
     if (focus_game) {
       this.block = true;
     }
+    // setTimeout(() => {
+    this.focus_game = focus_game;
     setTimeout(() => {
-      this.focus_game = focus_game;
-      setTimeout(() => {
-        this.block = false;
-      }, 300);
-    }, 500);
+      this.block = false;
+    }, 300);
+    // }, 500);
   },
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
