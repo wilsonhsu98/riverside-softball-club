@@ -641,10 +641,10 @@
       </div>
     </div>
     <div style="text-align: center; margin: 14px;">
-      <!-- <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
+      <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
         <i class="fa fa-facebook-square"></i>
         {{ $t('fb_share') }}
-      </button> -->
+      </button>
       <router-link
         v-if="box.slice(1).length === 0 && role === 'manager'"
         :to="{
@@ -908,6 +908,7 @@
       &.off {
         background-color: #fff;
         color: $current_user_bgcolor;
+        margin-bottom: 10px;
       }
     }
   }
@@ -1116,6 +1117,9 @@
       margin: 10px 0 0 auto;
       display: flex;
       align-items: flex-end;
+      > i:first-child {
+        margin-left: 0;
+      }
     }
   }
   .result-icon {
@@ -1565,20 +1569,33 @@ export default {
     this.container = this.$refs.container;
   },
   methods: {
-    ...mapActions({
-      setGame: 'setGame',
-      toggleLoading: 'toggleLoading',
-      setBoxDisplay: 'setBoxDisplay',
-      toggleGameStatus: 'toggleGameStatus',
-      editGameOrder: 'editGameOrder',
-    }),
+    ...mapActions([
+      'setGame',
+      'toggleLoading',
+      'setBoxDisplay',
+      'toggleGameStatus',
+      'editGameOrder',
+    ]),
     screenshot() {
       this.toggleLoading(true);
+      document.querySelector('.action').style.visibility = 'hidden';
+      const { width, top } = this.$refs.container.getBoundingClientRect();
       html2canvas(this.$refs.container, {
         useCORS: true,
         logging: false,
+        y: window.scrollY + top,
+        x: (window.innerWidth - width) / 2,
+        scrollY: 0,
+        scrollX: 0,
+        width,
+        height: this.$refs.container.scrollHeight,
+        ignoreElements: ele =>
+          ['fa-video-camera', 'gen-graphic', 'fa-map-marker'].some(cls =>
+            ele.classList.contains(cls),
+          ),
       })
         .then(canvas => {
+          document.querySelector('.action').style.visibility = '';
           const formData = new FormData();
           formData.append(
             'image',
@@ -1829,16 +1846,16 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      game: 'game',
-      box: 'box',
-      boxSummary: 'boxSummary',
-      currentTeamIcon: 'currentTeamIcon',
-      role: 'role',
-      teamInfo: 'teamInfo',
-      boxDisplay: 'boxDisplay',
-      userId: 'userId',
-    }),
+    ...mapGetters([
+      'game',
+      'box',
+      'boxSummary',
+      'currentTeamIcon',
+      'role',
+      'teamInfo',
+      'boxDisplay',
+      'userId',
+    ]),
   },
   watch: {
     boxSummary: {
