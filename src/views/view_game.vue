@@ -1616,7 +1616,8 @@ export default {
             display: 'popup',
           });
         })
-        .catch(() => {
+        .catch(err => {
+          console.log(err)
           this.toggleLoading(false);
         });
     },
