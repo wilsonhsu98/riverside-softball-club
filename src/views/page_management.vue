@@ -83,7 +83,7 @@
 @import '../scss/variable';
 
 .manage-container {
-  height: 0;
+  /* height: 0; */
   padding: 10px;
   text-align: center;
   button {

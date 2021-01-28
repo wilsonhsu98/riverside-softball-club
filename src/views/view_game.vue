@@ -241,6 +241,14 @@
           >{{ $t(`box_display_${item}`) }}</span
         >
         <span
+          v-if="box.slice(1).length"
+          class="gen-graphic share"
+          @click="screenshot"
+        >
+          <i class="fa fa-facebook-square"></i>
+          {{ $t('fb_share') }}
+        </span>
+        <span
           v-if="Object.keys(boxSummary.positions || {}).length"
           class="gen-graphic"
           @click="getPositions"
@@ -641,10 +649,10 @@
       </div>
     </div>
     <div style="text-align: center; margin: 14px;">
-      <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
+      <!-- <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
         <i class="fa fa-facebook-square"></i>
         {{ $t('fb_share') }}
-      </button>
+      </button> -->
       <router-link
         v-if="box.slice(1).length === 0 && role === 'manager'"
         :to="{
@@ -767,6 +775,10 @@
         background-color: $current_user_bgcolor;
         border-color: $current_user_bgcolor;
         color: #fff;
+        &.share {
+          background-color: #365899;
+          border-color: #365899;
+        }
       }
     }
   }
@@ -886,7 +898,7 @@
     text-align: right;
     width: 60px;
     position: sticky;
-    bottom: 20px;
+    bottom: 0;
     background: none;
     span {
       display: inline-block;
