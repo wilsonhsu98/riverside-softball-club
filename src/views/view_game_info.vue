@@ -302,6 +302,10 @@
           <input type="radio" v-model="gameType" value="playoff" />
           <span>{{ $t('ttl_playoff') }}</span>
         </label>
+        <label>
+          <input type="radio" v-model="gameType" value="cup" />
+          <span>{{ $t('ttl_cup') }}</span>
+        </label>
       </div>
 
       <div class="field-wrapper field-wrapper-item">

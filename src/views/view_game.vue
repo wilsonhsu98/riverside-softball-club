@@ -1917,8 +1917,9 @@ export default {
             this.$t('ttl_fun'),
             this.$t('ttl_regular'),
             this.$t('ttl_playoff'),
+            this.$t('ttl_cup'),
             '',
-          ][['fun', 'regular', 'playoff', ''].indexOf(gameType)];
+          ][['fun', 'regular', 'playoff', 'cup', ''].indexOf(gameType)];
           this.place = [
             this.$t('ttl_1st'),
             this.$t('ttl_3rd'),

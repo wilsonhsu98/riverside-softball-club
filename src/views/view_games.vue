@@ -1051,6 +1051,10 @@ export default {
               text: this.$t('ttl_playoff'),
               value: `gameType:playoff`,
             },
+            {
+              text: this.$t('ttl_cup'),
+              value: `gameType:cup`,
+            },
           ].map(item => ({
             ...item,
             color,
