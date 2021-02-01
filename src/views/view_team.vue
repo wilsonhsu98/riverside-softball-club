@@ -45,7 +45,7 @@
         v-model="teamCode"
       />
 
-      <div class="top-btn-container field-wrapper">
+      <div class="top-btn-container field-wrapper" v-if="$route.params.team">
         <button class="btn" @click="copy">
           {{ $t('btn_copy_link') }}&nbsp;<copy-link />
         </button>
