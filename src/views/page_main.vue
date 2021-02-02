@@ -72,13 +72,13 @@
     <loading v-if="loading" :text="loading.text"></loading>
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
-        <p class="msg" v-html="alertMsg"></p>
+        <p class="msg" v-html="alertMsg.replace('\n', '<br>')"></p>
         <button @click="alert('')">{{ $t('btn_noticed') }}</button>
       </div>
     </div>
     <div class="modal" v-if="confirmMsg">
       <div class="dialog">
-        <p class="msg" v-html="confirmMsg"></p>
+        <p class="msg" v-html="confirmMsg.replace('\n', '<br>')"></p>
         <button @click="confirmYes">{{ confirmMsgY || $t('btn_yes') }}</button>
         <button @click="confirmNo">{{ confirmMsgN || $t('btn_no') }}</button>
       </div>

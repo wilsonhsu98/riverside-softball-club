@@ -355,7 +355,6 @@
     position: relative;
     > p {
       margin: 0 0 10px;
-      word-break: keep-all;
       &:last-child {
         margin-bottom: 0;
       }
