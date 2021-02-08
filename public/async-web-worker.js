@@ -384,7 +384,7 @@ const displayGame = (players, records, errors = [], role) => {
         location,
         onbase,
         video,
-        color: contentColor(item.content),
+        color: formatColor(item.content),
         // 換局
         ...(shouldSetInnChange && {
           innChange: item.inn,
