@@ -4,7 +4,7 @@
     <input
       type="number"
       pattern="\d*"
-      min="1"
+      :min="min_"
       class="input"
       :disabled="disabled"
       @input="checkNumber"
@@ -94,11 +94,12 @@
 
 <script>
 export default {
-  props: ['value', 'disabled'],
+  props: ['value', 'disabled', 'min'],
   emits: ['change'],
   data() {
     return {
       val: this.value,
+      min_: this.min === undefined ? 1 : this.min,
     };
   },
   methods: {
@@ -109,7 +110,7 @@ export default {
     },
     minus() {
       if (!this.disabled) {
-        this.val -= this.val > 1 ? 1 : 0;
+        this.val -= this.val > this.min_ ? 1 : 0;
       }
     },
     checkNumber(e) {
@@ -124,7 +125,7 @@ export default {
         return this.val;
       },
       set(newValue) {
-        this.val = newValue || 1;
+        this.val = newValue || this.min_;
       },
     },
   },

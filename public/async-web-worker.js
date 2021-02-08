@@ -1,4 +1,4 @@
-const contentColor = content => {
+const formatColor = content => {
   if (['1H', '2H', '3H', 'HR'].includes(content)) {
     return 'red';
   }
@@ -83,7 +83,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
               content: item.content,
               order: item.order,
               exclude: limit++ > filterPA,
-              color: contentColor(item.content),
+              color: formatColor(item.content),
             };
           })
           .concat(game.slice(-6));
@@ -275,7 +275,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
           x: item.location.x,
           y: item.location.y,
           location: item.location.location,
-          color: contentColor(item.content),
+          color: formatColor(item.content),
           borderColor: item.content === 'HR' ? 'white' : 'black',
         })),
     };
@@ -347,7 +347,7 @@ const displayGame = (players, records, errors = [], role) => {
       const find = arr.find(sub => sub.name === item.name);
       const findIndex = arr.indexOf(find);
       const canPushPlayer = !find && startOrder === 0 && !item.break;
-      const shouldSetStartOrder = find && startOrder === 0;
+      const shouldSetStartOrder = (find && startOrder === 0) || item.break;
       const shouldSetInnChange = item.inn !== prevInn;
       const shouldSetNewContent =
         role === 'manager' && !item.content && !isSetNewContent;

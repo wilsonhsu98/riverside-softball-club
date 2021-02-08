@@ -136,6 +136,9 @@
     top: 0;
     left: 0;
     transition: left 0.5s;
+    &::v-deep > .mobile-download {
+      display: none;
+    }
   }
 }
 .players {

@@ -93,6 +93,7 @@
 
 $header_menu_height: 70px;
 $footer_menu_height: 50px;
+$main_width: 980px;
 
 .main-container {
   padding-top: $header_menu_height;
@@ -108,7 +109,7 @@ header {
   height: $header_menu_height;
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.13), 0 0 2px 0 rgba(0, 0, 0, 0.2);
   .header-container {
-    width: 980px;
+    width: $main_width;
     margin: 0 auto;
   }
   .icon {
@@ -180,7 +181,7 @@ header {
   }
 }
 .content {
-  width: 980px;
+  width: $main_width;
   margin: 0 auto;
   position: relative;
   /* z-index: 0; */
