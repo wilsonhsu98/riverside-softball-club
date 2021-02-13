@@ -483,13 +483,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
       svg {
         display: inline-block;
         vertical-align: middle;
-        height: 26px;
+        height: 22px;
         position: relative;
         top: -1px;
+      }
+      .fa-qrcode {
+        font-size: 26px;
       }
     }
   }
