@@ -635,24 +635,32 @@ export default {
       const nameArray = this.sourceList.map(player => player.name);
 
       const { positions = {} } = this.boxSummary;
-      Object.keys(positions).forEach((position, index, self) => {
-        const positionIndex = this.POSITION.indexOf(position);
-        if (positionIndex > 0) {
-          if (nameArray.includes(positions[position])) {
-            this[`order_${positionIndex}`][0] = this.getPlayer(
-              positions[position],
-            );
-          } else {
-            this[`order_${positionIndex}`] = [];
+      if (Object.keys(positions).length) {
+        Object.keys(positions).forEach((position, index, self) => {
+          const positionIndex = this.POSITION.indexOf(position);
+          if (positionIndex > 0) {
+            if (nameArray.includes(positions[position])) {
+              this[`order_${positionIndex}`][0] = this.getPlayer(
+                positions[position],
+              );
+            } else {
+              this[`order_${positionIndex}`] = [];
+            }
           }
-        }
-        if (index === self.length - 1) {
-          this.sourceList = this.sourceList.filter(
-            player =>
-              !self.map(position => positions[position]).includes(player.name),
-          );
-        }
-      });
+          if (index === self.length - 1) {
+            this.sourceList = this.sourceList.filter(
+              player =>
+                !self
+                  .map(position => positions[position])
+                  .includes(player.name),
+            );
+          }
+        });
+      } else {
+        this.ORDER.forEach(positionIndex => {
+          this[`order_${positionIndex}`] = [];
+        });
+      }
     },
     getPlayer(name) {
       return (

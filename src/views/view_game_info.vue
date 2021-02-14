@@ -777,13 +777,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions({
-      setGame: 'setGame',
-      editGame: 'editGame',
-      deleteGame: 'deleteGame',
-      alert: 'alert',
-      confirm: 'confirm',
-    }),
+    ...mapActions(['setGame', 'editGame', 'deleteGame', 'alert', 'confirm']),
     checkNumber(e) {
       if (!e.target.validity.valid) {
         e.target.value = '';
@@ -977,16 +971,18 @@ export default {
     },
   },
   computed: {
+    ...mapGetters([
+      'currentTeamIcon',
+      'currentTeam',
+      'box',
+      'boxSummary',
+      'games',
+      'gameOptions',
+      'teamInfo',
+      'teamNames',
+    ]),
     ...mapGetters({
-      currentTeamIcon: 'currentTeamIcon',
-      currentTeam: 'currentTeam',
-      box: 'box',
-      boxSummary: 'boxSummary',
-      games: 'games',
-      gameOptions: 'gameOptions',
       period_: 'period',
-      teamInfo: 'teamInfo',
-      teamNames: 'teamNames',
     }),
   },
   watch: {

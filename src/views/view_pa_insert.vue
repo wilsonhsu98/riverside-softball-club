@@ -1201,12 +1201,13 @@ export default {
     this.container = this.$refs.container;
   },
   methods: {
-    ...mapActions({
-      editGameOrder: 'editGameOrder',
-      deleteLastPa: 'deleteLastPa',
-      setOrder: 'setOrder',
-      alert: 'alert',
-    }),
+    ...mapActions([
+      'editGameOrder',
+      'deleteLastPa',
+      'setOrder',
+      'alert',
+      'confirm',
+    ]),
     toggle(path, value) {
       const setPath = (path, value) =>
         path
@@ -1963,14 +1964,14 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      teamInfo: 'teamInfo',
-      box: 'box',
-      boxSummary: 'boxSummary',
-      currentTeamIcon: 'currentTeamIcon',
-      pa: 'pa',
-      boxDisplay: 'boxDisplay',
-    }),
+    ...mapGetters([
+      'teamInfo',
+      'box',
+      'boxSummary',
+      'currentTeamIcon',
+      'pa',
+      'boxDisplay',
+    ]),
   },
 };
 </script>
