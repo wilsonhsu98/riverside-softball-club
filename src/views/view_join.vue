@@ -465,10 +465,12 @@
 }
 
 @media only screen and (max-width: 760px) {
-  .btn-container {
-    position: static;
-    .join {
-      display: inline-block;
+  .container {
+    .btn-container {
+      position: static;
+      .join {
+        display: inline-block;
+      }
     }
   }
 }

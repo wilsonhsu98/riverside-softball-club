@@ -144,17 +144,6 @@
           </div>
         </div>
       </div>
-      <div
-        v-if="
-          pa &&
-            boxSummary.contents.filter(item => item.content).length === order
-        "
-        class="delete-btn-container"
-      >
-        <button class="btn danger" @click="delete_">
-          {{ $t('btn_delete_pa') }}
-        </button>
-      </div>
       <div class="btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
         <button
@@ -162,7 +151,7 @@
             pa &&
               boxSummary.contents.filter(item => item.content).length === order
           "
-          class="btn danger"
+          class="btn danger keep"
           @click="delete_"
         >
           {{ $t('btn_delete_pa') }}
@@ -325,9 +314,6 @@
       line-height: 14px;
     }
   }
-  .delete-btn-container {
-    display: none;
-  }
 }
 
 @media only screen and (max-width: 760px) {
@@ -345,14 +331,12 @@
       }
     }
     .btn-container {
-      display: none;
-    }
-    .delete-btn-container {
+      position: static;
       display: block;
-      margin-top: 15px;
+      margin: 15px auto auto;
       max-width: 300px;
       width: 100%;
-      .btn {
+      .btn.keep {
         display: block;
         width: 100%;
         margin: 0;

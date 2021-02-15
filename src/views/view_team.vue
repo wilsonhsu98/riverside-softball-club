@@ -272,17 +272,15 @@
 
       <div v-if="players_err" class="error" v-html="players_err"></div>
 
-      <div v-if="$route.params.team" class="field-wrapper delete-btn-container">
-        <button class="btn danger" @click="delete_">
-          {{ $t('btn_delete_team') }}
-        </button>
-      </div>
-
       <div class="btn-container">
         <button class="btn" @click="back_">
           {{ $t('btn_cancel') }}
         </button>
-        <button v-if="$route.params.team" class="btn danger" @click="delete_">
+        <button
+          v-if="$route.params.team"
+          class="btn danger keep"
+          @click="delete_"
+        >
           {{ $t('btn_delete_team') }}
         </button>
         <button class="btn" @click="editTeam_">
@@ -495,9 +493,6 @@
       }
     }
   }
-  .delete-btn-container {
-    display: none;
-  }
   .btn.danger {
     width: auto;
   }
@@ -638,10 +633,13 @@
     .top-btn-container {
       top: 60px;
     }
-    .delete-btn-container {
+    .btn-container {
+      position: static;
       display: block;
-      margin-top: 15px;
-      .btn {
+      margin: 15px auto auto;
+      max-width: 400px;
+      width: 100%;
+      .btn.keep {
         display: block;
         width: 100%;
         margin: 0;
