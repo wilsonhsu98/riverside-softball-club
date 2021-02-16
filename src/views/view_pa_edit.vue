@@ -365,7 +365,7 @@
     text-align: center;
   }
   .single-col {
-    max-width: 400px;
+    max-width: $max_width;
     width: 100%;
     margin: 0 auto;
   }
@@ -832,7 +832,10 @@ export default {
         { name: this.base.second.name },
         { name: this.base.third.name },
       ];
-      const startPlayers = this.box.slice(1).map(player => player.name);
+      const startPlayers = this.box
+        .slice(1)
+        .filter(record => !record.hasOwnProperty('altOrder'))
+        .map(({ name }) => name);
       this.benchPlayers = this.teamInfo.players
         .filter(
           player =>
@@ -1113,7 +1116,7 @@ export default {
         ) {
           this.rbi.one.disabled = false;
         }
-        if (['1H', '2H', '3H', 'HR'].includes(this.content)) {
+        if (['1H', '2H', '3H', 'HR', 'SF'].includes(this.content)) {
           this.rbi.two.disabled = false;
           this.rbi.three.disabled = false;
         }

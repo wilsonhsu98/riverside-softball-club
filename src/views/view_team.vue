@@ -637,7 +637,7 @@
       position: static;
       display: block;
       margin: 15px auto auto;
-      max-width: 400px;
+      max-width: $max_width;
       width: 100%;
       .btn.keep {
         display: block;

@@ -52,7 +52,7 @@
     }
   }
   .team-wrapper {
-    max-width: 400px;
+    max-width: $max_width;
     margin: 12px auto 0;
     border: 2px solid $input_border;
     border-radius: 4px;

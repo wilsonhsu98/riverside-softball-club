@@ -292,7 +292,7 @@
     }
   }
   .single-col {
-    max-width: 400px;
+    max-width: $max_width;
     width: 100%;
     margin: 0 auto;
   }
@@ -670,7 +670,7 @@ export default {
           this.altRun.disabled = false;
           this.run.disabled = false;
         }
-        if (['1H', '2H', '3H', 'HR'].includes(this.content)) {
+        if (['1H', '2H', '3H', 'HR', 'SF'].includes(this.content)) {
           this.rbi.two.disabled = false;
           this.rbi.three.disabled = false;
         }
