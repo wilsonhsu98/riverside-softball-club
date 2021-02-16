@@ -714,7 +714,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { formatDate } from '../libs/utils';
+import { formatDate, sumByInn } from '../libs/utils';
 
 export default {
   data() {
@@ -922,7 +922,7 @@ export default {
       this.isFocusInn = '';
     },
     sumByInn(scores, inn) {
-      return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
+      return sumByInn(scores, inn);
     },
     chkResult() {
       const score = this.sumByInn(this.scores, this.inn);

@@ -1524,7 +1524,7 @@ import { mapGetters, mapActions } from 'vuex';
 import html2canvas from 'html2canvas';
 import axios from 'axios';
 import config from '../../config';
-import { formatContent } from '../libs/utils';
+import { formatContent, sumByInn } from '../libs/utils';
 
 export default {
   data() {
@@ -1638,7 +1638,7 @@ export default {
       this.$router.push(`/main/games/${this.$route.params.team}`);
     },
     sumByInn(scores, inn) {
-      return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
+      return sumByInn(scores, inn);
     },
     setLocationVideo(record) {
       if (record.location) {

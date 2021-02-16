@@ -850,6 +850,7 @@ i.fa {
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
+import { sumByInn } from '../libs/utils';
 const clickEvent = (() => {
   if ('ontouchstart' in document.documentElement === true) return 'touchstart';
   else return 'click';
@@ -974,7 +975,7 @@ export default {
       this.toggleSearch = false;
     },
     sumByInn(scores, inn) {
-      return scores.slice(0, inn).reduce((acc, v) => acc + (v || 0), 0);
+      return sumByInn(scores, inn);
     },
     toggleField(field) {
       this.selectedField = this.selectedField === field ? '' : field;

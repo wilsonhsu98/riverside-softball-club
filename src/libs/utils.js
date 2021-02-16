@@ -472,6 +472,9 @@ const formatDate = dateVal => {
     .replace(/\//g, '');
 };
 
+const sumByInn = (scores, inn) =>
+  scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
+
 export default {
   parseGame,
   genGameList,
@@ -489,4 +492,5 @@ export {
   scoreMapping,
   formatDate,
   innArray,
+  sumByInn,
 };
