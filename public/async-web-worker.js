@@ -26,17 +26,17 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       )
     );
   });
+  const filterGamesRecords = sortRecords.filter(item => {
+    return filterGames === undefined ||
+      (Array.isArray(filterGames) && filterGames.length === 0)
+      ? true
+      : filterGames.includes(item._table);
+  });
 
   return players.map(player => {
     const name = player.id;
 
-    const top = sortRecords
-      .filter(item => {
-        return filterGames === undefined ||
-          (Array.isArray(filterGames) && filterGames.length === 0)
-          ? true
-          : filterGames.includes(item._table);
-      })
+    const top = filterGamesRecords
       .filter(
         item =>
           item.name === name && item.content && item.content !== 'UNKNOWN',
@@ -44,7 +44,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       .slice(0, filterPA)
       .map(item => {
         const onbase = (() => {
-          const next5 = sortRecords
+          const next5 = filterGamesRecords
             .filter(sub => sub._table === item._table)
             .reverse()
             .slice(item.order - 1, item.order - 1 + 5)
@@ -70,7 +70,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
       .map(item => item._table)
       .filter((v, i, self) => self.indexOf(v) === i)
       .map(game => {
-        return sortRecords
+        return filterGamesRecords
           .filter(
             item =>
               item._table === game &&
@@ -171,7 +171,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
           bb: acc.bb + (item.content === 'BB' ? 1 : 0),
           sf: acc.sf + (item.content === 'SF' ? 1 : 0),
           dp: acc.dp + (item.content === 'DP' ? 1 : 0),
-          r: acc.r + (item.r === item.name ? 1 : 0),
+          r: acc.r + (filterPA && item.r === item.name ? 1 : 0),
         };
       },
       {
@@ -197,16 +197,15 @@ const genStatistics = (players, records, filterPA, filterGames) => {
         dp: 0,
         r:
           filterPA === undefined
-            ? sortRecords
-                .filter(item => {
-                  return item.r === name && item.name !== name;
-                })
-                .filter(item => {
-                  return filterGames === undefined ||
-                    (Array.isArray(filterGames) && filterGames.length === 0)
-                    ? true
-                    : filterGames.includes(item._table);
-                }).length
+            ? filterGamesRecords.filter(item => {
+                return (
+                  item.r === name ||
+                  (Array.isArray(item.onbase) &&
+                    item.onbase.some(
+                      sub => sub && sub.name === name && sub.result === 'run',
+                    ))
+                );
+              }).length
             : 0,
       },
     );
