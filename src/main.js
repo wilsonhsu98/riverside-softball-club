@@ -103,6 +103,17 @@ if (window.localStorage.getItem('version') !== version.toString()) {
   window.indexedDB.deleteDatabase(process.env.VUE_APP_PROJECTNAME);
 }
 
+// https://aryedoveidelman.com/fixing_vh_units_on_mobile_once_and_for_all
+let preVH;
+const resetVH = () => {
+  const VH = window.innerHeight * 0.01;
+  if (preVH !== VH) {
+    document.documentElement.style.setProperty('--vh', `${VH}px`);
+    preVH = VH;
+  }
+};
+resetVH();
+
 const render = () => {
   new Promise(resolve => {
     resolve(
@@ -114,20 +125,11 @@ const render = () => {
       }),
     );
   }).then(() => {
+    resetVH();
     store.dispatch('chkLoginStatus');
   });
 };
 
-// https://aryedoveidelman.com/fixing_vh_units_on_mobile_once_and_for_all
-let preVH;
-const resetVH = () => {
-  const VH = window.innerHeight * 0.01;
-  if (preVH !== VH) {
-    document.documentElement.style.setProperty('--vh', `${VH}px`);
-    preVH = VH;
-  }
-};
-resetVH();
 const vhChangeEventTypes = [
   'scroll',
   'resize',
