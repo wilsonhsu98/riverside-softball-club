@@ -862,9 +862,7 @@ import { scrollTo, getShuffledArr } from '../libs/utils';
 export default {
   data() {
     const orderCount = 10;
-    const ORDER = Array(orderCount)
-      .fill(undefined)
-      .map((undefined, i) => i + 1);
+    const ORDER = [...Array(orderCount).keys()].map((undefined, i) => i + 1);
     const order_x = ORDER.reduce((acc, number) => {
       return {
         ...acc,
@@ -1250,8 +1248,7 @@ export default {
         }
         return b[sortBy] - a[sortBy];
       };
-      const alreadySetOrders = Array(10)
-        .fill(undefined)
+      const alreadySetOrders = [...Array(10).keys()]
         .map((undefined, i) => i + 1)
         .filter(order => this[`order_${order}`].length === 1);
       this.sourceList = rules
@@ -1365,9 +1362,9 @@ export default {
       this.sortBy_ = this.sortBy;
     },
     orderCount(next, prev) {
-      const ORDER = Array(this.orderCount)
-        .fill(undefined)
-        .map((undefined, i) => i + 1);
+      const ORDER = [...Array(this.orderCount).keys()].map(
+        (undefined, i) => i + 1,
+      );
       ORDER.forEach(number => {
         this[`order_${number}`] =
           Array.isArray(this[`order_${number}`]) &&

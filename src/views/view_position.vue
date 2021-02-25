@@ -357,9 +357,7 @@ import { mapGetters, mapActions } from 'vuex';
 
 export default {
   data() {
-    const ORDER = Array(10)
-      .fill(undefined)
-      .map((undefined, i) => i + 1);
+    const ORDER = [...Array(10).keys()].map((undefined, i) => i + 1);
     const order_x = ORDER.reduce((acc, number) => {
       acc[`order_${number}`] = [];
       return acc;
