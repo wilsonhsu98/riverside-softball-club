@@ -472,8 +472,26 @@ const formatDate = dateVal => {
     .replace(/\//g, '');
 };
 
-const sumByInn = (scores, inn) =>
+const sumByInn = (scores, inn = scores.length) =>
   scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
+
+const eraCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
+  const name = pitchers[currentIndex].name;
+  const { OUT, R } = [
+    ...beforePitchers.filter(bp => bp.name === name),
+    ...pitchers.slice(0, currentIndex).filter(bp => bp.name === name),
+    pitchers[currentIndex],
+  ].reduce(
+    (acc, bp) => {
+      return {
+        OUT: acc.OUT + sumByInn(bp.OUT),
+        R: acc.R + sumByInn(bp.R),
+      };
+    },
+    { OUT: 0, R: 0 },
+  );
+  return OUT === 0 ? (R === 0 ? '' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2);
+};
 
 export default {
   parseGame,
@@ -493,4 +511,5 @@ export {
   formatDate,
   innArray,
   sumByInn,
+  eraCalc,
 };

@@ -3,7 +3,12 @@ import {
   // getters as rootGetters,
   state as rootState,
 } from '../root';
-import utils from '../../libs/utils';
+import utils, {
+  formatColor,
+  innArray,
+  sumByInn,
+  eraCalc,
+} from '../../libs/utils';
 import workerCreater from '../../web-worker';
 
 const types = {
@@ -121,7 +126,19 @@ const getters = {
         state.game &&
         state.games.find(item => item.game === state.game)) ||
       {};
+    const allowedGameTypes =
+      boxSummary.gameType === 'fun' ? ['fun'] : ['regular', 'playoff', 'cup'];
     const game = state.records.filter(item => item._table === state.game);
+    const beforePitchers = state.games
+      .filter(
+        item =>
+          allowedGameTypes.includes(item.gameType) &&
+          parseInt(item.game.replace('-', ''), 10) <
+            parseInt(state.game.replace('-', ''), 10) &&
+          Array.isArray(item.pitchers),
+      )
+      .map(item => item.pitchers)
+      .flat();
     return {
       ...boxSummary,
       result: boxSummary.result,
@@ -158,6 +175,27 @@ const getters = {
         }
         return acc;
       }, []),
+      pitchersRaw: boxSummary.pitchers,
+      beforePitchers,
+      pitchers:
+        Array.isArray(boxSummary.pitchers) && boxSummary.pitchers.length
+          ? boxSummary.pitchers.map((p, i, self) => {
+              const OUT = sumByInn(p.OUT);
+              const decimal = OUT % 3;
+              const IP = `${Math.floor(OUT / 3)}${
+                decimal > 0 ? `.${decimal}` : ''
+              }`;
+              return {
+                IP,
+                H: sumByInn(p.H),
+                R: sumByInn(p.R),
+                BB: sumByInn(p.BB),
+                SO: sumByInn(p.SO),
+                ERA: eraCalc(beforePitchers, self, i),
+                name: p.name,
+              };
+            })
+          : [],
     };
   },
   games: state => state.games,

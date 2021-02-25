@@ -234,6 +234,56 @@ const actions = {
         commit(rootTypes.LOADING, false);
       });
   },
+  editGameDefense({ commit }, data) {
+    const { teamCode, gameId, opponentScores, pitchers, redirect } = data;
+    commit(rootTypes.LOADING, true);
+    const batch = db.batch();
+    batch.set(
+      db.doc(`teams/${teamCode}/games/${gameId}`),
+      {
+        opponentScores,
+        pitchers: pitchers.map(p => ({
+          ...Object.keys(p).reduce((acc, key) => {
+            if (Array.isArray(p[key])) {
+              return {
+                ...acc,
+                [key]: p[key].reduce(
+                  (acc, v) => [...acc, v === undefined ? '' : v],
+                  [],
+                ),
+              };
+            }
+            return {
+              ...acc,
+              [key]: p[key],
+            };
+          }, {}),
+        })),
+        timestamp,
+      },
+      { merge: true },
+    );
+    batch.set(
+      db.doc(`teams/${teamCode}`),
+      { games: { [gameId]: timestamp }, timestamp },
+      { merge: true },
+    );
+    batch
+      .commit()
+      .then(() => {
+        if (typeof redirect === 'function') {
+          redirect();
+        } else {
+          // dispatch('setGame', gameId);
+          // router.push(`/main/games/${teamCode}/${gameId}`);
+        }
+        commit(rootTypes.LOADING, false);
+      })
+      .catch(error => {
+        console.log('Error editing document:', error);
+        commit(rootTypes.LOADING, false);
+      });
+  },
   deleteGame({ commit }, data) {
     const { teamCode, gameId } = data;
     commit(rootTypes.LOADING, true);

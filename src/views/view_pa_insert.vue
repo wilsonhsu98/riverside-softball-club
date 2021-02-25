@@ -1391,14 +1391,20 @@ export default {
           redirect: () => {
             const { team, game } = this.$route.params;
             if (this.onbaseOut === 3) {
-              this.$router.push(`/main/games/${team}/${game}/edit`);
-              window.localStorage.setItem(
-                'temp_msg',
-                this.$t('msg_check_opponent_score'),
-              );
+              this.confirm({
+                msg: this.$t('msg_check_opponent_score'),
+                y: this.$t('btn_go_edit'),
+                n: this.$t('btn_go_defense'),
+              })
+                .then(() => {
+                  this.$router.push(`/main/games/${team}/${game}/edit`);
+                })
+                .catch(() => {
+                  this.$router.push(`/main/games/${team}/${game}/defense`);
+                });
             } else if (
               this.$route.params.order !== 'new' &&
-              this.order < this.box.length - 1
+              this.order < this.boxSummary.contents.length
             ) {
               this.resetBasic();
               this.setOrder(this.order + 1);

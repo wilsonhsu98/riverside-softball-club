@@ -83,6 +83,12 @@ const router = new VueRouter({
           meta: { requiresAuth: true },
         },
         {
+          path: 'games/:team/:game/defense',
+          name: 'edit_defense_info',
+          component: require('./views/view_defense').default,
+          meta: { requiresAuth: true },
+        },
+        {
           path: 'games/:team/:game/order',
           name: 'game_order',
           component: require('./views/view_order').default,

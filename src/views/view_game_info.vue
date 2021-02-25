@@ -9,6 +9,49 @@
     <div class="container" ref="container">
       <h1>{{ mode === 'edit' ? $t('edit_game') : $t('create_game') }}</h1>
 
+      <div
+        class="field-wrapper top-btn-container"
+        v-if="mode === 'edit' && box.slice(1).length"
+      >
+        <div class="four-column chart-btn-container">
+          <router-link
+            :to="{
+              name: 'edit_game_position',
+              params: {
+                team: $route.params.team,
+                game: $route.params.game,
+                mode: 'edit',
+              },
+            }"
+            tag="button"
+            class="btn"
+            ><span>{{ $t('fill_position') }}</span>
+          </router-link>
+          <button
+            class="btn"
+            @click="getPositions"
+            :disabled="Object.keys(boxSummary.positions || {}).length === 0"
+          >
+            <span>{{ $t('btn_gen_position') }}</span>
+          </button>
+          <button class="btn" @click="getOrders">
+            <span>{{ $t('btn_gen_order') }}</span>
+          </button>
+          <router-link
+            :to="{
+              name: 'edit_defense_info',
+              params: {
+                team: $route.params.team,
+                game: $route.params.game,
+              },
+            }"
+            tag="button"
+            class="btn"
+            ><span>{{ $t('btn_defense') }}</span>
+          </router-link>
+        </div>
+      </div>
+
       <div v-if="mode === 'edit'" class="field-wrapper edit">
         <label>{{ $t('ttl_after_game') }}</label>
         <div v-if="version !== 'import' && topBottom" class="team-versus">
@@ -152,19 +195,31 @@
           </label>
         </div>
 
-        <div
+        <template
           v-if="
             mode === 'edit' &&
               version !== 'import' &&
               ['win', 'lose'].includes(result)
           "
-          class="field-wrapper field-wrapper-item"
-          :class="pitcher ? '' : 'empty'"
-          @click="changePlayer('pitcher')"
         >
-          <span>{{ $t(`ttl_pitcher_${result}`) }}</span>
-          <label v-if="pitcher">{{ pitcher }}</label>
-        </div>
+          <custom-input
+            v-if="Array.isArray(pitchers) && pitchers.length"
+            type="select"
+            :options="pitchers.map(({ name }) => name)"
+            :name="$t(`ttl_pitcher_${result}`)"
+            :placeholder="$t(`ttl_pitcher_${result}`)"
+            v-model="pitcher"
+          />
+          <div
+            v-else
+            class="field-wrapper field-wrapper-item"
+            :class="pitcher ? '' : 'empty'"
+            @click="changePlayer('pitcher')"
+          >
+            <span>{{ $t(`ttl_pitcher_${result}`) }}</span>
+            <label v-if="pitcher">{{ pitcher }}</label>
+          </div>
+        </template>
 
         <div
           v-if="mode === 'edit' && version !== 'import' && result"
@@ -290,22 +345,24 @@
 
       <div class="field-wrapper field-wrapper-item">
         <span>{{ $t('ttl_game_type') }}</span>
-        <label>
-          <input type="radio" v-model="gameType" value="fun" />
-          <span>{{ $t('ttl_fun') }}</span>
-        </label>
-        <label>
-          <input type="radio" v-model="gameType" value="regular" />
-          <span>{{ $t('ttl_regular') }}</span>
-        </label>
-        <label>
-          <input type="radio" v-model="gameType" value="playoff" />
-          <span>{{ $t('ttl_playoff') }}</span>
-        </label>
-        <label>
-          <input type="radio" v-model="gameType" value="cup" />
-          <span>{{ $t('ttl_cup') }}</span>
-        </label>
+        <div>
+          <label>
+            <input type="radio" v-model="gameType" value="fun" />
+            <span>{{ $t('ttl_fun') }}</span>
+          </label>
+          <label>
+            <input type="radio" v-model="gameType" value="regular" />
+            <span>{{ $t('ttl_regular') }}</span>
+          </label>
+          <label>
+            <input type="radio" v-model="gameType" value="playoff" />
+            <span>{{ $t('ttl_playoff') }}</span>
+          </label>
+          <label>
+            <input type="radio" v-model="gameType" value="cup" />
+            <span>{{ $t('ttl_cup') }}</span>
+          </label>
+        </div>
       </div>
 
       <div class="field-wrapper field-wrapper-item">
@@ -367,43 +424,9 @@
         v-model="tags"
       />
 
-      <div class="field-wrapper" v-if="mode === 'edit' && box.slice(1).length">
-        <div class="three-column chart-btn-container">
-          <router-link
-            :to="{
-              name: 'edit_game_position',
-              params: {
-                team: $route.params.team,
-                game: $route.params.game,
-                mode: 'edit',
-              },
-            }"
-            tag="button"
-            class="btn"
-            >{{ $t('fill_position') }}
-          </router-link>
-          <button
-            class="btn"
-            @click="getPositions"
-            :disabled="Object.keys(boxSummary.positions || {}).length === 0"
-          >
-            {{ $t('btn_gen_position') }}
-          </button>
-          <button class="btn" @click="getOrders">
-            {{ $t('btn_gen_order') }}
-          </button>
-        </div>
-      </div>
-
-      <div v-if="mode === 'edit'" class="field-wrapper delete-btn-container">
-        <button class="btn danger" @click="delete_">
-          {{ $t('btn_delete_game') }}
-        </button>
-      </div>
-
-      <div class="btn-container">
+      <div class="field-wrapper btn-container">
         <button class="btn" @click="back_">{{ $t('btn_cancel') }}</button>
-        <button v-if="mode === 'edit'" class="btn danger" @click="delete_">
+        <button v-if="mode === 'edit'" class="btn danger keep" @click="delete_">
           {{ $t('btn_delete_game') }}
         </button>
         <button class="btn" @click="edit_">
@@ -500,7 +523,11 @@
       padding: 0 4px;
       line-height: 14px;
     }
-    > label {
+    > div {
+      overflow: hidden;
+      height: 36px;
+    }
+    label {
       cursor: pointer;
       color: black;
       > span {
@@ -560,7 +587,7 @@
     }
   }
   .two-column,
-  .three-column {
+  .four-column {
     display: flex;
     justify-content: space-between;
     > div {
@@ -570,8 +597,8 @@
   .two-column > div {
     max-width: calc(50% - 5px);
   }
-  .three-column > button {
-    max-width: calc(33% - 5px);
+  .four-column > button {
+    max-width: calc(25% - 5px);
   }
   .team-versus {
     margin-top: 15px;
@@ -658,6 +685,12 @@
       }
     }
   }
+  .top-btn-container {
+    position: sticky;
+    top: 80px;
+    z-index: 2;
+    margin-top: 8px;
+  }
   .chart-btn-container {
     margin-top: 15px;
     .btn {
@@ -666,10 +699,12 @@
       margin: 0;
       padding-right: 0;
       padding-left: 0;
+      > span {
+        height: 16px;
+        display: inline-block;
+        overflow: hidden;
+      }
     }
-  }
-  .delete-btn-container {
-    display: none;
   }
   .fa {
     cursor: pointer;
@@ -699,10 +734,16 @@
 }
 @media only screen and (max-width: 760px) {
   .container {
-    .delete-btn-container {
+    .top-btn-container {
+      top: 60px;
+    }
+    .btn-container {
+      position: static;
       display: block;
-      margin-top: 15px;
-      .btn {
+      margin: 15px auto auto;
+      max-width: $max_width;
+      width: 100%;
+      .btn.keep {
         display: block;
         width: 100%;
         margin: 0;
@@ -751,6 +792,7 @@ export default {
       changeMode: '',
       currentPlayer: undefined,
       pitcher: '',
+      pitchers: [],
       mvp: '',
       coach: '',
       recorder: '',
@@ -768,12 +810,6 @@ export default {
       this.boxSummary.game !== this.$route.params.game
     ) {
       this.setGame(this.$route.params.game);
-    }
-
-    const tempMsg = window.localStorage.getItem('temp_msg');
-    window.localStorage.removeItem('temp_msg');
-    if (tempMsg) {
-      this.alert(tempMsg);
     }
   },
   methods: {
@@ -1006,6 +1042,7 @@ export default {
             recorder,
             tags,
             pitcher,
+            pitchers,
             mvp,
             period,
             gameNote,
@@ -1036,6 +1073,7 @@ export default {
           this.recorder = recorder;
           this.tags = tags;
           this.pitcher = pitcher;
+          this.pitchers = pitchers;
           this.mvp = mvp;
           this.period = period;
           this.gameNote = gameNote;

@@ -232,6 +232,51 @@
           </div>
         </template>
       </div>
+      <div class="box-table normal pitcher" v-if="pitchers.length">
+        <div class="player-records header">
+          <div class="player">
+            <span class="order">#</span>
+            <span class="name">{{ $t('ttl_pitcher') }}</span>
+          </div>
+          <div class="records">
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${colInesx}`"
+                v-for="(col, colInesx) in pitcherCol"
+              >
+                <span class="content">{{ col }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div
+          class="player-records"
+          v-for="(item, i) in pitchers"
+          :key="`record_${i}`"
+        >
+          <div class="player">
+            <span class="order">{{ i + 1 }}</span>
+            <span class="name">
+              <photo
+                :photo="item.data.photo"
+                :name="item.name"
+                :number="item.data.number"
+              />
+              {{ item.name }}
+            </span>
+          </div>
+          <div class="records">
+            <div class="records-flex">
+              <template v-for="(col, colIndex) in pitcherCol">
+                <div class="record" :key="`content_${colIndex}`">
+                  {{ item[col] }}
+                </div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="sticky-display-btn" v-if="box.slice(1).length">
         <span
           v-for="item in ['content', 'code']"
@@ -858,6 +903,7 @@
     &.normal {
       display: table;
       overflow-x: auto;
+      border-radius: 0;
       .player-records {
         &.header > div {
           background-color: rgba(50, 122, 129, 0.9);
@@ -876,15 +922,18 @@
             width: 10px;
           }
         }
-        &:last-child {
+        /* &:last-child {
           > :first-child {
             border-radius: 0 0 0 10px;
           }
           > :last-child {
             border-radius: 0 0 10px 0;
           }
-        }
+        } */
       }
+    }
+    &.pitcher {
+      margin-bottom: 20px;
     }
     width: 100%;
     border-radius: 10px;
@@ -1499,6 +1548,12 @@
       &.normal {
         display: none;
       }
+      &.pitcher {
+        display: table;
+        .player-records .player .name {
+          max-width: unset;
+        }
+      }
     }
     .tags {
       .action {
@@ -1570,6 +1625,22 @@ export default {
       end: 0,
       videoOrder: 0,
       shortVideo: undefined,
+      pitcherCol: ['IP', 'H', 'R', 'BB', 'SO', 'ERA'],
+      pitchers: [
+        // {
+        //   data: {
+        //     photo: '',
+        //     number: '',
+        //   },
+        //   name: '徐偉鈞 (W, 10-10)',
+        //   IP: 4.2,
+        //   H: 8,
+        //   R: 1,
+        //   BB: 2,
+        //   SO: 3,
+        //   ERA: 1.07,
+        // },
+      ],
     };
   },
   created() {
@@ -1629,7 +1700,7 @@ export default {
           });
         })
         .catch(err => {
-          console.log(err)
+          console.log(err);
           this.toggleLoading(false);
         });
     },
@@ -1891,6 +1962,7 @@ export default {
             coach,
             recorder,
             pitcher,
+            pitchers,
             mvp,
             result,
             tags,
@@ -1929,6 +2001,10 @@ export default {
           this.coach = coach;
           this.recorder = recorder;
           this.pitcher = pitcher;
+          this.pitchers = pitchers.map(p => ({
+            ...p,
+            data: this.getPlayer(p.name),
+          }));
           this.mvp = mvp;
           this.result = result;
           this.tags = tags || [];

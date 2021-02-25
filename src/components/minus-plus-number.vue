@@ -105,7 +105,11 @@ export default {
   methods: {
     plus() {
       if (!this.disabled) {
-        this.val += 1;
+        if (typeof this.val === 'number') {
+          this.val += 1;
+        } else {
+          this.val = 1;
+        }
       }
     },
     minus() {
@@ -125,7 +129,8 @@ export default {
         return this.val;
       },
       set(newValue) {
-        this.val = newValue || this.min_;
+        // this.val = newValue || this.min_;
+        this.val = newValue;
       },
     },
   },
