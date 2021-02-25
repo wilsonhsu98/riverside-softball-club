@@ -472,7 +472,7 @@ const formatDate = dateVal => {
     .replace(/\//g, '');
 };
 
-const sumByInn = (scores, inn = scores.length) =>
+const sumByInn = (scores = [], inn = scores.length) =>
   scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
 
 const eraCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
