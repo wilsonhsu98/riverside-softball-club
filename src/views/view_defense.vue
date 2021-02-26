@@ -165,12 +165,22 @@
                   class="input-score cell"
                   v-text="(pContent[col] || [])[index]"
                   @click="
-                    setMinusPlus(
-                      index + 1,
-                      col,
-                      (pContent[col] || [])[index],
-                      val => setPitchers(pIndex, col, index, val),
-                    )
+                    () => {
+                      setMinusPlus(
+                        index + 1,
+                        col,
+                        (pContent[col] || [])[index],
+                        val => setPitchers(pIndex, col, index, val),
+                      );
+                      if (col === 'OUT') {
+                        setMinusPlus2(
+                          index + 1,
+                          'S',
+                          (pContent['S'] || [])[index],
+                          val => setPitchers(pIndex, 'S', index, val),
+                        );
+                      }
+                    }
                   "
                 ></div>
               </template>
@@ -219,11 +229,23 @@
     <div class="modal" v-if="minusPlusCol" @click="closeSetMinusPlus">
       <div>
         <p @click="closeSetMinusPlus">{{ minusPlusCol }}</p>
-        <minus-plus-number
-          min="0"
-          :value="minusPlusNumber"
-          @change="setMinusPlusNumber"
-        />
+        <div>
+          <minus-plus-number
+            min="0"
+            :value="minusPlusNumber"
+            @change="setMinusPlusNumber"
+          />
+        </div>
+        <template v-if="minusPlusCol2">
+          <p @click="closeSetMinusPlus">{{ minusPlusCol2 }}</p>
+          <div>
+            <minus-plus-number
+              min="0"
+              :value="minusPlusNumber2"
+              @change="setMinusPlusNumber2"
+            />
+          </div>
+        </template>
         <p @click="closeSetMinusPlus">{{ minusPlusAuto }}</p>
       </div>
     </div>
@@ -524,6 +546,9 @@ export default {
       minusPlusCol: '',
       minusPlusNumber: 0,
       minusPlusFn: () => {},
+      minusPlusCol2: '',
+      minusPlusNumber2: 0,
+      minusPlusFn2: () => {},
       minusPlusAuto: '',
       currentPlayer: undefined,
       currentPitcherIndex: undefined,
@@ -608,6 +633,11 @@ export default {
       });
       this.minusPlusNumber = val || 0;
       this.minusPlusFn = fn;
+    },
+    setMinusPlus2(inn, col, val, fn) {
+      this.minusPlusCol2 = this.$t(col);
+      this.minusPlusNumber2 = val || 0;
+      this.minusPlusFn2 = fn;
     },
     setOpponentScore(index, val) {
       this.opponentScores.length = this.inn;
@@ -706,11 +736,15 @@ export default {
     closeSetMinusPlus(e) {
       if (e.currentTarget === e.target) {
         this.minusPlusCol = '';
+        this.minusPlusCol2 = '';
         this.minusPlusAuto = '';
       }
     },
     setMinusPlusNumber(val) {
       this.minusPlusFn(val);
+    },
+    setMinusPlusNumber2(val) {
+      this.minusPlusFn2(val);
     },
     formatSummary(pIndex) {
       const pContent = this.pitchers[pIndex];
