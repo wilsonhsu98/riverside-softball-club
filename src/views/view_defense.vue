@@ -531,6 +531,7 @@ export default {
       autoCalc: [null, 'true'].includes(
         window.localStorage.getItem('auto_calc_p'),
       ),
+      redirectInfo: undefined,
     };
   },
   created() {
@@ -539,7 +540,20 @@ export default {
   methods: {
     ...mapActions(['setGame', 'editGameDefense']),
     back_() {
-      this.$router.back();
+      if (this.redirectInfo) {
+        this.$router.push({
+          name: 'pa',
+          params: {
+            ...this.redirectInfo,
+            order:
+              parseInt(this.redirectInfo.order) + 1 > 10
+                ? 'new'
+                : parseInt(this.redirectInfo.order) + 1 || 'new',
+          },
+        });
+      } else {
+        this.$router.back();
+      }
     },
     sumByInn(scores, inn) {
       return sumByInn(scores, inn);
@@ -627,15 +641,15 @@ export default {
         {
           ...this.pitchers[pIndex],
           [col]: [...colArr.slice(0, index), val, ...colArr.slice(index + 1)],
-          ...(this.autoCalc && col === 'OUT'
-            ? {
-                S: [
-                  ...sArr.slice(0, index),
-                  sVal + delta < 0 ? 0 : sVal + delta,
-                  ...sArr.slice(index + 1),
-                ],
-              }
-            : undefined),
+          // ...(this.autoCalc && col === 'OUT'
+          //   ? {
+          //       S: [
+          //         ...sArr.slice(0, index),
+          //         sVal + delta < 0 ? 0 : sVal + delta,
+          //         ...sArr.slice(index + 1),
+          //       ],
+          //     }
+          //   : undefined),
           ...(this.autoCalc && col === 'SO'
             ? {
                 OUT: [
@@ -681,7 +695,7 @@ export default {
       const somethingWithDelta = col =>
         this.$t(col) + (delta >= 0 ? '+' : '') + delta;
       const auto = {
-        OUT: somethingWithDelta('S'),
+        // OUT: somethingWithDelta('S'),
         SO: somethingWithDelta('OUT') + ' ' + somethingWithDelta('S'),
         H: somethingWithDelta('S'),
         BB: somethingWithDelta('B'),
@@ -764,6 +778,13 @@ export default {
   },
   computed: {
     ...mapGetters(['currentTeamIcon', 'currentTeam', 'boxSummary', 'teamInfo']),
+  },
+  beforeRouteEnter(undefined, from, next) {
+    next(vm => {
+      if (from.name === 'pa') {
+        vm.redirectInfo = from.params;
+      }
+    });
   },
   watch: {
     boxSummary: {
