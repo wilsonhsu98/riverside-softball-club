@@ -300,7 +300,7 @@ const getNameNumber = ({ name = '', number = '' }) => {
   return `${tempName}${tempNum}`;
 };
 
-const basicCount = 19;
+const basicCount = 20;
 const scoreMapping = [
   {
     key: 'teamIcon',
@@ -439,6 +439,12 @@ const scoreMapping = [
         ? 1
         : 0;
     },
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gamePitchers',
+    checkFunc: ({ games = [] }) =>
+      games.some(g => Array.isArray(g.pitchers) && g.pitchers.length) ? 1 : 0,
     percent: 60 / basicCount,
   },
 ];

@@ -262,6 +262,7 @@
 	"desc_score_teamIcon": "上傳球隊LOGO",
 	"desc_score_teamIntro": "有輸入球隊簡介",
 	"desc_score_teamOtherNames": "有輸入球隊其他隊名",
+	"desc_score_gamePitchers": "比賽記錄輸入[投手記錄]",
 	"btn_copy_link": "複製加入連結",
 	"btn_qrcode": "QR Code",
 	"msg_copy_success": "複製成功",
