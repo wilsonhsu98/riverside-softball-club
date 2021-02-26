@@ -235,7 +235,19 @@
       <div class="box-table normal pitcher" v-if="pitchers.length">
         <div class="player-records header">
           <div class="player">
-            <span class="order">#</span>
+            <router-link
+              v-if="editable"
+              :to="{
+                name: 'edit_defense_info',
+                params: {
+                  team: $route.params.team,
+                  game: $route.params.game,
+                },
+              }"
+              class="fa fa-pencil"
+              tag="i"
+            />
+            <span class="order">{{ editable ? '' : '#' }}</span>
             <span class="name">{{ $t('ttl_pitcher') }}</span>
           </div>
           <div class="records">
@@ -934,6 +946,26 @@
     }
     &.pitcher {
       margin-bottom: 20px;
+      .fa {
+        width: 26px;
+        height: 26px;
+        line-height: 26px;
+        font-size: 18px;
+        box-sizing: border-box;
+        cursor: pointer;
+        text-align: center;
+        vertical-align: middle;
+        margin-left: 5px;
+        &.fa-pencil {
+          color: white;
+          background-color: $current_user_bgcolor;
+          border-radius: 4px;
+          position: absolute;
+          left: 9px;
+          top: 4px;
+          z-index: 1;
+        }
+      }
     }
     width: 100%;
     border-radius: 10px;

@@ -241,7 +241,10 @@ const actions = {
     batch.set(
       db.doc(`teams/${teamCode}/games/${gameId}`),
       {
-        opponentScores,
+        opponentScores: opponentScores.reduce(
+          (acc, v) => [...acc, v === undefined ? '' : v],
+          [],
+        ),
         pitchers: pitchers.map(p => ({
           ...Object.keys(p).reduce((acc, key) => {
             if (Array.isArray(p[key])) {
