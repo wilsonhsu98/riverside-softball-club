@@ -36,7 +36,7 @@
 
         <div class="box">
           <div class="team">
-            <div class="cell">
+            <div class="cell special">
               <i
                 class="fa fa-minus-circle"
                 @click="inn = Math.max(0, inn - 1)"
@@ -46,6 +46,8 @@
                 style="margin-left: 5px;"
                 @click="inn += 1"
               ></i>
+              <div>{{ useTeam }}</div>
+              <div>{{ opponent }}</div>
             </div>
             <div v-if="topBottom" class="cell">
               {{ topBottom === 'top' ? useTeam : opponent }}
