@@ -1013,11 +1013,11 @@ export default {
       'box',
       'boxSummary',
       'games',
-      'gameOptions',
       'teamInfo',
       'teamNames',
     ]),
     ...mapGetters({
+      gameOptions: 'allTimeGameOptions',
       period_: 'period',
     }),
   },

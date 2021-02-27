@@ -230,6 +230,67 @@ const getters = {
       (state.period.find(item => item.select) || { games: [] }).games,
     );
   },
+  allTimeGameOptions: state => {
+    const concat = (acc, item, col) => {
+      const values = [].concat(item[col]);
+      return values.reduce((acc, text) => {
+        const find = acc.find(prev => prev.text === text);
+        if (find) {
+          return [
+            ...acc.filter(prev => prev.text !== text),
+            { text, count: find.count + 1 },
+          ];
+        } else if (text) {
+          return acc.concat({ text, count: 1 });
+        } else {
+          return acc;
+        }
+      }, acc[col]);
+    };
+    return state.games.reduce(
+      (acc, item, i, self) => {
+        if (i === self.length - 1) {
+          return {
+            period: concat(acc, item, 'period').sort(
+              (a, b) => b.text.localeCompare(a.text),
+              'zh-TW',
+            ),
+            opponent: concat(acc, item, 'opponent').sort(
+              (a, b) => a.text.localeCompare(b.text),
+              'zh-TW',
+            ),
+            league: concat(acc, item, 'league').sort(
+              (a, b) => a.text.localeCompare(b.text),
+              'zh-TW',
+            ),
+            group: concat(acc, item, 'group').sort(
+              (a, b) => a.text.localeCompare(b.text),
+              'zh-TW',
+            ),
+            tags: concat(acc, item, 'tags').sort(
+              (a, b) => a.text.localeCompare(b.text),
+              'zh-TW',
+            ),
+          };
+        } else {
+          return {
+            period: concat(acc, item, 'period'),
+            opponent: concat(acc, item, 'opponent'),
+            league: concat(acc, item, 'league'),
+            group: concat(acc, item, 'group'),
+            tags: concat(acc, item, 'tags'),
+          };
+        }
+      },
+      {
+        period: [],
+        opponent: [],
+        league: [],
+        group: [],
+        tags: [],
+      },
+    );
+  },
   gameOptions: state => {
     const concat = (acc, item, col) => {
       const values = [].concat(item[col]);
@@ -268,10 +329,6 @@ const getters = {
                 (a, b) => a.text.localeCompare(b.text),
                 'zh-TW',
               ),
-              period: concat(acc, item, 'period').sort(
-                (a, b) => a.text.localeCompare(b.text),
-                'zh-TW',
-              ),
               coach: concat(acc, item, 'coach').sort(
                 (a, b) => a.text.localeCompare(b.text),
                 'zh-TW',
@@ -290,7 +347,6 @@ const getters = {
               opponent: concat(acc, item, 'opponent'),
               league: concat(acc, item, 'league'),
               group: concat(acc, item, 'group'),
-              period: concat(acc, item, 'period'),
               coach: concat(acc, item, 'coach'),
               recorder: concat(acc, item, 'recorder'),
               tags: concat(acc, item, 'tags'),
@@ -301,7 +357,6 @@ const getters = {
           opponent: [],
           league: [],
           group: [],
-          period: [],
           coach: [],
           recorder: [],
           tags: [],
