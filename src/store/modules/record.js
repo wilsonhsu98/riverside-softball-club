@@ -392,6 +392,9 @@ const actions = {
         top: state.top,
         period: state.period,
         sortBy: state.sortBy,
+        excludedGames: state.games
+          .filter(g => g.gameType === 'fun')
+          .map(g => g.game),
       },
       data => {
         commit(types.SET_GENSTATISTICS, data);
@@ -408,6 +411,9 @@ const actions = {
         records: state.records,
         period: state.period,
         games: state.games,
+        excludedGames: state.games
+          .filter(g => g.gameType === 'fun')
+          .map(g => g.game),
       },
       data => {
         commit(types.SET_ITEMSTATS, data);

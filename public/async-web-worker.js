@@ -12,7 +12,7 @@ const formatColor = content => {
 };
 const innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
 
-const genStatistics = (players, records, filterPA, filterGames) => {
+const genStatistics = (players, records, filterPA, filterGames = []) => {
   // filterPA = filterPA || 10;
   const sortRecords = [...records].sort((a, b) => {
     return (
@@ -27,10 +27,7 @@ const genStatistics = (players, records, filterPA, filterGames) => {
     );
   });
   const filterGamesRecords = sortRecords.filter(item => {
-    return filterGames === undefined ||
-      (Array.isArray(filterGames) && filterGames.length === 0)
-      ? true
-      : filterGames.includes(item._table);
+    return filterGames.length ? filterGames.includes(item._table) : true;
   });
 
   return players.map(player => {
@@ -649,7 +646,9 @@ const execGenStatistics = state => {
     state.players,
     state.records,
     state.unlimitedPA ? undefined : state.top,
-    state.period.find(item => item.select).games,
+    (state.period.find(item => item.select).games || []).filter(
+      g => !(state.excludedGames || []).includes(g),
+    ),
   )
     .filter(
       item => item.PA !== '-' && (state.unlimitedPA || item.PA === state.top),
@@ -683,7 +682,9 @@ const execGenStatistics = state => {
 };
 
 const execItemStats = state => {
-  const games = state.period.find(item => item.select).games || [];
+  const games = (state.period.find(item => item.select).games || []).filter(
+    g => !(state.excludedGames || []).includes(g),
+  );
   const minimunPA = games.length * 1.6;
   const records = genStatistics(state.players, state.records, undefined, games);
   return {
