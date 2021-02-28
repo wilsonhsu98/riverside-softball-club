@@ -26,9 +26,9 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
       )
     );
   });
-  const filterGamesRecords = sortRecords.filter(item => {
-    return filterGames.length ? filterGames.includes(item._table) : true;
-  });
+  const filterGamesRecords = sortRecords.filter(item =>
+    filterGames.includes(item._table),
+  );
 
   return players.map(player => {
     const name = player.id;

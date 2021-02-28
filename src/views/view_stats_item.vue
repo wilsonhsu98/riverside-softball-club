@@ -16,7 +16,7 @@
       <div class="condition__container">
         <div class="condition">
           <div class="condition__label">{{ $t('col_period') }}</div>
-          <div class="condition__element">
+          <div class="condition__element" :data-col="$t('col_period')">
             <div class="selectdiv">
               <select
                 class="dropdown"
@@ -39,6 +39,23 @@
                 >
               </select>
             </div>
+          </div>
+          <br />
+          <div class="condition__label">{{ $t('col_game_type') }}</div>
+          <div class="condition__element" :data-col="$t('col_game_type')">
+            <label
+              class="condition__col"
+              v-for="gameType in ['regular', 'playoff', 'cup', 'fun']"
+              :key="`gameType_${gameType}`"
+            >
+              <input
+                type="checkbox"
+                :checked="gameTypes.includes(gameType)"
+                :value="gameType"
+                @change="setGameTypes_(gameType)"
+              />
+              <span>{{ $t(`ttl_${gameType}`) }}</span>
+            </label>
           </div>
           <template v-if="lastUpdate">
             <br />
@@ -102,13 +119,19 @@
     display: inline-block;
     line-height: 30px;
     height: 30px;
-    vertical-align: middle;
+    vertical-align: top;
   }
   label {
     cursor: pointer;
   }
   &__label {
     padding: 0 4px;
+  }
+  &__col {
+    margin-right: 10px;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
   }
 }
 
@@ -273,7 +296,7 @@ i.fa {
       margin: 0;
       display: flex;
       flex-wrap: wrap;
-      padding: 3px;
+      padding: 3px 10px;
       box-sizing: border-box;
       position: relative;
       > br {
@@ -285,21 +308,32 @@ i.fa {
         display: inline-block;
         color: $header_color;
       }
+      &__col {
+        margin: 0 8px 3px 0;
+      }
       &__label {
-        text-align: right;
-        margin: 0 3px 6px 0;
-        &.date {
-          display: none;
-        }
+        display: none;
       }
       &__element {
+        width: auto;
         text-align: left;
-        margin: 0 3px 6px 0;
+        line-height: normal;
+        margin: 0 15px 10px 0;
+        height: 30px;
+        white-space: nowrap;
+        &:before {
+          content: attr(data-col);
+          display: inline-block;
+          vertical-align: top;
+          margin-right: 3px;
+          line-height: 30px;
+        }
         &.date {
           width: 100vw;
           text-align: right;
           padding: 0 10px 10px 0;
           margin: 0;
+          line-height: 30px;
           &:before {
             content: attr(data-long);
           }
@@ -339,10 +373,11 @@ i.fa {
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .search-bar {
     .condition {
-      &__label {
-        width: 33vw;
-      }
       &__element {
+        &:before {
+          width: 72px;
+          text-align: right;
+        }
         &.date {
           &:before {
             content: attr(data-short);
@@ -351,16 +386,16 @@ i.fa {
       }
     }
   }
+  [lang='zh-TW'] {
+    .search-bar .condition__element label {
+      font-size: 14px;
+    }
+  }
 }
 @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
-  .search-bar {
-    .condition {
-      &__label {
-        width: 20vw;
-      }
-      &__element {
-        width: 30vw;
-      }
+  [lang='zh-TW'] {
+    .search-bar .condition__element label {
+      font-size: 12px;
     }
   }
 }
@@ -389,7 +424,7 @@ export default {
     document.removeEventListener(clickEvent, this.collapseSearch);
   },
   methods: {
-    ...mapActions(['setPeriod', 'setSortBy', 'setUnlimitedPA']),
+    ...mapActions(['setPeriod', 'setGameTypes', 'setSortBy', 'setUnlimitedPA']),
     collapseSearch(event) {
       if (
         this.toggleSearch &&
@@ -404,6 +439,10 @@ export default {
       this.setPeriod(period);
       this.toggleSearch = false;
     },
+    setGameTypes_(gameType) {
+      this.toggleTarget = null;
+      this.setGameTypes(gameType);
+    },
     goStats(key) {
       this.setSortBy(key);
       this.setUnlimitedPA(true);
@@ -411,14 +450,15 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      period: 'period',
-      periodSelect: 'periodSelect',
-      periodGames: 'periodGames',
-      lastUpdate: 'lastUpdate',
-      itemStats: 'itemStats',
-      currentTeamIcon: 'currentTeamIcon',
-    }),
+    ...mapGetters([
+      'period',
+      'periodSelect',
+      'periodGames',
+      'gameTypes',
+      'lastUpdate',
+      'itemStats',
+      'currentTeamIcon',
+    ]),
   },
   components: {
     board: {

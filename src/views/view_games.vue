@@ -954,12 +954,12 @@ export default {
     document.removeEventListener(clickEvent, this.collapseSearch);
   },
   methods: {
-    ...mapActions({
-      setGame: 'setGame',
-      setPeriod: 'setPeriod',
-      setOtherConditions: 'setOtherConditions',
-      setUnionOrIntersect: 'setUnionOrIntersect',
-    }),
+    ...mapActions([
+      'setGame',
+      'setPeriod',
+      'setOtherConditions',
+      'setUnionOrIntersect',
+    ]),
     collapseSearch(event) {
       if (
         this.toggleSearch &&
@@ -1043,7 +1043,6 @@ export default {
           break;
         case 'game_type':
           this.fieldOptions = [
-            { text: this.$t('ttl_fun'), value: `gameType:fun` },
             {
               text: this.$t('ttl_regular'),
               value: `gameType:regular`,
@@ -1056,6 +1055,7 @@ export default {
               text: this.$t('ttl_cup'),
               value: `gameType:cup`,
             },
+            { text: this.$t('ttl_fun'), value: `gameType:fun` },
           ].map(item => ({
             ...item,
             color,
@@ -1119,21 +1119,21 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      boxSummary: 'boxSummary',
-      groupGames: 'groupGames',
-      currentTeamIcon: 'currentTeamIcon',
-      role: 'role',
-      period: 'period',
-      periodSelect: 'periodSelect',
-      gamesResult: 'gamesResult',
-      lastUpdate: 'lastUpdate',
-      teamInfo: 'teamInfo',
-      teamNames: 'teamNames',
-      gameOptions: 'gameOptions',
-      otherConditions: 'otherConditions',
-      unionOrIntersect: 'unionOrIntersect',
-    }),
+    ...mapGetters([
+      'boxSummary',
+      'groupGames',
+      'currentTeamIcon',
+      'role',
+      'period',
+      'periodSelect',
+      'gamesResult',
+      'lastUpdate',
+      'teamInfo',
+      'teamNames',
+      'gameOptions',
+      'otherConditions',
+      'unionOrIntersect',
+    ]),
   },
   watch: {
     boxSummary: {

@@ -16,7 +16,7 @@
       <div class="condition__container">
         <div class="condition">
           <div class="condition__label">{{ $t('col_period') }}</div>
-          <div class="condition__element">
+          <div class="condition__element" :data-col="$t('col_period')">
             <div class="selectdiv">
               <select
                 class="dropdown"
@@ -41,7 +41,7 @@
             </div>
           </div>
           <div class="condition__label">{{ $t('col_sort') }}</div>
-          <div class="condition__element">
+          <div class="condition__element" :data-col="$t('col_sort')">
             <div class="selectdiv">
               <select
                 class="dropdown"
@@ -58,7 +58,7 @@
             </div>
           </div>
           <div class="condition__label">{{ $t('col_latest') }}</div>
-          <div class="condition__element pa">
+          <div class="condition__element pa" :data-col="$t('col_latest')">
             <minus-plus-number
               :value="top"
               :disabled="unlimitedPA"
@@ -73,8 +73,25 @@
             </label>
           </div>
           <br />
+          <div class="condition__label">{{ $t('col_game_type') }}</div>
+          <div class="condition__element" :data-col="$t('col_game_type')">
+            <label
+              class="condition__col"
+              v-for="gameType in ['regular', 'playoff', 'cup', 'fun']"
+              :key="`gameType_${gameType}`"
+            >
+              <input
+                type="checkbox"
+                :checked="gameTypes.includes(gameType)"
+                :value="gameType"
+                @change="setGameTypes_(gameType)"
+              />
+              <span>{{ $t(`ttl_${gameType}`) }}</span>
+            </label>
+          </div>
+          <br />
           <div class="condition__label col">{{ $t('col_display') }}</div>
-          <div class="condition__element col">
+          <div class="condition__element col" :data-col="$t('col_display')">
             <label class="condition__col">
               <input
                 type="checkbox"
@@ -794,33 +811,43 @@ i.fa {
       margin: 0;
       display: flex;
       flex-wrap: wrap;
-      padding: 3px;
+      padding: 3px 10px;
       box-sizing: border-box;
       position: relative;
       > br {
         display: none;
       }
       &__col {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
         margin: 0 8px 3px 0;
       }
       &__label {
-        text-align: right;
-        margin: 0 3px 6px 0;
-        &.date {
-          display: none;
-        }
+        display: none;
       }
       &__element {
+        width: auto;
         text-align: left;
-        margin: 0 3px 6px 0;
+        line-height: normal;
+        margin: 0 15px 10px 0;
+        height: 30px;
+        white-space: nowrap;
+        &.col {
+          height: auto;
+          white-space: initial;
+          margin: 0 0 10px 0;
+        }
+        &:before {
+          content: attr(data-col);
+          display: inline-block;
+          vertical-align: top;
+          margin-right: 3px;
+          line-height: 30px;
+        }
         &.date {
           width: 100vw;
           text-align: right;
           padding: 0 10px 10px 0;
           margin: 0;
+          line-height: 30px;
           &:before {
             content: attr(data-long);
           }
@@ -842,20 +869,10 @@ i.fa {
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .search-bar {
     .condition {
-      &__label {
-        width: 31vw;
-        &.date {
-          display: none;
-        }
-      }
       &__element {
-        width: 62vw;
-        &.col {
-          height: auto;
-          width: 62vw;
-          display: flex;
-          flex-wrap: wrap;
-          margin-bottom: 4px;
+        &:before {
+          width: 72px;
+          text-align: right;
         }
         &.date {
           &:before {
@@ -863,46 +880,17 @@ i.fa {
           }
         }
       }
-      &__col {
-        width: 29%;
-      }
     }
   }
   [lang='zh-TW'] {
-    .search-bar .condition__element.col {
+    .search-bar .condition__element label {
       font-size: 14px;
     }
   }
 }
 @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
-  .search-bar {
-    .condition {
-      &__label {
-        width: 18vw;
-        &.date {
-          visibility: hidden;
-        }
-      }
-      &__element {
-        width: 29vw;
-        &.pa {
-          width: 78vw;
-        }
-        &.col {
-          height: auto;
-          width: 78vw;
-          display: flex;
-          flex-wrap: wrap;
-          margin: 0 0 0 2px;
-        }
-      }
-      &__col {
-        width: 12%;
-      }
-    }
-  }
   [lang='zh-TW'] {
-    .search-bar .condition__element.col {
+    .search-bar .condition__element label {
       font-size: 12px;
     }
   }
@@ -951,6 +939,7 @@ export default {
   methods: {
     ...mapActions([
       'setPeriod',
+      'setGameTypes',
       'setTop',
       'setUnlimitedPA',
       'setSortBy',
@@ -985,6 +974,10 @@ export default {
     setPeriod_(period) {
       this.toggleTarget = null;
       this.setPeriod(period);
+    },
+    setGameTypes_(gameType) {
+      this.toggleTarget = null;
+      this.setGameTypes(gameType);
     },
     setTop_(top) {
       this.toggleTarget = null;
@@ -1029,19 +1022,22 @@ export default {
     },
   },
   computed: {
+    ...mapGetters([
+      'period',
+      'periodSelect',
+      'gameTypes',
+      'top',
+      'unlimitedPA',
+      'sortBy',
+      'checkAll',
+      'conditionCols',
+      'displayedCols',
+      'lastUpdate',
+      'userId',
+      'currentTeamIcon',
+    ]),
     ...mapGetters({
-      period: 'period',
-      periodSelect: 'periodSelect',
-      top: 'top',
-      unlimitedPA: 'unlimitedPA',
-      sortBy: 'sortBy',
-      checkAll: 'checkAll',
-      conditionCols: 'conditionCols',
       list: 'genStatistics',
-      displayedCols: 'displayedCols',
-      lastUpdate: 'lastUpdate',
-      userId: 'userId',
-      currentTeamIcon: 'currentTeamIcon',
     }),
   },
   watch: {

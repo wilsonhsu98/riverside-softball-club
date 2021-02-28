@@ -347,10 +347,6 @@
         <span>{{ $t('ttl_game_type') }}</span>
         <div>
           <label>
-            <input type="radio" v-model="gameType" value="fun" />
-            <span>{{ $t('ttl_fun') }}</span>
-          </label>
-          <label>
             <input type="radio" v-model="gameType" value="regular" />
             <span>{{ $t('ttl_regular') }}</span>
           </label>
@@ -361,6 +357,10 @@
           <label>
             <input type="radio" v-model="gameType" value="cup" />
             <span>{{ $t('ttl_cup') }}</span>
+          </label>
+          <label>
+            <input type="radio" v-model="gameType" value="fun" />
+            <span>{{ $t('ttl_fun') }}</span>
           </label>
         </div>
       </div>

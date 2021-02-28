@@ -17,6 +17,7 @@ const types = {
   GET_PLAYERS: 'RECORD/GET_PLAYERS',
   GET_RECORDS: 'RECORD/GET_RECORDS',
   SET_PERIOD: 'RECORD/SET_PERIOD',
+  SET_GAME_TYPES: 'RECORD/SET_GAME_TYPES',
   SET_TOP: 'RECORD/SET_TOP',
   SET_UNLIMITED_PA: 'RECORD/SET_UNLIMITED_PA',
   SET_SORTBY: 'RECORD/SET_SORTBY',
@@ -39,6 +40,7 @@ const state = {
   players: [],
   records: [],
   period: [{ period: 'period_all', select: true }],
+  gameTypes: ['regular', 'playoff', 'cup'],
   top: 10,
   unlimitedPA: true,
   sortBy: 'OPS',
@@ -88,6 +90,7 @@ const getters = {
   periodSelect: state => {
     return state.period.find(item => item.select).period;
   },
+  gameTypes: state => state.gameTypes,
   top: state => state.top,
   unlimitedPA: state => state.unlimitedPA,
   sortBy: state => state.sortBy,
@@ -410,6 +413,11 @@ const actions = {
     actions.workerGenStatistics({ commit });
     actions.workerItemStats({ commit });
   },
+  setGameTypes({ commit }, value) {
+    commit(types.SET_GAME_TYPES, value);
+    actions.workerGenStatistics({ commit });
+    actions.workerItemStats({ commit });
+  },
   setTop({ commit }, value) {
     commit(types.SET_TOP, value);
     actions.workerGenStatistics({ commit });
@@ -448,7 +456,7 @@ const actions = {
         period: state.period,
         sortBy: state.sortBy,
         excludedGames: state.games
-          .filter(g => g.gameType === 'fun')
+          .filter(g => !state.gameTypes.includes(g.gameType))
           .map(g => g.game),
       },
       data => {
@@ -467,7 +475,7 @@ const actions = {
         period: state.period,
         games: state.games,
         excludedGames: state.games
-          .filter(g => g.gameType === 'fun')
+          .filter(g => !state.gameTypes.includes(g.gameType))
           .map(g => g.game),
       },
       data => {
@@ -535,6 +543,8 @@ const mutations = {
     if (pref_period) state.period = JSON.parse(pref_period);
     const pref_cols = window.localStorage.getItem('pref_cols');
     if (pref_cols) state.cols = JSON.parse(pref_cols);
+    const pref_game_types = window.localStorage.getItem('pref_game_types');
+    if (pref_game_types) state.gameTypes = JSON.parse(pref_game_types);
     const pref_other_conditions = window.localStorage.getItem(
       'pref_other_conditions',
     );
@@ -615,6 +625,15 @@ const mutations = {
       select: item.period === data,
     }));
     window.localStorage.setItem('pref_period', JSON.stringify(state.period));
+  },
+  [types.SET_GAME_TYPES](state, value) {
+    state.gameTypes = state.gameTypes.includes(value)
+      ? state.gameTypes.filter(gameType => gameType !== value)
+      : [...state.gameTypes, value];
+    window.localStorage.setItem(
+      'pref_game_types',
+      JSON.stringify(state.gameTypes),
+    );
   },
   [types.SET_TOP](state, value) {
     state.top = value;
