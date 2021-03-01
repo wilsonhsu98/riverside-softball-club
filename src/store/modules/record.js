@@ -7,7 +7,7 @@ import utils, {
   formatColor,
   innArray,
   sumByInn,
-  eraCalc,
+  accCalc,
 } from '../../libs/utils';
 import workerCreater from '../../web-worker';
 
@@ -188,13 +188,15 @@ const getters = {
               const IP = `${Math.floor(OUT / 3)}${
                 decimal > 0 ? `.${decimal}` : ''
               }`;
+              const { ERA, WHIP } = accCalc(beforePitchers, self, i);
               return {
                 IP,
                 H: sumByInn(p.H),
                 R: sumByInn(p.R),
                 BB: sumByInn(p.BB),
                 SO: sumByInn(p.SO),
-                ERA: eraCalc(beforePitchers, self, i),
+                ERA,
+                WHIP,
                 name: p.name,
               };
             })

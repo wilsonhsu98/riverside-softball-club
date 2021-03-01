@@ -518,7 +518,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
-import { sumByInn, eraCalc } from '../libs/utils';
+import { sumByInn, accCalc } from '../libs/utils';
 
 export default {
   data() {
@@ -760,6 +760,7 @@ export default {
       );
       const decimal = OUT % 3;
       const IP = `${Math.floor(OUT / 3)}${decimal > 0 ? `.${decimal}` : ''}`;
+      const { ERA, WHIP } = accCalc(this.beforePitchers, this.pitchers, pIndex);
       const count = {
         IP,
         OUT,
@@ -772,9 +773,10 @@ export default {
           (acc, v = 0) => acc + (parseInt(v) || 0),
           0,
         ),
-        ERA: eraCalc(this.beforePitchers, this.pitchers, pIndex),
+        ERA,
+        WHIP,
       };
-      return ['IP', 'SO', 'BB', 'R', 'ERA']
+      return ['IP', 'SO', 'BB', 'R', 'ERA', 'WHIP']
         .filter(col => count[col] !== '')
         .map(col => `${count[col]}<span class="unit">${col}</span>`)
         .join('');

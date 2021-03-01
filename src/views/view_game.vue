@@ -1657,7 +1657,7 @@ export default {
       end: 0,
       videoOrder: 0,
       shortVideo: undefined,
-      pitcherCol: ['IP', 'H', 'R', 'BB', 'SO', 'ERA'],
+      pitcherCol: ['IP', 'H', 'R', 'BB', 'SO', 'ERA', 'WHIP'],
       pitchers: [
         // {
         //   data: {

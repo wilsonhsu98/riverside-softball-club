@@ -481,9 +481,9 @@ const formatDate = dateVal => {
 const sumByInn = (scores = [], inn = scores.length) =>
   scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
 
-const eraCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
+const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
   const name = pitchers[currentIndex].name;
-  const { OUT, R } = [
+  const { OUT, R, H, BB } = [
     ...beforePitchers.filter(bp => bp.name === name),
     ...pitchers.slice(0, currentIndex).filter(bp => bp.name === name),
     pitchers[currentIndex],
@@ -492,11 +492,16 @@ const eraCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
       return {
         OUT: acc.OUT + sumByInn(bp.OUT),
         R: acc.R + sumByInn(bp.R),
+        H: acc.H + sumByInn(bp.H),
+        BB: acc.BB + sumByInn(bp.BB),
       };
     },
-    { OUT: 0, R: 0 },
+    { OUT: 0, R: 0, H: 0, BB: 0 },
   );
-  return OUT === 0 ? (R === 0 ? '' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2);
+  return {
+    ERA: OUT === 0 ? (R === 0 ? '' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2),
+    WHIP: OUT === 0 ? '-' : ((H + BB) / (OUT / 3)).toFixed(2),
+  };
 };
 
 export default {
@@ -517,5 +522,5 @@ export {
   formatDate,
   innArray,
   sumByInn,
-  eraCalc,
+  accCalc,
 };
