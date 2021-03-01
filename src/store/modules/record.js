@@ -129,8 +129,7 @@ const getters = {
         state.game &&
         state.games.find(item => item.game === state.game)) ||
       {};
-    const allowedGameTypes =
-      boxSummary.gameType === 'fun' ? ['fun'] : ['regular', 'playoff', 'cup'];
+    const allowedGameTypes = state.gameTypes;
     const game = state.records.filter(item => item._table === state.game);
     const beforePitchers = state.games
       .filter(
@@ -207,12 +206,15 @@ const getters = {
   records: state => {
     return state.records;
   },
-  gamesResult: state =>
-    state.conditionGames
-      .filter(item =>
-        (state.period.find(item => item.select).games || []).includes(
-          item.game,
-        ),
+  gamesResult: state => {
+    const allowedGameTypes = state.gameTypes;
+    return state.conditionGames
+      .filter(
+        item =>
+          allowedGameTypes.includes(item.gameType) &&
+          (state.period.find(item => item.select).games || []).includes(
+            item.game,
+          ),
       )
       .reduce(
         ({ win, lose, tie }, item) => {
@@ -227,11 +229,15 @@ const getters = {
           };
         },
         { win: 0, lose: 0, tie: 0 },
-      ),
+      );
+  },
   groupGames: state => {
     if (state.reseting) return undefined;
+    const allowedGameTypes = state.gameTypes;
     return utils.genGameList(
-      state.conditionGames,
+      state.conditionGames.filter(item =>
+        allowedGameTypes.includes(item.gameType),
+      ),
       (state.period.find(item => item.select) || { games: [] }).games,
     );
   },
@@ -313,11 +319,16 @@ const getters = {
         }
       }, acc[col]);
     };
+    const allowedGameTypes = state.gameTypes;
     const filterGames = (
       state.period.find(item => item.select) || { games: [] }
     ).games;
     return state.games
-      .filter(item => filterGames.includes(item.game))
+      .filter(
+        item =>
+          allowedGameTypes.includes(item.gameType) &&
+          filterGames.includes(item.game),
+      )
       .reduce(
         (acc, item, i, self) => {
           if (i === self.length - 1) {

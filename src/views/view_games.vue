@@ -41,6 +41,23 @@
             </div>
           </div>
           <br />
+          <div class="condition__label">{{ $t('col_game_type') }}</div>
+          <div class="condition__element" :data-col="$t('col_game_type')">
+            <label
+              class="condition__col"
+              v-for="gameType in ['regular', 'playoff', 'cup', 'fun']"
+              :key="`gameType_${gameType}`"
+            >
+              <input
+                type="checkbox"
+                :checked="gameTypes.includes(gameType)"
+                :value="gameType"
+                @change="setGameTypes_(gameType)"
+              />
+              <span>{{ $t(`ttl_${gameType}`) }}</span>
+            </label>
+          </div>
+          <br />
           <div class="condition__label">{{ $t('col_others') }}</div>
           <div class="condition__element tags" :data-col="$t('col_others')">
             <span
@@ -585,10 +602,15 @@
   }
   &__label {
     padding: 0 4px;
-    margin-bottom: 10px;
     &.date {
       margin-bottom: 0;
     }
+  }
+  &__col {
+    margin-right: 10px;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
   }
   .tags {
     width: calc(100% - 90px);
@@ -724,10 +746,10 @@ i.fa {
         display: none;
       }
       &__element {
-        width: 100%;
+        width: auto;
         text-align: left;
         line-height: normal;
-        margin-bottom: 5px;
+        margin: 0 15px 10px 0;
         &::before {
           content: attr(data-col);
           display: inline-block;
@@ -745,6 +767,12 @@ i.fa {
             content: attr(data-long);
           }
         }
+      }
+      &__col {
+        margin-right: 10px;
+        vertical-align: middle;
+        text-align: left;
+        overflow: hidden;
       }
       .tags {
         .tag {
@@ -842,8 +870,18 @@ i.fa {
       }
     }
   }
+  [lang='zh-TW'] {
+    .search-bar .condition__element label {
+      font-size: 14px;
+    }
+  }
 }
 @media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
+  [lang='zh-TW'] {
+    .search-bar .condition__element label {
+      font-size: 12px;
+    }
+  }
 }
 </style>
 
@@ -878,11 +916,6 @@ const queryFields = [
     invertColor: '#fff',
   },
   {
-    field: 'game_type',
-    color: '#efaf34',
-    invertColor: '#fff',
-  },
-  {
     field: 'place',
     color: '#17a2b8',
     invertColor: '#fff',
@@ -899,7 +932,7 @@ const queryFields = [
   },
   {
     field: 'recorder',
-    color: '#990066',
+    color: '#efaf34',
     invertColor: '#fff',
   },
   {
@@ -957,6 +990,7 @@ export default {
     ...mapActions([
       'setGame',
       'setPeriod',
+      'setGameTypes',
       'setOtherConditions',
       'setUnionOrIntersect',
     ]),
@@ -972,7 +1006,9 @@ export default {
     },
     setPeriod_(period) {
       this.setPeriod(period);
-      this.toggleSearch = false;
+    },
+    setGameTypes_(gameType) {
+      this.setGameTypes(gameType);
     },
     sumByInn(scores, inn) {
       return sumByInn(scores, inn);
@@ -1041,27 +1077,6 @@ export default {
             invertColor,
           }));
           break;
-        case 'game_type':
-          this.fieldOptions = [
-            {
-              text: this.$t('ttl_regular'),
-              value: `gameType:regular`,
-            },
-            {
-              text: this.$t('ttl_playoff'),
-              value: `gameType:playoff`,
-            },
-            {
-              text: this.$t('ttl_cup'),
-              value: `gameType:cup`,
-            },
-            { text: this.$t('ttl_fun'), value: `gameType:fun` },
-          ].map(item => ({
-            ...item,
-            color,
-            invertColor,
-          }));
-          break;
         case 'place':
           this.fieldOptions = [
             { text: this.$t('ttl_1st'), value: `${this.selectedField}:1` },
@@ -1126,6 +1141,7 @@ export default {
       'role',
       'period',
       'periodSelect',
+      'gameTypes',
       'gamesResult',
       'lastUpdate',
       'teamInfo',
@@ -1181,6 +1197,13 @@ export default {
     },
     selectedField: {
       handler() {
+        this.refreshCondition();
+      },
+      immediate: true,
+    },
+    gameTypes: {
+      handler() {
+        this.groupGames_ = this.groupGames;
         this.refreshCondition();
       },
       immediate: true,
