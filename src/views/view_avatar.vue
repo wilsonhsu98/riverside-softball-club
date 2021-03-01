@@ -224,9 +224,7 @@ export default {
     });
   },
   methods: {
-    ...mapActions({
-      editAvatar: 'editAvatar',
-    }),
+    ...mapActions(['editAvatar']),
     setCurrent(provider) {
       this.current = provider;
     },
@@ -248,11 +246,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      accountInfo: 'accountInfo',
-      currentTeamIcon: 'currentTeamIcon',
-      userId: 'userId',
-    }),
+    ...mapGetters(['accountInfo', 'currentTeamIcon', 'userId']),
   },
 };
 </script>

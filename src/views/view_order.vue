@@ -924,15 +924,15 @@ export default {
     window.removeEventListener('resize', this.requestAnimationFrame);
   },
   methods: {
-    ...mapActions({
-      setGame: 'setGame',
-      setPeriod: 'setPeriod',
-      setTop: 'setTop',
-      setUnlimitedPA: 'setUnlimitedPA',
-      setSortBy: 'setSortBy',
-      editGameOrder: 'editGameOrder',
-      alert: 'alert',
-    }),
+    ...mapActions([
+      'setGame',
+      'setPeriod',
+      'setTop',
+      'setUnlimitedPA',
+      'setSortBy',
+      'editGameOrder',
+      'alert',
+    ]),
     back_() {
       this.$router.back();
     },
@@ -1325,18 +1325,18 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      currentTeamIcon: 'currentTeamIcon',
-      currentTeam: 'currentTeam',
-      teamInfo: 'teamInfo',
-      period: 'period',
-      periodSelect: 'periodSelect',
-      top: 'top',
-      unlimitedPA: 'unlimitedPA',
-      sortBy: 'sortBy',
-      conditionCols: 'conditionCols',
-      genStatistics: 'genStatistics',
-    }),
+    ...mapGetters([
+      'currentTeamIcon',
+      'currentTeam',
+      'teamInfo',
+      'period',
+      'periodSelect',
+      'top',
+      'unlimitedPA',
+      'sortBy',
+      'conditionCols',
+      'genStatistics',
+    ]),
   },
   watch: {
     genStatistics() {

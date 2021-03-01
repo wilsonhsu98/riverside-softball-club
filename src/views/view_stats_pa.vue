@@ -834,6 +834,9 @@ i.fa {
           height: auto;
           white-space: initial;
           margin: 0 0 10px 0;
+          label {
+            min-width: 57px;
+          }
         }
         &:before {
           content: attr(data-col);

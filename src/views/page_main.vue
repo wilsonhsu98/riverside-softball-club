@@ -371,13 +371,13 @@ export default {
     this.shouldShowAd(this.$route);
   },
   methods: {
-    ...mapActions({
-      initFromLS: 'initFromLS',
-      listenTeamChange: 'listenTeamChange',
-      logout: 'logout',
-      alert: 'alert',
-      confirm: 'confirm',
-    }),
+    ...mapActions([
+      'initFromLS',
+      'listenTeamChange',
+      'logout',
+      'alert',
+      'confirm',
+    ]),
     confirmYes() {
       this.confirmPromiseResolve();
       this.confirm(undefined);

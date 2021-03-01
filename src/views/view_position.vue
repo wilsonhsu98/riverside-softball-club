@@ -396,11 +396,7 @@ export default {
     this.initSetSource();
   },
   methods: {
-    ...mapActions({
-      editGamePosition: 'editGamePosition',
-      setGame: 'setGame',
-      alert: 'alert',
-    }),
+    ...mapActions(['editGamePosition', 'setGame', 'alert']),
     back_() {
       const { team, game } = this.$route.params;
       if (this.mode === 'edit') {
@@ -680,12 +676,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      currentTeamIcon: 'currentTeamIcon',
-      teamInfo: 'teamInfo',
-      box: 'box',
-      boxSummary: 'boxSummary',
-    }),
+    ...mapGetters(['currentTeamIcon', 'teamInfo', 'box', 'boxSummary']),
   },
   watch: {
     box: {

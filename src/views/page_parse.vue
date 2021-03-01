@@ -111,12 +111,9 @@ export default {
     ]),
   },
   computed: {
+    ...mapGetters(['loading', 'todo', 'done', 'current_handel']),
     ...mapGetters({
       list: 'getSourceList',
-      loading: 'loading',
-      todo: 'todo',
-      done: 'done',
-      current_handel: 'current_handel',
     }),
   },
   watch: {

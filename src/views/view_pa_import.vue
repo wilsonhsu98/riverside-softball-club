@@ -388,11 +388,7 @@ export default {
     this.setPa();
   },
   methods: {
-    ...mapActions({
-      editGameOrder: 'editGameOrder',
-      deleteLastPa: 'deleteLastPa',
-      confirm: 'confirm',
-    }),
+    ...mapActions(['editGameOrder', 'deleteLastPa', 'confirm']),
     toggle(path, value) {
       const setPath = (path, value) =>
         path
@@ -709,13 +705,7 @@ export default {
     },
   },
   computed: {
-    ...mapGetters({
-      teamInfo: 'teamInfo',
-      box: 'box',
-      boxSummary: 'boxSummary',
-      currentTeamIcon: 'currentTeamIcon',
-      pa: 'pa',
-    }),
+    ...mapGetters(['teamInfo', 'box', 'boxSummary', 'currentTeamIcon', 'pa']),
   },
 };
 </script>

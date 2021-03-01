@@ -19,16 +19,10 @@ export default {
     this.setOrder(this.$route.params.order);
   },
   methods: {
-    ...mapActions({
-      setGame: 'setGame',
-      setOrder: 'setOrder',
-    }),
+    ...mapActions(['setGame', 'setOrder']),
   },
   computed: {
-    ...mapGetters({
-      boxSummary: 'boxSummary',
-      pa: 'pa',
-    }),
+    ...mapGetters(['boxSummary', 'pa']),
   },
   components: {
     import: require('./view_pa_import').default,
