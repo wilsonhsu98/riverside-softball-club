@@ -74,12 +74,26 @@
     <div class="web">
       <div class="item-container">
         <board
-          v-for="key in ['AVG', 'H', 'HR', 'RBI', 'W']"
+          v-for="key in pitcherGameCount
+            ? ['AVG', 'H', 'HR', 'RBI']
+            : ['AVG', 'H', 'HR', 'RBI', 'W']"
           :key="`block_${key}`"
           :cat="key"
           :itemStats="itemStats"
           :periodGames="periodGames"
           :goStats="goStats"
+          :pitcherGameCount="pitcherGameCount"
+        />
+      </div>
+      <div class="item-container" v-if="pitcherGameCount">
+        <board
+          v-for="key in ['W', 'SO', 'ERA', 'WHIP']"
+          :key="`block_${key}`"
+          :cat="key"
+          :itemStats="itemStats"
+          :periodGames="periodGames"
+          :goStats="goStats"
+          :pitcherGameCount="pitcherGameCount"
         />
       </div>
     </div>
@@ -87,7 +101,9 @@
       <ad :mode="'stats_item'" />
       <carousel-3d class="item-container" border="0" :width="200" :height="326">
         <slide
-          v-for="(key, index) in ['AVG', 'H', 'HR', 'RBI', 'W']"
+          v-for="(key, index) in pitcherGameCount
+            ? ['AVG', 'H', 'HR', 'RBI', 'W', 'SO', 'ERA', 'WHIP']
+            : ['AVG', 'H', 'HR', 'RBI', 'W']"
           :index="index"
           :key="`carousel_${key}`"
         >
@@ -96,6 +112,7 @@
             :itemStats="itemStats"
             :periodGames="periodGames"
             :goStats="goStats"
+            :pitcherGameCount="pitcherGameCount"
           />
         </slide>
       </carousel-3d>
@@ -458,21 +475,22 @@ export default {
       'lastUpdate',
       'itemStats',
       'currentTeamIcon',
+      'pitcherGameCount',
     ]),
   },
   components: {
     board: {
-      props: ['cat', 'itemStats', 'periodGames', 'goStats'],
+      props: ['cat', 'itemStats', 'periodGames', 'goStats', 'pitcherGameCount'],
       template: `
         <div class="item-container__table">
           <div class="header">
             <span
-              :class="{ clickable: cat !== 'W' }"
-              @click="cat !== 'W' && goStats(cat)"
+              :class="{ clickable: !['W', 'SO', 'ERA', 'WHIP'].includes(cat) }"
+              @click="!['W', 'SO', 'ERA', 'WHIP'].includes(cat) && goStats(cat)"
               >{{ $t(cat) }}</span
             >
           </div>
-          <template v-for="(item, index) in itemStats[cat].slice(0, 5)">
+          <template v-for="(item, index) in (itemStats[cat] || []).slice(0, 5)">
             <div v-if="index === 0" class="row" :key="index">
               <span class="rank">{{ index + 1 }}</span>
               <img
@@ -495,9 +513,11 @@ export default {
           </template>
           <div class="note">
             {{
-              $t(cat + '_note', {
+              $t((cat === 'W' && pitcherGameCount) ? 'W__note' : cat + '_note', {
                 g: periodGames.length,
                 pa: parseInt(periodGames.length * 1.6, 10),
+                p: parseInt(pitcherGameCount * 1, 10),
+                out: parseInt(pitcherGameCount * 3, 10),
               })
             }}
           </div>

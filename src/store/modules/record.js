@@ -34,6 +34,7 @@ const types = {
   SET_BOX_DISPLAY: 'RECORD/SET_BOX_DISPLAY',
   SET_OTHER_CONDITIONS: 'RECORD/SET_OTHER_CONDITIONS',
   SET_UNION_INTERSECT: 'RECORD/SET_UNION_INTERSECT',
+  SET_SUPPORT_PITCHERS: 'RECORD/SET_SUPPORT_PITCHERS',
 };
 
 const state = {
@@ -76,13 +77,23 @@ const state = {
   order: 0,
   games: [],
   genStatistics: [],
-  itemStats: { AVG: [], H: [], HR: [], RBI: [], W: [] },
+  itemStats: {
+    AVG: [],
+    H: [],
+    HR: [],
+    RBI: [],
+    W: [],
+    SO: [],
+    ERA: [],
+    WHIP: [],
+  },
   box: [],
   boxDisplay: 'content',
   otherConditions: [],
   unionOrIntersect: 'union',
   conditionGames: [],
   reseting: true,
+  pitcherGameCount: 0,
 };
 
 const getters = {
@@ -386,6 +397,7 @@ const getters = {
   boxDisplay: state => state.boxDisplay,
   otherConditions: state => state.otherConditions,
   unionOrIntersect: state => state.unionOrIntersect,
+  pitcherGameCount: state => state.pitcherGameCount,
 };
 
 const actions = {
@@ -492,7 +504,9 @@ const actions = {
           .map(g => g.game),
       },
       data => {
-        commit(types.SET_ITEMSTATS, data);
+        const { pitcherGameCount, ...others } = data;
+        commit(types.SET_ITEMSTATS, others);
+        commit(types.SET_SUPPORT_PITCHERS, pitcherGameCount);
         commit(rootTypes.LOADING, false);
       },
     );
@@ -724,6 +738,9 @@ const mutations = {
       state.otherConditions,
       state.games,
     );
+  },
+  [types.SET_SUPPORT_PITCHERS](state, data) {
+    state.pitcherGameCount = data;
   },
 };
 

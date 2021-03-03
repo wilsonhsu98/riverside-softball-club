@@ -11,6 +11,30 @@ const formatColor = content => {
   return 'blue';
 };
 const innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
+const sumByInn = (scores = [], inn = scores.length) =>
+  scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
+const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
+  const name = pitchers[currentIndex].name;
+  const { OUT, R, H, BB } = [
+    ...beforePitchers.filter(bp => bp.name === name),
+    ...pitchers.slice(0, currentIndex).filter(bp => bp.name === name),
+    pitchers[currentIndex],
+  ].reduce(
+    (acc, bp) => {
+      return {
+        OUT: acc.OUT + sumByInn(bp.OUT),
+        R: acc.R + sumByInn(bp.R),
+        H: acc.H + sumByInn(bp.H),
+        BB: acc.BB + sumByInn(bp.BB),
+      };
+    },
+    { OUT: 0, R: 0, H: 0, BB: 0 },
+  );
+  return {
+    ERA: OUT === 0 ? (R === 0 ? '' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2),
+    WHIP: OUT === 0 ? '-' : ((H + BB) / (OUT / 3)).toFixed(2),
+  };
+};
 
 const genStatistics = (players, records, filterPA, filterGames = []) => {
   // filterPA = filterPA || 10;
@@ -687,6 +711,61 @@ const execItemStats = state => {
   );
   const minimunPA = games.length * 1.6;
   const records = genStatistics(state.players, state.records, undefined, games);
+
+  const pitcherGames = state.games.filter(
+    item =>
+      games.includes(item.game) &&
+      Array.isArray(item.pitchers) &&
+      item.pitchers.length,
+  );
+  const minimunOut = pitcherGames.length * 3;
+  const pitcherSet = pitcherGames
+    .map(item => item.pitchers)
+    .flat()
+    .reduce((acc, p) => {
+      const samePlayer = acc[p.name] || {
+        BB: 0,
+        H: 0,
+        OUT: 0,
+        R: 0,
+        SO: 0,
+      };
+      const { BB, H, OUT, R, SO } = {
+        BB: samePlayer.BB + sumByInn(p.BB),
+        H: samePlayer.H + sumByInn(p.H),
+        OUT: samePlayer.OUT + sumByInn(p.OUT),
+        R: samePlayer.R + sumByInn(p.R),
+        SO: samePlayer.SO + sumByInn(p.SO),
+      };
+      const { ERA, WHIP } = accCalc(
+        [],
+        [
+          {
+            BB: [BB],
+            H: [H],
+            OUT: [OUT],
+            R: [R],
+          },
+        ],
+        0,
+      );
+      return {
+        ...acc,
+        [p.name]: {
+          BB,
+          H,
+          OUT,
+          R,
+          SO,
+          ERA,
+          WHIP,
+        },
+      };
+    }, {});
+  const pitchers = Object.keys(pitcherSet).map(name => ({
+    ...pitcherSet[name],
+    name,
+  }));
   return {
     AVG: records
       .filter(item => item.PA !== '-' && item.AVG > 0 && item.PA >= minimunPA)
@@ -742,19 +821,56 @@ const execItemStats = state => {
             ...acc,
             {
               pitcher,
+              OUT: (pitcherSet[pitcher] || { OUT: 0 }).OUT,
               W: self.filter(player => player === pitcher).length,
             },
           ];
         }
         return acc;
       }, [])
-      .sort((a, b) => b['W'] - a['W'])
+      .sort((a, b) =>
+        b['W'] === a['W'] ? a['OUT'] - b['OUT'] : b['W'] - a['W'],
+      )
       .map(item => ({
         name: item.pitcher,
         W: item.W,
         data: (state.players.find(player => player.id === item.pitcher) || {})
           .data,
       })),
+    SO: pitchers
+      .filter(item => item.SO > 0)
+      .sort((a, b) =>
+        b['SO'] === a['SO'] ? a['OUT'] - b['OUT'] : b['SO'] - a['SO'],
+      )
+      .map(item => ({
+        name: item.name,
+        SO: item.SO,
+        data: (state.players.find(player => player.id === item.name) || {})
+          .data,
+      })),
+    ERA: pitchers
+      .filter(item => !['', '∞'].includes(item.ERA) && item.OUT >= minimunOut)
+      .sort((a, b) =>
+        b['ERA'] === a['ERA'] ? b['OUT'] - a['OUT'] : a['ERA'] - b['ERA'],
+      )
+      .map(item => ({
+        name: item.name,
+        ERA: item.ERA,
+        data: (state.players.find(player => player.id === item.name) || {})
+          .data,
+      })),
+    WHIP: pitchers
+      .filter(item => item.WHIP !== '-' && item.OUT >= minimunOut)
+      .sort((a, b) =>
+        b['WHIP'] === a['WHIP'] ? b['OUT'] - a['OUT'] : a['WHIP'] - b['WHIP'],
+      )
+      .map(item => ({
+        name: item.name,
+        WHIP: item.WHIP,
+        data: (state.players.find(player => player.id === item.name) || {})
+          .data,
+      })),
+    pitcherGameCount: pitcherGames.length,
   };
 };
 
