@@ -166,6 +166,9 @@ i.fa {
 .item-container {
   display: flex;
   margin: 0 -10px;
+  &:last-child {
+    margin-top: 20px;
+  }
   .item-container__table {
     flex: 1;
     min-height: 200px;
