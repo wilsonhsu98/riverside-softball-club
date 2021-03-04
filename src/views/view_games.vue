@@ -301,7 +301,9 @@
                         <div class="cell" v-if="topBottom === 'top'">
                           {{ hit }}
                         </div>
-                        <div class="cell">?</div>
+                        <div class="cell">
+                          {{ pitchers.length ? opponentH : '?' }}
+                        </div>
                         <div class="cell" v-if="topBottom === 'bot'">
                           {{ hit }}
                         </div>
@@ -956,6 +958,7 @@ export default {
       topBottom: '',
       score: 0,
       opponentScore: 0,
+      opponentH: 0,
       hit: 0,
       toggleSearch: false,
       defaultIcon,
@@ -966,6 +969,7 @@ export default {
       conditions: [],
       groupGames_: undefined,
       block: false,
+      pitchers: [],
     };
   },
   mounted() {
@@ -1164,6 +1168,7 @@ export default {
             topBottom,
             r,
             h,
+            pitchers,
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -1177,6 +1182,8 @@ export default {
             (acc, num) => (acc += num || 0),
             0,
           );
+          this.opponentH = pitchers.reduce((acc, p) => acc + p.H, 0);
+          this.pitchers = pitchers;
           this.hit = h;
         }
       },

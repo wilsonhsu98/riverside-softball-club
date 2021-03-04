@@ -151,7 +151,7 @@
                 <div>{{ opponent }}</div>
               </div>
               <div :key="col" v-for="col in pContentCol" class="cell">
-                {{ $t(col) }}
+                {{ $t(['H', 'R'].includes(col) ? `${col}_P` : col) }}
               </div>
             </div>
             <div class="gap"></div>

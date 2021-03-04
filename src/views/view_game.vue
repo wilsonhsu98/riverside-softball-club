@@ -90,7 +90,7 @@
               <div class="cell" v-if="topBottom === 'top'">
                 {{ hit }}
               </div>
-              <div class="cell">?</div>
+              <div class="cell">{{ pitchers.length ? opponentH : '?' }}</div>
               <div class="cell" v-if="topBottom === 'bot'">
                 {{ hit }}
               </div>
@@ -1626,6 +1626,7 @@ export default {
       topBottom: '',
       score: 0,
       opponentScore: 0,
+      opponentH: 0,
       hit: 0,
       period: '',
       league: '',
@@ -2040,6 +2041,7 @@ export default {
             ...p,
             data: this.getPlayer(p.name),
           }));
+          this.opponentH = pitchers.reduce((acc, p) => acc + p.H, 0);
           this.mvp = mvp;
           this.result = result;
           this.tags = tags || [];
