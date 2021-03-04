@@ -298,7 +298,7 @@
           >{{ $t(`box_display_${item}`) }}</span
         >
         <span
-          v-if="box.slice(1).length"
+          v-if="box.slice(1).length && !isAnonymous"
           class="gen-graphic share"
           @click="screenshot"
         >
@@ -1693,7 +1693,8 @@ export default {
     ]),
     screenshot() {
       this.toggleLoading(true);
-      document.querySelector('.action').style.visibility = 'hidden';
+      const actionBar = document.querySelector('.action');
+      if (actionBar) actionBar.style.visibility = 'hidden';
       const { width, top } = this.$refs.container.getBoundingClientRect();
       html2canvas(this.$refs.container, {
         useCORS: true,
@@ -1710,7 +1711,8 @@ export default {
           ),
       })
         .then(canvas => {
-          document.querySelector('.action').style.visibility = '';
+          const actionBar = document.querySelector('.action');
+          if (actionBar) actionBar.style.visibility = '';
           const formData = new FormData();
           formData.append(
             'image',
@@ -1971,6 +1973,7 @@ export default {
       'teamInfo',
       'boxDisplay',
       'userId',
+      'isAnonymous',
     ]),
   },
   watch: {

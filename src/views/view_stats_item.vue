@@ -490,7 +490,7 @@ export default {
             <span
               :class="{ clickable: !['W', 'SO', 'ERA', 'WHIP'].includes(cat) }"
               @click="!['W', 'SO', 'ERA', 'WHIP'].includes(cat) && goStats(cat)"
-              >{{ $t(cat) }}</span
+              >{{ $t(cat === 'SO' ? 'SO_P': cat) }}</span
             >
           </div>
           <template v-for="(item, index) in (itemStats[cat] || []).slice(0, 5)">

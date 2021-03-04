@@ -207,6 +207,7 @@
 	"S": "好球",
 	"B": "壞球",
 	"SO": "三振",
+	"SO_P": "奪三振",
 	"OUT": "出局",
 	"desc_opponent_score": "對手分數",
 	"desc_inn_p_info": "第%{n}局 %{col}",
