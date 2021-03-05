@@ -82,9 +82,10 @@
       >
         <i class="fa fa-picture-o" @click="iconEdit = true"></i>
         <img :src="$cacheImg(icon)" />
+        <i v-if="icon" class="fa fa-times" @click="icon = ''"></i>
       </div>
       <div v-else class="icon-editor-container">
-        <i class="fa fa-times" @click="iconEdit = false"></i>
+        <i class="fa fa-arrow-left" @click="iconEdit = false"></i>
         <vue-avatar-editor
           class="icon-editor"
           :image="icon"
@@ -524,8 +525,14 @@
     box-sizing: border-box;
     cursor: pointer;
     position: absolute;
-    left: 6px;
-    top: 6px;
+    &:first-child {
+      left: 6px;
+      top: 6px;
+    }
+    &:last-child {
+      right: 6px;
+      top: 6px;
+    }
   }
   img {
     vertical-align: middle;

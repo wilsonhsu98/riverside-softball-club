@@ -298,7 +298,7 @@
           >{{ $t(`box_display_${item}`) }}</span
         >
         <span
-          v-if="box.slice(1).length && !isAnonymous"
+          v-if="box.slice(1).length && !isAnonymous && gameStatus === 'lock'"
           class="gen-graphic share"
           @click="screenshot"
         >
@@ -711,7 +711,7 @@
         {{ $t('fb_share') }}
       </button> -->
       <router-link
-        v-if="box.slice(1).length === 0 && role === 'manager'"
+        v-if="box.slice(1).length === 0 && role === 'manager' && editable"
         :to="{
           name: 'game_order',
           params: { team: $route.params.team, game: $route.params.game },
