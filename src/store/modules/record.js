@@ -28,6 +28,10 @@ const types = {
   SET_ORDER: 'RECORD/SET_ORDER',
   GET_GAMELIST: 'RECORD/GET_GAMELIST',
   SET_GENSTATISTICS: 'RECORD/SET_GENSTATISTICS',
+  SET_PITCHER_SORTBY: 'RECORD/SET_PITCHER_SORTBY',
+  SET_PITCHER_CHECKALL: 'RECORD/SET_PITCHER_CHECKALL',
+  SET_PITCHER_COLS: 'RECORD/SET_PITCHER_COLS',
+  SET_PITCHER_GENSTATISTICS: 'RECORD/SET_PITCHER_GENSTATISTICS',
   SET_ITEMSTATS: 'RECORD/SET_ITEMSTATS',
   SET_BOX: 'RECORD/SET_BOX',
   RESET_PERIOD: 'RECORD/RESET_PERIOD',
@@ -77,6 +81,29 @@ const state = {
   order: 0,
   games: [],
   genStatistics: [],
+  pitcherSortBy: 'ERA',
+  pitcherCols: [
+    { name: 'Rank', visible: true },
+    { name: 'name', visible: true },
+    { name: 'W', visible: true },
+    { name: 'L', visible: true },
+    { name: 'ERA', visible: true },
+    { name: 'G', visible: true },
+    { name: 'GS', visible: true },
+    { name: 'IP', visible: true },
+    { name: 'H', visible: true },
+    { name: 'R', visible: true },
+    { name: 'NP', visible: true },
+    { name: 'BB', visible: true },
+    { name: 'SO', visible: true },
+    { name: 'WHIP', visible: true },
+    { name: 'S%', visible: true },
+    { name: 'PIP', visible: true },
+    { name: 'K7', visible: true },
+    { name: 'BB7', visible: true },
+    { name: 'H7', visible: true },
+  ],
+  genPitcherStatistics: [],
   itemStats: {
     AVG: [],
     H: [],
@@ -126,6 +153,30 @@ const getters = {
   genStatistics: state => state.genStatistics,
   displayedCols: state => {
     return state.cols.filter(item => item.visible);
+  },
+  pitcherSortBy: state => state.pitcherSortBy,
+  pitcherCheckAll: state => {
+    return (
+      state.pitcherCols.filter(
+        item => item.name !== 'Rank' && item.name !== 'name' && item.visible,
+      ).length ===
+      state.pitcherCols.filter(
+        item => item.name !== 'Rank' && item.name !== 'name',
+      ).length
+    );
+  },
+  pitcherConditionCols: state => {
+    return state.pitcherCols
+      .filter(item => item.name !== 'Rank' && item.name !== 'name')
+      .map(item => ({
+        name: item.name,
+        visible: item.visible,
+        disabled: item.name === state.pitcherSortBy,
+      }));
+  },
+  genPitcherStatistics: state => state.genPitcherStatistics,
+  pitcherDisplayedCols: state => {
+    return state.pitcherCols.filter(item => item.visible);
   },
   lastUpdate: state => state.lastUpdate,
   pa: state => {
@@ -430,17 +481,20 @@ const actions = {
     commit(types.GET_RECORDS, records);
     commit(types.GET_GAMELIST, period);
     actions.workerGenStatistics({ commit });
+    actions.workerGenPitcherStatistics({ commit });
     actions.workerItemStats({ commit });
     actions.workerBox({ commit });
   },
   setPeriod({ commit }, value) {
     commit(types.SET_PERIOD, value);
     actions.workerGenStatistics({ commit });
+    actions.workerGenPitcherStatistics({ commit });
     actions.workerItemStats({ commit });
   },
   setGameTypes({ commit }, value) {
     commit(types.SET_GAME_TYPES, value);
     actions.workerGenStatistics({ commit });
+    actions.workerGenPitcherStatistics({ commit });
     actions.workerItemStats({ commit });
   },
   setTop({ commit }, value) {
@@ -486,6 +540,36 @@ const actions = {
       },
       data => {
         commit(types.SET_GENSTATISTICS, data);
+        commit(rootTypes.LOADING, false);
+      },
+    );
+  },
+  setPitcherSortBy({ commit }, value) {
+    commit(types.SET_PITCHER_SORTBY, value);
+    commit(types.SET_PITCHER_COLS, { col: value, visible: true });
+    actions.workerGenPitcherStatistics({ commit });
+  },
+  setPitcherCheckAll({ commit }, isCheckAll) {
+    commit(types.SET_PITCHER_CHECKALL, isCheckAll);
+  },
+  togglePitcherColumn({ commit }, col) {
+    commit(types.SET_PITCHER_COLS, { col });
+  },
+  workerGenPitcherStatistics({ commit }) {
+    commit(rootTypes.LOADING, true);
+    workerCreater(
+      {
+        cmd: 'GenPitcherStatistics',
+        players: state.players,
+        games: state.games,
+        period: state.period,
+        sortBy: state.pitcherSortBy,
+        excludedGames: state.games
+          .filter(g => !state.gameTypes.includes(g.gameType))
+          .map(g => g.game),
+      },
+      data => {
+        commit(types.SET_PITCHER_GENSTATISTICS, data);
         commit(rootTypes.LOADING, false);
       },
     );
@@ -560,6 +644,8 @@ const mutations = {
       window.localStorage.getItem('pref_unlimited_pa') === 'true' ||
       state.unlimitedPA;
     state.sortBy = window.localStorage.getItem('pref_sortby') || state.sortBy;
+    state.pitcherSortBy =
+      window.localStorage.getItem('pref_pitcher_sortby') || state.pitcherSortBy;
     state.boxDisplay =
       window.localStorage.getItem('pref_box_display') || state.boxDisplay;
     state.unionOrIntersect =
@@ -570,6 +656,8 @@ const mutations = {
     if (pref_period) state.period = JSON.parse(pref_period);
     const pref_cols = window.localStorage.getItem('pref_cols');
     if (pref_cols) state.cols = JSON.parse(pref_cols);
+    const pref_pitcher_cols = window.localStorage.getItem('pref_pitcher_cols');
+    if (pref_pitcher_cols) state.cols = JSON.parse(pref_pitcher_cols);
     const pref_game_types = window.localStorage.getItem('pref_game_types');
     if (pref_game_types) state.gameTypes = JSON.parse(pref_game_types);
     const pref_other_conditions = window.localStorage.getItem(
@@ -707,6 +795,34 @@ const mutations = {
   },
   [types.SET_GENSTATISTICS](state, data) {
     state.genStatistics = data;
+  },
+  [types.SET_PITCHER_SORTBY](state, value) {
+    state.pitcherSortBy = value;
+    window.localStorage.setItem('pref_pitcher_sortby', state.pitcherSortBy);
+  },
+  [types.SET_PITCHER_CHECKALL](state, isCheckAll) {
+    state.pitcherCols = state.pitcherCols.map(item => ({
+      ...item,
+      visible:
+        ['Rank', 'name', state.pitcherSortBy].includes(item.name) || isCheckAll,
+    }));
+    window.localStorage.setItem(
+      'pref_pitcher_cols',
+      JSON.stringify(state.pitcherCols),
+    );
+  },
+  [types.SET_PITCHER_COLS](state, { col, visible }) {
+    state.pitcherCols = state.pitcherCols.map(item => ({
+      ...item,
+      visible: item.name === col ? visible || !item.visible : item.visible,
+    }));
+    window.localStorage.setItem(
+      'pref_pitcher_cols',
+      JSON.stringify(state.pitcherCols),
+    );
+  },
+  [types.SET_PITCHER_GENSTATISTICS](state, data) {
+    state.genPitcherStatistics = data;
   },
   [types.SET_ITEMSTATS](state, data) {
     state.itemStats = data;

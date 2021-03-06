@@ -125,6 +125,12 @@ const router = new VueRouter({
           meta: { requiresAuth: true },
         },
         {
+          path: 'stats_pitcher/:team',
+          name: 'stats_pitcher',
+          component: require('./views/view_stats_pitcher').default,
+          meta: { requiresAuth: true },
+        },
+        {
           path: 'stats_item/:team',
           name: 'stats_item',
           component: require('./views/view_stats_item').default,

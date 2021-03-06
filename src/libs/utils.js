@@ -483,7 +483,7 @@ const sumByInn = (scores = [], inn = scores.length) =>
 
 const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
   const name = pitchers[currentIndex].name;
-  const { OUT, R, H, BB } = [
+  const { OUT, R, H, SO, BB, S, B } = [
     ...beforePitchers.filter(bp => bp.name === name),
     ...pitchers.slice(0, currentIndex).filter(bp => bp.name === name),
     pitchers[currentIndex],
@@ -493,14 +493,21 @@ const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
         OUT: acc.OUT + sumByInn(bp.OUT),
         R: acc.R + sumByInn(bp.R),
         H: acc.H + sumByInn(bp.H),
+        SO: acc.SO + sumByInn(bp.SO),
         BB: acc.BB + sumByInn(bp.BB),
+        S: acc.S + sumByInn(bp.S),
+        B: acc.B + sumByInn(bp.B),
       };
     },
-    { OUT: 0, R: 0, H: 0, BB: 0 },
+    { OUT: 0, R: 0, H: 0, SO: 0, BB: 0, S: 0, B: 0 },
   );
   return {
-    ERA: OUT === 0 ? (R === 0 ? '' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2),
+    ERA: OUT === 0 ? (R === 0 ? '-' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2),
     WHIP: OUT === 0 ? '-' : ((H + BB) / (OUT / 3)).toFixed(2),
+    PIP: OUT === 0 ? '-' : ((S + B) / (OUT / 3)).toFixed(2),
+    K7: OUT === 0 ? '-' : ((SO * 7) / (OUT / 3)).toFixed(2),
+    BB7: OUT === 0 ? '-' : ((BB * 7) / (OUT / 3)).toFixed(2),
+    H7: OUT === 0 ? '-' : ((H * 7) / (OUT / 3)).toFixed(2),
   };
 };
 

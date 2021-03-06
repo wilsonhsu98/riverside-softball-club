@@ -57,21 +57,6 @@
               </select>
             </div>
           </div>
-          <div class="condition__label">{{ $t('col_latest') }}</div>
-          <div class="condition__element pa" :data-col="$t('col_latest')">
-            <minus-plus-number
-              :value="top"
-              :disabled="unlimitedPA"
-              @change="setTop_"
-            />
-            <label class="unlimited_pa">
-              <input
-                type="checkbox"
-                :checked="unlimitedPA"
-                @change="setUnlimitedPA_($event.target.checked)"
-              />{{ $t('col_unlimited') }}
-            </label>
-          </div>
           <br />
           <div class="condition__label">{{ $t('col_game_type') }}</div>
           <div class="condition__element" :data-col="$t('col_game_type')">
@@ -158,14 +143,24 @@
                   sort: col.name === sortBy,
                   [col.name]: true,
                 }"
-                :title="$t(col.name)"
+                :title="
+                  ['SO', 'R'].includes(col.name)
+                    ? $t(`${col.name}_P`)
+                    : $t(col.name)
+                "
                 @click="setSortBy_(col.name)"
               >
-                <div>{{ $t(col.name) }}</div>
+                <div>
+                  {{
+                    ['SO', 'R'].includes(col.name)
+                      ? $t(`${col.name}_P`)
+                      : $t(col.name)
+                  }}
+                </div>
               </div>
             </template>
           </div>
-          <div class="sum-row" v-if="sum.PA > 0">
+          <div class="sum-row" v-if="sum.OUT > 0">
             <template v-for="(col, colIndex) in displayedCols">
               <div
                 v-if="col.name === 'Rank'"
@@ -180,35 +175,25 @@
               >
                 {{ $t('SUM') }}
               </div>
-              <div
-                v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
-                class="cell advance"
+              <!-- <div
+                v-else-if="['ERA', 'WHIP'].includes(col.name)"
+                class="cell"
                 :class="{ sort: col.name === sortBy }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
-                <div>
-                  {{ formatValue(sum[col.name]) }}
+                {{ formatValue(sum[col.name], 3) }}
+              </div> -->
+              <div
+                v-else-if="['S%', 'PIP', 'K7', 'BB7', 'H7'].includes(col.name)"
+                class="cell"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_sum_${colIndex}`"
+              >
+                <div class="align-right _30">
+                  {{ formatValue(sum[col.name], 1) }}
                 </div>
-                <div>{{ `(${sum[col.name.replace('_', '_DESC_')]})` }}</div>
-              </div>
-              <div
-                v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
-                class="cell"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_sum_${colIndex}`"
-              >
-                {{ formatValue(sum[col.name]) }}
-              </div>
-              <div
-                v-else-if="col.name === 'LEVEL'"
-                class="cell"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_sum_${colIndex}`"
-              >
-                {{ sum[col.name] }}
               </div>
               <div
                 v-else
@@ -222,32 +207,22 @@
             </template>
           </div>
           <template v-for="(item, itemIndex) in list">
-            <input
-              :key="`chk_${item.name}`"
-              :id="`chk_${item.name}`"
-              type="radio"
-              name="expand"
-              class="toggle-row non-input"
-              :checked="toggleTarget === item.name"
-              @click="e => toggleRadio(e, item.name)"
-            />
             <div
               class="normal-row"
               :class="{ current: item.data.uid === userId }"
               :key="`div_${item.name}`"
             >
               <template v-for="(col, colIndex) in displayedCols">
-                <label
+                <div
                   v-if="col.name === 'Rank'"
                   :key="`row_${item.name}_${colIndex}`"
-                  :for="`chk_${item.name}`"
                   class="cell rank"
-                  ><div class="align-right">{{ itemIndex + 1 }}</div></label
                 >
-                <label
+                  <div class="align-right">{{ itemIndex + 1 }}</div>
+                </div>
+                <div
                   v-else-if="col.name === 'name'"
                   :key="`row_${item.name}_${colIndex}`"
-                  :for="`chk_${item.name}`"
                   class="cell name"
                 >
                   <div class="player">
@@ -258,107 +233,19 @@
                     />
                     {{ item.name }}
                   </div>
-                  <div
-                    v-if="item.listByGame.length && lazy"
-                    class="chart"
-                    tabIndex="-1"
-                    :id="`chart_${item.name}`"
-                    :style="{ width: `${chartWidth}px` }"
-                    @click="e => e.preventDefault()"
-                  >
-                    <div class="chart-wrapper">
-                      <simplebar
-                        class="chart-inner"
-                        :style="{
-                          height: item.locations.length ? '144px' : 'auto',
-                          width: `${
-                            item.locations.length
-                              ? chartWidth - 144
-                              : chartWidth
-                          }px`,
-                        }"
-                      >
-                        <div
-                          class="bar"
-                          v-for="(cube, cubeIndex) in item.listByGame"
-                          :key="`bar_${item.name}_${cubeIndex}`"
-                        >
-                          <template v-for="(cell, cellIndex) in cube">
-                            <div
-                              v-if="cellIndex === cube.length - 1"
-                              class="game"
-                              :key="`${cubeIndex}${cellIndex}`"
-                            >
-                              {{ cell }}
-                            </div>
-                            <div
-                              v-else
-                              class="item"
-                              :class="{
-                                [cell.color]: true,
-                                exclude: cell.exclude,
-                              }"
-                              :key="`${cubeIndex}${cellIndex}`"
-                            >
-                              {{ $t(cell.content) }}
-                            </div>
-                          </template>
-                        </div>
-                      </simplebar>
-                      <coordination
-                        v-if="item.locations.length"
-                        :no_track="true"
-                        :values="item.locations"
-                        :showPercentage="isPercentageMode"
-                        fixedSize="144"
-                        style="cursor: pointer;"
-                        @click.native="
-                          coordinates = {
-                            values: item.locations,
-                            avatar: item.data.photo,
-                            player: item.name,
-                          }
-                        "
-                      />
-                      <i
-                        v-if="item.locations.length"
-                        class="fa"
-                        :class="{
-                          'fa-map-marker': isPercentageMode,
-                          'fa-percent': !isPercentageMode,
-                        }"
-                        @click="isPercentageMode = !isPercentageMode"
-                      ></i>
-                    </div>
+                </div>
+                <div
+                  v-else-if="
+                    ['S%', 'PIP', 'K7', 'BB7', 'H7'].includes(col.name)
+                  "
+                  class="cell"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_${item.name}_${colIndex}`"
+                >
+                  <div class="align-right _30">
+                    {{ formatValue(item[col.name], 1) }}
                   </div>
-                </label>
-                <div
-                  v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
-                  class="cell advance"
-                  :class="{ sort: col.name === sortBy }"
-                  :data-label="$t(col.name)"
-                  :key="`row_${item.name}_${colIndex}`"
-                >
-                  <div>{{ formatValue(item[col.name]) }}</div>
-                  <div>{{ `(${item[col.name.replace('_', '_DESC_')]})` }}</div>
-                </div>
-                <div
-                  v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
-                  class="cell"
-                  :class="{ sort: col.name === sortBy }"
-                  :data-label="$t(col.name)"
-                  :key="`row_${item.name}_${colIndex}`"
-                >
-                  {{ formatValue(item[col.name]) }}
-                </div>
-                <div
-                  v-else-if="col.name === 'LEVEL'"
-                  class="cell"
-                  :class="{ sort: col.name === sortBy }"
-                  :data-label="$t(col.name)"
-                  :key="`row_${item.name}_${colIndex}`"
-                >
-                  {{ item[col.name] }}
                 </div>
                 <div
                   v-else
@@ -374,19 +261,6 @@
           </template>
         </div>
       </simplebar>
-    </div>
-    <div
-      v-if="coordinates.values.length > 0"
-      class="location-modal"
-      @click="closeLocation"
-    >
-      <coordination
-        :no_track="true"
-        :values="coordinates.values"
-        :showPercentage="isPercentageMode"
-        :avatar="coordinates.avatar"
-        :player="coordinates.player"
-      />
     </div>
   </div>
 </template>
@@ -499,6 +373,7 @@ i.fa {
       top: 36px;
       z-index: 4;
       text-align: center;
+      vertical-align: top;
       &:not(.rank):not(.name) {
         cursor: initial;
       }
@@ -526,30 +401,12 @@ i.fa {
       }
     }
   }
-  .toggle-row {
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: 36px;
-    z-index: 1;
-    margin: 0;
-    opacity: 0;
-    cursor: pointer;
-    &:checked + .normal-row {
-      .cell.name {
-        z-index: 3;
-      }
-      .chart {
-        display: block;
-      }
-    }
-  }
   .normal-row {
     display: table-row;
-    &:nth-child(4n + 4) .cell {
+    &:nth-child(2n + 1) .cell {
       background-color: $row_even_bgcolor;
     }
-    &:nth-child(4n + 2) .cell {
+    &:nth-child(2n + 2) .cell {
       background-color: $row_odd_bgcolor;
     }
     &.current {
@@ -561,9 +418,6 @@ i.fa {
         &::v-deep .img {
           border-color: $current_user_color;
         }
-      }
-      .chart .game {
-        color: $row_color;
       }
     }
   }
@@ -578,14 +432,12 @@ i.fa {
       position: sticky !important;
       left: 0 !important;
       z-index: 2;
-      cursor: pointer;
     }
     &.name {
       position: sticky !important;
       left: 42px !important;
       z-index: 2;
       /* box-shadow: 5px 0 5px -5px #333; */
-      cursor: pointer;
       text-align: center;
       &:first-letter {
         text-transform: uppercase;
@@ -616,114 +468,16 @@ i.fa {
     &.sort {
       color: $error_color;
     }
-    &.level {
-      display: none;
-    }
-    &.advance > div {
-      display: inline-block;
-      vertical-align: top;
-      &:first-child {
-        width: 50px;
-        text-align: right;
-      }
-      &:last-child {
-        margin-left: 5px;
-        width: 65px;
-        text-align: left;
-      }
-    }
     .align-right {
       margin: auto;
-      width: 30px;
+      padding-right: 5px;
+      /* width: 30px; */
       text-align: right;
       direction: rtl;
-    }
-  }
-  .chart {
-    background-color: #fff;
-    position: absolute;
-    left: 110px;
-    z-index: 2;
-    overflow: hidden;
-    outline: none;
-
-    display: none;
-
-    font-size: 12px;
-    padding: 0;
-    border-top: 0;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-    .chart-wrapper {
-      display: flex;
-      width: 100%;
-      align-items: flex-end;
-    }
-    .chart-inner {
-      flex-grow: 1;
-      direction: rtl;
-      padding-top: 5px;
-      box-sizing: border-box;
-      cursor: initial;
-      ::-webkit-scrollbar {
-        display: none;
+      &._30 {
+        padding-right: initial;
+        width: 30px;
       }
-      &::v-deep {
-        .simplebar-content {
-          display: flex;
-          align-items: flex-end;
-          height: 100%;
-          box-sizing: border-box;
-        }
-        .simplebar-track {
-          top: 0;
-        }
-      }
-    }
-    .bar {
-      flex-grow: 1;
-      min-width: 50px;
-    }
-    .item {
-      display: block;
-      height: 20px;
-      line-height: 20px;
-      width: 36px;
-      margin: auto;
-      color: #fff;
-      margin-bottom: 1px;
-      text-align: center;
-      &.red {
-        background-color: $hit;
-      }
-      &.yellow {
-        background-color: $nonpa;
-      }
-      &.blue {
-        background-color: $ng;
-      }
-      &.exclude {
-        opacity: 0.5;
-      }
-    }
-    .game {
-      display: block;
-      line-height: 20px;
-      width: 36px;
-      margin: auto;
-    }
-    i.fa {
-      color: white;
-      background-color: $active_bgcolor;
-      border-radius: 4px;
-      width: 26px;
-      height: 26px;
-      line-height: 26px;
-      font-size: 18px;
-      box-sizing: border-box;
-      position: absolute;
-      right: 10px;
-      bottom: 10px;
-      transform: translateZ(0);
     }
   }
 }
@@ -731,24 +485,6 @@ i.fa {
 .search-bar__container,
 .toggle-search {
   display: none;
-}
-
-.location-modal {
-  position: fixed;
-  z-index: 3;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  &::v-deep {
-    .root-container {
-      top: 50%;
-      left: 50%;
-      transform: translateY(-50%) translateX(-50%);
-      display: inline-block;
-    }
-  }
 }
 @media only screen and (max-width: 760px) {
   .search-bar {
@@ -862,12 +598,6 @@ i.fa {
     height: calc(100vh - 100px) !important;
     height: calc(var(--vh, 1vh) * 100 - 100px) !important;
   }
-  .sticky-table {
-    .toggle-row:checked + .normal-row .chart {
-      left: -42px;
-      width: 100vw !important;
-    }
-  }
 }
 @media only screen and (max-width: 760px) and (max-aspect-ratio: 13/9) {
   .search-bar {
@@ -903,6 +633,7 @@ i.fa {
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
+import { accCalc } from '../libs/utils';
 const clickEvent = (() => {
   if ('ontouchstart' in document.documentElement === true) return 'touchstart';
   else return 'click';
@@ -914,55 +645,29 @@ export default {
       toggleSearch: false,
       toggleTarget: null,
       defaultIcon,
-      coordinates: {
-        values: [],
-        avatar: '',
-        player: '',
-      },
-      lazy: false,
-      chartWidth: 0,
       tableHeight: 0,
-      isPercentageMode: false,
       sum: {},
     };
   },
   created() {},
   mounted() {
-    setTimeout(() => {
-      this.lazy = true;
-    }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
-    this.detectChartWidth();
+    this.detectHeight();
   },
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
     window.removeEventListener('resize', this.requestAnimationFrame);
   },
   methods: {
-    ...mapActions([
-      'setPeriod',
-      'setGameTypes',
-      'setTop',
-      'setUnlimitedPA',
-      'setSortBy',
-      'setCheckAll',
-      'toggleColumn',
-    ]),
-    formatValue(value) {
-      return value !== '-' ? value.toFixed(3) : value;
-    },
-    toggleRadio(e, target) {
-      if (this.toggleTarget === target) {
-        this.toggleTarget = null;
-      } else {
-        this.toggleTarget = target;
-        setTimeout(() => {
-          document
-            .querySelector(`#${e.target.id.replace('chk_', 'chart_')}`)
-            .focus();
-        }, 100);
-      }
+    ...mapActions(['setPeriod', 'setGameTypes']),
+    ...mapActions({
+      setSortBy: 'setPitcherSortBy',
+      setCheckAll: 'setPitcherCheckAll',
+      toggleColumn: 'togglePitcherColumn',
+    }),
+    formatValue(value, decimal = 3) {
+      return value !== '-' ? parseFloat(value).toFixed(decimal) : value;
     },
     collapseSearch(event) {
       if (
@@ -982,14 +687,6 @@ export default {
       this.toggleTarget = null;
       this.setGameTypes(gameType);
     },
-    setTop_(top) {
-      this.toggleTarget = null;
-      this.setTop(top);
-    },
-    setUnlimitedPA_(isChecked) {
-      this.toggleTarget = null;
-      this.setUnlimitedPA(isChecked);
-    },
     setSortBy_(sortItem) {
       if (sortItem !== this.sortBy) {
         this.toggleTarget = null;
@@ -1004,24 +701,14 @@ export default {
       this.toggleTarget = null;
       this.toggleColumn(column);
     },
-    closeLocation(e) {
-      if (e.currentTarget === e.target) {
-        this.coordinates = {
-          values: [],
-          avatar: '',
-          player: '',
-        };
-      }
-    },
-    detectChartWidth() {
-      const { width, top } = this.$refs[
+    detectHeight() {
+      const { top } = this.$refs[
         'sticky-table-wrapper'
       ].getBoundingClientRect();
-      this.chartWidth = width - 152;
       this.tableHeight = window.innerHeight - top - 20;
     },
     requestAnimationFrame() {
-      window.requestAnimationFrame(this.detectChartWidth);
+      window.requestAnimationFrame(this.detectHeight);
     },
   },
   computed: {
@@ -1029,18 +716,16 @@ export default {
       'period',
       'periodSelect',
       'gameTypes',
-      'top',
-      'unlimitedPA',
-      'sortBy',
-      'checkAll',
-      'conditionCols',
-      'displayedCols',
       'lastUpdate',
       'userId',
       'currentTeamIcon',
     ]),
     ...mapGetters({
-      list: 'genStatistics',
+      list: 'genPitcherStatistics',
+      sortBy: 'pitcherSortBy',
+      checkAll: 'pitcherCheckAll',
+      conditionCols: 'pitcherConditionCols',
+      displayedCols: 'pitcherDisplayedCols',
     }),
   },
   watch: {
@@ -1056,65 +741,51 @@ export default {
               {},
             );
             if (index === self.length - 1) {
+              const { ERA, WHIP, K7, BB7, H7, PIP } = accCalc(
+                [],
+                [
+                  {
+                    OUT: [sum.OUT],
+                    R: [sum.R],
+                    H: [sum.H],
+                    SO: [sum.SO],
+                    BB: [sum.BB],
+                    S: [sum.S],
+                    B: [sum.B],
+                  },
+                ],
+                0,
+              );
               return {
                 ...sum,
-                AVG: Math.round((sum.H / sum.AB) * 1000) / 1000,
-                AVG_NO: sum.abNo
-                  ? Math.round((sum.hNo / sum.abNo) * 1000) / 1000
-                  : '-',
-                AVG_DESC_NO: `${sum.abNo}-${sum.hNo}`,
-                AVG_SP: sum.abSP
-                  ? Math.round((sum.hSP / sum.abSP) * 1000) / 1000
-                  : '-',
-                AVG_DESC_SP: `${sum.abSP}-${sum.hSP}`,
-                AVG_FB: sum.abFB
-                  ? Math.round((sum.hFB / sum.abFB) * 1000) / 1000
-                  : '-',
-                AVG_DESC_FB: `${sum.abFB}-${sum.hFB}`,
-                OBP: Math.round((sum.TOB / sum.PA) * 1000) / 1000,
-                SLG: Math.round((sum.TB / sum.AB) * 1000) / 1000,
-                OPS:
-                  Math.round((sum.TOB / sum.PA + sum.TB / sum.AB) * 1000) /
-                  1000,
-                LEVEL: `${Math.floor(
-                  Math.round((sum.H / sum.AB) * 1000) / 100,
-                )}/${Math.floor(
-                  Math.round((sum.TOB / sum.PA) * 1000) / 100,
-                )}/${Math.floor(Math.round((sum.TB / sum.AB) * 1000) / 100)}`,
+                ERA,
+                WHIP,
+                K7,
+                BB7,
+                H7,
+                PIP,
+                'S%':
+                  sum.B === 0 ? '-' : Math.round((sum.S / sum.B) * 100) / 100,
+                IP: `${Math.floor(sum.OUT / 3)}.${sum.OUT % 3}`,
               };
             }
             return sum;
           },
           {
-            PA: 0,
-            AB: 0,
+            OUT: 0,
+            W: 0,
+            L: 0,
+            G: 0,
+            GS: 0,
             H: 0,
-            TB: 0,
-            TOB: 0,
             R: 0,
-            RBI: 0,
-            '1H': 0,
-            '2H': 0,
-            '3H': 0,
-            HR: 0,
-            K: 0,
+            NP: 0,
             BB: 0,
-            SF: 0,
-            DP: 0,
-            hNo: 0,
-            abNo: 0,
-            hSP: 0,
-            abSP: 0,
-            hFB: 0,
-            abFB: 0,
+            SO: 0,
+            S: 0,
+            B: 0,
           },
         );
-
-        this.lazy = false;
-        setTimeout(() => {
-          this.lazy = true;
-          this.detectChartWidth();
-        }, 500);
       },
       immediate: true,
     },

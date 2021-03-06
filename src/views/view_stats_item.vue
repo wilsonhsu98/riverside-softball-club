@@ -187,7 +187,7 @@ i.fa {
         line-height: 36px;
         text-align: right;
         padding-right: 10px;
-        span.clickable {
+        span {
           cursor: pointer;
           text-decoration: underline;
         }
@@ -444,7 +444,13 @@ export default {
     document.removeEventListener(clickEvent, this.collapseSearch);
   },
   methods: {
-    ...mapActions(['setPeriod', 'setGameTypes', 'setSortBy', 'setUnlimitedPA']),
+    ...mapActions([
+      'setPeriod',
+      'setGameTypes',
+      'setSortBy',
+      'setUnlimitedPA',
+      'setPitcherSortBy',
+    ]),
     collapseSearch(event) {
       if (
         this.toggleSearch &&
@@ -464,9 +470,15 @@ export default {
       this.setGameTypes(gameType);
     },
     goStats(key) {
-      this.setSortBy(key);
-      this.setUnlimitedPA(true);
-      this.$router.push(`/main/stats_pa/${this.$route.params.team}`);
+      if (['AVG', 'H', 'HR', 'RBI'].includes(key)) {
+        this.setSortBy(key);
+        this.setUnlimitedPA(true);
+        this.$router.push(`/main/stats_pa/${this.$route.params.team}`);
+      }
+      if (['W', 'SO', 'ERA', 'WHIP'].includes(key)) {
+        this.setPitcherSortBy(key);
+        this.$router.push(`/main/stats_pitcher/${this.$route.params.team}`);
+      }
     },
   },
   computed: {
@@ -487,11 +499,7 @@ export default {
       template: `
         <div class="item-container__table">
           <div class="header">
-            <span
-              :class="{ clickable: !['W', 'SO', 'ERA', 'WHIP'].includes(cat) }"
-              @click="!['W', 'SO', 'ERA', 'WHIP'].includes(cat) && goStats(cat)"
-              >{{ $t(cat === 'SO' ? 'SO_P': cat) }}</span
-            >
+            <span @click="goStats(cat)">{{ $t(cat === 'SO' ? 'SO_P': cat) }}</span>
           </div>
           <template v-for="(item, index) in (itemStats[cat] || []).slice(0, 5)">
             <div v-if="index === 0" class="row" :key="index">

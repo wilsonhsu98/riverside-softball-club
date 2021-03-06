@@ -758,11 +758,9 @@ export default {
         (acc, v = 0) => acc + (parseInt(v) || 0),
         0,
       );
-      const decimal = OUT % 3;
-      const IP = `${Math.floor(OUT / 3)}${decimal > 0 ? `.${decimal}` : ''}`;
       const { ERA, WHIP } = accCalc(this.beforePitchers, this.pitchers, pIndex);
       const count = {
-        IP,
+        IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
         OUT,
         R,
         SO: (pContent.SO || []).reduce(
@@ -777,7 +775,7 @@ export default {
         WHIP,
       };
       return ['IP', 'SO', 'BB', 'R', 'ERA', 'WHIP']
-        .filter(col => count[col] !== '')
+        .filter(col => count[col] !== '-')
         .map(col => `${count[col]}<span class="unit">${col}</span>`)
         .join('');
     },

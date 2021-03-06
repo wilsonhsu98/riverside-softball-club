@@ -15,7 +15,7 @@ const sumByInn = (scores = [], inn = scores.length) =>
   scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
 const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
   const name = pitchers[currentIndex].name;
-  const { OUT, R, H, BB } = [
+  const { OUT, R, H, SO, BB, S, B } = [
     ...beforePitchers.filter(bp => bp.name === name),
     ...pitchers.slice(0, currentIndex).filter(bp => bp.name === name),
     pitchers[currentIndex],
@@ -25,14 +25,21 @@ const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
         OUT: acc.OUT + sumByInn(bp.OUT),
         R: acc.R + sumByInn(bp.R),
         H: acc.H + sumByInn(bp.H),
+        SO: acc.SO + sumByInn(bp.SO),
         BB: acc.BB + sumByInn(bp.BB),
+        S: acc.S + sumByInn(bp.S),
+        B: acc.B + sumByInn(bp.B),
       };
     },
-    { OUT: 0, R: 0, H: 0, BB: 0 },
+    { OUT: 0, R: 0, H: 0, SO: 0, BB: 0, S: 0, B: 0 },
   );
   return {
-    ERA: OUT === 0 ? (R === 0 ? '' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2),
+    ERA: OUT === 0 ? (R === 0 ? '-' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2),
     WHIP: OUT === 0 ? '-' : ((H + BB) / (OUT / 3)).toFixed(2),
+    PIP: OUT === 0 ? '-' : ((S + B) / (OUT / 3)).toFixed(2),
+    K7: OUT === 0 ? '-' : ((SO * 7) / (OUT / 3)).toFixed(2),
+    BB7: OUT === 0 ? '-' : ((BB * 7) / (OUT / 3)).toFixed(2),
+    H7: OUT === 0 ? '-' : ((H * 7) / (OUT / 3)).toFixed(2),
   };
 };
 
@@ -353,6 +360,113 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
         abFB,
       };
     }
+  });
+};
+
+const genPitcherStatistics = (players, games, filterGames = []) => {
+  const games_ = games.filter(g => filterGames.includes(g.game));
+  const alltime = games_.filter(
+    g => g.pitcher || (Array.isArray(g.pitchers) && g.pitchers.length),
+  );
+  const legacy = games_.filter(
+    g =>
+      g.pitcher &&
+      (!Array.isArray(g.pitchers) ||
+        (Array.isArray(g.pitchers) && g.pitchers.length === 0)),
+  );
+  const current = games_.filter(
+    g => Array.isArray(g.pitchers) && g.pitchers.length,
+  );
+  const { pitchers, records } = alltime.reduce(
+    (acc, g) => {
+      return {
+        pitchers: acc.pitchers.includes(g.pitcher)
+          ? acc.pitchers
+          : g.pitcher
+          ? [...acc.pitchers, g.pitcher]
+          : acc.pitchers,
+        records: [
+          ...acc.records,
+          ...(Array.isArray(g.pitchers) ? g.pitchers : []),
+        ],
+      };
+    },
+    { pitchers: [], records: [] },
+  );
+  return pitchers.map(name => {
+    const { OUT, R, H, SO, BB, S, B } = records
+      .filter(p => p.name === name)
+      .reduce(
+        (acc, p) => ({
+          OUT: acc.OUT + sumByInn(p.OUT),
+          R: acc.R + sumByInn(p.R),
+          H: acc.H + sumByInn(p.H),
+          SO: acc.SO + sumByInn(p.SO),
+          BB: acc.BB + sumByInn(p.BB),
+          S: acc.S + sumByInn(p.S),
+          B: acc.B + sumByInn(p.B),
+        }),
+        { OUT: 0, R: 0, H: 0, S: 0, SO: 0, BB: 0, B: 0 },
+      );
+    const { ERA, WHIP, K7, BB7, H7, PIP } = accCalc(
+      [],
+      [
+        {
+          OUT: [OUT],
+          R: [R],
+          H: [H],
+          SO: [SO],
+          BB: [BB],
+          S: [S],
+          B: [B],
+        },
+      ],
+      0,
+    );
+    return {
+      name,
+      data: (players.find(sub => sub.id === name) || { data: {} }).data,
+      OUT,
+      S,
+      B,
+      W: alltime.filter(g => g.pitcher === name && g.result === 'win').length,
+      L: alltime.filter(g => g.pitcher === name && g.result === 'lose').length,
+      ERA,
+      G:
+        current.filter(g => g.pitchers.some(p => p.name === name)).length +
+        legacy.filter(g => g.pitcher === name).length,
+      ...(OUT === 0
+        ? {
+            GS: '-',
+            IP: '-',
+            H: '-',
+            R: '-',
+            NP: '-',
+            BB: '-',
+            SO: '-',
+            WHIP: '-',
+            'S%': '-',
+            PIP: '-',
+            K7: '-',
+            BB7: '-',
+            H7: '-',
+          }
+        : {
+            GS: current.filter(g => (g.pitchers[0] || {}).name === name).length,
+            IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
+            H,
+            R,
+            NP: S + B,
+            BB,
+            SO,
+            WHIP,
+            'S%': B === 0 ? '-' : Math.round((S / B) * 100) / 100,
+            PIP,
+            K7,
+            BB7,
+            H7,
+          }),
+    };
   });
 };
 
@@ -705,6 +819,37 @@ const execGenStatistics = state => {
     });
 };
 
+const execGenPitcherStatistics = state => {
+  return genPitcherStatistics(
+    state.players,
+    state.games,
+    (state.period.find(item => item.select).games || []).filter(
+      g => !(state.excludedGames || []).includes(g),
+    ),
+  ).sort((a, b) => {
+    if (b[state.sortBy] === '-' && a[state.sortBy] !== '-') {
+      return -1;
+    }
+    if (['ERAA'].includes(state.sortBy)) {
+      return b[state.sortBy] === a[state.sortBy]
+        ? b['IP'] - a['IP']
+        : b[state.sortBy] - a[state.sortBy];
+    } else if (['ERA', 'WHIP', 'BB7', 'H7'].includes(state.sortBy)) {
+      return b[state.sortBy] === a[state.sortBy]
+        ? b['IP'] - a['IP']
+        : a[state.sortBy] - b[state.sortBy];
+    } else {
+      if (b[state.sortBy] === 0 && a[state.sortBy] === 0) {
+        return b['IP'] - a['IP'];
+      } else {
+        return b[state.sortBy] === a[state.sortBy]
+          ? a['IP'] - b['IP']
+          : b[state.sortBy] - a[state.sortBy];
+      }
+    }
+  });
+};
+
 const execItemStats = state => {
   const games = (state.period.find(item => item.select).games || []).filter(
     g => !(state.excludedGames || []).includes(g),
@@ -894,6 +1039,9 @@ self.addEventListener(
     switch (data.cmd) {
       case 'GenStatistics':
         self.postMessage(execGenStatistics(data));
+        break;
+      case 'GenPitcherStatistics':
+        self.postMessage(execGenPitcherStatistics(data));
         break;
       case 'ItemStats':
         self.postMessage(execItemStats(data));

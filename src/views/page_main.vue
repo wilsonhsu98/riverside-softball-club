@@ -28,6 +28,15 @@
           </li>
           <li v-if="currentTeam">
             <router-link
+              :to="{ name: 'stats_pitcher', params: { team: currentTeam } }"
+              active-class="active"
+              :data-label="$t('menu_stats_pitcher')"
+            >
+              <i class="fa fa-list-ol"></i>
+            </router-link>
+          </li>
+          <li v-if="currentTeam">
+            <router-link
               :to="{ name: 'stats_item', params: { team: currentTeam } }"
               active-class="active"
               :data-label="$t('menu_stats_item')"
