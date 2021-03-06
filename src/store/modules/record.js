@@ -245,13 +245,9 @@ const getters = {
         Array.isArray(boxSummary.pitchers) && boxSummary.pitchers.length
           ? boxSummary.pitchers.map((p, i, self) => {
               const OUT = sumByInn(p.OUT);
-              const decimal = OUT % 3;
-              const IP = `${Math.floor(OUT / 3)}${
-                decimal > 0 ? `.${decimal}` : ''
-              }`;
               const { ERA, WHIP } = accCalc(beforePitchers, self, i);
               return {
-                IP,
+                IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
                 H: sumByInn(p.H),
                 R: sumByInn(p.R),
                 BB: sumByInn(p.BB),

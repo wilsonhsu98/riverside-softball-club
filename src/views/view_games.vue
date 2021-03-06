@@ -42,7 +42,11 @@
           </div>
           <br />
           <div class="condition__label">{{ $t('col_game_type') }}</div>
-          <div class="condition__element" :data-col="$t('col_game_type')">
+          <div
+            class="condition__element"
+            :data-col="$t('col_game_type')"
+            style="white-space: nowrap;"
+          >
             <label
               class="condition__col"
               v-for="gameType in ['regular', 'playoff', 'cup', 'fun']"
