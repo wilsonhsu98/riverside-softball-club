@@ -257,7 +257,9 @@
                 :key="`header_${colInesx}`"
                 v-for="(col, colInesx) in pitcherCol"
               >
-                <span class="content">{{ $t(col) }}</span>
+                <span class="content">{{
+                  ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
+                }}</span>
               </div>
             </div>
           </div>
