@@ -102,8 +102,17 @@
       <carousel-3d class="item-container" border="0" :width="200" :height="326">
         <slide
           v-for="(key, index) in pitcherGameCount
-            ? ['AVG', 'H', 'HR', 'RBI', 'W', 'SO', 'ERA', 'WHIP']
-            : ['AVG', 'H', 'HR', 'RBI', 'W']"
+            ? getRandomStartArr([
+                'AVG',
+                'H',
+                'HR',
+                'RBI',
+                'W',
+                'SO',
+                'ERA',
+                'WHIP',
+              ])
+            : getRandomStartArr(['AVG', 'H', 'HR', 'RBI', 'W'])"
           :index="index"
           :key="`carousel_${key}`"
         >
@@ -479,6 +488,12 @@ export default {
         this.setPitcherSortBy(key);
         this.$router.push(`/main/stats_pitcher/${this.$route.params.team}`);
       }
+    },
+    getRandomStartArr(arr = []) {
+      return arr
+        .slice(Math.floor(Math.random() * arr.length))
+        .concat(arr)
+        .slice(0, arr.length);
     },
   },
   computed: {

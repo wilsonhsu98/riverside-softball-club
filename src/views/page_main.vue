@@ -251,9 +251,9 @@ header {
 @media only screen and (max-width: 990px) {
   header .header-container,
   .content {
-    width: calc(100% - 40px);
-    margin-left: 20px;
-    margin-right: 20px;
+    width: calc(100% - 20px);
+    margin-left: 10px;
+    margin-right: 10px;
   }
 }
 @media only screen and (max-width: 760px) {
@@ -396,7 +396,9 @@ export default {
       this.confirm(undefined);
     },
     shouldShowAd(currentRoute) {
-      if (['stats_pa', 'edit_team'].includes(currentRoute.name)) {
+      if (
+        ['stats_pa', 'stats_pitcher', 'edit_team'].includes(currentRoute.name)
+      ) {
         this.showAd = new Date().getTime();
         this.adMode = `${currentRoute.name}_f`;
       } else if (

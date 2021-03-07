@@ -257,7 +257,7 @@
                 :key="`header_${colInesx}`"
                 v-for="(col, colInesx) in pitcherCol"
               >
-                <span class="content">{{ col }}</span>
+                <span class="content">{{ $t(col) }}</span>
               </div>
             </div>
           </div>
@@ -268,7 +268,18 @@
           :key="`record_${i}`"
         >
           <div class="player">
-            <span class="order">{{ i + 1 }}</span>
+            <span class="order">
+              {{ i + 1 }}
+              <span
+                v-if="
+                  pitcher === item.name &&
+                    pitchers.map(p => p.name).indexOf(pitcher) === i
+                "
+                :class="`result-icon ${result}`"
+              >
+                {{ (result && result.slice(0, 1)) || '?' }}
+              </span>
+            </span>
             <span class="name">
               <photo
                 :photo="item.data.photo"
@@ -1028,6 +1039,13 @@
         text-align: right;
         width: 30px;
         padding-right: 10px;
+        position: relative;
+        .result-icon {
+          transform: scale(0.6) translate(-50%, -50%);
+          top: 50%;
+          left: 50%;
+          transform-origin: left top;
+        }
       }
       .name {
         text-align: left;
