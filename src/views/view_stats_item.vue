@@ -101,18 +101,7 @@
       <ad :mode="'stats_item'" />
       <carousel-3d class="item-container" border="0" :width="200" :height="326">
         <slide
-          v-for="(key, index) in pitcherGameCount
-            ? getRandomStartArr([
-                'AVG',
-                'H',
-                'HR',
-                'RBI',
-                'W',
-                'SO',
-                'ERA',
-                'WHIP',
-              ])
-            : getRandomStartArr(['AVG', 'H', 'HR', 'RBI', 'W'])"
+          v-for="(key, index) in pitcherGameCount ? col_v2 : col_v1"
           :index="index"
           :key="`carousel_${key}`"
         >
@@ -443,6 +432,17 @@ export default {
     return {
       toggleSearch: false,
       defaultIcon,
+      col_v1: this.getRandomStartArr(['AVG', 'H', 'HR', 'RBI', 'W']),
+      col_v2: this.getRandomStartArr([
+        'AVG',
+        'H',
+        'HR',
+        'RBI',
+        'W',
+        'SO',
+        'ERA',
+        'WHIP',
+      ]),
     };
   },
   created() {},
