@@ -1519,6 +1519,9 @@
       }
     }
     .player-records {
+      &.header {
+        font-size: 12px;
+      }
       .player {
         .order {
           width: 20px;
