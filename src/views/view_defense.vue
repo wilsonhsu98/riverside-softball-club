@@ -223,7 +223,11 @@
           <custom-input
             v-if="Array.isArray(pitchers) && pitchers.length"
             type="select"
-            :options="pitchers.map(({ name }) => name)"
+            :options="
+              pitchers
+                .map(({ name }) => name)
+                .filter((n, i, self) => self.indexOf(n) === i)
+            "
             :name="$t(`ttl_pitcher_${result}`)"
             :placeholder="$t(`ttl_pitcher_${result}`)"
             v-model="pitcher"
