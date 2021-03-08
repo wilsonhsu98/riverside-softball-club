@@ -193,11 +193,19 @@
               @click="changePlayer(pIndex, pContent.name)"
               :player="getPlayer(pContent.name)"
             />
-            <div class="info" v-html="formatSummary(pIndex)"></div>
-            <i
-              class="fa fa-pencil"
-              @click="pEditMode = [...pEditMode, pIndex]"
-            ></i>
+            <div class="info">
+              <span
+                v-for="item in formatSummary(pIndex)"
+                :data-num="item.val"
+                :key="item.col"
+                class="unit"
+                >{{ item.col }}</span
+              >
+              <i
+                class="fa fa-pencil"
+                @click="pEditMode = [...pEditMode, pIndex]"
+              ></i>
+            </div>
             <i class="fa fa-times" @click="deleteP(pIndex)"></i>
           </template>
         </div>
@@ -394,13 +402,23 @@
       margin: 0;
     }
     .info {
-      white-space: nowrap;
+      width: 100%;
       display: flex;
+      flex-wrap: wrap;
       align-items: center;
       padding-left: 5px;
+      line-height: 24px;
       &::v-deep .unit {
         color: $input_font;
-        margin: 0 8px 0 2px;
+        margin: 0 8px 0 0;
+        &:before {
+          content: attr(data-num);
+          color: #000;
+          margin-right: 2px;
+        }
+      }
+      .fa {
+        margin-left: auto;
       }
     }
     .fa-pencil {
@@ -776,8 +794,10 @@ export default {
       };
       return ['IP', 'SO', 'BB', 'R', 'ERA', 'WHIP']
         .filter(col => count[col] !== '-')
-        .map(col => `${count[col]}<span class="unit">${col}</span>`)
-        .join('');
+        .map(col => ({
+          val: count[col],
+          col,
+        }));
     },
     setAutoCalc() {
       window.localStorage.setItem('auto_calc_p', this.autoCalc);
