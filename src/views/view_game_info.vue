@@ -343,7 +343,13 @@
         </div>
       </div>
 
-      <div class="field-wrapper field-wrapper-item">
+      <div
+        :class="[
+          'field-wrapper',
+          'field-wrapper-item',
+          { 'has-error': gameType_err },
+        ]"
+      >
         <span>{{ $t('ttl_game_type') }}</span>
         <div>
           <label>
@@ -363,6 +369,9 @@
             <span>{{ $t('ttl_fun') }}</span>
           </label>
         </div>
+      </div>
+      <div v-if="gameType_err" class="field-wrapper field-wrapper-message">
+        {{ gameType_err }}
       </div>
 
       <div class="field-wrapper field-wrapper-item">
@@ -782,6 +791,7 @@ export default {
       opponent: '',
       opponent_err: '',
       gameType: '',
+      gameType_err: '',
       place: '',
       topBottom: '',
       tags: '',
@@ -851,9 +861,17 @@ export default {
         this.opponent_err = this.$t('required');
       }
 
-      return ![this.gameId_err, this.useTeam_err, this.opponent_err].some(
-        str => !!str,
-      );
+      this.gameType_err = '';
+      if (!this.gameType) {
+        this.gameType_err = this.$t('required');
+      }
+
+      return ![
+        this.gameId_err,
+        this.useTeam_err,
+        this.opponent_err,
+        this.gameType_err,
+      ].some(str => !!str);
     },
     back_() {
       if (this.mode === 'edit') {
