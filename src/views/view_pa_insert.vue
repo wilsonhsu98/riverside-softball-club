@@ -237,7 +237,15 @@
               <button class="btn" @click="revertOnbase">
                 {{ $t('btn_original') }}
               </button>
-              <button class="btn" @click="estimate">
+              <button
+                class="btn"
+                @click="
+                  () => {
+                    revertOnbase();
+                    estimate();
+                  }
+                "
+              >
                 {{ $t('btn_estimate') }}
               </button>
               <div
@@ -1725,7 +1733,6 @@ export default {
       }
     },
     estimate() {
-      this.revertOnbase();
       if (['FO', 'GO', 'FOUL', 'K'].includes(this.content)) {
         // 全不動 打者出局
         this.base.home.result = 'out';
