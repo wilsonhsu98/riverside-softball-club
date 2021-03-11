@@ -407,6 +407,19 @@ export default {
       ) {
         this.showAd = new Date().getTime();
         this.adMode = 'game_f';
+      } else if (
+        [
+          'create_game_info',
+          'edit_game_info',
+          'edit_defense_info',
+          'game_order',
+          'game_position',
+          'edit_game_position',
+          'pa',
+        ].includes(currentRoute.name)
+      ) {
+        this.showAd = '';
+        this.adMode = '';
       } else {
         window.adCount = (window.adCount || 0) + 1;
         if (window.adCount % 1 === 0) {

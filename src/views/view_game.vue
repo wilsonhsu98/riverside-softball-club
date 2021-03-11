@@ -127,7 +127,7 @@
             </div>
             <div v-if="role === 'manager'" class="action">
               <i
-                v-if="editable"
+                v-if="editable && box.slice(1).length"
                 class="fa batch"
                 :class="{ on: batchEdit }"
                 @click="toggleBatchEdit(batchEdit)"

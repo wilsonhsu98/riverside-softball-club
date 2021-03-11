@@ -565,7 +565,10 @@ export default {
       }, undefined);
     },
     checkModalPlayer() {
-      const startPlayers = this.box.slice(1).map(player => player.name);
+      const startPlayers = this.box
+        .slice(1)
+        .filter(record => !record.hasOwnProperty('altOrder'))
+        .map(({ name }) => name);
       this.benchPlayers = this.teamInfo.players.filter(
         player =>
           (player.name && !startPlayers.includes(player.name)) ||
