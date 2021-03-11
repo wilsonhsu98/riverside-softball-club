@@ -160,7 +160,7 @@ export default {
         games: '8a80854b77f116cb01781c61dc7222d9',
         game: '8a80854b77f116cb01781c624ed122da',
       },
-      frequencyBannerKey: '8a80854b757283cf017576f08a1c25a8',
+      frequencyBannerKey: '8a80854b77f116cb0178201b14cc2642',
       debug: true,
     };
 
