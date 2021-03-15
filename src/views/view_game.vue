@@ -374,7 +374,7 @@
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <span class="inn">{{ record.innChange }}</span>
                   <router-link
-                    v-if="editable"
+                    v-if="editable && record.content !== 'PR'"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -571,7 +571,7 @@
                 ></div>
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <router-link
-                    v-if="editable"
+                    v-if="editable && record.content !== 'PR'"
                     tag="span"
                     :to="{
                       name: 'pa',

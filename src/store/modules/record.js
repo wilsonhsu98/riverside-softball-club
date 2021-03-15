@@ -3,12 +3,7 @@ import {
   // getters as rootGetters,
   state as rootState,
 } from '../root';
-import utils, {
-  formatColor,
-  innArray,
-  sumByInn,
-  accCalc,
-} from '../../libs/utils';
+import utils, { sumByInn, accCalc } from '../../libs/utils';
 import workerCreater from '../../web-worker';
 
 const types = {
@@ -594,15 +589,6 @@ const actions = {
   workerBox({ commit }) {
     // commit(rootTypes.LOADING, true);
     if (state.game && state.records.some(item => item._table === state.game)) {
-      // const test = displayGame(
-      //   state.players,
-      //   state.records.filter(item => item._table === state.game),
-      //   state.games.find(item => item.game === state.game).errors,
-      //   rootState.role,
-      // );
-      // console.log(test);
-      // commit(types.SET_BOX, test);
-      // return;
       workerCreater(
         {
           cmd: 'Box',

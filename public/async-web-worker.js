@@ -10,7 +10,6 @@ const formatColor = content => {
   }
   return 'blue';
 };
-const innArray = ['', '一', '二', '三', '四', '五', '六', '七'];
 const sumByInn = (scores = [], inn = scores.length) =>
   scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
 const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
@@ -471,6 +470,62 @@ const genPitcherStatistics = (players, games, filterGames = []) => {
 };
 
 const displayGame = (players, records, errors = [], role) => {
+  const insertAfter = (arr, name, newItem, startOrder) => {
+    const firstFind = arr.find(sub => sub.name === name);
+    const findAlt = arr.find(sub => sub.name === newItem.name);
+    if (firstFind && !findAlt) {
+      const find =
+        firstFind.altOrder && !firstFind.order
+          ? arr.find(sub => sub.order === firstFind.altOrder)
+          : firstFind;
+      const findIndex = arr.indexOf(find);
+      const altOrder = find.order % startOrder || startOrder || find.order;
+      const temp = [
+        ...arr.slice(0, findIndex),
+        {
+          ...find,
+          altRunners: [
+            ...(find.altRunners || []),
+            {
+              ...newItem,
+              altOrder,
+            },
+          ],
+          queue: [...find.queue, newItem.name],
+        },
+        ...arr.slice(findIndex + 1),
+      ];
+      return [
+        ...temp.filter(t => t.order < altOrder || t.altOrder < altOrder),
+        temp.find(t => t.order === altOrder || t.altOrder === altOrder),
+        ...temp.find(t => t.order === altOrder || t.altOrder === altOrder)
+          .altRunners,
+        ...temp.filter(t => t.order > altOrder || t.altOrder > altOrder),
+      ];
+    }
+    return arr;
+  };
+  const checkRunOut = (self, i, item) => {
+    const selfAndNext5 = self
+      .slice(i, i + 6)
+      .filter(sub => sub.inn === item.inn)
+      .map(sub => sub.onbase)
+      .flat();
+    return {
+      r:
+        item.r ||
+        (selfAndNext5.find(
+          sub => sub && sub.name === item.name && sub.result === 'run',
+        )
+          ? item.name
+          : ''),
+      out: selfAndNext5.find(
+        sub => sub && sub.name === item.name && sub.result === 'out',
+      )
+        ? true
+        : false,
+    };
+  };
   const assumedOrder = 12;
   return records.reduce(
     (acc, item, i, self) => {
@@ -486,26 +541,7 @@ const displayGame = (players, records, errors = [], role) => {
       const shouldSetNewContent =
         role === 'manager' && !item.content && !isSetNewContent;
 
-      const { r, out } = (() => {
-        const selfAndNext5 = self
-          .slice(i, i + 6)
-          .map(sub => sub.onbase)
-          .reduce((acc, sub) => acc.concat(sub), []);
-        return {
-          r:
-            item.r ||
-            (selfAndNext5.find(
-              sub => sub && sub.name === item.name && sub.result === 'run',
-            )
-              ? item.name
-              : ''),
-          out: selfAndNext5.find(
-            sub => sub && sub.name === item.name && sub.result === 'out',
-          )
-            ? true
-            : false,
-        };
-      })();
+      const { r, out } = checkRunOut(self, i, item);
       const { name, inn, rbi, location, onbase, video } = item;
       const newItem = {
         name,
@@ -534,79 +570,118 @@ const displayGame = (players, records, errors = [], role) => {
         )
         .lastIndexOf(true);
       const shouldSetAltBatter = !find && alt > -1;
-      const shouldSetAltRunner = r && r !== item.name && alt > -1;
+      const shouldSetLegacyAltRunner = r && r !== item.name && alt > -1;
       const isLast = i === self.length - 1;
       const midLen = Math.ceil(order / (startOrder || assumedOrder) - 1);
 
+      const prev5 = self
+        .slice(Math.max(i - 5, 0), i)
+        .filter(sub => sub.inn === item.inn);
+      const prev5name = prev5.map(sub => sub.name);
+      const prev5outOrRun = prev5
+        .map(sub => sub.onbase)
+        .flat()
+        .filter(
+          sub => typeof sub === 'object' && ['out', 'run'].includes(sub.result),
+        )
+        .map(sub => sub.name);
+      const currentOnbase = (item.onbase || [])
+        .slice(1)
+        .filter(sub => sub.name && sub.result)
+        .map(sub => sub.name)
+        .reverse()
+        .concat(shouldSetLegacyAltRunner ? [r] : []);
+      const candidate = prev5name.filter(n => !prev5outOrRun.includes(n));
+      const altRunners = currentOnbase.reduce((acc, name, ii) => {
+        if (candidate.includes(name)) {
+          return acc;
+        }
+        const { r, out } = checkRunOut(self, i, { name, inn: item.inn });
+        return [
+          ...acc,
+          {
+            original: shouldSetLegacyAltRunner ? item.name : candidate[ii],
+            alt: {
+              name,
+              data: (players.find(sub => sub.id === name) || { data: {} }).data,
+              content: Array(midLen).concat({
+                inn: item.inn,
+                name,
+                r: shouldSetLegacyAltRunner ? name : r,
+                out,
+                order,
+                color: 'gray',
+                content: 'PR',
+              }),
+            },
+          },
+        ];
+      }, []);
       const result = {
         ...acc,
         prevInn: item.inn,
         // 第一輪加入球員
         ...(canPushPlayer && {
-          arr: [
-            ...arr,
-            {
-              name: item.name,
-              data: (players.find(sub => sub.id === item.name) || { data: {} })
-                .data,
-              order,
-              content: [newItem],
+          arr: altRunners.reduce(
+            (acc, runner) => {
+              return insertAfter(acc, runner.original, runner.alt, startOrder);
             },
-          ],
+            [
+              ...arr,
+              {
+                name: item.name,
+                data: (
+                  players.find(sub => sub.id === item.name) || { data: {} }
+                ).data,
+                order,
+                content: [newItem],
+                queue: [item.name],
+              },
+            ],
+          ),
         }),
         // 第二輪找到原本球員並加入打擊內容
         ...(find && {
-          arr: [
-            ...arr.slice(0, findIndex),
-            {
-              ...find,
-              /*
-               * https://stackoverflow.com/questions/34559918/spread-syntax-es6
-               * Array.prototype.concat will preserve the empty slots in the array
-               * while the Spread will replace them with undefined values.
-               */
-              content: find.content.concat(
-                Array(Math.max(midLen - find.content.length, 0)),
-                newItem,
-              ),
+          arr: altRunners.reduce(
+            (acc, runner) => {
+              return insertAfter(acc, runner.original, runner.alt, startOrder);
             },
-            // 代跑
-            ...(shouldSetAltRunner
-              ? [
-                  {
-                    name: r,
-                    data: (players.find(sub => sub.id === r) || { data: {} })
-                      .data,
-                    order,
-                    altOrder: item.order % startOrder || startOrder,
-                    content: Array(midLen).concat({
-                      inn: item.inn,
-                      name: r,
-                      order,
-                      r,
-                      color: 'gray',
-                      content: 'PR',
-                    }),
-                  },
-                ]
-              : []),
-            ...arr.slice(findIndex + 1),
-          ],
+            [
+              ...arr.slice(0, findIndex),
+              {
+                ...find,
+                /*
+                 * https://stackoverflow.com/questions/34559918/spread-syntax-es6
+                 * Array.prototype.concat will preserve the empty slots in the array
+                 * while the Spread will replace them with undefined values.
+                 */
+                content: find.content.concat(
+                  Array(Math.max(midLen - find.content.length, 0)),
+                  newItem,
+                ),
+                queue: [...(find.queue || []), item.name],
+              },
+              ...arr.slice(findIndex + 1),
+            ],
+          ),
         }),
         // 代打
         ...(shouldSetAltBatter && {
-          arr: [
-            ...arr.slice(0, alt + 1),
+          arr: insertAfter(
+            arr,
+            (
+              arr.find(
+                sub => sub.order === (order % startOrder || startOrder),
+              ) || {}
+            ).name,
             {
               name: item.name,
               data: (players.find(sub => sub.id === item.name) || { data: {} })
                 .data,
-              order,
-              altOrder: order % startOrder || startOrder,
               content: Array(midLen).concat(newItem),
             },
-            ...arr.slice(alt + 1),
-          ],
+            startOrder,
+          ),
         }),
         // 一輪有幾棒
         ...(shouldSetStartOrder && {
@@ -634,56 +709,38 @@ const displayGame = (players, records, errors = [], role) => {
           (self.length % (startOrder || self.length) === 0 && role === 'manager'
             ? 1
             : 0);
-        const header = innArray.reduce((acc, item, i) => {
-          if (startOrder === 0) {
-            const inns = records
-              .filter(record => record.inn)
-              .map(record => record.inn);
-            const maxInn = inns.length ? Math.max(...inns) : 1;
-            return Array.apply(null, Array(maxInn)).map(
-              (undefined, i) => i + 1,
-            );
-          }
-          if (i) {
-            return [
-              ...acc,
-              ...Array(
-                Math.ceil(
-                  (records.filter(record => record.inn === i).length +
-                    (i === (records[records.length - 1] || {}).inn &&
-                    role === 'manager'
-                      ? 1
-                      : 0)) /
-                    startOrder,
-                ),
-              )
-                .fill(undefined)
-                .map(() => i),
-            ];
-          }
-          return acc;
-        }, []);
+        const header = Array(20)
+          .fill(undefined)
+          .reduce((acc, item, i) => {
+            if (startOrder === 0) {
+              const inns = records
+                .filter(record => record.inn)
+                .map(record => record.inn);
+              const maxInn = inns.length ? Math.max(...inns) : 1;
+              return Array.apply(null, Array(maxInn)).map(
+                (undefined, i) => i + 1,
+              );
+            }
+            if (i) {
+              return [
+                ...acc,
+                ...Array(
+                  Math.ceil(
+                    (records.filter(record => record.inn === i).length +
+                      (i === (records[records.length - 1] || {}).inn &&
+                      role === 'manager'
+                        ? 1
+                        : 0)) /
+                      startOrder,
+                  ),
+                )
+                  .fill(undefined)
+                  .map(() => i),
+              ];
+            }
+            return acc;
+          }, []);
 
-        // if (
-        //   (records.length && startOrder) ||
-        //   (startOrder === 0 &&
-        //     [undefined, 'new'].indexOf(records[records.length - 1].content) === -1)
-        // ) {
-        //   if (startOrder === 0) startOrder = records.length;
-        //   let insertAt = records[records.length - startOrder];
-        //   if (insertAt.r && insertAt.name !== insertAt.r) {
-        //     insertAt = insertAt.r;
-        //   } else {
-        //     insertAt = insertAt.name;
-        //   }
-        //   arr
-        //     .find(player => player.name === insertAt)
-        //     .content.push({
-        //       content: 'new',
-        //       name: insertAt,
-        //       inn: role === 'manager' && records[records.length - 1].inn,
-        //     });
-        // }
         return [
           [...header, startOrder],
           ...arr.map(sub => {
@@ -716,6 +773,18 @@ const displayGame = (players, records, errors = [], role) => {
             const newBatter =
               preBatter.r && preBatter.name !== preBatter.r
                 ? preBatter.r
+                : arr.some(
+                    r =>
+                      r.altOrder ===
+                      (preBatter.order % startOrder || preBatter.order),
+                  )
+                ? arr
+                    .filter(
+                      r =>
+                        r.altOrder ===
+                        (preBatter.order % startOrder || preBatter.order),
+                    )
+                    .reverse()[0].name
                 : preBatter.name;
             const shouldSetLastNew =
               role === 'manager' && sub.name === newBatter;

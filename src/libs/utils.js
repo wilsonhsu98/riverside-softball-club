@@ -527,7 +527,6 @@ export {
   evaluateTeamScore,
   scoreMapping,
   formatDate,
-  innArray,
   sumByInn,
   accCalc,
 };

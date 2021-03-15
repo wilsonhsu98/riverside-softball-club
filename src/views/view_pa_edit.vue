@@ -24,8 +24,11 @@
             {{
               $t('desc_batting', {
                 n: box.length
-                  ? order % box[box.length - 1].order ||
-                    box[box.length - 1].order
+                  ? order %
+                      (box[box.length - 1].order ||
+                        box[box.length - 1].altOrder) ||
+                    box[box.length - 1].order ||
+                    box[box.length - 1].altOrder
                   : '',
               })
             }}
