@@ -379,11 +379,11 @@ const genPitcherStatistics = (players, games, filterGames = []) => {
   const { pitchers, records } = alltime.reduce(
     (acc, g) => {
       return {
-        pitchers: acc.pitchers.includes(g.pitcher)
-          ? acc.pitchers
-          : g.pitcher
-          ? [...acc.pitchers, g.pitcher]
-          : acc.pitchers,
+        pitchers: [
+          ...acc.pitchers,
+          g.pitcher,
+          ...(Array.isArray(g.pitchers) ? g.pitchers.map(p => p.name) : []),
+        ].filter((n, i, self) => n && self.indexOf(n) === i),
         records: [
           ...acc.records,
           ...(Array.isArray(g.pitchers) ? g.pitchers : []),
