@@ -1030,6 +1030,65 @@ const actions = {
         console.log('Error getting document:', error);
       });
   },
+  migrate({ commit }) {
+    commit(rootTypes.LOADING, true);
+    db.collection('teams')
+      .get()
+      .then(teamCollection => {
+        window.trackRead('searchTeams', teamCollection.docs.length || 1);
+        const allTeams = teamCollection.docs.map(doc => {
+          const data = doc.data();
+          return {
+            teamCode: doc.id,
+            ...data,
+            timestamp: data.timestamp.toDate(),
+          };
+        });
+
+        return Promise.all(
+          allTeams
+            .map(({ teamCode }) =>
+              db.collection(`teams/${teamCode}/games`).get(),
+            )
+            .flat(),
+        );
+      })
+      .then(teams => {
+        const games = teams.map(teamCollection =>
+          teamCollection.docs.map(doc => ({ ...doc.data(), doc })),
+        );
+        const noGameTypes = games.flat().filter(g => g.gameType === '');
+        const paths = noGameTypes.reduce((acc, d) => {
+          return [...acc, d.doc.ref.path];
+        }, []);
+        // console.log(paths);
+
+        const batch = db.batch();
+        paths.forEach(path => {
+          const [, teamCode, , gameId] = path.split('/');
+          batch.set(
+            db.doc(`teams/${teamCode}`),
+            {
+              games: { [gameId]: timestamp },
+              timestamp,
+            },
+            { merge: true },
+          );
+          batch.set(
+            db.doc(path),
+            {
+              gameType: 'regular',
+              timestamp,
+            },
+            { merge: true },
+          );
+        });
+        return batch.commit();
+      })
+      .then(() => {
+        commit(rootTypes.LOADING, false);
+      });
+  },
 };
 
 const mutations = {

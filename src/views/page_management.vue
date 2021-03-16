@@ -69,6 +69,9 @@
     <button @click="batchEvaluateTeamScore">
       Batch Evaluate Team Score
     </button>
+    <button @click="migrate" disabled>
+      Migrate
+    </button>
     <loading v-if="loading"></loading>
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
@@ -168,6 +171,7 @@ export default {
       'fetchDummyTeams',
       'deleteTeam',
       'editTeamScore',
+      'migrate',
     ]),
     deleteUnuseTeams() {
       this.checkedTeams
