@@ -601,7 +601,8 @@ const displayGame = (players, records, errors = [], role) => {
       const shouldSetAltRunner = !find && altR > -1 && item.content === 'PR';
       const shouldSetLegacyAltRunner = r && r !== item.name && alt > -1;
       const isLast = i === self.length - 1;
-      const midLen = Math.ceil(order / (startOrder || assumedOrder) - 1);
+      const order_ = !item.order ? i + 1 : item.order;
+      const midLen = Math.ceil(order_ / (startOrder || assumedOrder) - 1);
 
       const result = {
         ...acc,
