@@ -398,7 +398,7 @@
       box-sizing: border-box;
       border-radius: 4px;
       width: 65px;
-      border: 1px solid $input_border;
+      border: 2px solid $input_border;
       font-size: 12px;
       line-height: 14px;
       height: 32px;

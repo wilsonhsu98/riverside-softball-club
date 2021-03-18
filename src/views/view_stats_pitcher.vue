@@ -160,7 +160,7 @@
               </div>
             </template>
           </div>
-          <div class="sum-row" v-if="sum.OUT > 0">
+          <div class="sum-row">
             <template v-for="(col, colIndex) in displayedCols">
               <div
                 v-if="col.name === 'Rank'"
@@ -193,6 +193,19 @@
               >
                 <div class="align-right _30">
                   {{ formatValue(sum[col.name], 1) }}
+                </div>
+              </div>
+              <div
+                v-else-if="
+                  ['GS', 'IP', 'H', 'R', 'NP', 'BB', 'SO'].includes(col.name)
+                "
+                class="cell"
+                :class="{ sort: col.name === sortBy }"
+                :data-label="$t(col.name)"
+                :key="`row_sum_${colIndex}`"
+              >
+                <div class="align-right">
+                  {{ sum.OUT === 0 ? '-' : sum[col.name] }}
                 </div>
               </div>
               <div
