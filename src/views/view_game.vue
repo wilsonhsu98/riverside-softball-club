@@ -807,6 +807,70 @@
         />
       </div>
     </div>
+
+    <div v-if="firstGuide" class="image-modal" @click="closeFirstGuide">
+      <div>
+        <p @click="closeFirstGuide">{{ $t('msg_first_guide') }}</p>
+        <button
+          v-if="['top', ''].includes(topBottom)"
+          class="btn"
+          @click="closeFirstGuide"
+        >
+          {{ $t('btn_to_batting') }}
+        </button>
+        <router-link
+          :to="{
+            name: 'edit_defense_info',
+            params: {
+              team: $route.params.team,
+              game: $route.params.game,
+            },
+          }"
+          tag="button"
+          class="btn"
+          >{{ $t('btn_to_pitching') }}
+        </router-link>
+        <button v-if="topBottom === 'bot'" class="btn" @click="closeFirstGuide">
+          {{ $t('btn_to_batting') }}
+        </button>
+        <router-link
+          :to="{
+            name: 'edit_game_info',
+            params: {
+              team: $route.params.team,
+              game: $route.params.game,
+            },
+          }"
+          tag="button"
+          class="btn"
+          >{{ $t('btn_to_edit_game') }}
+        </router-link>
+        <router-link
+          :to="{
+            name: 'game_order',
+            params: {
+              team: $route.params.team,
+              game: $route.params.game,
+            },
+          }"
+          tag="button"
+          class="btn"
+          >{{ $t('btn_to_fill_order') }}
+        </router-link>
+        <router-link
+          :to="{
+            name: 'game_position',
+            params: {
+              team: $route.params.team,
+              game: $route.params.game,
+            },
+          }"
+          tag="button"
+          class="btn"
+          >{{ $t('btn_to_fill_position') }}
+        </router-link>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1421,6 +1485,17 @@
     transform: translateY(-50%) translateX(-50%);
     display: flex;
     flex-direction: column;
+    p {
+      height: 22px;
+      line-height: 22px;
+      text-align: center;
+      margin: 0 0 5px 0;
+      color: #fff;
+    }
+    .btn {
+      width: 100%;
+      margin: 5px auto;
+    }
   }
   .iframe {
     background-color: black;
@@ -1668,6 +1743,7 @@ export default {
       gameStatus: 'lock',
       editable: false,
       stillCanEditOrder: false,
+      firstGuide: false,
       editVideo: false,
       positions: undefined,
       orders: undefined,
@@ -1902,6 +1978,23 @@ export default {
         }
       }
     },
+    checkFirstGuide() {
+      if (
+        this.editable &&
+        this.box.length &&
+        this.box.slice(1)[0].content[0].content === 'new' &&
+        [undefined, ''].includes(this.boxSummary.opponentScores[0])
+      ) {
+        this.firstGuide = true;
+      } else {
+        this.firstGuide = false;
+      }
+    },
+    closeFirstGuide(e) {
+      if (e.currentTarget === e.target) {
+        this.firstGuide = false;
+      }
+    },
     toggleBatchEdit(value) {
       this.batchEdit = !value;
     },
@@ -2075,6 +2168,7 @@ export default {
           this.gameNote = gameNote;
 
           this.checkEditVideo();
+          this.checkFirstGuide();
         }
       },
       immediate: true,
@@ -2106,6 +2200,7 @@ export default {
         }
         this.checkLastColumn();
         this.checkEditVideo();
+        this.checkFirstGuide();
       },
       immediate: true,
     },

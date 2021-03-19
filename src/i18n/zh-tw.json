@@ -106,6 +106,12 @@
 	"ttl_end": "結束",
 	"ttl_range": "長度",
 	"opt_video": "第{n}部影片",
+	"msg_first_guide": "比賽剛開始，你要",
+	"btn_to_batting": "記錄打擊",
+	"btn_to_pitching": "記錄投手",
+	"btn_to_edit_game": "編輯比賽資訊",
+	"btn_to_fill_order": "調整歐打",
+	"btn_to_fill_position": "調整守位",
 
 	"create_game": "新增比賽",
 	"edit_game": "修改比賽",
