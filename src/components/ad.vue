@@ -155,7 +155,7 @@ export default {
         edit_team_f: '8a80854b783404b001785a55cc5241c4',
         user: '8a80854b783404b001785a56bc8f41c5',
         user300x250: '8a80854b783404b001785a573baa41c7',
-        stats_item: 'stats_item_1',
+        stats_item: '8a80854b783404b001785a57d87e41c8',
         stats_item300x250: '8a80854b783404b001785a58345841c9',
         games: '8a80854b783404b001785a58ac5441e4',
         game: '8a80854b783404b001785a590b4841f0',
