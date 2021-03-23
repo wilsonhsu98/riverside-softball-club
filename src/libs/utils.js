@@ -481,7 +481,7 @@ const formatDate = dateVal => {
 const sumByInn = (scores = [], inn = scores.length) =>
   scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
 
-const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
+const accCalc = (beforePitchers = [], pitchers = [], currentIndex, inn = 7) => {
   const name = pitchers[currentIndex].name;
   const { OUT, R, H, SO, BB, S, B } = [
     ...beforePitchers.filter(bp => bp.name === name),
@@ -502,12 +502,12 @@ const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
     { OUT: 0, R: 0, H: 0, SO: 0, BB: 0, S: 0, B: 0 },
   );
   return {
-    ERA: OUT === 0 ? (R === 0 ? '-' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2),
+    ERA: OUT === 0 ? (R === 0 ? '-' : '∞') : ((R * inn) / (OUT / 3)).toFixed(2),
     WHIP: OUT === 0 ? '-' : ((H + BB) / (OUT / 3)).toFixed(2),
     PIP: OUT === 0 ? '-' : ((S + B) / (OUT / 3)).toFixed(2),
-    K7: OUT === 0 ? '-' : ((SO * 7) / (OUT / 3)).toFixed(2),
-    BB7: OUT === 0 ? '-' : ((BB * 7) / (OUT / 3)).toFixed(2),
-    H7: OUT === 0 ? '-' : ((H * 7) / (OUT / 3)).toFixed(2),
+    K7: OUT === 0 ? '-' : ((SO * inn) / (OUT / 3)).toFixed(2),
+    BB7: OUT === 0 ? '-' : ((BB * inn) / (OUT / 3)).toFixed(2),
+    H7: OUT === 0 ? '-' : ((H * inn) / (OUT / 3)).toFixed(2),
   };
 };
 

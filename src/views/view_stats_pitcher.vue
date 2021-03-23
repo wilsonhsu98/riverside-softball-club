@@ -151,11 +151,20 @@
                 @click="setSortBy_(col.name)"
               >
                 <div>
-                  {{
-                    ['SO', 'R'].includes(col.name)
-                      ? $t(`${col.name}_P`)
-                      : $t(col.name)
-                  }}
+                  <template v-if="['SO', 'R'].includes(col.name)">
+                    {{ $t(`${col.name}_P`) }}
+                  </template>
+                  <template
+                    v-else-if="
+                      ['K7', 'BB7', 'H7'].includes(col.name) &&
+                        teamInfo.teamType === 'baseball'
+                    "
+                  >
+                    {{ $t(`${col.name}_9`) }}
+                  </template>
+                  <template v-else>
+                    {{ $t(col.name) }}
+                  </template>
                 </div>
               </div>
             </template>
@@ -732,6 +741,7 @@ export default {
       'lastUpdate',
       'userId',
       'currentTeamIcon',
+      'teamInfo',
     ]),
     ...mapGetters({
       list: 'genPitcherStatistics',
@@ -768,6 +778,7 @@ export default {
                   },
                 ],
                 0,
+                this.teamInfo.pitcherInn,
               );
               return {
                 ...sum,

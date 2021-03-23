@@ -825,6 +825,7 @@ export default {
             '1B': { x: 75, y: 76.5 },
             P: { x: 50, y: 76.5 },
             C: { x: 50, y: 95 },
+            DH: { x: 85, y: 95 },
           };
           Object.keys(this.positions_).forEach(key => {
             ctx.fillStyle = '#fff';

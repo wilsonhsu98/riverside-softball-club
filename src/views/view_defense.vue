@@ -780,7 +780,12 @@ export default {
         (acc, v = 0) => acc + (parseInt(v) || 0),
         0,
       );
-      const { ERA, WHIP } = accCalc(this.beforePitchers, this.pitchers, pIndex);
+      const { ERA, WHIP } = accCalc(
+        this.beforePitchers,
+        this.pitchers,
+        pIndex,
+        this.teamInfo.pitcherInn,
+      );
       const count = {
         IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
         OUT,

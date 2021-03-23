@@ -46,7 +46,8 @@
   z-index: 0;
   cursor: pointer;
   width: 26px;
-  height: 26px;
+  height: 30px;
+  box-sizing: border-box;
   display: inline-block;
   border: 2px solid black;
   vertical-align: top;

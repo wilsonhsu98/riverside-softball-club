@@ -52,7 +52,11 @@
             fixedSize="400"
             :style="{ left: `${shiftLeft}px` }"
           >
-            <div class="players starting-players" ref="coordination">
+            <div
+              class="players starting-players"
+              :class="{ baseball: teamInfo.teamType === 'baseball' }"
+              ref="coordination"
+            >
               <div
                 v-for="order in ORDER"
                 :key="`order_${order}_${sourceList.length}`"
@@ -68,6 +72,7 @@
                   <i class="slash" />
                 </div>
                 <vue-draggable
+                  v-if="teamInfo.teamType === 'baseball' ? order > 1 : true"
                   group="people"
                   handle=".handle"
                   class="order"
@@ -103,6 +108,23 @@
                     </span>
                   </div>
                 </vue-draggable>
+                <div v-else class="pitcher" @click="changePlayer">
+                  <div class="player" v-if="order_(1)[0]">
+                    <span class="name">
+                      <span class="avatar">
+                        <photo
+                          :photo="order_(1)[0].photo"
+                          :name="order_(1)[0].name"
+                          :number="order_(1)[0].number"
+                        />
+                      </span>
+                      <span class="number">{{
+                        order_(1)[0].number || '?'
+                      }}</span>
+                      <span>{{ order_(1)[0].name }}</span>
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
           </coordination>
@@ -115,6 +137,15 @@
         </button>
       </div>
     </div>
+
+    <player-modal
+      :current="currentPlayer"
+      :current_label="$t('ttl_current_player')"
+      :fourth="possiblePlayers"
+      :fourth_label="$t('ttl_all_players')"
+      @select="selectPlayer"
+      @clear="clearPlayer"
+    ></player-modal>
   </div>
 </template>
 
@@ -285,6 +316,51 @@
         top: 30%;
       }
     }
+    &.baseball {
+      .order-wrapper {
+        &[data-order='1'] {
+          cursor: pointer;
+          border-color: $current_user_bgcolor;
+          border-style: solid !important;
+          .placeholder {
+            &:before,
+            &:after {
+              color: $current_user_bgcolor;
+            }
+            > .slash {
+              border-color: $current_user_bgcolor;
+              border-right-style: solid !important;
+            }
+          }
+        }
+        &[data-order='10'] {
+          left: unset;
+          right: 5%;
+          top: calc(86.5% - 20px);
+          .placeholder {
+            &:before {
+              content: none;
+            }
+            > .slash {
+              display: none;
+            }
+            &:after {
+              width: 100%;
+            }
+          }
+        }
+        .pitcher {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+    }
   }
   .player {
     display: inline-block;
@@ -387,6 +463,8 @@ export default {
       clickTimer: null,
       shiftLeft: 0,
       POSITION,
+      currentPlayer: undefined,
+      possiblePlayers: [],
     };
   },
   created() {
@@ -424,17 +502,35 @@ export default {
         return acc;
       }, {});
 
-      const errorStr = [
-        {
-          // if fill the field, only free can be empty
-          condition:
-            Object.keys(result).length > 0 &&
-            !this.POSITION.filter(key => !['', 'FREE'].includes(key)).every(
-              key => result[key],
-            ),
-          err: this.$t('msg_sould_fill_position'),
-        },
-      ]
+      const errorStr = (this.teamInfo.teamType === 'baseball'
+        ? [
+            {
+              // if fill the field, only free can be empty
+              condition:
+                Object.keys(result).length > 0 &&
+                !this.POSITION.filter(key => !['', 'FREE'].includes(key)).every(
+                  key => result[key],
+                ),
+              err: this.$t('msg_should_fill_position_baseball'),
+            },
+            {
+              condition:
+                Object.values(result).filter(v => v === result.P).length > 1,
+              err: this.$t('msg_pitcher_duplicate'),
+            },
+          ]
+        : [
+            {
+              // if fill the field, only free can be empty
+              condition:
+                Object.keys(result).length > 0 &&
+                !this.POSITION.filter(key => !['', 'FREE'].includes(key)).every(
+                  key => result[key],
+                ),
+              err: this.$t('msg_should_fill_position'),
+            },
+          ]
+      )
         .reduce((acc, check) => {
           return check.condition ? acc.concat(check.err) : acc;
         }, [])
@@ -564,9 +660,12 @@ export default {
         this.target_order = undefined;
         if (!order) {
           this.origin_order = undefined;
-          this.target_order = this.ORDER.find(
-            order => this[`order_${order}`].length === 0,
-          );
+          this.target_order =
+            this.teamInfo.teamType === 'baseball'
+              ? this.ORDER.find(
+                  order => order !== 1 && this[`order_${order}`].length === 0,
+                )
+              : this.ORDER.find(order => this[`order_${order}`].length === 0);
         }
         this.dragEnd();
       }
@@ -638,7 +737,13 @@ export default {
                 positions[position],
               );
             } else {
-              this[`order_${positionIndex}`] = [];
+              if (this.teamInfo.teamType === 'baseball' && position === 'P') {
+                this[`order_${positionIndex}`][0] = this.getPlayer(
+                  positions[position],
+                );
+              } else {
+                this[`order_${positionIndex}`] = [];
+              }
             }
           }
           if (index === self.length - 1) {
@@ -674,6 +779,19 @@ export default {
         this.shiftLeft = 0;
       }
     },
+    changePlayer() {
+      this.currentPlayer = this[`order_${1}`][0];
+      this.possiblePlayers = this.teamInfo.players;
+      this.$modal.show('player');
+    },
+    selectPlayer(player) {
+      this[`order_${1}`] = [player];
+      this.$modal.hide('player');
+    },
+    clearPlayer() {
+      this[`order_${1}`] = [];
+      this.$modal.hide('player');
+    },
   },
   computed: {
     ...mapGetters(['currentTeamIcon', 'teamInfo', 'box', 'boxSummary']),
@@ -682,6 +800,27 @@ export default {
     box: {
       handler() {
         this.initSetSource();
+      },
+      immediate: true,
+    },
+    teamInfo: {
+      handler() {
+        if (this.teamInfo.teamType === 'baseball') {
+          this.POSITION = [
+            '',
+            'P',
+            'C',
+            '1B',
+            '2B',
+            '3B',
+            'SS',
+            'LF',
+            'CF',
+            'RF',
+            'DH',
+          ];
+        }
+        // this.initSetSource();
       },
       immediate: true,
     },

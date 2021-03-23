@@ -64,6 +64,9 @@
 	"K7": "K/7",
 	"BB7": "BB/7",
 	"H7": "H/7",
+	"K7_9": "K/9",
+	"BB7_9": "BB/9",
+	"H7_9": "H/9",
 	"FO": "飛球",
 	"GO": "滾地",
 	"E": "失誤",
@@ -172,7 +175,9 @@
 
 	"fill_position": "排守位",
 	"btn_start_game": "開始比賽",
-	"msg_sould_fill_position": "一旦排了守位，僅允許不排10洞",
+	"msg_should_fill_position": "一旦排了守位，僅允許不排10洞",
+	"msg_should_fill_position_baseball": "一旦排了守位，僅允許不排DH",
+	"msg_pitcher_duplicate": "投手位置重覆了",
 
 	"add_pa": "新增打席",
 	"edit_pa": "編輯打席",

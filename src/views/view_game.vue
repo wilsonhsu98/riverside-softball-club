@@ -845,18 +845,9 @@
           class="btn"
           >{{ $t('btn_to_edit_game') }}
         </router-link>
-        <router-link
-          :to="{
-            name: 'game_order',
-            params: {
-              team: $route.params.team,
-              game: $route.params.game,
-            },
-          }"
-          tag="button"
-          class="btn"
-          >{{ $t('btn_to_fill_order') }}
-        </router-link>
+        <button class="btn" @click="editOrder">
+          {{ $t('btn_to_fill_order') }}
+        </button>
         <router-link
           :to="{
             name: 'game_position',

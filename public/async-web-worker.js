@@ -12,7 +12,7 @@ const formatColor = content => {
 };
 const sumByInn = (scores = [], inn = scores.length) =>
   scores.slice(0, inn).reduce((acc, v) => acc + (parseInt(v) || 0), 0);
-const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
+const accCalc = (beforePitchers = [], pitchers = [], currentIndex, inn = 7) => {
   const name = pitchers[currentIndex].name;
   const { OUT, R, H, SO, BB, S, B } = [
     ...beforePitchers.filter(bp => bp.name === name),
@@ -33,12 +33,12 @@ const accCalc = (beforePitchers = [], pitchers = [], currentIndex) => {
     { OUT: 0, R: 0, H: 0, SO: 0, BB: 0, S: 0, B: 0 },
   );
   return {
-    ERA: OUT === 0 ? (R === 0 ? '-' : '∞') : ((R * 7) / (OUT / 3)).toFixed(2),
+    ERA: OUT === 0 ? (R === 0 ? '-' : '∞') : ((R * inn) / (OUT / 3)).toFixed(2),
     WHIP: OUT === 0 ? '-' : ((H + BB) / (OUT / 3)).toFixed(2),
     PIP: OUT === 0 ? '-' : ((S + B) / (OUT / 3)).toFixed(2),
-    K7: OUT === 0 ? '-' : ((SO * 7) / (OUT / 3)).toFixed(2),
-    BB7: OUT === 0 ? '-' : ((BB * 7) / (OUT / 3)).toFixed(2),
-    H7: OUT === 0 ? '-' : ((H * 7) / (OUT / 3)).toFixed(2),
+    K7: OUT === 0 ? '-' : ((SO * inn) / (OUT / 3)).toFixed(2),
+    BB7: OUT === 0 ? '-' : ((BB * inn) / (OUT / 3)).toFixed(2),
+    H7: OUT === 0 ? '-' : ((H * inn) / (OUT / 3)).toFixed(2),
   };
 };
 
@@ -362,7 +362,12 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
   });
 };
 
-const genPitcherStatistics = (players, games, filterGames = []) => {
+const genPitcherStatistics = (
+  players,
+  games,
+  filterGames = [],
+  pitcherInn = 7,
+) => {
   const games_ = games.filter(g => filterGames.includes(g.game));
   const alltime = games_.filter(
     g => g.pitcher || (Array.isArray(g.pitchers) && g.pitchers.length),
@@ -421,6 +426,7 @@ const genPitcherStatistics = (players, games, filterGames = []) => {
         },
       ],
       0,
+      pitcherInn,
     );
     return {
       name,
@@ -930,26 +936,27 @@ const execGenPitcherStatistics = state => {
     (state.period.find(item => item.select).games || []).filter(
       g => !(state.excludedGames || []).includes(g),
     ),
+    state.pitcherInn,
   ).sort((a, b) => {
     if (b[state.sortBy] === '-' && a[state.sortBy] !== '-') {
       return -1;
     }
-    if (['ERAA'].includes(state.sortBy)) {
-      return b[state.sortBy] === a[state.sortBy]
-        ? b['IP'] - a['IP']
-        : b[state.sortBy] - a[state.sortBy];
-    } else if (['ERA', 'WHIP', 'BB7', 'H7'].includes(state.sortBy)) {
+    if (b[state.sortBy] === 0 && a[state.sortBy] === 0) {
+      return b['IP'] - a['IP'];
+    }
+    if (
+      ['L', 'ERA', 'WHIP', 'PIP', 'H', 'R', 'BB', 'BB7', 'H7'].includes(
+        state.sortBy,
+      )
+    ) {
+      // small to large
       return b[state.sortBy] === a[state.sortBy]
         ? b['IP'] - a['IP']
         : a[state.sortBy] - b[state.sortBy];
     } else {
-      if (b[state.sortBy] === 0 && a[state.sortBy] === 0) {
-        return b['IP'] - a['IP'];
-      } else {
-        return b[state.sortBy] === a[state.sortBy]
-          ? a['IP'] - b['IP']
-          : b[state.sortBy] - a[state.sortBy];
-      }
+      return b[state.sortBy] === a[state.sortBy]
+        ? a['IP'] - b['IP']
+        : b[state.sortBy] - a[state.sortBy];
     }
   });
 };
@@ -997,6 +1004,7 @@ const execItemStats = state => {
           },
         ],
         0,
+        state.pitcherInn,
       );
       return {
         ...acc,

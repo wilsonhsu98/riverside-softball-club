@@ -1355,29 +1355,35 @@ export default {
           });
           this.sourceList = this.resetSource();
         }
+        if (this.teamInfo.teamType === 'baseball') {
+          this.orderCount = 9;
+        }
       },
       immediate: true,
     },
     sortBy() {
       this.sortBy_ = this.sortBy;
     },
-    orderCount(next, prev) {
-      const ORDER = [...Array(this.orderCount).keys()].map(
-        (undefined, i) => i + 1,
-      );
-      ORDER.forEach(number => {
-        this[`order_${number}`] =
-          Array.isArray(this[`order_${number}`]) &&
-          this[`order_${number}`].length
-            ? this[`order_${number}`]
-            : [];
-      });
-      if (next < prev) {
-        this[`order_${prev}`] = [];
-      }
-      this.highlight = [];
-      this.ORDER = ORDER;
-      this.doResetSource();
+    orderCount: {
+      handler(next, prev) {
+        const ORDER = [...Array(this.orderCount).keys()].map(
+          (undefined, i) => i + 1,
+        );
+        ORDER.forEach(number => {
+          this[`order_${number}`] =
+            Array.isArray(this[`order_${number}`]) &&
+            this[`order_${number}`].length
+              ? this[`order_${number}`]
+              : [];
+        });
+        if (next < prev) {
+          this[`order_${prev}`] = [];
+        }
+        this.highlight = [];
+        this.ORDER = ORDER;
+        this.doResetSource();
+      },
+      immediate: true,
     },
   },
 };

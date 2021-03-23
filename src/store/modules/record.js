@@ -3,6 +3,7 @@ import {
   // getters as rootGetters,
   state as rootState,
 } from '../root';
+import { state as teamState, getters as teamGetters } from './team';
 import utils, { sumByInn, accCalc } from '../../libs/utils';
 import workerCreater from '../../web-worker';
 
@@ -240,7 +241,12 @@ const getters = {
         Array.isArray(boxSummary.pitchers) && boxSummary.pitchers.length
           ? boxSummary.pitchers.map((p, i, self) => {
               const OUT = sumByInn(p.OUT);
-              const { ERA, WHIP } = accCalc(beforePitchers, self, i);
+              const { ERA, WHIP } = accCalc(
+                beforePitchers,
+                self,
+                i,
+                teamGetters.teamInfo(teamState).pitcherInn,
+              );
               return {
                 IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
                 H: sumByInn(p.H),
@@ -558,6 +564,7 @@ const actions = {
         excludedGames: state.games
           .filter(g => !state.gameTypes.includes(g.gameType))
           .map(g => g.game),
+        pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
       },
       data => {
         commit(types.SET_PITCHER_GENSTATISTICS, data);
@@ -577,6 +584,7 @@ const actions = {
         excludedGames: state.games
           .filter(g => !state.gameTypes.includes(g.gameType))
           .map(g => g.game),
+        pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
       },
       data => {
         const { pitcherGameCount, ...others } = data;

@@ -96,6 +96,8 @@ const state = {
     benches: [{}],
     icon: '',
     unlockGames: [],
+    teamType: 'softball', // ['softball', 'baseball']
+    pitcherInn: 7, // [7, 9]
   },
   demoTeam: undefined,
   keyword: '',
@@ -1103,6 +1105,8 @@ const mutations = {
       players: [{}],
       benches: [{}],
       icon: '',
+      teamType: 'softball',
+      pitcherInn: 7,
     };
   },
   [types.FETCH_TEAM](state, data) {
@@ -1117,6 +1121,8 @@ const mutations = {
       benches: [...data.benches].sort((a, b) => a.number - b.number),
       icon: data.icon,
       unlockGames: [...(data.unlockGames || [])],
+      // teamType: data.teamType || 'baseball', // ['softball', 'baseball']
+      // pitcherInn: data.pitcherInn || 9, // [7, 9]
     };
   },
   [types.FETCH_DEMO_TEAM](state, data) {
@@ -1142,7 +1148,7 @@ const mutations = {
   },
 };
 
-export { types };
+export { types, state, getters };
 export default {
   state,
   getters,
