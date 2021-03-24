@@ -149,18 +149,18 @@ export default {
     };
     const prodKey = {
       keys: {
-        game_f: '8a80854b783404b001785a53c89941c1',
-        stats_pa_f: '8a80854b783404b001785a54633741c2',
-        stats_pitcher_f: '8a80854b783404b001785a554a6541c3',
-        edit_team_f: '8a80854b783404b001785a55cc5241c4',
-        user: '8a80854b783404b001785a56bc8f41c5',
-        user300x250: '8a80854b783404b001785a573baa41c7',
-        stats_item: '8a80854b783404b001785a57d87e41c8',
-        stats_item300x250: '8a80854b783404b001785a58345841c9',
-        games: '8a80854b783404b001785a58ac5441e4',
-        game: '8a80854b783404b001785a590b4841f0',
+        game_f: '8a80854b783404b0017863e7ac2a7fa3',
+        stats_pa_f: '8a80854b783404b0017863e80aea7fa4',
+        stats_pitcher_f: '8a80854b783404b0017863e86f8e7fa5',
+        edit_team_f: '8a80854b783404b0017863e8e0987fa6',
+        user: '8a80854b783404b0017863e954f57fa7',
+        user300x250: '8a80854b783404b0017863e9cddb7fa8',
+        stats_item: '8a80854b783404b0017863ea9cc57faa',
+        stats_item300x250: '8a80854b783404b0017863eb1d9a7fab',
+        games: '8a80854b783404b0017863ec147a7fac',
+        game: '8a80854b783404b0017863ec96e87fad',
       },
-      frequencyBannerKey: '8a80854b783404b001785a5996f0424e',
+      frequencyBannerKey: '8a80854b783404b0017863ed00dc7fae',
       debug: true,
     };
 
