@@ -67,6 +67,48 @@
         v-model="otherNames"
       />
 
+      <div class="field-wrapper">
+        <div class="two-column">
+          <div class="field-wrapper-item">
+            <span>{{ $t('ttl_team_type') }}</span>
+            <div>
+              <label>
+                <input type="radio" v-model="teamType" value="softball" />
+                <span>{{ $t('ttl_softball') }}</span>
+              </label>
+              <label>
+                <input type="radio" v-model="teamType" value="baseball" />
+                <span>{{ $t('ttl_baseball') }}</span>
+              </label>
+            </div>
+          </div>
+          <div class="field-wrapper-item">
+            <span>{{ $t('ttl_pitcher_inn') }}</span>
+            <div>
+              <label>
+                <input type="radio" v-model="pitcherInn" :value="7" />
+                <span>{{ $t('ttl_7_inn') }}</span>
+              </label>
+              <label>
+                <input type="radio" v-model="pitcherInn" :value="9" />
+                <span>{{ $t('ttl_9_inn') }}</span>
+              </label>
+            </div>
+          </div>
+          <i
+            v-if="container"
+            class="fa fa-info-circle team-type"
+            v-tooltip="{
+              content: `<ul><li>${$t('tip_team_type')
+                .split('|')
+                .join('</li><li>')}</li></ul>`,
+              classes: ['info'],
+              container: $refs.container,
+            }"
+          ></i>
+        </div>
+      </div>
+
       <custom-input
         type="textarea"
         rows="3"
@@ -401,6 +443,56 @@
     width: 100%;
     margin: 0 auto;
   }
+  .field-wrapper-item {
+    margin-top: 15px;
+    padding-left: 10px;
+    height: 40px;
+    line-height: 36px;
+    border-radius: 4px;
+    border: 2px solid $input_border;
+    box-sizing: border-box;
+    font-size: $input_font_size;
+    color: $input_font;
+    position: relative;
+    > span {
+      background-color: #fff;
+      font-size: $input_font_size - 2;
+      position: absolute;
+      top: -$input_font_size / 2;
+      left: 8px;
+      z-index: 1;
+      padding: 0 4px;
+      line-height: 14px;
+    }
+    > div {
+      overflow: hidden;
+      height: 36px;
+    }
+    label {
+      cursor: pointer;
+      color: black;
+      > span {
+        margin: 0 10px 0 3px;
+      }
+    }
+    @media (hover: hover) and (pointer: fine) {
+      &:hover {
+        border-color: #3b5998;
+      }
+    }
+    &:active {
+      border-color: #3b5998;
+    }
+  }
+  .two-column {
+    display: flex;
+    justify-content: space-between;
+    > div {
+      margin: 15px 0 0;
+      width: 100%;
+      max-width: calc(50% - 20px);
+    }
+  }
   .fa {
     font-size: 28px;
     cursor: pointer;
@@ -411,6 +503,13 @@
   .fa-times-circle {
     position: absolute;
     right: 5px;
+  }
+  .team-type {
+    display: inline-block;
+    height: 28px;
+    top: 15px;
+    position: relative;
+    color: $input_font;
   }
   .binded {
     width: 28px;
@@ -695,6 +794,8 @@ export default {
       teamCode_err: '',
       teamName: '',
       teamName_err: '',
+      teamType: 'softball',
+      pitcherInn: 7,
       teamIntro: '',
       otherNames: '',
       teamScore: undefined,
@@ -823,6 +924,8 @@ export default {
           this.editTeam({
             code: this.teamCode,
             name: this.teamName,
+            teamType: this.teamType,
+            pitcherInn: this.pitcherInn,
             subNames: this.otherNames,
             intro: this.teamIntro,
             players: this.players,
@@ -969,6 +1072,8 @@ export default {
         if (this.$route.params.team) {
           this.teamCode = this.teamInfo.teamCode;
           this.teamName = this.teamInfo.teamName;
+          this.teamType = this.teamInfo.teamType || 'softball';
+          this.pitcherInn = this.teamInfo.pitcherInn || 7;
           this.teamIntro = this.teamInfo.teamIntro;
           this.otherNames = this.teamInfo.otherNames;
           this.teamScore = this.teamInfo.score;

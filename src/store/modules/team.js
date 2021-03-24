@@ -297,6 +297,8 @@ const actions = {
             {
               name: data.name,
               subNames: data.subNames,
+              teamType: data.teamType,
+              pitcherInn: data.pitcherInn,
               intro: data.intro,
               icon: url,
               players,
@@ -1121,8 +1123,8 @@ const mutations = {
       benches: [...data.benches].sort((a, b) => a.number - b.number),
       icon: data.icon,
       unlockGames: [...(data.unlockGames || [])],
-      // teamType: data.teamType || 'baseball', // ['softball', 'baseball']
-      // pitcherInn: data.pitcherInn || 9, // [7, 9]
+      teamType: data.teamType || 'softball', // ['softball', 'baseball']
+      pitcherInn: data.pitcherInn || 7, // [7, 9]
     };
   },
   [types.FETCH_DEMO_TEAM](state, data) {

@@ -1071,7 +1071,7 @@ export default {
           this.inn = Math.max(
             opponentScores.length,
             1,
-            topBottom === 'bot' && scores.length < 7
+            topBottom === 'bot' && scores.length < this.teamInfo.pitcherInn
               ? scores.length + 1
               : scores.length,
           );

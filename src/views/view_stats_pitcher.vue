@@ -157,7 +157,7 @@
                   <template
                     v-else-if="
                       ['K7', 'BB7', 'H7'].includes(col.name) &&
-                        teamInfo.teamType === 'baseball'
+                        teamInfo.pitcherInn === 9
                     "
                   >
                     {{ $t(`${col.name}_9`) }}
