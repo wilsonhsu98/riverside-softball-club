@@ -118,8 +118,13 @@
                 })
               }}
             </div>
-            <div v-if="gwrbi && result === 'win'" class="tag">
-              {{ $t('box_gwrbi', { name: gwrbi }) }}
+            <div v-if="Array.isArray(gwrbi) && result === 'win'" class="tag">
+              {{
+                $t('box_gwrbi', {
+                  name: gwrbi[0],
+                  inn: `${gwrbi[1]}${getTopBottomSymbol(topBottom)}`,
+                })
+              }}
             </div>
             <div v-if="mvp && result === 'win'" class="tag">
               {{ $t('box_mvp', { name: mvp }) }}
@@ -2091,6 +2096,13 @@ export default {
         animation-delay: -${(Math.random() * (0 - 1) + 1).toFixed(2)}s;
         animation-duration: ${(Math.random() * (0 - 1) + 1).toFixed(2)}s;
       `;
+    },
+    getTopBottomSymbol(topBottom) {
+      const mapping = {
+        top: '▲',
+        bot: '▼',
+      };
+      return topBottom ? mapping[topBottom] : '?';
     },
   },
   computed: {

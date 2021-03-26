@@ -94,7 +94,7 @@
 	"box_recorder": "記錄: %{name}",
 	"box_pitcher_w": "勝投: %{name}",
 	"box_pitcher_l": "敗投: %{name}",
-	"box_gwrbi": "勝利打點: %{name}",
+	"box_gwrbi": "勝利打點: %{name} %{inn}",
 	"box_mvp": "MVP: %{name}",
 	"box_best_player": "優秀: %{name}",
 	"box_win": "贏了",

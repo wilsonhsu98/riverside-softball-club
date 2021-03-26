@@ -226,12 +226,24 @@
           </div>
           <div
             v-if="mode === 'edit' && version !== 'import' && result === 'win'"
-            class="field-wrapper field-wrapper-item"
-            :class="gwrbi ? '' : 'empty'"
-            @click="changePlayer('gwrbi')"
+            style="position: relative;"
           >
-            <span>{{ $t(`ttl_gwrbi`) }}</span>
-            <label v-if="gwrbi">{{ gwrbi }}</label>
+            <div
+              class="field-wrapper field-wrapper-item"
+              :class="gwrbi ? '' : 'empty'"
+              @click="changePlayer('gwrbi')"
+            >
+              <span>{{ $t(`ttl_gwrbi`) }}</span>
+              <label v-if="gwrbi">{{ gwrbi }}</label>
+            </div>
+            <div v-if="gwrbi" class="gwrbi-inn">
+              <minus-plus-number
+                :min="1"
+                :max="inn"
+                :value="gwrbiInn"
+                @change="setGwrbiInn"
+              />{{ $t('desc_inn') }}
+            </div>
           </div>
         </template>
 
@@ -737,6 +749,17 @@
       font-size: 28px;
     }
   }
+  .gwrbi-inn {
+    position: absolute;
+    right: 9px;
+    top: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    > div {
+      margin-right: 2px;
+    }
+  }
 }
 
 .image-modal {
@@ -819,6 +842,7 @@ export default {
       pitchers: [],
       mvp: '',
       gwrbi: '',
+      gwrbiInn: 1,
       coach: '',
       recorder: '',
       period: '',
@@ -923,6 +947,7 @@ export default {
             pitcher,
             mvp,
             gwrbi,
+            gwrbiInn,
             period,
             gameNote,
             youtubeVideos,
@@ -945,7 +970,7 @@ export default {
             opponentScores: opponentScores.slice(0, inn),
             pitcher: typeof pitcher === 'object' ? pitcher.code : pitcher,
             mvp,
-            gwrbi,
+            gwrbi: gwrbi ? [gwrbi, gwrbiInn] : undefined,
             period,
             gameNote,
             youtubeVideos,
@@ -1048,6 +1073,9 @@ export default {
         ) || { name, number: '' }
       );
     },
+    setGwrbiInn(val) {
+      this.gwrbiInn = val;
+    },
   },
   computed: {
     ...mapGetters([
@@ -1127,7 +1155,8 @@ export default {
             : pitcher;
           this.pitchers = pitchers;
           this.mvp = mvp;
-          this.gwrbi = gwrbi;
+          this.gwrbi = Array.isArray(gwrbi) ? gwrbi[0] : '';
+          this.gwrbiInn = Array.isArray(gwrbi) ? gwrbi[1] : 1;
           this.period = period;
           this.gameNote = gameNote;
           this.youtubeVideos = youtubeVideos;

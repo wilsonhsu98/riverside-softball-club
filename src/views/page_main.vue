@@ -422,7 +422,7 @@ export default {
         this.adMode = '';
       } else {
         window.adCount = (window.adCount || 0) + 1;
-        if (window.adCount % 5 === 0) {
+        if (window.adCount % 3 === 0) {
           // console.log('adCount:', window.adCount);
           this.showAd = new Date().getTime();
           this.adMode = 'bottom_banner';

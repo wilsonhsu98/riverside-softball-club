@@ -5,6 +5,7 @@
       type="number"
       pattern="\d*"
       :min="min_"
+      :max="max_"
       class="input"
       :disabled="disabled"
       @input="checkNumber"
@@ -95,19 +96,24 @@
 
 <script>
 export default {
-  props: ['value', 'disabled', 'min'],
+  props: ['value', 'disabled', 'min', 'max'],
   emits: ['change'],
   data() {
     return {
       val: this.value,
       min_: this.min === undefined ? 1 : this.min,
+      max_: this.max,
     };
   },
   methods: {
     plus() {
       if (!this.disabled) {
         if (typeof this.val === 'number') {
-          this.val += 1;
+          if (typeof this.max_ === 'number') {
+            this.val += this.val < this.max_ ? 1 : 0;
+          } else {
+            this.val += 1;
+          }
         } else {
           this.val = 1;
         }
