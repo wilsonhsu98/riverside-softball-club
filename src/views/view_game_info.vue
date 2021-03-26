@@ -224,6 +224,15 @@
             <span>{{ $t(`ttl_pitcher_${result}`) }}</span>
             <label v-if="pitcher">{{ pitcher }}</label>
           </div>
+          <div
+            v-if="mode === 'edit' && version !== 'import' && result === 'win'"
+            class="field-wrapper field-wrapper-item"
+            :class="gwrbi ? '' : 'empty'"
+            @click="changePlayer('gwrbi')"
+          >
+            <span>{{ $t(`ttl_gwrbi`) }}</span>
+            <label v-if="gwrbi">{{ gwrbi }}</label>
+          </div>
         </template>
 
         <div
@@ -809,6 +818,7 @@ export default {
       pitcher: '',
       pitchers: [],
       mvp: '',
+      gwrbi: '',
       coach: '',
       recorder: '',
       period: '',
@@ -912,6 +922,7 @@ export default {
             inn,
             pitcher,
             mvp,
+            gwrbi,
             period,
             gameNote,
             youtubeVideos,
@@ -934,6 +945,7 @@ export default {
             opponentScores: opponentScores.slice(0, inn),
             pitcher: typeof pitcher === 'object' ? pitcher.code : pitcher,
             mvp,
+            gwrbi,
             period,
             gameNote,
             youtubeVideos,
@@ -954,21 +966,29 @@ export default {
       });
     },
     changePlayer(mode) {
-      if (['coach', 'recorder', 'pitcher', 'mvp'].includes(mode)) {
+      if (['coach', 'recorder', 'pitcher', 'mvp', 'gwrbi'].includes(mode)) {
         this.currentPlayer = this[mode] ? this.getPlayer(this[mode]) : '';
       }
       this.$modal.show('player');
       this.changeMode = mode;
     },
     selectPlayer(player) {
-      if (['coach', 'recorder', 'pitcher', 'mvp'].includes(this.changeMode)) {
+      if (
+        ['coach', 'recorder', 'pitcher', 'mvp', 'gwrbi'].includes(
+          this.changeMode,
+        )
+      ) {
         this[this.changeMode] = player.name;
       }
       this.$modal.hide('player');
       this.changeMode = '';
     },
     clearPlayer() {
-      if (['coach', 'recorder', 'pitcher', 'mvp'].includes(this.changeMode)) {
+      if (
+        ['coach', 'recorder', 'pitcher', 'mvp', 'gwrbi'].includes(
+          this.changeMode,
+        )
+      ) {
         this[this.changeMode] = '';
       }
       this.$modal.hide('player');
@@ -1067,6 +1087,7 @@ export default {
             pitcher,
             pitchers,
             mvp,
+            gwrbi,
             period,
             gameNote,
             youtubeVideos,
@@ -1106,6 +1127,7 @@ export default {
             : pitcher;
           this.pitchers = pitchers;
           this.mvp = mvp;
+          this.gwrbi = gwrbi;
           this.period = period;
           this.gameNote = gameNote;
           this.youtubeVideos = youtubeVideos;

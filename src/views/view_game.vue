@@ -118,6 +118,9 @@
                 })
               }}
             </div>
+            <div v-if="gwrbi && result === 'win'" class="tag">
+              {{ $t('box_gwrbi', { name: gwrbi }) }}
+            </div>
             <div v-if="mvp && result === 'win'" class="tag">
               {{ $t('box_mvp', { name: mvp }) }}
             </div>
@@ -1744,6 +1747,7 @@ export default {
       recorder: '',
       pitcher: '',
       mvp: '',
+      gwrbi: '',
       result: '',
       tags: [],
       coordinate: undefined,
@@ -2125,6 +2129,7 @@ export default {
             pitcher,
             pitchers,
             mvp,
+            gwrbi,
             result,
             tags,
             youtubeVideos,
@@ -2168,6 +2173,7 @@ export default {
           }));
           this.opponentH = pitchers.reduce((acc, p) => acc + p.H, 0);
           this.mvp = mvp;
+          this.gwrbi = gwrbi;
           this.result = result;
           this.tags = tags || [];
           this.videoIDs = (youtubeVideos || '')
