@@ -75,7 +75,7 @@
       <div class="item-container">
         <board
           v-for="key in pitcherGameCount
-            ? ['AVG', 'H', 'HR', 'RBI']
+            ? ['AVG', 'H', 'HR', 'RBI', 'GWRBI']
             : ['AVG', 'H', 'HR', 'RBI', 'W']"
           :key="`block_${key}`"
           :cat="key"
@@ -87,7 +87,7 @@
       </div>
       <div class="item-container" v-if="pitcherGameCount">
         <board
-          v-for="key in ['W', 'SO', 'ERA', 'WHIP']"
+          v-for="key in ['W', 'SO', 'ERA', 'WHIP', 'MVP']"
           :key="`block_${key}`"
           :cat="key"
           :itemStats="itemStats"
@@ -191,7 +191,7 @@ i.fa {
         line-height: 36px;
         text-align: right;
         padding-right: 10px;
-        span {
+        span.clickable {
           cursor: pointer;
           text-decoration: underline;
         }
@@ -444,10 +444,12 @@ export default {
         'H',
         'HR',
         'RBI',
+        'GWRBI',
         'W',
         'SO',
         'ERA',
         'WHIP',
+        'MVP',
       ]),
     };
   },
@@ -520,7 +522,19 @@ export default {
       template: `
         <div class="item-container__table">
           <div class="header">
-            <span @click="goStats(cat)">{{ $t(cat === 'SO' ? 'SO_P': cat) }}</span>
+            <span
+              :class="{ clickable: [
+                'AVG',
+                'H',
+                'HR',
+                'RBI',
+                'W',
+                'SO',
+                'ERA',
+                'WHIP',
+              ].includes(cat)}"
+              @click="goStats(cat)"
+            >{{ $t(cat === 'SO' ? 'SO_P': cat) }}</span>
           </div>
           <template v-for="(item, index) in (itemStats[cat] || []).slice(0, 5)">
             <div v-if="index === 0" class="row" :key="index">

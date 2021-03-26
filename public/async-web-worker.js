@@ -1139,6 +1139,61 @@ const execItemStats = state => {
         data: (state.players.find(player => player.id === item.name) || {})
           .data,
       })),
+    GWRBI: state.games
+      .filter(
+        item =>
+          games.includes(item.game) &&
+          item.result === 'win' &&
+          Array.isArray(item.gwrbi) &&
+          item.gwrbi[0],
+      )
+      .map(item => item.gwrbi[0])
+      .reduce((acc, batter, undefined, self) => {
+        if (!acc.find(player => player.batter === batter)) {
+          return [
+            ...acc,
+            {
+              batter,
+              PA: (records.find(item => item.name === batter) || { PA: 0 }).PA,
+              GWRBI: self.filter(player => player === batter).length,
+            },
+          ];
+        }
+        return acc;
+      }, [])
+      .sort((a, b) =>
+        b['GWRBI'] === a['GWRBI'] ? a['PA'] - b['PA'] : b['GWRBI'] - a['GWRBI'],
+      )
+      .map(item => ({
+        name: item.batter,
+        GWRBI: item.GWRBI,
+        data: (state.players.find(player => player.id === item.batter) || {})
+          .data,
+      })),
+    MVP: state.games
+      .filter(item => games.includes(item.game) && item.mvp)
+      .map(item => item.mvp)
+      .reduce((acc, mvp, undefined, self) => {
+        if (!acc.find(player => player.mvp === mvp)) {
+          return [
+            ...acc,
+            {
+              mvp,
+              PA: (records.find(item => item.name === mvp) || { PA: 0 }).PA,
+              MVP: self.filter(player => player === mvp).length,
+            },
+          ];
+        }
+        return acc;
+      }, [])
+      .sort((a, b) =>
+        b['MVP'] === a['MVP'] ? a['PA'] - b['PA'] : b['MVP'] - a['MVP'],
+      )
+      .map(item => ({
+        name: item.mvp,
+        MVP: item.MVP,
+        data: (state.players.find(player => player.id === item.mvp) || {}).data,
+      })),
     pitcherGameCount: pitcherGames.length,
   };
 };
