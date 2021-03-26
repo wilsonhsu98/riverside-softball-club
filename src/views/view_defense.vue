@@ -224,9 +224,10 @@
             v-if="Array.isArray(pitchers) && pitchers.length"
             type="select"
             :options="
-              pitchers
-                .map(({ name }) => name)
-                .filter((n, i, self) => self.indexOf(n) === i)
+              pitchers.map(({ name }, i) => ({
+                code: [name, i + 1],
+                label: $t('opt_pitcher', { name, n: i + 1 }),
+              }))
             "
             :name="$t(`ttl_pitcher_${result}`)"
             :placeholder="$t(`ttl_pitcher_${result}`)"
@@ -837,6 +838,8 @@ export default {
             {},
           ),
         })),
+        pitcher:
+          typeof this.pitcher === 'object' ? this.pitcher.code : this.pitcher,
         opponentScores: opponentScores.slice(0, inn_),
       });
     },
@@ -879,7 +882,15 @@ export default {
           this.useTeam = useTeam;
           this.opponent = opponent;
           this.topBottom = topBottom;
-          this.pitcher = pitcher;
+          this.pitcher = Array.isArray(pitcher)
+            ? {
+                code: pitcher,
+                label: this.$t('opt_pitcher', {
+                  name: pitcher[0],
+                  n: pitcher[1],
+                }),
+              }
+            : pitcher;
           this.pitchers =
             Array.isArray(pitchers) && pitchers.length
               ? pitchers

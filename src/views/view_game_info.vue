@@ -205,7 +205,12 @@
           <custom-input
             v-if="Array.isArray(pitchers) && pitchers.length"
             type="select"
-            :options="pitchers.map(({ name }) => name)"
+            :options="
+              pitchers.map(({ name }, i) => ({
+                code: [name, i + 1],
+                label: $t('opt_pitcher', { name, n: i + 1 }),
+              }))
+            "
             :name="$t(`ttl_pitcher_${result}`)"
             :placeholder="$t(`ttl_pitcher_${result}`)"
             v-model="pitcher"
@@ -927,7 +932,7 @@ export default {
             tags,
             result,
             opponentScores: opponentScores.slice(0, inn),
-            pitcher,
+            pitcher: typeof pitcher === 'object' ? pitcher.code : pitcher,
             mvp,
             period,
             gameNote,
@@ -1090,7 +1095,15 @@ export default {
           this.coach = coach;
           this.recorder = recorder;
           this.tags = tags;
-          this.pitcher = pitcher;
+          this.pitcher = Array.isArray(pitcher)
+            ? {
+                code: pitcher,
+                label: this.$t('opt_pitcher', {
+                  name: pitcher[0],
+                  n: pitcher[1],
+                }),
+              }
+            : pitcher;
           this.pitchers = pitchers;
           this.mvp = mvp;
           this.period = period;

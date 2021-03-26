@@ -235,7 +235,14 @@ const actions = {
       });
   },
   editGameDefense({ commit }, data) {
-    const { teamCode, gameId, opponentScores, pitchers, redirect } = data;
+    const {
+      teamCode,
+      gameId,
+      opponentScores,
+      pitchers,
+      pitcher,
+      redirect,
+    } = data;
     commit(rootTypes.LOADING, true);
     const batch = db.batch();
     batch.set(
@@ -262,6 +269,7 @@ const actions = {
             };
           }, {}),
         })),
+        pitcher,
         timestamp,
       },
       { merge: true },

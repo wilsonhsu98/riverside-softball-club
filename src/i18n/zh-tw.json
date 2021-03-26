@@ -236,6 +236,7 @@
 	"desc_opponent_score": "對手分數",
 	"desc_inn_p_info": "第%{n}局 %{col}",
 	"desc_auto_calc": "好壞球,出局,分數連動",
+	"opt_pitcher": "%{name} 第%{n}任",
 
 	"create_team": "新增球隊",
 	"manage_team": "管理球隊",

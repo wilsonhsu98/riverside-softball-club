@@ -507,7 +507,7 @@
   .team-type {
     display: inline-block;
     height: 28px;
-    top: 15px;
+    top: 20px;
     position: relative;
     color: $input_font;
   }
@@ -570,7 +570,7 @@
     width: 100%;
     position: sticky;
     top: 80px;
-    z-index: 2;
+    z-index: 99999;
     margin-top: 8px;
     .btn {
       width: calc(50% - 4px);

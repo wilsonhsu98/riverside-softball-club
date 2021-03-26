@@ -105,10 +105,18 @@
             <div v-if="gameType" class="tag">{{ gameType }}</div>
             <div v-if="place" class="tag">{{ place }}</div>
             <div v-if="pitcher && result === 'win'" class="tag">
-              {{ $t('box_pitcher_w', { name: pitcher }) }}
+              {{
+                $t('box_pitcher_w', {
+                  name: Array.isArray(pitcher) ? pitcher[0] : pitcher,
+                })
+              }}
             </div>
             <div v-if="pitcher && result === 'lose'" class="tag">
-              {{ $t('box_pitcher_l', { name: pitcher }) }}
+              {{
+                $t('box_pitcher_l', {
+                  name: Array.isArray(pitcher) ? pitcher[0] : pitcher,
+                })
+              }}
             </div>
             <div v-if="mvp && result === 'win'" class="tag">
               {{ $t('box_mvp', { name: mvp }) }}
@@ -276,6 +284,16 @@
                 v-if="
                   pitcher === item.name &&
                     pitchers.map(p => p.name).indexOf(pitcher) === i
+                "
+                :class="`result-icon ${result}`"
+              >
+                {{ (result && result.slice(0, 1)) || '?' }}
+              </span>
+              <span
+                v-if="
+                  Array.isArray(pitcher) &&
+                    pitcher[0] === item.name &&
+                    pitcher[1] === i + 1
                 "
                 :class="`result-icon ${result}`"
               >

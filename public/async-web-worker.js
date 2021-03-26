@@ -386,7 +386,7 @@ const genPitcherStatistics = (
       return {
         pitchers: [
           ...acc.pitchers,
-          g.pitcher,
+          Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher,
           ...(Array.isArray(g.pitchers) ? g.pitchers.map(p => p.name) : []),
         ].filter((n, i, self) => n && self.indexOf(n) === i),
         records: [
@@ -434,12 +434,22 @@ const genPitcherStatistics = (
       OUT,
       S,
       B,
-      W: alltime.filter(g => g.pitcher === name && g.result === 'win').length,
-      L: alltime.filter(g => g.pitcher === name && g.result === 'lose').length,
+      W: alltime.filter(
+        g =>
+          (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name &&
+          g.result === 'win',
+      ).length,
+      L: alltime.filter(
+        g =>
+          (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name &&
+          g.result === 'lose',
+      ).length,
       ERA,
       G:
         current.filter(g => g.pitchers.some(p => p.name === name)).length +
-        legacy.filter(g => g.pitcher === name).length,
+        legacy.filter(
+          g => (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name,
+        ).length,
       ...(OUT === 0
         ? {
             GS: '-',
@@ -1071,7 +1081,9 @@ const execItemStats = state => {
         item =>
           games.includes(item.game) && item.result === 'win' && item.pitcher,
       )
-      .map(item => item.pitcher)
+      .map(item =>
+        Array.isArray(item.pitcher) ? item.pitcher[0] : item.pitcher,
+      )
       .reduce((acc, pitcher, undefined, self) => {
         if (!acc.find(player => player.pitcher === pitcher)) {
           return [
