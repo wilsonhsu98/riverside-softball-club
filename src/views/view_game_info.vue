@@ -970,7 +970,7 @@ export default {
             opponentScores: opponentScores.slice(0, inn),
             pitcher: typeof pitcher === 'object' ? pitcher.code : pitcher,
             mvp,
-            gwrbi: gwrbi ? [gwrbi, gwrbiInn] : undefined,
+            ...(gwrbi ? { gwrbi: [gwrbi, gwrbiInn] } : undefined),
             period,
             gameNote,
             youtubeVideos,
