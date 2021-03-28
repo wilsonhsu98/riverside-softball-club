@@ -1103,8 +1103,11 @@ const execItemStats = state => {
       .map(item => ({
         name: item.pitcher,
         W: item.W,
-        data: (state.players.find(player => player.id === item.pitcher) || {})
-          .data,
+        data: (
+          state.players.find(player => player.id === item.pitcher) || {
+            data: {},
+          }
+        ).data,
       })),
     SO: pitchers
       .filter(item => item.SO > 0)
@@ -1114,8 +1117,9 @@ const execItemStats = state => {
       .map(item => ({
         name: item.name,
         SO: item.SO,
-        data: (state.players.find(player => player.id === item.name) || {})
-          .data,
+        data: (
+          state.players.find(player => player.id === item.name) || { data: {} }
+        ).data,
       })),
     ERA: pitchers
       .filter(item => !['', '∞'].includes(item.ERA) && item.OUT >= minimunOut)
@@ -1125,8 +1129,9 @@ const execItemStats = state => {
       .map(item => ({
         name: item.name,
         ERA: item.ERA,
-        data: (state.players.find(player => player.id === item.name) || {})
-          .data,
+        data: (
+          state.players.find(player => player.id === item.name) || { data: {} }
+        ).data,
       })),
     WHIP: pitchers
       .filter(item => item.WHIP !== '-' && item.OUT >= minimunOut)
@@ -1136,8 +1141,9 @@ const execItemStats = state => {
       .map(item => ({
         name: item.name,
         WHIP: item.WHIP,
-        data: (state.players.find(player => player.id === item.name) || {})
-          .data,
+        data: (
+          state.players.find(player => player.id === item.name) || { data: {} }
+        ).data,
       })),
     GWRBI: state.games
       .filter(
@@ -1167,8 +1173,11 @@ const execItemStats = state => {
       .map(item => ({
         name: item.batter,
         GWRBI: item.GWRBI,
-        data: (state.players.find(player => player.id === item.batter) || {})
-          .data,
+        data: (
+          state.players.find(player => player.id === item.batter) || {
+            data: {},
+          }
+        ).data,
       })),
     MVP: state.games
       .filter(item => games.includes(item.game) && item.mvp)
@@ -1192,7 +1201,9 @@ const execItemStats = state => {
       .map(item => ({
         name: item.mvp,
         MVP: item.MVP,
-        data: (state.players.find(player => player.id === item.mvp) || {}).data,
+        data: (
+          state.players.find(player => player.id === item.mvp) || { data: {} }
+        ).data,
       })),
     pitcherGameCount: pitcherGames.length,
   };
