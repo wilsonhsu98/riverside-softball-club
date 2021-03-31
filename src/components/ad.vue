@@ -166,7 +166,7 @@ export default {
 
     return {
       local: false,
-      show: true,
+      show: false,
       callbackMethod: `vponCallBackMethod${new Date().getTime()}`,
       configMode: 'production', // test1, test2, production
       config: {

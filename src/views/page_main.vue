@@ -377,7 +377,7 @@ export default {
     this.initFromLS();
   },
   mounted() {
-    this.shouldShowAd(this.$route);
+    // this.shouldShowAd(this.$route);
   },
   methods: {
     ...mapActions([
@@ -443,22 +443,6 @@ export default {
           head.appendChild(script);
         }
       });
-
-      // if (
-      //   ['games', 'game', 'stats_pa', 'stats_item', 'user'].includes(
-      //     currentRoute.name,
-      //   )
-      // ) {
-      //   this.showAd = new Date().getTime();
-      //   if (currentRoute.name === 'game') {
-      //     this.adMode = 'fullscreen';
-      //   } else {
-      //     this.adMode = 'banner';
-      //   }
-      // } else {
-      //   this.showAd = '';
-      //   this.adMode = '';
-      // }
     },
   },
   computed: {
@@ -489,7 +473,7 @@ export default {
         console.log('route2');
         this.listenTeamChange(this.currentTeam);
       }
-      this.shouldShowAd(to);
+      // this.shouldShowAd(to);
     },
     currentTeam: {
       handler() {
