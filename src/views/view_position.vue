@@ -453,6 +453,7 @@ export default {
     ];
     return {
       mode: this.$route.params.mode === 'edit' ? 'edit' : 'create',
+      fromRoute: '',
       sourceList: [],
       drag: false,
       dragBack: false,
@@ -472,12 +473,20 @@ export default {
       this.setGame(this.$route.params.game);
     }
     this.initSetSource();
+
+    const fromRoute = window.localStorage.getItem('from_route');
+    window.localStorage.removeItem('from_route');
+    if (fromRoute) {
+      this.fromRoute = fromRoute;
+    }
   },
   methods: {
     ...mapActions(['editGamePosition', 'setGame', 'alert']),
     back_() {
       const { team, game } = this.$route.params;
-      if (this.mode === 'edit') {
+      if (this.fromRoute) {
+        this.$router.push(this.fromRoute);
+      } else if (this.mode === 'edit') {
         this.$router.push(`/main/games/${team}/${game}/edit`);
       } else {
         const currentOrder = this.box.slice(1).map(player => player.name);

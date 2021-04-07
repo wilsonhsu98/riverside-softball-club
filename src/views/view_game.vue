@@ -550,7 +550,7 @@
           </div>
           <span class="summary">{{ item.summary }}</span>
         </div>
-        <div class="player-records sum" v-if="batterSumDesc">
+        <div class="player-records sum" v-if="batterSum.AB && batterSumDesc">
           <div>
             {{ $t('SUM') }}
             <i
@@ -921,18 +921,9 @@
         <button class="btn" @click="editOrder">
           {{ $t('btn_to_fill_order') }}
         </button>
-        <router-link
-          :to="{
-            name: 'game_position',
-            params: {
-              team: $route.params.team,
-              game: $route.params.game,
-            },
-          }"
-          tag="button"
-          class="btn"
-          >{{ $t('btn_to_fill_position') }}
-        </router-link>
+        <button class="btn" @click="editPosition">
+          {{ $t('btn_to_fill_position') }}
+        </button>
       </div>
     </div>
 
@@ -2017,6 +2008,16 @@ export default {
         },
       });
     },
+    editPosition() {
+      window.localStorage.setItem('from_route', this.$route.path);
+      this.$router.push({
+        name: 'game_position',
+        params: {
+          team: this.$route.params.team,
+          game: this.$route.params.game,
+        },
+      });
+    },
     toggleGameStatus_(value) {
       this.toggleGameStatus({
         teamCode: this.$route.params.team,
@@ -2375,8 +2376,8 @@ export default {
             }
             return sum;
           }, this.batterSum);
-        this.batterSumDesc = `${this.batterSum.AB}-${this.batterSum.H} (${
-          this.batterSum.AVG
+        this.batterSumDesc = `${this.batterSum.AVG} (${this.batterSum.AB}-${
+          this.batterSum.H
         })${this.batterSum.BB ? ` ${this.batterSum.BB}BB` : ''}${
           this.batterSum.HR ? ` ${this.batterSum.HR}HR` : ''
         }`;
