@@ -792,8 +792,8 @@ const displayGame = (players, records, errors = [], role) => {
         return [
           [...header, startOrder],
           ...arr.map(sub => {
-            const { ab, h } = sub.content.reduce(
-              ({ ab, h }, item) => ({
+            const { ab, h, BB, HR, locations } = sub.content.reduce(
+              ({ ab, h, BB, HR, locations }, item) => ({
                 ab:
                   ab +
                   ([
@@ -814,8 +814,24 @@ const displayGame = (players, records, errors = [], role) => {
                     : 0),
                 h:
                   h + (['1H', '2H', '3H', 'HR'].includes(item.content) ? 1 : 0),
+                BB: BB + (item.content === 'BB' ? 1 : 0),
+                HR: HR + (item.content === 'HR' ? 1 : 0),
+                locations:
+                  item.location && item.location.x
+                    ? [
+                        ...locations,
+                        {
+                          x: item.location.x,
+                          y: item.location.y,
+                          location: item.location.location,
+                          color: formatColor(item.content),
+                          borderColor:
+                            item.content === 'HR' ? 'white' : 'black',
+                        },
+                      ]
+                    : locations,
               }),
-              { ab: 0, h: 0 },
+              { ab: 0, h: 0, BB: 0, HR: 0, locations: [] },
             );
             const preBatter =
               self.find(
@@ -883,6 +899,12 @@ const displayGame = (players, records, errors = [], role) => {
               }, []),
               summary: `${ab}-${h}`,
               error: (errors.find(({ name }) => name === sub.name) || {}).count,
+              /* for group summary */
+              AB: ab,
+              H: h,
+              BB,
+              HR,
+              locations,
             };
           }),
         ];

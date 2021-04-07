@@ -327,6 +327,21 @@
             </div>
           </div>
         </div>
+        <div class="player-records sum" v-if="pitchers.length > 1">
+          <div>{{ $t('SUM') }}</div>
+          <div class="records">
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${colInesx}`"
+                v-for="(col, colInesx) in pitcherCol"
+              >
+                {{ pitcherSum[col] }}
+              </div>
+            </div>
+          </div>
+          <div></div>
+        </div>
       </div>
       <div class="sticky-display-btn" v-if="box.slice(1).length">
         <span
@@ -535,6 +550,22 @@
           </div>
           <span class="summary">{{ item.summary }}</span>
         </div>
+        <div class="player-records sum" v-if="batterSumDesc">
+          <div>
+            {{ $t('SUM') }}
+            <i
+              v-if="batterSum.locations"
+              class="fa fa-map-marker"
+              @click="groupCoordinates = batterSum.locations"
+            ></i>
+          </div>
+          <div class="records">
+            <div class="records-flex">
+              <span style="margin-left: 10px;">{{ batterSumDesc }}</span>
+            </div>
+          </div>
+          <div></div>
+        </div>
       </div>
       <div class="box-table normal" v-if="box.slice(1).length">
         <div class="player-records header">
@@ -732,6 +763,22 @@
           </div>
           <span class="summary">{{ item.summary }}</span>
         </div>
+        <div class="player-records sum" v-if="batterSumDesc">
+          <div>
+            {{ $t('SUM') }}
+            <i
+              v-if="batterSum.locations"
+              class="fa fa-map-marker"
+              @click="groupCoordinates = batterSum.locations"
+            ></i>
+          </div>
+          <div class="records">
+            <div class="records-flex">
+              <span style="margin-left: 10px;">{{ batterSumDesc }}</span>
+            </div>
+          </div>
+          <div></div>
+        </div>
       </div>
       <div class="button-container" v-if="stillCanEditOrder && editable">
         <span class="fa fa-pencil" @click="editOrder"></span>
@@ -888,6 +935,27 @@
         </router-link>
       </div>
     </div>
+
+    <div v-if="positions" class="image-modal" @click="closePositions">
+      <div>
+        <coordination
+          :no_track="true"
+          :positions="positions"
+          :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
+        />
+      </div>
+    </div>
+    <div
+      v-if="groupCoordinates.length > 0"
+      class="image-modal"
+      @click="closeGroupCoordinates"
+    >
+      <coordination
+        :no_track="true"
+        :values="groupCoordinates"
+        :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
+      />
+    </div>
   </div>
 </template>
 
@@ -1012,7 +1080,7 @@
       border-radius: 0;
       .player-records {
         &.header > div {
-          background-color: rgba(50, 122, 129, 0.9);
+          background-color: $header_bgcolor;
           color: #fff;
           position: sticky;
           top: 70px;
@@ -1230,6 +1298,34 @@
       padding-right: 20px;
       white-space: nowrap;
       width: 1px;
+    }
+    &.sum {
+      > div {
+        &:first-child {
+          text-align: right;
+        }
+        &:nth-child(2) {
+          font-weight: bold;
+        }
+      }
+
+      .fa {
+        width: 26px;
+        height: 26px;
+        line-height: 26px;
+        font-size: 18px;
+        box-sizing: border-box;
+        cursor: pointer;
+        text-align: center;
+        position: relative;
+        top: 5px;
+        vertical-align: top;
+        &.fa-map-marker {
+          color: white;
+          background-color: $current_user_bgcolor;
+          border-radius: 4px;
+        }
+      }
     }
   }
   .team-versus {
@@ -1791,6 +1887,10 @@ export default {
         //   ERA: 1.07,
         // },
       ],
+      pitcherSum: { OUT: 0, H: 0, R: 0, BB: 0, SO: 0 },
+      batterSum: { AB: 0, H: 0, BB: 0, HR: 0 },
+      batterSumDesc: '',
+      groupCoordinates: [],
     };
   },
   created() {
@@ -2104,6 +2204,11 @@ export default {
       };
       return topBottom ? mapping[topBottom] : '?';
     },
+    closeGroupCoordinates(e) {
+      if (e.currentTarget === e.target) {
+        this.groupCoordinates = [];
+      }
+    },
   },
   computed: {
     ...mapGetters([
@@ -2183,6 +2288,22 @@ export default {
             ...p,
             data: this.getPlayer(p.name),
           }));
+          this.pitcherSum = pitchers.reduce((acc, record, index, self) => {
+            const sum = Object.keys(acc).reduce(
+              (accObj, k) => ({
+                ...accObj,
+                [k]: acc[k] + (Number.isInteger(record[k]) ? record[k] : 0),
+              }),
+              {},
+            );
+            if (index === self.length - 1) {
+              return {
+                ...sum,
+                IP: `${Math.floor(sum.OUT / 3)}.${sum.OUT % 3}`,
+              };
+            }
+            return sum;
+          }, this.pitcherSum);
           this.opponentH = pitchers.reduce((acc, p) => acc + p.H, 0);
           this.mvp = mvp;
           this.gwrbi = gwrbi;
@@ -2225,6 +2346,41 @@ export default {
         ) {
           this.stillCanEditOrder = true;
         }
+
+        this.batterSum = this.box
+          .slice(1)
+          .reduce((acc, record, index, self) => {
+            const sum = Object.keys(acc).reduce(
+              (accObj, k) => ({
+                ...accObj,
+                [k]: acc[k] + (Number.isInteger(record[k]) ? record[k] : 0),
+              }),
+              {},
+            );
+            if (index === self.length - 1) {
+              return {
+                ...sum,
+                AVG: Math.round((sum.H / sum.AB) * 1000) / 1000,
+                locations: self
+                  .map(s => s.locations)
+                  .flat()
+                  .sort((a, b) => {
+                    if (a.borderColor === 'white' && b.borderColor !== 'white')
+                      return 1;
+                    if (a.borderColor !== 'white' && b.borderColor === 'white')
+                      return -1;
+                    return 0;
+                  }),
+              };
+            }
+            return sum;
+          }, this.batterSum);
+        this.batterSumDesc = `${this.batterSum.AB}-${this.batterSum.H} (${
+          this.batterSum.AVG
+        })${this.batterSum.BB ? ` ${this.batterSum.BB}BB` : ''}${
+          this.batterSum.HR ? ` ${this.batterSum.HR}HR` : ''
+        }`;
+
         this.checkLastColumn();
         this.checkEditVideo();
         this.checkFirstGuide();

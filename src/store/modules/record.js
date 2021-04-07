@@ -250,6 +250,7 @@ const getters = {
                 teamGetters.teamInfo(teamState).pitcherInn,
               );
               return {
+                OUT,
                 IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
                 H: sumByInn(p.H),
                 R: sumByInn(p.R),

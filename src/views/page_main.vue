@@ -14,7 +14,7 @@
               active-class="active"
               :data-label="$t('menu_games')"
             >
-              <i class="fa fa-table"></i>
+              <i class="fa box"><box /></i>
             </router-link>
           </li>
           <li v-if="currentTeam">
@@ -308,6 +308,9 @@ header {
             margin-top: -2px;
             width: 34px;
           }
+          &.box > svg {
+            width: 26px;
+          }
         }
         &:after {
           content: attr(data-label);
@@ -331,6 +334,9 @@ header {
           &.carousel > svg {
             margin-top: 0;
             height: 40px;
+          }
+          &.box > svg {
+            margin-top: 5px;
           }
         }
       }
