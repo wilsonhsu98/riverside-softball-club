@@ -554,7 +554,7 @@
           <div>
             {{ $t('SUM') }}
             <i
-              v-if="batterSum.locations"
+              v-if="batterSum.locations.length"
               class="fa fa-map-marker"
               @click="groupCoordinates = batterSum.locations"
             ></i>
@@ -767,7 +767,7 @@
           <div>
             {{ $t('SUM') }}
             <i
-              v-if="batterSum.locations"
+              v-if="batterSum.locations.length"
               class="fa fa-map-marker"
               @click="groupCoordinates = batterSum.locations"
             ></i>
@@ -1383,6 +1383,7 @@
     display: flex;
     flex-wrap: wrap;
     text-align: left;
+    margin-left: -10px;
     .tag {
       white-space: nowrap;
       display: inline-block;
@@ -1391,7 +1392,7 @@
       box-sizing: border-box;
       color: #000;
       padding: 4px 8px;
-      margin: 10px 10px 0 0;
+      margin: 10px 0 0 10px;
       line-height: 20px;
     }
     .action {
@@ -1749,7 +1750,7 @@
       }
     }
     .tags {
-      margin: 0 10px;
+      margin: 0 10px 0 0;
       .tag {
         color: $row_color;
         border-color: $row_color;
@@ -2376,11 +2377,11 @@ export default {
             }
             return sum;
           }, this.batterSum);
-        this.batterSumDesc = `${this.batterSum.AVG} (${this.batterSum.AB}-${
-          this.batterSum.H
-        })${this.batterSum.BB ? ` ${this.batterSum.BB}BB` : ''}${
-          this.batterSum.HR ? ` ${this.batterSum.HR}HR` : ''
-        }`;
+        this.batterSumDesc = `${
+          this.batterSum.AVG ? this.batterSum.AVG.toFixed(3) : ''
+        } (${this.batterSum.AB}-${this.batterSum.H})${
+          this.batterSum.BB ? ` ${this.batterSum.BB}BB` : ''
+        }${this.batterSum.HR ? ` ${this.batterSum.HR}HR` : ''}`;
 
         this.checkLastColumn();
         this.checkEditVideo();
