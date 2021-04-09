@@ -935,16 +935,22 @@ export default {
             icon: this.icon,
             isNew: !this.$route.params.team,
             nextAction: () => {
-              const { score, scoreKVP } = evaluateTeamScore({
-                teamInfo: this.teamInfo,
-                games: this.games,
-                records: this.records,
-              });
-              this.editTeamScore({
-                teamCode: this.teamCode,
-                score,
-                scoreKVP,
-              });
+              if (!this.$route.params.team) {
+                this.editTeamScore({
+                  teamCode: this.teamCode,
+                });
+              } else {
+                const { score, scoreKVP } = evaluateTeamScore({
+                  teamInfo: this.teamInfo,
+                  games: this.games,
+                  records: this.records,
+                });
+                this.editTeamScore({
+                  teamCode: this.teamCode,
+                  score,
+                  scoreKVP,
+                });
+              }
             },
           });
         } else {

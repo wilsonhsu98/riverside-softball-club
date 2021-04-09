@@ -1,0 +1,32 @@
+var connection = indexedDB.open('RiversideSoftballClub');
+var teamsToDump = ['c_games', 'cc_games', 's_games'];
+connection.onsuccess = e => {
+  const db = e.target.result;
+  const getGame = tableName => new Promise(resolve => {
+    try {
+    const objectStore = db.transaction(tableName).objectStore(tableName);
+    let games = [];
+    objectStore.openCursor().onsuccess = event => {
+      const cursor = event.target.result;
+      if (cursor) {
+        games = [...games, cursor.value];
+        cursor.continue();
+      } else {
+        resolve({ team: tableName, games });
+      }
+    };
+  }catch {
+    resolve();
+  }
+  })
+  Promise.all(teamsToDump.map(tableName => getGame(tableName))).then(res => {
+    const exportObj = res.filter(r => r);
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportObj));
+    var downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href",     dataStr);
+    downloadAnchorNode.setAttribute("download",  "dump.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  });
+}

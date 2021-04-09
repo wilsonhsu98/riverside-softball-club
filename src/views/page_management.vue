@@ -69,8 +69,17 @@
     <button @click="batchEvaluateTeamScore">
       Batch Evaluate Team Score
     </button>
+    <hr />
     <button @click="migrate" disabled>
       Migrate
+    </button>
+    <hr />
+    <input type="file" accept="application/JSON" @change="handleRollbackFile" />
+    <div>
+      <code>{{ parsingResult }}</code>
+    </div>
+    <button @click="handleRollback" :disabled="rollbackJSON === null">
+      Rollback
     </button>
     <loading v-if="loading"></loading>
     <div class="modal" v-if="alertMsg">
@@ -159,6 +168,8 @@ export default {
   data() {
     return {
       checkedTeams: [],
+      parsingResult: '',
+      rollbackJSON: null,
     };
   },
   created() {
@@ -172,6 +183,7 @@ export default {
       'deleteTeam',
       'editTeamScore',
       'migrate',
+      'rollback',
     ]),
     deleteUnuseTeams() {
       this.checkedTeams
@@ -209,6 +221,41 @@ export default {
         .then(() => {
           this.alert('完成');
         });
+    },
+    handleRollbackFile(event) {
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          this.rollbackJSON = JSON.parse(e.target.result);
+          this.parsingResult = JSON.stringify(
+            this.rollbackJSON.map(({ team, games }) => ({
+              team,
+              games: games.map(g => g.id),
+            })),
+          );
+        } catch (ex) {
+          this.rollbackJSON = null;
+          this.parsingResult = ex;
+        }
+      };
+      reader.readAsText(event.target.files[0]);
+    },
+    handleRollback() {
+      if (
+        Array.isArray(this.rollbackJSON) &&
+        this.rollbackJSON.length > 0 &&
+        this.rollbackJSON.every(
+          row =>
+            typeof row === 'object' &&
+            row.team &&
+            Array.isArray(row.games) &&
+            row.games.length,
+        )
+      ) {
+        this.rollback(this.rollbackJSON);
+      } else {
+        this.alert('格式不符');
+      }
     },
   },
   computed: {

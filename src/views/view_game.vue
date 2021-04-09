@@ -551,7 +551,7 @@
           <span class="summary">{{ item.summary }}</span>
         </div>
         <div class="player-records sum" v-if="batterSum.AB && batterSumDesc">
-          <div>
+          <div style="white-space: nowrap; padding-left: 5px;">
             {{ $t('SUM') }}
             <i
               v-if="batterSum.locations.length"

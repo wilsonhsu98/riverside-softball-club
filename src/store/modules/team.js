@@ -1061,11 +1061,12 @@ const actions = {
         const games = teams.map(teamCollection =>
           teamCollection.docs.map(doc => ({ ...doc.data(), doc })),
         );
-        const noGameTypes = games.flat().filter(g => g.gameType === '');
-        const paths = noGameTypes.reduce((acc, d) => {
+        const hasGwrbi = games.flat().filter(g => g.gwrbi);
+        const paths = hasGwrbi.reduce((acc, d) => {
           return [...acc, d.doc.ref.path];
         }, []);
-        // console.log(paths);
+        console.log(paths);
+        return;
 
         const batch = db.batch();
         paths.forEach(path => {
@@ -1087,9 +1088,58 @@ const actions = {
             { merge: true },
           );
         });
+        // return batch.commit();
+      })
+      .then(() => {
+        commit(rootTypes.LOADING, false);
+      });
+  },
+  rollback({ commit }, data) {
+    commit(rootTypes.LOADING, true);
+    Promise.all(
+      data.map(t =>
+        db
+          .collection('teams')
+          .doc(t.team.replace('_games', ''))
+          .get(),
+      ),
+    )
+      .then(teamDocs => {
+        const batch = db.batch();
+        teamDocs.forEach(teamDoc => {
+          if (teamDoc.exists) {
+            const games = data.find(d => d.team === `${teamDoc.id}_games`)
+              .games;
+            const teamCode = teamDoc.id;
+            games.forEach(game => {
+              const gameId = game.id;
+              batch.set(
+                db.doc(`teams/${teamCode}/games/${gameId}`),
+                {
+                  ...game,
+                  timestamp,
+                },
+                { merge: true },
+              );
+              batch.set(
+                db.doc(`teams/${teamCode}`),
+                {
+                  games: { [gameId]: timestamp },
+                  timestamp,
+                },
+                { merge: true },
+              );
+            });
+          }
+        });
         return batch.commit();
       })
       .then(() => {
+        rootActions.alert({ commit }, '完成');
+        commit(rootTypes.LOADING, false);
+      })
+      .catch(error => {
+        console.log('Error editing document:', error);
         commit(rootTypes.LOADING, false);
       });
   },
