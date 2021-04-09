@@ -8,28 +8,16 @@
       @save="edit_"
     />
     <div class="container" ref="container">
-      <h1>{{ $t('add_pa') }}</h1>
+      <h1>
+        <i class="instruction" @click="showInstruction = true"><help /></i>
+        {{ $t('add_pa') }}
+      </h1>
+      <div style="width: 100%;"></div>
       <div class="single-col">
         <div class="separater">
           <label>{{ $t('ttl_current_pa') }}</label>
         </div>
         <div :class="['current-desc', { show: base['home'].name }]">
-          <div class="tip-btn-container">
-            <button @click="highlight('inn')">
-              {{ $t('btn_change_inn') }}
-            </button>
-            <button
-              @click="highlight('runner')"
-              :disabled="
-                !['second', 'first', 'third'].some(b => !!base[b].name)
-              "
-            >
-              {{ $t('btn_change_runner') }}
-            </button>
-            <button @click="highlight('batter')">
-              {{ $t('btn_change_batter') }}
-            </button>
-          </div>
           <div class="summary">
             <div class="box">
               <div class="team">
@@ -444,6 +432,21 @@
         </button>
       </div>
     </div>
+
+    <div v-if="showInstruction" class="modal" @click="showInstruction = false">
+      <div class="normal">
+        <button class="btn" @click="highlight('inn')">
+          {{ $t('btn_change_inn') }}
+        </button>
+        <button class="btn" @click="highlight('runner')">
+          {{ $t('btn_change_runner') }}
+        </button>
+        <button class="btn" @click="highlight('batter')">
+          {{ $t('btn_change_batter') }}
+        </button>
+      </div>
+    </div>
+
     <div
       v-show="spotlight"
       class="spotlight"
@@ -467,7 +470,17 @@
   justify-content: space-evenly;
   align-content: flex-start;
   h1 {
+    max-width: $max_width;
     width: 100%;
+    margin: 0 auto;
+    position: relative;
+    .instruction {
+      width: 26px;
+      height: 26px;
+      position: absolute;
+      left: 0;
+      cursor: pointer;
+    }
   }
   .current-desc {
     width: 280px;
@@ -482,18 +495,6 @@
     visibility: hidden;
     &.show {
       visibility: visible;
-    }
-    .tip-btn-container {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-      button {
-        width: 32%;
-        padding: 5px 0;
-        margin: 0;
-        background-color: $header_bgcolor;
-        outline: none;
-      }
     }
     .summary {
       display: flex;
@@ -1000,6 +1001,21 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(2);
+    &.normal {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translateY(-50%) translateX(-50%);
+      display: flex;
+      flex-direction: column;
+    }
+    .btn {
+      width: 100%;
+      margin: 5px auto;
+      background-color: $header_bgcolor;
+      padding: 10px 15px;
+      outline: none;
+    }
   }
   .dialog {
     position: absolute;
@@ -1072,7 +1088,7 @@
       }
     }
   }
-  button {
+  button:not(.btn) {
     background-color: $header_bgcolor;
     padding: 10px;
     margin: 0;
@@ -1203,6 +1219,7 @@ export default {
       spotlight: undefined,
       spotlightIcon: undefined,
       spotlightTimer: undefined,
+      showInstruction: false,
     };
   },
   created() {
@@ -1907,6 +1924,7 @@ export default {
         this.spotlight = undefined;
         this.spotlightIcon = undefined;
       }, 3000);
+      this.showInstruction = false;
     },
   },
   watch: {
