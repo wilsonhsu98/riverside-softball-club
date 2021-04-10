@@ -11,6 +11,7 @@
           <li v-if="currentTeam">
             <router-link
               :to="{ name: 'games', params: { team: currentTeam } }"
+              exact
               active-class="active"
               :data-label="$t('menu_games')"
             >
