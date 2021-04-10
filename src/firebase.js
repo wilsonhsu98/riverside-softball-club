@@ -8,6 +8,7 @@ firebase.initializeApp(config.firebase);
 
 const db = firebase.firestore();
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+const f_timestamp = firebase.firestore.Timestamp;
 const fieldValue = firebase.firestore.FieldValue;
 db.settings({});
 
@@ -43,6 +44,7 @@ const messaging = (() => {
 export {
   db,
   timestamp,
+  f_timestamp,
   fieldValue,
   auth,
   providerMapping,

@@ -9,7 +9,7 @@ import {
 } from '../root';
 import { types as userTypes } from './user';
 import { actions as recordActions, types as recordTypes } from './record';
-import { db, auth, fieldValue, timestamp } from '../../firebase';
+import { db, auth, fieldValue, timestamp, f_timestamp } from '../../firebase';
 import router from '../../router';
 import { evaluateTeamScore, formatDate } from '../../libs/utils';
 import { openDB } from 'idb';
@@ -1113,19 +1113,22 @@ const actions = {
             const teamCode = teamDoc.id;
             games.forEach(game => {
               const gameId = game.id;
+              const timestamp_ = new f_timestamp(
+                game.timestamp.seconds,
+                game.timestamp.nanoseconds,
+              );
               batch.set(
                 db.doc(`teams/${teamCode}/games/${gameId}`),
                 {
                   ...game,
-                  timestamp,
+                  timestamp: timestamp_,
                 },
                 { merge: true },
               );
               batch.set(
                 db.doc(`teams/${teamCode}`),
                 {
-                  games: { [gameId]: timestamp },
-                  timestamp,
+                  games: { [gameId]: timestamp_ },
                 },
                 { merge: true },
               );
