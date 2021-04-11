@@ -1082,8 +1082,8 @@ export default {
           this.pitcherInn = this.teamInfo.pitcherInn || 7;
           this.teamIntro = this.teamInfo.teamIntro;
           this.otherNames = this.teamInfo.otherNames;
-          this.teamScore = this.teamInfo.score;
-          this.teamScoreKVP = this.teamInfo.scoreKVP;
+          this.teamScore = this.teamInfo.score || 0;
+          this.teamScoreKVP = this.teamInfo.scoreKVP || {};
 
           this.icon = this.teamInfo.icon;
           this.players = this.teamInfo.players.map(player => {

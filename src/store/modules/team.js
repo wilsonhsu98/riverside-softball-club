@@ -761,6 +761,7 @@ const actions = {
     batch
       .commit()
       .then(() => {
+        window.scrollTo(0, 0);
         commit(rootTypes.LOADING, false);
         // dispatch("fetchRequests", data.uid);
       })

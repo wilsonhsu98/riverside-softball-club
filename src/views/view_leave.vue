@@ -89,10 +89,11 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import defaultIcon from '../images/icon.png';
 
 export default {
   data() {
-    return {};
+    return { defaultIcon };
   },
   created() {},
   methods: {
