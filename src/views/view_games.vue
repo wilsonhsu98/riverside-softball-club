@@ -371,12 +371,16 @@
       </div>
       <div
         class="button-container"
-        v-if="role === 'manager' && Array.isArray(groupGames_)"
+        v-if="
+          role === 'manager' &&
+            Array.isArray(groupGames_) &&
+            $route.params.team === currentTeam
+        "
       >
         <router-link
           :to="{
             name: 'create_game_info',
-            params: { team: $route.params.team },
+            params: { team: currentTeam },
           }"
           tag="span"
           >＋</router-link
@@ -1145,6 +1149,7 @@ export default {
     ...mapGetters([
       'boxSummary',
       'groupGames',
+      'currentTeam',
       'currentTeamIcon',
       'role',
       'period',
