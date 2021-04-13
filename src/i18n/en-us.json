@@ -351,6 +351,7 @@
 	"btn_seldom": "不常用的功能",
 	"ttl_switch_team": "Current teams (tap to switch)",
 	"ttl_current_team": "Current team",
+	"msg_team_ellipsis": "還有%{n}個",
 	"required": "Required column",
 	"msg_required": "%{col}為必填欄位",
 	"msg_no_option": "Sorry, no matching options",

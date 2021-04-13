@@ -51,7 +51,7 @@
             <p class="team__name">{{ team.name }}</p>
             <p
               class="team__name"
-              v-for="(subName, i) in team.subNames.split(',')"
+              v-for="(subName, i) in ellipsisTeams(team.subNames.split(','))"
               :key="`${team.teamCode}_subname_${i}`"
             >
               {{ subName }}
@@ -604,6 +604,16 @@ export default {
         } else {
           this.alert(this.$t('msg_not_valid_invited_url'));
         }
+      }
+    },
+    ellipsisTeams(teams) {
+      const subTeams = teams.filter(team => team);
+      if (subTeams.length > 2) {
+        const find =
+          subTeams.find(t => t.includes(this.keyWord)) || subTeams[0];
+        return [find, this.$t('msg_team_ellipsis', { n: subTeams.length - 1 })];
+      } else {
+        return subTeams;
       }
     },
   },

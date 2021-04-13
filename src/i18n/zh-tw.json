@@ -351,6 +351,7 @@
 	"btn_seldom": "不常用的功能",
 	"ttl_switch_team": "目前球隊(可點選切換)",
 	"ttl_current_team": "目前球隊",
+	"msg_team_ellipsis": "還有%{n}個",
 	"required": "必填欄位",
 	"msg_required": "%{col}為必填欄位",
 	"msg_no_option": "目前尚無可選擇項目",
