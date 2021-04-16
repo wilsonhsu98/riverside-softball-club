@@ -1062,15 +1062,15 @@ const actions = {
         const games = teams.map(teamCollection =>
           teamCollection.docs.map(doc => ({ ...doc.data(), doc })),
         );
-        const hasGwrbi = games.flat().filter(g => g.gwrbi);
-        const paths = hasGwrbi.reduce((acc, d) => {
+        const hasErrors = games.flat().filter(g => Array.isArray(g.errors) && g.errors.length === 0);
+        const paths = hasErrors.reduce((acc, d) => {
           return [...acc, d.doc.ref.path];
         }, []);
         console.log(paths);
         return;
 
         const batch = db.batch();
-        paths.forEach(path => {
+        paths.slice(0, 100).forEach(path => {
           const [, teamCode, , gameId] = path.split('/');
           batch.set(
             db.doc(`teams/${teamCode}`),
@@ -1083,13 +1083,13 @@ const actions = {
           batch.set(
             db.doc(path),
             {
-              gameType: 'regular',
+              errors: fieldValue.delete(),
               timestamp,
             },
             { merge: true },
           );
         });
-        // return batch.commit();
+        return batch.commit();
       })
       .then(() => {
         commit(rootTypes.LOADING, false);

@@ -81,7 +81,7 @@ const actions = {
         batch.set(
           refNewGameDoc,
           {
-            ...(prevGameDoc ? prevGameDoc.data() : { errors: [] }),
+            ...(prevGameDoc ? prevGameDoc.data() : {}),
             useTeam,
             opponent,
             league,
