@@ -1002,7 +1002,7 @@ export default {
             pitcher,
             pitchersRaw: pitchers,
             beforePitchers,
-            errors,
+            errors = [],
           } = this.boxSummary;
           this.result = result;
           this.inn = Math.max(
