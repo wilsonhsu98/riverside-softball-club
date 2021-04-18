@@ -217,10 +217,15 @@ const getters = {
             if (item.onbase[3].result === 'run') acc += 1;
             return acc;
           }, 0),
-      e: (boxSummary.errors || []).reduce(
-        (result, item) => result + item.count,
-        0,
-      ),
+      e: Array.isArray(boxSummary.errors)
+        ? boxSummary.errors.some(e => e.hasOwnProperty('count'))
+          ? (boxSummary.errors || []).reduce(
+              (result, item) => result + item.count,
+              0,
+            )
+          : boxSummary.errors.length
+        : '',
+      opponentE: game.filter(item => ['E'].includes(item.content)).length,
       contents: game,
       opponentScores: boxSummary.opponentScores || [],
       scores: game.reduce((acc, item) => {

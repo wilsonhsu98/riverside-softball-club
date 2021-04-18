@@ -35,87 +35,108 @@
         </div>
 
         <div class="box">
-          <div class="team">
-            <div class="cell special">
-              <i
-                class="fa fa-minus-circle"
-                @click="inn = Math.max(0, inn - 1)"
-              ></i
-              ><i
-                class="fa fa-plus-circle"
-                style="margin-left: 5px;"
-                @click="inn += 1"
-              ></i>
-              <div>{{ useTeam }}</div>
-              <div>{{ opponent }}</div>
-            </div>
-            <div v-if="topBottom" class="cell">
-              {{ topBottom === 'top' ? useTeam : opponent }}
-            </div>
-            <div v-if="topBottom" class="cell">
-              {{ topBottom === 'bot' ? useTeam : opponent }}
-            </div>
-            <div v-else class="cell">
-              {{ opponent }}
-            </div>
-          </div>
-          <div class="gap"></div>
-          <div
-            v-for="(undefined, index) in Array.apply(null, Array(inn))"
-            :key="index"
-            class="inn"
-          >
-            <div>{{ index + 1 }}</div>
-            <template v-if="topBottom">
-              <div class="cell" v-if="topBottom === 'top'">
-                {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+          <div class="inner-wrapper">
+            <div class="team">
+              <div class="cell special">
+                <i
+                  class="fa fa-minus-circle"
+                  @click="inn = Math.max(0, inn - 1)"
+                ></i
+                ><i
+                  class="fa fa-plus-circle"
+                  style="margin-left: 5px;"
+                  @click="inn += 1"
+                ></i>
+                <div>{{ useTeam }}</div>
+                <div>{{ opponent }}</div>
               </div>
-              <div
-                v-else
-                class="input-score cell"
-                v-text="opponentScores[index]"
-                @click="
-                  setMinusPlus(
-                    index + 1,
-                    'desc_opponent_score',
-                    opponentScores[index],
-                    val => setOpponentScore(index, val),
-                  )
-                "
-              ></div>
-            </template>
-            <template v-if="topBottom">
-              <div v-if="topBottom === 'bot'" class="cell">
-                {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+              <div v-if="topBottom" class="cell">
+                {{ topBottom === 'top' ? useTeam : opponent }}
               </div>
-              <div
-                v-else
-                class="input-score cell"
-                v-text="opponentScores[index]"
-                @click="
-                  setMinusPlus(
-                    index + 1,
-                    'desc_opponent_score',
-                    opponentScores[index],
-                    val => setOpponentScore(index, val),
-                  )
-                "
-              ></div>
-            </template>
-            <template v-else>
-              <div
-                class="input-score cell"
-                v-text="opponentScores[index]"
-                @click="
-                  setMinusPlus(
-                    index + 1,
-                    'desc_opponent_score',
-                    opponentScores[index],
-                    val => setOpponentScore(index, val),
-                  )
-                "
-              ></div>
-            </template>
+              <div v-if="topBottom" class="cell">
+                {{ topBottom === 'bot' ? useTeam : opponent }}
+              </div>
+              <div v-else class="cell">
+                {{ opponent }}
+              </div>
+              <div class="hr"></div>
+              <div style="margin-top: 4px;" class="cell">{{ $t('E') }}</div>
+            </div>
+            <div class="gap"></div>
+            <div
+              v-for="(undefined, index) in Array.apply(null, Array(inn))"
+              :key="index"
+              class="inn"
+            >
+              <div>{{ index + 1 }}</div>
+              <template v-if="topBottom">
+                <div class="cell" v-if="topBottom === 'top'">
+                  {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+                </div>
+                <div
+                  v-else
+                  class="input-score cell"
+                  v-text="opponentScores[index]"
+                  @click="
+                    setMinusPlus(
+                      index + 1,
+                      'desc_opponent_score',
+                      opponentScores[index],
+                      val => setOpponentScore(index, val),
+                    )
+                  "
+                ></div>
+              </template>
+              <template v-if="topBottom">
+                <div v-if="topBottom === 'bot'" class="cell">
+                  {{ scores[index] !== undefined ? scores[index] : '&nbsp;' }}
+                </div>
+                <div
+                  v-else
+                  class="input-score cell"
+                  v-text="opponentScores[index]"
+                  @click="
+                    setMinusPlus(
+                      index + 1,
+                      'desc_opponent_score',
+                      opponentScores[index],
+                      val => setOpponentScore(index, val),
+                    )
+                  "
+                ></div>
+              </template>
+              <template v-else>
+                <div
+                  class="input-score cell"
+                  v-text="opponentScores[index]"
+                  @click="
+                    setMinusPlus(
+                      index + 1,
+                      'desc_opponent_score',
+                      opponentScores[index],
+                      val => setOpponentScore(index, val),
+                    )
+                  "
+                ></div>
+              </template>
+              <div></div>
+              <div class="input-error" @click="setError(index + 1)">
+                <div
+                  class="input-score cell"
+                  v-text="getErrorCount(index + 1)"
+                ></div>
+                <photo
+                  class="avatar"
+                  v-for="player in errors
+                    .filter(e => e.inn === index + 1)
+                    .sort((a, b) => a.index > b.index)"
+                  :key="player.name"
+                  :photo="getPlayer(player.name).photo"
+                  :name="player.name"
+                  :number="getPlayer(player.name).number"
+                />
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -129,63 +150,65 @@
           :class="{ summary: !pEditMode.includes(pIndex) }"
         >
           <template v-if="pEditMode.includes(pIndex)">
-            <div class="team">
-              <div class="cell special">
-                <div>
-                  <i
-                    class="fa fa-arrow-left"
-                    @click="pEditMode = pEditMode.filter(i => i !== pIndex)"
-                  ></i
-                  ><photo
-                    class="photo"
-                    :photo="getPlayer(pContent.name).photo"
-                    :name="pContent.name"
-                    :number="getPlayer(pContent.name).number"
-                  />
+            <div class="inner-wrapper">
+              <div class="team">
+                <div class="cell special">
+                  <div>
+                    <i
+                      class="fa fa-arrow-left"
+                      @click="pEditMode = pEditMode.filter(i => i !== pIndex)"
+                    ></i
+                    ><photo
+                      class="photo"
+                      :photo="getPlayer(pContent.name).photo"
+                      :name="pContent.name"
+                      :number="getPlayer(pContent.name).number"
+                    />
+                  </div>
+                  <div>
+                    <i class="fa fa-minus-circle"></i
+                    ><i class="fa fa-plus-circle" style="margin-left: 5px;"></i>
+                  </div>
+                  <div>{{ useTeam }}</div>
+                  <div>{{ opponent }}</div>
                 </div>
-                <div>
-                  <i class="fa fa-minus-circle"></i
-                  ><i class="fa fa-plus-circle" style="margin-left: 5px;"></i>
+                <div :key="col" v-for="col in pContentCol" class="cell">
+                  {{ $t(['H', 'R', 'SO'].includes(col) ? `${col}_P` : col) }}
                 </div>
-                <div>{{ useTeam }}</div>
-                <div>{{ opponent }}</div>
               </div>
-              <div :key="col" v-for="col in pContentCol" class="cell">
-                {{ $t(['H', 'R', 'SO'].includes(col) ? `${col}_P` : col) }}
-              </div>
-            </div>
-            <div class="gap"></div>
-            <div
-              v-for="(undefined, index) in Array.apply(null, Array(inn))"
-              :key="index"
-              class="inn"
-            >
-              <div>{{ index + 1 }}</div>
-              <template v-for="col in pContentCol">
-                <div
-                  :key="col"
-                  class="input-score cell"
-                  v-text="(pContent[col] || [])[index]"
-                  @click="
-                    () => {
-                      setMinusPlus(
-                        index + 1,
-                        col,
-                        (pContent[col] || [])[index],
-                        val => setPitchers(pIndex, col, index, val),
-                      );
-                      if (col === 'OUT') {
-                        setMinusPlus2(
+              <div class="gap"></div>
+              <div
+                v-for="(undefined, index) in Array.apply(null, Array(inn))"
+                :key="index"
+                class="inn"
+              >
+                <div>{{ index + 1 }}</div>
+                <template v-for="col in pContentCol">
+                  <div
+                    :key="col"
+                    class="input-score cell"
+                    v-text="(pContent[col] || [])[index]"
+                    @click="
+                      () => {
+                        setMinusPlus(
                           index + 1,
-                          'S',
-                          (pContent['S'] || [])[index],
-                          val => setPitchers(pIndex, 'S', index, val),
+                          col,
+                          (pContent[col] || [])[index],
+                          val => setPitchers(pIndex, col, index, val),
                         );
+                        if (col === 'OUT') {
+                          setMinusPlus2(
+                            index + 1,
+                            'S',
+                            (pContent['S'] || [])[index],
+                            val => setPitchers(pIndex, 'S', index, val),
+                          );
+                        }
                       }
-                    }
-                  "
-                ></div>
-              </template>
+                    "
+                  ></div>
+                </template>
+              </div>
             </div>
           </template>
           <template v-else>
@@ -271,6 +294,16 @@
       :fourth_label="$t('ttl_all_players')"
       @select="selectPlayer"
     ></player-modal>
+    <players-modal
+      :first="startedPlayers"
+      :first_label="$t('ttl_started_players')"
+      :current="currentErrors"
+      :current_label="errorLabel"
+      :second="benchPlayers"
+      :second_label="$t('ttl_other_players')"
+      @add="addError"
+      @delete="deleteError"
+    ></players-modal>
   </div>
 </template>
 
@@ -336,13 +369,22 @@
     box-sizing: border-box;
     font-size: 16px;
     color: #000;
-    display: flex;
     text-align: center;
-    padding: 4px 0 0 4px;
+    padding: 4px 4px 0 4px;
     position: relative;
+    .inner-wrapper {
+      display: flex;
+      overflow: hidden;
+    }
     .team {
       border: 2px solid transparent;
       text-align: left;
+      .hr {
+        position: relative;
+        left: -30px;
+        border-top: 2px solid #ced4da;
+        width: 1000%;
+      }
     }
     .inn {
       flex: 1 1 50px;
@@ -396,6 +438,32 @@
       &:empty {
         border: 2px solid $input_border;
         border-radius: 4px;
+      }
+    }
+    .input-error {
+      margin-top: 10px;
+      .avatar {
+        position: relative;
+        height: 17px;
+        width: 34px;
+        margin: auto;
+        &:last-child {
+          height: 34px;
+          margin-bottom: 4px;
+        }
+        &::v-deep {
+          .img {
+            border: 1px solid #fff;
+            width: 34px;
+            height: 34px;
+          }
+          .img-photo {
+            text-indent: -34px;
+            &:after {
+              line-height: 34px;
+            }
+          }
+        }
       }
     }
     &.summary {
@@ -582,6 +650,16 @@ export default {
         window.localStorage.getItem('auto_calc_p'),
       ),
       redirectInfo: undefined,
+      errors: [
+        // { index: 0, name: '徐偉鈞', inn: 2 },
+        // { index: 1, name: '陳育辰', inn: 1 },
+        // { index: 2, name: '洪偉哲', inn: 2 },
+      ],
+      currentErrorInn: undefined,
+      errorLabel: '',
+      startedPlayers: [],
+      benchPlayers: [],
+      currentErrors: [],
     };
   },
   created() {
@@ -813,7 +891,7 @@ export default {
       window.localStorage.setItem('auto_calc_p', this.autoCalc);
     },
     edit_() {
-      const { inn, opponentScores, pitchers } = this;
+      const { inn, opponentScores, pitchers, errors } = this;
       const inn_ =
         ([...Array(inn).keys()].reverse().find(i => {
           return (
@@ -841,11 +919,67 @@ export default {
         pitcher:
           typeof this.pitcher === 'object' ? this.pitcher.code : this.pitcher,
         opponentScores: opponentScores.slice(0, inn_),
+        errors: errors.filter(error => error.inn <= inn_),
       });
+    },
+    getOrders() {
+      return this.box
+        .slice(1)
+        .filter(record => !record.hasOwnProperty('altOrder'))
+        .map(({ name }) => this.getPlayer(name));
+    },
+    setError(inn) {
+      this.currentErrorInn = inn;
+      this.startedPlayers = this.getOrders();
+      const startedNames = this.startedPlayers.map(player => player.name);
+      this.benchPlayers = this.teamInfo.players.filter(
+        player => !startedNames.includes(player.name),
+      );
+      this.errorLabel = this.$t('ttl_inn_error_players', { n: inn });
+      this.$modal.show('players');
+    },
+    getErrorCount(inn) {
+      const count = this.errors.filter(e => e.inn === inn).length;
+      return count ? `${count}E` : '';
+    },
+    addError(player) {
+      this.errors = [
+        ...this.errors,
+        {
+          index: (this.errors.slice(-1)[0] || { index: -1 }).index + 1,
+          name: player.name,
+          inn: this.currentErrorInn,
+        },
+      ];
+    },
+    deleteError(player) {
+      this.errors = this.errors.filter(
+        ({ index, name, inn }) =>
+          !(
+            index === player.index &&
+            name === player.name &&
+            inn === this.currentErrorInn
+          ),
+      );
+    },
+    setCurrentErrors() {
+      this.currentErrors = this.errors
+        .filter(e => e.inn === this.currentErrorInn)
+        .sort((a, b) => a.index > b.index)
+        .map(({ name, index }) => ({
+          ...this.getPlayer(name),
+          index,
+        }));
     },
   },
   computed: {
-    ...mapGetters(['currentTeamIcon', 'currentTeam', 'boxSummary', 'teamInfo']),
+    ...mapGetters([
+      'currentTeam',
+      'currentTeamIcon',
+      'box',
+      'boxSummary',
+      'teamInfo',
+    ]),
   },
   beforeRouteEnter(undefined, from, next) {
     next(vm => {
@@ -868,6 +1002,7 @@ export default {
             pitcher,
             pitchersRaw: pitchers,
             beforePitchers,
+            errors,
           } = this.boxSummary;
           this.result = result;
           this.inn = Math.max(
@@ -876,6 +1011,7 @@ export default {
             topBottom === 'bot' && scores.length < this.teamInfo.pitcherInn
               ? scores.length + 1
               : scores.length,
+            ...errors.map(e => e.inn),
           );
           this.scores = scores;
           this.opponentScores = [...opponentScores];
@@ -898,9 +1034,16 @@ export default {
               ? [{ name: pitcher }]
               : [];
           this.beforePitchers = beforePitchers;
+          this.errors = errors;
         }
       },
       immediate: true,
+    },
+    errors() {
+      this.setCurrentErrors();
+    },
+    currentErrorInn() {
+      this.setCurrentErrors();
     },
   },
 };

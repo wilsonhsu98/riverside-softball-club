@@ -116,7 +116,7 @@
 	"opt_video": "第{n}部影片",
 	"msg_first_guide": "比賽剛開始，你要",
 	"btn_to_batting": "記錄打擊",
-	"btn_to_pitching": "記錄投手",
+	"btn_to_pitching": "記錄防守",
 	"btn_to_edit_game": "編輯比賽資訊",
 	"btn_to_fill_order": "調整歐打",
 	"btn_to_fill_position": "調整守位",
@@ -228,7 +228,7 @@
 	"btn_go_edit": "記錄分數",
 	"btn_go_defense": "分數&投手成績",
 
-	"btn_defense": "投手記錄",
+	"btn_defense": "防守記錄",
 	"ttl_defense": "防守資訊",
 	"ttl_pitcher": "投手",
 	"btn_add_pitcher": "新增投手",
@@ -243,6 +243,9 @@
 	"desc_inn_p_info": "第%{n}局 %{col}",
 	"desc_auto_calc": "好壞球,出局,分數連動",
 	"opt_pitcher": "%{name} 第%{n}任",
+	"ttl_started_players": "先發球員",
+	"ttl_inn_error_players": "第%{n}局 失誤球員",
+	"ttl_other_players": "其他球員",
 
 	"create_team": "Create a team",
 	"manage_team": "Manage your team",

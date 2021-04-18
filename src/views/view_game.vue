@@ -95,6 +95,18 @@
                 {{ hit }}
               </div>
             </div>
+            <div class="inn">
+              <div class="cell">E</div>
+              <div class="cell" v-if="topBottom === 'top'">
+                {{ error === '' ? '?' : error }}
+              </div>
+              <div class="cell">
+                {{ opponentError }}
+              </div>
+              <div class="cell" v-if="topBottom === 'bot'">
+                {{ error === '' ? '?' : error }}
+              </div>
+            </div>
           </div>
           <div class="tags">
             <div v-if="period" class="tag">{{ period }}</div>
@@ -559,6 +571,7 @@
               @click="groupCoordinates = batterSum.locations"
             ></i>
           </div>
+          <div v-if="boxSummary.e" class="error"></div>
           <div class="records">
             <div class="records-flex">
               <span style="margin-left: 10px;">{{ batterSumDesc }}</span>
@@ -772,6 +785,7 @@
               @click="groupCoordinates = batterSum.locations"
             ></i>
           </div>
+          <div v-if="boxSummary.e" class="error"></div>
           <div class="records">
             <div class="records-flex">
               <span style="margin-left: 10px;">{{ batterSumDesc }}</span>
@@ -1828,9 +1842,11 @@ export default {
       opponent: '',
       topBottom: '',
       score: 0,
+      hit: 0,
+      error: '',
       opponentScore: 0,
       opponentH: 0,
-      hit: 0,
+      opponentError: 0,
       period: '',
       league: '',
       group: '',
@@ -2253,6 +2269,8 @@ export default {
             tags,
             youtubeVideos,
             gameNote,
+            e,
+            opponentE,
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -2267,6 +2285,8 @@ export default {
             0,
           );
           this.hit = h;
+          this.error = e;
+          this.opponentError = opponentE;
           this.period = period;
           this.league = league;
           this.group = group;

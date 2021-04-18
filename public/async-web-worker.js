@@ -898,7 +898,9 @@ const displayGame = (players, records, errors = [], role) => {
                 }
               }, []),
               summary: `${ab}-${h}`,
-              error: (errors.find(({ name }) => name === sub.name) || {}).count,
+              error: errors.some(e => e.hasOwnProperty('count'))
+                ? (errors.find(({ name }) => name === sub.name) || {}).count
+                : errors.filter(({ name }) => name === sub.name).length,
               /* for group summary */
               AB: ab,
               H: h,

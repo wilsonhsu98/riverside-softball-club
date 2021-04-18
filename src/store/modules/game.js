@@ -243,6 +243,7 @@ const actions = {
       opponentScores,
       pitchers,
       pitcher,
+      errors,
       redirect,
     } = data;
     commit(rootTypes.LOADING, true);
@@ -272,6 +273,7 @@ const actions = {
           }, {}),
         })),
         pitcher,
+        errors,
         timestamp,
       },
       { merge: true },

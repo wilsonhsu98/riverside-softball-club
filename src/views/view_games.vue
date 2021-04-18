@@ -312,6 +312,18 @@
                           {{ hit }}
                         </div>
                       </div>
+                      <div class="inn">
+                        <div class="cell">E</div>
+                        <div class="cell" v-if="topBottom === 'top'">
+                          {{ error === '' ? '?' : error }}
+                        </div>
+                        <div class="cell">
+                          {{ opponentError }}
+                        </div>
+                        <div class="cell" v-if="topBottom === 'bot'">
+                          {{ error === '' ? '?' : error }}
+                        </div>
+                      </div>
                     </div>
                   </template>
                   <template v-else>
@@ -965,9 +977,11 @@ export default {
       opponent: '',
       topBottom: '',
       score: 0,
+      hit: 0,
+      error: '',
       opponentScore: 0,
       opponentH: 0,
-      hit: 0,
+      opponentError: 0,
       toggleSearch: false,
       defaultIcon,
       unlockGames: [],
@@ -1178,6 +1192,8 @@ export default {
             r,
             h,
             pitchers,
+            e,
+            opponentE,
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -1194,6 +1210,8 @@ export default {
           this.opponentH = pitchers.reduce((acc, p) => acc + p.H, 0);
           this.pitchers = pitchers;
           this.hit = h;
+          this.error = e;
+          this.opponentError = opponentE;
         }
       },
       immediate: true,
