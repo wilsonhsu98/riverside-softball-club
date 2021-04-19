@@ -127,10 +127,10 @@
                 ></div>
                 <photo
                   class="avatar"
-                  v-for="player in errors
+                  v-for="(player, index) in errors
                     .filter(e => e.inn === index + 1)
                     .sort((a, b) => a.index > b.index)"
-                  :key="player.name"
+                  :key="index"
                   :photo="getPlayer(player.name).photo"
                   :name="player.name"
                   :number="getPlayer(player.name).number"
