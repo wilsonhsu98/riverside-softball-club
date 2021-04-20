@@ -169,7 +169,7 @@ const actions = {
     batch
       .commit()
       .then(() => {
-        commit(rootTypes.LOADING, false);
+        // commit(rootTypes.LOADING, false);
       })
       .catch(error => {
         console.log('Error editing document:', error);
