@@ -144,6 +144,11 @@ const actions = {
             },
             { merge: true },
           );
+          batch.set(
+            db.doc(`teams/${team}`),
+            { games: { [item.table]: timestamp }, timestamp },
+            { merge: true },
+          );
         });
 
         return batch.commit();
@@ -168,54 +173,63 @@ const actions = {
       .then(res => {
         const teddySummary = res[0].data.find(item => item['場次'] === game);
         const parseResult = utils.parseGame(res[1].data);
-        return db
-          .collection('teams')
-          .doc(team)
-          .collection('games')
-          .doc(game)
-          .set(
-            {
-              version: 'import',
-              orders: parseResult.orders,
-              errors: parseResult.errors,
-              result: ['win', 'lose', 'tie', ''][
-                ['勝', '敗', '和', ''].indexOf(
-                  teddySummary ? teddySummary['結果'] : '',
-                )
-              ],
-              period: teddySummary
-                ? `${teddySummary['年度']}${teddySummary['季度']}`
-                : '',
-              gameType: teddySummary
-                ? teddySummary['季度'].indexOf('季後') > -1
-                  ? 'playoff'
-                  : 'regular'
-                : '',
-              opponent: teddySummary ? teddySummary['對手'] : '',
-              league: teddySummary ? teddySummary['聯盟'] : '',
-              coach: teddySummary ? teddySummary['教練'] : '',
-              place:
-                ['', '一', '二', '三'].indexOf(
-                  teddySummary ? teddySummary['休息區'] : '',
-                ) || '',
-              group: teddySummary ? teddySummary['組別'] : '',
-              useTeam: [
-                'TrendMicro',
-                'TrendMicro',
-                'TrendMicro',
-                '趨勢科技',
-                '趨勢科技',
-                '趨勢科技',
-                '',
-              ][
-                ['B', 'C', 'D', 'E', 'F', 'G', ''].indexOf(
-                  teddySummary ? teddySummary['組別'] : '',
-                )
-              ],
-              timestamp,
-            },
-            { merge: true },
-          );
+        const batch = db.batch();
+        batch.set(
+          db
+            .collection('teams')
+            .doc(team)
+            .collection('games')
+            .doc(game),
+          {
+            version: 'import',
+            orders: parseResult.orders,
+            errors: parseResult.errors,
+            result: ['win', 'lose', 'tie', ''][
+              ['勝', '敗', '和', ''].indexOf(
+                teddySummary ? teddySummary['結果'] : '',
+              )
+            ],
+            period: teddySummary
+              ? `${teddySummary['年度']}${teddySummary['季度']}`
+              : '',
+            gameType: teddySummary
+              ? teddySummary['季度'].indexOf('季後') > -1
+                ? 'playoff'
+                : 'regular'
+              : '',
+            opponent: teddySummary ? teddySummary['對手'] : '',
+            league: teddySummary ? teddySummary['聯盟'] : '',
+            coach: teddySummary ? teddySummary['教練'] : '',
+            place:
+              ['', '一', '二', '三'].indexOf(
+                teddySummary ? teddySummary['休息區'] : '',
+              ) || '',
+            group: teddySummary ? teddySummary['組別'] : '',
+            useTeam: [
+              'TrendMicro',
+              'TrendMicro',
+              'TrendMicro',
+              '趨勢科技',
+              '趨勢科技',
+              '趨勢科技',
+              '',
+            ][
+              ['B', 'C', 'D', 'E', 'F', 'G', ''].indexOf(
+                teddySummary ? teddySummary['組別'] : '',
+              )
+            ],
+            timestamp,
+          },
+          { merge: true },
+        );
+
+        batch.set(
+          db.doc(`teams/${team}`),
+          { games: { [game]: timestamp }, timestamp },
+          { merge: true },
+        );
+
+        return batch.commit();
       })
       .then(() => {
         commit(rootTypes.LOADING, false);

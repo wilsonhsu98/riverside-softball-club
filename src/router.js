@@ -212,7 +212,9 @@ router.beforeEach((to, from, next) => {
       ].includes(store.getters.userId)) ||
     (to.matched.some(route => route.meta.anonymous === false) &&
       store.getters.isAnonymous) ||
-    (to.params.team && to.params.team !== store.getters.currentTeam)
+    (to.params.team &&
+      store.getters.currentTeam &&
+      to.params.team !== store.getters.currentTeam)
   ) {
     next({ path: from.path });
   } else {

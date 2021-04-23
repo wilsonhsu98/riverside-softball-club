@@ -1062,14 +1062,12 @@ const actions = {
         const games = teams.map(teamCollection =>
           teamCollection.docs.map(doc => ({ ...doc.data(), doc })),
         );
-        const hasErrors = games
-          .flat()
-          .filter(g => Array.isArray(g.errors) && g.errors.length === 0);
+        const hasErrors = games.flat().filter(g => Array.isArray(g.errors));
         const paths = hasErrors.reduce((acc, d) => {
-          return [...acc, d.doc.ref.path];
+          return [...acc, `${d.errors.length}__${d.doc.ref.path}`];
         }, []);
         console.log(paths);
-        // return;
+        return;
 
         const batch = db.batch();
         paths.slice(0, 100).forEach(path => {

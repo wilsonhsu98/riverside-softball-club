@@ -70,7 +70,7 @@
       Batch Evaluate Team Score
     </button>
     <hr />
-    <button @click="migrate" disabled>
+    <button @click="migrate">
       Migrate
     </button>
     <hr />
