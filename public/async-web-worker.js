@@ -610,14 +610,15 @@ const displayGame = (players, records, errors = [], role) => {
           sub =>
             (sub.altOrder &&
               sub.altOrder === (item.altOrder % startOrder || item.altOrder)) ||
-            sub.order === (item.altOrder % startOrder || item.altOrder),
+            sub.order === (item.altOrder % startOrder || item.altOrder) ||
+            sub.order % startOrder === item.altOrder % startOrder,
         )
         .lastIndexOf(true);
       const shouldSetAltBatter = !find && alt > -1 && item.content !== 'PR';
       const shouldSetAltRunner = !find && altR > -1 && item.content === 'PR';
       const shouldSetLegacyAltRunner = r && r !== item.name && alt > -1;
       const isLast = i === self.length - 1;
-      const order_ = !item.order ? i + 1 : item.order;
+      const order_ = !item.order ? item.altOrder || i + 1 : item.order;
       const midLen = Math.ceil(order_ / (startOrder || assumedOrder) - 1);
 
       const result = {
