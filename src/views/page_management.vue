@@ -1,5 +1,100 @@
 <template>
   <div class="manage-container">
+    <simplebar class="sticky-table-wrapper">
+      <div class="sticky-table">
+        <div class="header-row">
+          <template v-for="col in displayedCols">
+            <div
+              v-if="col === 'Rank'"
+              :key="`header_${col}`"
+              class="cell rank"
+              :title="$t(col)"
+            >
+              {{ $t(col) }}
+            </div>
+            <div
+              v-else-if="col === 'name'"
+              :key="`header_${col}`"
+              class="cell name"
+              :title="$t(col)"
+            >
+              {{ $t(col) }}
+            </div>
+            <div
+              v-else
+              :key="`header_${col}`"
+              class="cell"
+              :class="{
+                sort: col === sortBy,
+                [col]: true,
+              }"
+              :title="columnSet[col]"
+              @click="setSortBy_(col)"
+            >
+              {{ columnSet[col] }}
+            </div>
+          </template>
+        </div>
+        <template v-for="(item, itemIndex) in allTeams_">
+          <div
+            class="normal-row"
+            :key="`div_${item.name}`"
+            :class="{ current: item.teamCode === hightlight }"
+            @click="setHighlight(item.teamCode)"
+          >
+            <template v-for="(col, colIndex) in displayedCols">
+              <div
+                v-if="col === 'Rank'"
+                :key="`row_${item.name}_${colIndex}`"
+                class="cell rank"
+              >
+                <div class="align-right">{{ itemIndex + 1 }}</div>
+              </div>
+              <div
+                v-else-if="col === 'name'"
+                :key="`row_${item.name}_${colIndex}`"
+                class="cell name"
+              >
+                <div class="player">
+                  <photo :photo="item.icon" :name="item.name" />
+                  {{ item.name }}
+                </div>
+              </div>
+              <div
+                v-else-if="['createTime', 'lastUpdate'].includes(col)"
+                class="cell"
+                :class="{ sort: col === sortBy }"
+                :key="`row_${item.name}_${colIndex}`"
+              >
+                <div class="align-right">
+                  {{
+                    new Date(item[col]).toString() === 'Invalid Date'
+                      ? ''
+                      : new Date(item[col]).toLocaleDateString()
+                  }}
+                </div>
+              </div>
+              <div
+                v-else
+                class="cell"
+                :class="{ sort: col === sortBy }"
+                :key="`row_${item.name}_${colIndex}`"
+              >
+                <div class="align-right">
+                  {{
+                    typeof item[col] === 'boolean'
+                      ? item[col]
+                        ? '●'
+                        : ''
+                      : item[col]
+                  }}
+                </div>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+    </simplebar>
     <button @click="deleteAnonymousUsers()">
       Delete Anonymous Users
     </button>
@@ -94,6 +189,139 @@
 <style lang="scss" scoped>
 @import '../scss/variable';
 
+.sticky-table-wrapper {
+  max-height: 50vh;
+  margin-bottom: 10px;
+  ::-webkit-scrollbar {
+    display: none;
+  }
+}
+.sticky-table {
+  display: table;
+  min-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+  color: $row_color;
+  position: relative;
+  z-index: 0;
+  .header-row {
+    display: table-row;
+    color: $header_color;
+    .cell {
+      background: $header_bgcolor_noalpha;
+      position: sticky;
+      top: 0;
+      z-index: 4;
+      text-align: center;
+      &:not(.rank):not(.name) {
+        cursor: pointer;
+      }
+      > div {
+        height: 36px;
+        white-space: nowrap;
+      }
+      &.rank {
+        width: 1px;
+        z-index: 5;
+        cursor: initial;
+      }
+      &.name {
+        width: 110px;
+        /* min-width: 110px; */
+        padding-left: 0;
+        text-align: center;
+        z-index: 5;
+        cursor: initial;
+      }
+      &:nth-child(2n + 3):not(.sort) {
+        opacity: 1;
+        > div {
+          opacity: 0.6;
+        }
+      }
+    }
+  }
+  .normal-row {
+    display: table-row;
+    &:nth-child(2n + 1) .cell {
+      background-color: $row_even_bgcolor;
+    }
+    &:nth-child(2n + 2) .cell {
+      background-color: $row_odd_bgcolor;
+    }
+    &.current {
+      color: $current_user_color;
+      .cell {
+        background-color: $current_user_bgcolor;
+        &::v-deep .img {
+          border-color: $current_user_color;
+        }
+      }
+    }
+  }
+  .cell {
+    display: table-cell;
+    line-height: 36px;
+    text-align: center;
+    padding: 0 5px;
+    box-sizing: border-box;
+    white-space: nowrap;
+    &.rank {
+      position: sticky !important;
+      left: 0 !important;
+      z-index: 2;
+    }
+    &.name {
+      position: sticky !important;
+      left: 42px !important;
+      z-index: 2;
+      /* box-shadow: 5px 0 5px -5px #333; */
+      text-align: center;
+      &:first-letter {
+        text-transform: uppercase;
+      }
+      .player {
+        position: relative;
+        padding-left: 36px;
+        text-align: left;
+        line-height: 36px;
+        display: inline-block;
+        width: 120px;
+        box-sizing: border-box;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        vertical-align: middle;
+      }
+      &:after {
+        content: '';
+        position: absolute;
+        right: -5px;
+        display: inline-block;
+        width: 5px;
+        height: 100%;
+        background: linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.12),
+          rgba(0, 0, 0, 0)
+        );
+      }
+    }
+    &.sort {
+      color: $error_color;
+    }
+    .align-right {
+      margin: auto;
+      padding-right: 5px;
+      /* width: 30px; */
+      text-align: right;
+      direction: rtl;
+      &._30 {
+        padding-right: initial;
+        width: 30px;
+      }
+    }
+  }
+}
 .manage-container {
   /* height: 0; */
   padding: 10px;
@@ -163,6 +391,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { f_timestamp } from '../firebase';
 
 export default {
   data() {
@@ -170,6 +399,77 @@ export default {
       checkedTeams: [],
       parsingResult: '',
       rollbackJSON: null,
+      displayedCols: [
+        'Rank',
+        'name',
+        'score',
+        'games',
+        'players',
+        'managers',
+        'benches',
+        'teamIcon',
+        '10Players',
+        '10BindingPlayers',
+        '10CompletedGames',
+        'teamIntro',
+        'teamOtherNames',
+        'gamePeriod',
+        'gameLeague',
+        'gameGroup',
+        'gameType',
+        'gamePlace',
+        'gameTopBottom',
+        'gameCoach',
+        'gameRecorder',
+        'gameTags',
+        'gamePitcher',
+        'gamePitchers',
+        'gameResult',
+        'gameOpponentScores',
+        'gameMvp',
+        'gameNote',
+        'gamePositions',
+        'gameVideo',
+        'gamePersonalVideo',
+        'createTime',
+        'lastUpdate',
+      ],
+      columnSet: {
+        score: '分數',
+        games: '場數',
+        players: '球員',
+        managers: '管理',
+        benches: '板凳',
+        teamIcon: 'LOGO',
+        '10Players': '10球員',
+        '10BindingPlayers': '10綁定',
+        '10CompletedGames': '10比賽',
+        teamIntro: '簡介',
+        teamOtherNames: '別名',
+        gamePeriod: '區間',
+        gameLeague: '聯盟',
+        gameGroup: '組別',
+        gameType: '比賽性質',
+        gamePlace: '休息區',
+        gameTopBottom: '攻守',
+        gameCoach: '教練',
+        gameRecorder: '記錄',
+        gameTags: '標籤',
+        gamePitcher: '投手',
+        gamePitchers: '投手記錄',
+        gameResult: '勝敗',
+        gameOpponentScores: '對手分數',
+        gameMvp: 'MVP',
+        gameNote: '賽後',
+        gamePositions: '守位',
+        gameVideo: '影片',
+        gamePersonalVideo: '個人影片',
+        createTime: '加入時間',
+        lastUpdate: '最後更新',
+      },
+      allTeams_: JSON.parse(window.localStorage.getItem('allTeams')) || [],
+      sortBy: 'score',
+      hightlight: '',
     };
   },
   created() {
@@ -257,6 +557,33 @@ export default {
         this.alert('格式不符');
       }
     },
+    setSortBy_(sortItem) {
+      if (sortItem !== this.sortBy) {
+        this.sortBy = sortItem;
+        if (['createTime', 'lastUpdate'].includes(sortItem)) {
+          this.allTeams_ = this.allTeams_.sort((a, b) => {
+            if (
+              new Date(a[sortItem]).toString() === 'Invalid Date' &&
+              new Date(b[sortItem]).toString() !== 'Invalid Date'
+            )
+              return 1;
+            if (
+              new Date(a[sortItem]).toString() !== 'Invalid Date' &&
+              new Date(b[sortItem]).toString() === 'Invalid Date'
+            )
+              return -1;
+            return new Date(b[sortItem]) - new Date(a[sortItem]);
+          });
+        } else {
+          this.allTeams_ = this.allTeams_.sort(
+            (a, b) => b[sortItem] - a[sortItem],
+          );
+        }
+      }
+    },
+    setHighlight(team) {
+      this.hightlight = team;
+    },
   },
   computed: {
     ...mapGetters([
@@ -266,6 +593,33 @@ export default {
       'recentGames',
       'allTeams',
     ]),
+  },
+  watch: {
+    allTeams: {
+      handler() {
+        const allTeams_ = this.allTeams
+          .map(team => ({
+            ...team,
+            games: Object.keys(team.games || {}).length,
+            players: Object.keys(team.players || {}).length,
+            benches: Object.keys(team.benches || {}).length,
+            managers: Object.keys(team.players || {}).filter(
+              name => team.players[name].manager,
+            ).length,
+            ...team.scoreKVP,
+            createTime: team.createTime
+              ? new f_timestamp(
+                  team.createTime.seconds,
+                  team.createTime.nanoseconds,
+                ).toDate()
+              : '',
+            lastUpdate: new Date(team.timestamp),
+          }))
+          .sort((a, b) => b[this.sortBy] - a[this.sortBy]);
+        window.localStorage.setItem('allTeams', JSON.stringify(allTeams_));
+        this.allTeams_ = allTeams_;
+      },
+    },
   },
 };
 </script>

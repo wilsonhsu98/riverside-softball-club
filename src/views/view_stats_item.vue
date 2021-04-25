@@ -220,7 +220,7 @@ i.fa {
           white-space: nowrap;
         }
         .value {
-          width: 50px;
+          max-width: 50px;
           text-align: right;
           padding-right: 10px;
         }

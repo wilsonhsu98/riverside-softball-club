@@ -710,7 +710,7 @@ const actions = {
     }).then(teams => {
       const filterTeams = teams
         .filter(team => {
-          if (['*', '＊'].includes(keyword)) return true;
+          if (['***', '＊＊＊'].includes(keyword)) return true;
           return keyword
             ? team.keyword.match(
                 new RegExp(
