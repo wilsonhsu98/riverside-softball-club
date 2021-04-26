@@ -75,6 +75,16 @@
                 </div>
               </div>
               <div
+                v-else-if="['teamType'].includes(col)"
+                class="cell"
+                :class="{ sort: col === sortBy }"
+                :key="`row_${item.name}_${colIndex}`"
+              >
+                <div class="align-right">
+                  {{ columnSet[item[col]] }}
+                </div>
+              </div>
+              <div
                 v-else
                 class="cell"
                 :class="{ sort: col === sortBy }"
@@ -190,8 +200,8 @@
 @import '../scss/variable';
 
 .sticky-table-wrapper {
+  margin: -10px -10px 10px;
   max-height: 50vh;
-  margin-bottom: 10px;
   ::-webkit-scrollbar {
     display: none;
   }
@@ -407,6 +417,8 @@ export default {
         'players',
         'managers',
         'benches',
+        'teamType',
+        'pitcherInn',
         'teamIcon',
         '10Players',
         '10BindingPlayers',
@@ -440,6 +452,8 @@ export default {
         players: '球員',
         managers: '管理',
         benches: '板凳',
+        teamType: '棒壘',
+        pitcherInn: '局',
         teamIcon: 'LOGO',
         '10Players': '10球員',
         '10BindingPlayers': '10綁定',
@@ -466,6 +480,8 @@ export default {
         gamePersonalVideo: '個人影片',
         createTime: '加入時間',
         lastUpdate: '最後更新',
+        softball: '壘',
+        baseball: '棒',
       },
       allTeams_: JSON.parse(window.localStorage.getItem('allTeams')) || [],
       sortBy: 'score',
@@ -573,6 +589,26 @@ export default {
             )
               return -1;
             return new Date(b[sortItem]) - new Date(a[sortItem]);
+          });
+        } else if (['teamType', 'pitcherInn'].includes(sortItem)) {
+          this.allTeams_ = this.allTeams_.sort((a, b) => {
+            if (a[sortItem] === undefined && b[sortItem] !== undefined)
+              return 1;
+            if (a[sortItem] !== undefined && b[sortItem] === undefined)
+              return -1;
+            if (
+              typeof b[sortItem] === 'string' &&
+              typeof a[sortItem] === 'string'
+            ) {
+              return a[sortItem].localeCompare(b[sortItem]);
+            } else if (
+              typeof b[sortItem] === 'number' &&
+              typeof a[sortItem] === 'number'
+            ) {
+              return b[sortItem] - a[sortItem];
+            } else {
+              return b[sortItem] - a[sortItem];
+            }
           });
         } else {
           this.allTeams_ = this.allTeams_.sort(
