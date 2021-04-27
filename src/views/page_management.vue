@@ -105,10 +105,10 @@
         </template>
       </div>
     </simplebar>
-    <button @click="deleteAnonymousUsers()">
+    <!-- <button @click="deleteAnonymousUsers()">
       Delete Anonymous Users
     </button>
-    <hr />
+    <hr /> -->
     <div v-for="team in teamList" :key="team.teamCode">
       <label :for="`chk${team.teamCode}`">
         <input

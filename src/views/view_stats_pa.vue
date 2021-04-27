@@ -422,7 +422,7 @@
   }
   &__element {
     &.col {
-      width: calc(100% - 90px);
+      width: calc(100% - 80px);
       height: auto;
     }
   }

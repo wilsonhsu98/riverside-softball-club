@@ -635,7 +635,7 @@
     overflow: hidden;
   }
   .tags {
-    width: calc(100% - 90px);
+    width: calc(100% - 80px);
     display: inline-block;
     .tag {
       white-space: nowrap;
@@ -656,14 +656,17 @@
     .hr {
       border-top: 2px solid $gray;
       margin-bottom: 10px;
+      width: calc(100% - 10px);
     }
     .field-block-wrapper {
       max-height: 106px;
       overflow: auto;
       margin-bottom: 10px;
       padding: 0 0 10px 0;
+      width: calc(100% - 10px);
+      overflow-x: hidden;
       .field-block {
-        margin: -10px 0 -10px 0;
+        margin: -10px -10px -10px 0;
         .fa-refresh {
           font-size: 24px;
           margin-right: 10px;
