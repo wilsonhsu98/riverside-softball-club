@@ -979,7 +979,7 @@ export default {
         },
         teamCode: this.$route.params.team,
         gameId: this.$route.params.game,
-        orders: result.map(name => ({ name })),
+        orders: result.filter(name => name).map(name => ({ name })),
       });
     },
     order_(i) {
