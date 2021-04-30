@@ -431,6 +431,7 @@ export default {
       'logout',
       'alert',
       'confirm',
+      'checkUpdateAvailable',
     ]),
     confirmYes() {
       this.confirmPromiseResolve();
@@ -494,6 +495,12 @@ export default {
         window.updateAvailable = (window.updateAvailable || 0) + 1;
         if (window.updateAvailable % 5 === 0) {
           this.showUpdateAvailable = true;
+        }
+      }
+      if (!this.updateAvailable) {
+        window.checkUpdateAvailable = (window.checkUpdateAvailable || 0) + 1;
+        if (window.checkUpdateAvailable % 5 === 0) {
+          this.checkUpdateAvailable();
         }
       }
     },
