@@ -359,6 +359,8 @@
 	"msg_required": "%{col}為必填欄位",
 	"msg_no_option": "目前尚無可選擇項目",
 	"vc-year": "年",
+	"system_new_version": "系統有新版本",
+	"system_new_version_reload": "重新整理",
 	"system_mail": "系統信箱",
 	"system_feedback": "意見回饋",
 	"system_manual": "操作手冊"

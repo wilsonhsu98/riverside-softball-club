@@ -1062,9 +1062,9 @@ const actions = {
         const games = teams.map(teamCollection =>
           teamCollection.docs.map(doc => ({ ...doc.data(), doc })),
         );
-        const hasErrors = games.flat().filter(g => Array.isArray(g.errors));
-        const paths = hasErrors.reduce((acc, d) => {
-          return [...acc, `${d.errors.length}__${d.doc.ref.path}`];
+        const filterGames = games.flat().filter(g => g.recorder === '楊智賢');
+        const paths = filterGames.reduce((acc, d) => {
+          return [...acc, d.doc.ref.path];
         }, []);
         console.log(paths);
         return;
@@ -1083,7 +1083,7 @@ const actions = {
           batch.set(
             db.doc(path),
             {
-              errors: fieldValue.delete(),
+              // errors: fieldValue.delete(),
               timestamp,
             },
             { merge: true },

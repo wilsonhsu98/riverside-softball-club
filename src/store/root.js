@@ -32,6 +32,7 @@ const types = {
   SET_ANONYMOUS: 'SET_ANONYMOUS',
   ALERT: 'ALERT',
   CONFIRM: 'CONFIRM',
+  SET_UPDATE_AVAILABLE: 'SET_UPDATE_AVAILABLE',
 };
 
 const state = {
@@ -53,6 +54,7 @@ const state = {
   confirmMsgN: '',
   confirmPromiseResolve: () => {},
   confirmPromiseReject: () => {},
+  updateAvailable: false,
 };
 
 const getters = {
@@ -80,6 +82,7 @@ const getters = {
   confirmMsgN: state => state.confirmMsgN,
   confirmPromiseResolve: state => state.confirmPromiseResolve,
   confirmPromiseReject: state => state.confirmPromiseReject,
+  updateAvailable: state => state.updateAvailable,
 };
 
 const actions = {
@@ -336,6 +339,8 @@ const actions = {
         }
       }
     });
+
+    actions.checkUpdateAvailable({ commit });
   },
   logout({ commit, state, getters }) {
     isLogout = true;
@@ -398,6 +403,19 @@ const actions = {
     } else {
       commit(types.CONFIRM, {});
     }
+  },
+  checkUpdateAvailable({ commit }) {
+    fetch('/')
+      .then(res => res.text())
+      .then(res => {
+        const prevHash = window.localStorage.getItem('version_hash');
+        const currentHash = res.replace(/.*\/app.?(.*)\.js.*/s, '$1');
+        // const currentHash = new Date().getTime();
+        if (prevHash !== currentHash) {
+          commit(types.SET_UPDATE_AVAILABLE, true);
+          window.localStorage.setItem('version_hash', currentHash);
+        }
+      });
   },
 };
 
@@ -489,6 +507,9 @@ const mutations = {
     state.confirmMsgN = n;
     state.confirmPromiseResolve = resolve;
     state.confirmPromiseReject = reject;
+  },
+  [types.SET_UPDATE_AVAILABLE](state, val) {
+    state.updateAvailable = val;
   },
 };
 

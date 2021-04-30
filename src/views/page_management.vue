@@ -484,7 +484,7 @@ export default {
         baseball: '棒',
       },
       allTeams_: JSON.parse(window.localStorage.getItem('allTeams')) || [],
-      sortBy: 'score',
+      sortBy: window.localStorage.getItem('pref_m_team_sortby') || 'score',
       hightlight: '',
     };
   },
@@ -576,6 +576,7 @@ export default {
     setSortBy_(sortItem) {
       if (sortItem !== this.sortBy) {
         this.sortBy = sortItem;
+        window.localStorage.setItem('pref_m_team_sortby', sortItem);
         if (['createTime', 'lastUpdate'].includes(sortItem)) {
           this.allTeams_ = this.allTeams_.sort((a, b) => {
             if (

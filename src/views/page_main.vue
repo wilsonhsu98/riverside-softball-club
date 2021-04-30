@@ -95,6 +95,13 @@
     </div>
     <ad v-if="showAd" :key="showAd" :mode="adMode" />
     <div class="preload" />
+    <div v-if="showUpdateAvailable" class="update">
+      <span>{{ $t('system_new_version') }}</span>
+      <a class="link" @click="hardReload">{{
+        $t('system_new_version_reload')
+      }}</a>
+      <i class="fa fa-times" @click="showUpdateAvailable = false"></i>
+    </div>
   </div>
 </template>
 
@@ -249,6 +256,27 @@ header {
     content: '\e901';
   }
 }
+.update {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 20px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  a {
+    cursor: pointer;
+    margin: 0 20px;
+  }
+  i.fa {
+    font-size: 30px;
+    height: 16px;
+    margin-top: -16px;
+    cursor: pointer;
+  }
+}
 @media only screen and (max-width: 990px) {
   header .header-container,
   .content {
@@ -364,6 +392,15 @@ header {
     margin: 0;
     padding-top: 50px;
   }
+  .update {
+    right: 0;
+    bottom: 50px;
+    left: 0;
+    border-radius: 0;
+    i.fa {
+      margin-left: auto;
+    }
+  }
 }
 </style>
 
@@ -378,6 +415,7 @@ export default {
       totalRequest: 0,
       showAd: '',
       adMode: '',
+      showUpdateAvailable: false,
     };
   },
   created() {
@@ -451,6 +489,18 @@ export default {
         }
       });
     },
+    shouldShowUpdateAvailable() {
+      if (this.updateAvailable && !this.showUpdateAvailable) {
+        window.updateAvailable = (window.updateAvailable || 0) + 1;
+        if (window.updateAvailable % 5 === 0) {
+          this.showUpdateAvailable = true;
+        }
+      }
+    },
+    hardReload(e) {
+      window.location.reload();
+      e.preventDefault();
+    },
   },
   computed: {
     ...mapGetters([
@@ -468,6 +518,7 @@ export default {
       'confirmPromiseResolve',
       'confirmPromiseReject',
       'isAnonymous',
+      'updateAvailable',
     ]),
   },
   watch: {
@@ -481,6 +532,7 @@ export default {
         this.listenTeamChange(this.currentTeam);
       }
       // this.shouldShowAd(to);
+      this.shouldShowUpdateAvailable();
     },
     currentTeam: {
       handler() {
@@ -502,6 +554,14 @@ export default {
           .reduce((acc, team) => {
             return acc + ((team.requests || []).length || 0);
           }, 0);
+      },
+      immediate: true,
+    },
+    updateAvailable: {
+      handler() {
+        if (this.updateAvailable) {
+          this.showUpdateAvailable = true;
+        }
       },
       immediate: true,
     },
