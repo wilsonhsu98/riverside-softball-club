@@ -491,16 +491,16 @@ export default {
       });
     },
     shouldShowUpdateAvailable() {
-      if (this.updateAvailable && !this.showUpdateAvailable) {
-        window.updateAvailable = (window.updateAvailable || 0) + 1;
-        if (window.updateAvailable % 5 === 0) {
-          this.showUpdateAvailable = true;
-        }
-      }
       if (!this.updateAvailable) {
         window.checkUpdateAvailable = (window.checkUpdateAvailable || 0) + 1;
         if (window.checkUpdateAvailable % 5 === 0) {
           this.checkUpdateAvailable();
+        }
+      }
+      if (this.updateAvailable && !this.showUpdateAvailable) {
+        window.updateAvailable = (window.updateAvailable || 0) + 1;
+        if (window.updateAvailable % 5 === 0) {
+          this.showUpdateAvailable = true;
         }
       }
     },
