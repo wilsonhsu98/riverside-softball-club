@@ -359,6 +359,8 @@
 	"msg_required": "%{col}為必填欄位",
 	"msg_no_option": "Sorry, no matching options",
 	"vc-year": "",
+	"system_new_version": "New version available",
+	"system_new_version_reload": "Reload",
 	"system_mail": "System Mail",
 	"system_feedback": "Feedback",
 	"system_manual": "Manual"
