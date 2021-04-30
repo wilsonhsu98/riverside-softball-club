@@ -411,7 +411,7 @@ const actions = {
         const prevHash = window.localStorage.getItem('version_hash');
         const currentHash = res.replace(/.*\/app.?(.*)\.js.*/s, '$1');
         // const currentHash = new Date().getTime();
-        if (prevHash !== currentHash) {
+        if (prevHash && prevHash !== currentHash) {
           commit(types.SET_UPDATE_AVAILABLE, true);
           window.localStorage.setItem('version_hash', currentHash);
         }
