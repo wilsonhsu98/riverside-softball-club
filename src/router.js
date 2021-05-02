@@ -251,7 +251,7 @@ router.beforeEach((to, from, next) => {
     (to.matched.some(route => route.meta.anonymous === false) &&
       store.getters.isAnonymous) ||
     (to.params.team &&
-      !store.getters.isViewMode &&
+      !window.sessionStorage.getItem('currentTeam') &&
       store.getters.currentTeam &&
       to.params.team !== store.getters.currentTeam)
   ) {

@@ -348,7 +348,7 @@
                   </template>
                   <router-link
                     :to="{
-                      name: isViewMode ? 'v_game' : 'game',
+                      name: isViewMode() ? 'v_game' : 'game',
                       params: { team: $route.params.team, game: sub.game },
                     }"
                     tag="button"
@@ -387,7 +387,7 @@
           role === 'manager' &&
             Array.isArray(groupGames_) &&
             $route.params.team === currentTeam &&
-            !isViewMode
+            !isViewMode()
         "
       >
         <router-link
@@ -1023,6 +1023,7 @@ export default {
       'setGameTypes',
       'setOtherConditions',
       'setUnionOrIntersect',
+      'isViewMode',
     ]),
     collapseSearch(event) {
       if (
@@ -1180,7 +1181,6 @@ export default {
       'gameOptions',
       'otherConditions',
       'unionOrIntersect',
-      'isViewMode',
     ]),
   },
   watch: {

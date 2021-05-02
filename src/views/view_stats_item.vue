@@ -467,6 +467,7 @@ export default {
       'setSortBy',
       'setUnlimitedPA',
       'setPitcherSortBy',
+      'isViewMode',
     ]),
     collapseSearch(event) {
       if (
@@ -491,7 +492,7 @@ export default {
         this.setSortBy(key);
         this.setUnlimitedPA(true);
         this.$router.push(
-          `/${this.isViewMode ? 'view' : 'main'}/stats_pa/${
+          `/${this.isViewMode() ? 'view' : 'main'}/stats_pa/${
             this.$route.params.team
           }`,
         );
@@ -499,7 +500,7 @@ export default {
       if (['W', 'SO', 'ERA', 'WHIP'].includes(key)) {
         this.setPitcherSortBy(key);
         this.$router.push(
-          `/${this.isViewMode ? 'view' : 'main'}/stats_pitcher/${
+          `/${this.isViewMode() ? 'view' : 'main'}/stats_pitcher/${
             this.$route.params.team
           }`,
         );
@@ -522,7 +523,6 @@ export default {
       'itemStats',
       'currentTeamIcon',
       'pitcherGameCount',
-      'isViewMode',
     ]),
   },
   components: {
