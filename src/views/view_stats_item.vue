@@ -490,11 +490,19 @@ export default {
       if (['AVG', 'H', 'HR', 'RBI'].includes(key)) {
         this.setSortBy(key);
         this.setUnlimitedPA(true);
-        this.$router.push(`/main/stats_pa/${this.$route.params.team}`);
+        this.$router.push(
+          `/${this.isViewMode ? 'view' : 'main'}/stats_pa/${
+            this.$route.params.team
+          }`,
+        );
       }
       if (['W', 'SO', 'ERA', 'WHIP'].includes(key)) {
         this.setPitcherSortBy(key);
-        this.$router.push(`/main/stats_pitcher/${this.$route.params.team}`);
+        this.$router.push(
+          `/${this.isViewMode ? 'view' : 'main'}/stats_pitcher/${
+            this.$route.params.team
+          }`,
+        );
       }
     },
     getRandomStartArr(arr = []) {
@@ -514,6 +522,7 @@ export default {
       'itemStats',
       'currentTeamIcon',
       'pitcherGameCount',
+      'isViewMode',
     ]),
   },
   components: {

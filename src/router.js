@@ -175,6 +175,44 @@ const router = new VueRouter({
       ],
     },
     {
+      path: '/view',
+      name: 'view',
+      component: require('./views/page_view').default,
+      meta: { requiresAuth: true, anonymous: true },
+      children: [
+        {
+          path: 'games/:team',
+          name: 'v_games',
+          component: require('./views/view_games').default,
+          meta: { requiresAuth: true, anonymous: true },
+        },
+        {
+          path: 'games/:team/:game',
+          name: 'v_game',
+          component: require('./views/view_game').default,
+          meta: { requiresAuth: true, anonymous: true },
+        },
+        {
+          path: 'stats_pa/:team',
+          name: 'v_stats_pa',
+          component: require('./views/view_stats_pa').default,
+          meta: { requiresAuth: true, anonymous: true },
+        },
+        {
+          path: 'stats_pitcher/:team',
+          name: 'v_stats_pitcher',
+          component: require('./views/view_stats_pitcher').default,
+          meta: { requiresAuth: true, anonymous: true },
+        },
+        {
+          path: 'stats_item/:team',
+          name: 'v_stats_item',
+          component: require('./views/view_stats_item').default,
+          meta: { requiresAuth: true, anonymous: true },
+        },
+      ],
+    },
+    {
       path: '*',
       redirect: '/main/user',
     },
@@ -213,6 +251,7 @@ router.beforeEach((to, from, next) => {
     (to.matched.some(route => route.meta.anonymous === false) &&
       store.getters.isAnonymous) ||
     (to.params.team &&
+      !store.getters.isViewMode &&
       store.getters.currentTeam &&
       to.params.team !== store.getters.currentTeam)
   ) {

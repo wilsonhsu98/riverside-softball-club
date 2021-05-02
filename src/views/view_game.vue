@@ -153,7 +153,7 @@
             <div class="tag" v-for="other in tags" :key="other">
               {{ other }}
             </div>
-            <div v-if="role === 'manager'" class="action">
+            <div v-if="role === 'manager' && !isViewMode" class="action">
               <i
                 v-if="editable && box.slice(1).length"
                 class="fa batch"
@@ -364,7 +364,12 @@
           >{{ $t(`box_display_${item}`) }}</span
         >
         <span
-          v-if="box.slice(1).length && !isAnonymous && gameStatus === 'lock'"
+          v-if="
+            box.slice(1).length &&
+              !isAnonymous &&
+              gameStatus === 'lock' &&
+              !isViewMode
+          "
           class="gen-graphic share"
           @click="screenshot"
         >
@@ -797,7 +802,10 @@
       <div class="button-container" v-if="stillCanEditOrder && editable">
         <span class="fa fa-pencil" @click="editOrder"></span>
       </div>
-      <div class="button-container" v-if="editVideo && !editable">
+      <div
+        class="button-container"
+        v-if="editVideo && !editable && !isViewMode"
+      >
         <span
           class="fa fa-video-camera"
           :class="{ off: !editVideoMode }"
@@ -1368,6 +1376,7 @@
     text-align: center;
     padding: 4px 0 4px 4px;
     position: relative;
+    background: #fff;
     .team {
       border: 2px solid transparent;
       text-align: left;
@@ -1408,6 +1417,7 @@
       padding: 4px 8px;
       margin: 10px 0 0 10px;
       line-height: 20px;
+      background: #fff;
     }
     .action {
       margin: 10px 0 0 auto;
@@ -2239,6 +2249,7 @@ export default {
       'boxDisplay',
       'userId',
       'isAnonymous',
+      'isViewMode',
     ]),
   },
   watch: {
@@ -2351,7 +2362,9 @@ export default {
           ? 'unlock-alt'
           : 'lock';
         this.editable =
-          this.role === 'manager' && this.gameStatus === 'unlock-alt';
+          this.role === 'manager' &&
+          this.gameStatus === 'unlock-alt' &&
+          !this.isViewMode;
         const startedPlayer = this.box.slice(1).map(row => row.name);
         this.possiblePlayers = this.teamInfo.players.filter(
           player => !startedPlayer.includes(player.name),

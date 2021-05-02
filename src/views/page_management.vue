@@ -57,7 +57,12 @@
               >
                 <div class="player">
                   <photo :photo="item.icon" :name="item.name" />
-                  {{ item.name }}
+                  <a
+                    class="link"
+                    target="_blank"
+                    :href="`#/view/games/${item.teamCode}`"
+                    >{{ item.name }}</a
+                  >
                 </div>
               </div>
               <div
@@ -350,6 +355,9 @@
     td {
       padding: 0 5px;
     }
+  }
+  .link {
+    color: $error_color;
   }
 }
 .modal {

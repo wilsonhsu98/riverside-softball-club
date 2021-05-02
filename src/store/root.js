@@ -83,6 +83,7 @@ const getters = {
   confirmPromiseResolve: state => state.confirmPromiseResolve,
   confirmPromiseReject: state => state.confirmPromiseReject,
   updateAvailable: state => state.updateAvailable,
+  isViewMode: () => !!window.sessionStorage.getItem('currentTeam'),
 };
 
 const actions = {
@@ -421,6 +422,9 @@ const actions = {
         }
       });
   },
+  setViewMode(undefined, teamCode) {
+    window.sessionStorage.setItem('currentTeam', teamCode);
+  },
 };
 
 const mutations = {
@@ -468,6 +472,7 @@ const mutations = {
     router.push('/login');
   },
   [types.SET_AUTH](state, auth = []) {
+    if (window.sessionStorage.getItem('currentTeam')) return;
     const find = auth.find(
       item => item.teamCode === window.localStorage.getItem('currentTeam'),
     );
