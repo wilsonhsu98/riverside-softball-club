@@ -1977,7 +1977,11 @@ export default {
     },
     back_() {
       // router.back();
-      this.$router.push(`/main/games/${this.$route.params.team}`);
+      this.$router.push(
+        `/${this.isViewMode() ? 'view' : 'main'}/games/${
+          this.$route.params.team
+        }`,
+      );
     },
     sumByInn(scores, inn) {
       return sumByInn(scores, inn);
