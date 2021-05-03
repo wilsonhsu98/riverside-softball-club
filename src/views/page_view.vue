@@ -262,13 +262,12 @@ export default {
   },
   created() {
     this.initFromLS();
-    this.setViewMode(this.currentTeam);
   },
   mounted() {
     this.listenTeamChange(this.currentTeam);
   },
   methods: {
-    ...mapActions(['initFromLS', 'listenTeamChange', 'setViewMode']),
+    ...mapActions(['initFromLS', 'listenTeamChange']),
   },
   computed: {
     ...mapGetters(['loading', 'currentTeamIcon']),

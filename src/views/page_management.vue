@@ -60,7 +60,7 @@
                   <a
                     class="link"
                     target="_blank"
-                    :href="`#/view/games/${item.teamCode}`"
+                    :href="`#/session/${item.teamCode}`"
                     >{{ item.name }}</a
                   >
                 </div>

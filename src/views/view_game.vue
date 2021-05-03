@@ -153,7 +153,7 @@
             <div class="tag" v-for="other in tags" :key="other">
               {{ other }}
             </div>
-            <div v-if="role === 'manager' && !isViewMode()" class="action">
+            <div v-if="role === 'manager' && !isViewMode" class="action">
               <i
                 v-if="editable && box.slice(1).length"
                 class="fa batch"
@@ -368,7 +368,7 @@
             box.slice(1).length &&
               !isAnonymous &&
               gameStatus === 'lock' &&
-              !isViewMode()
+              !isViewMode
           "
           class="gen-graphic share"
           @click="screenshot"
@@ -804,7 +804,7 @@
       </div>
       <div
         class="button-container"
-        v-if="editVideo && !editable && !isViewMode()"
+        v-if="editVideo && !editable && !isViewMode"
       >
         <span
           class="fa fa-video-camera"
@@ -1926,7 +1926,6 @@ export default {
       'setBoxDisplay',
       'toggleGameStatus',
       'editGameOrder',
-      'isViewMode',
     ]),
     screenshot() {
       this.toggleLoading(true);
@@ -1978,7 +1977,7 @@ export default {
     back_() {
       // router.back();
       this.$router.push(
-        `/${this.isViewMode() ? 'view' : 'main'}/games/${
+        `/${this.isViewMode ? 'view' : 'main'}/games/${
           this.$route.params.team
         }`,
       );
@@ -2254,6 +2253,7 @@ export default {
       'boxDisplay',
       'userId',
       'isAnonymous',
+      'isViewMode',
     ]),
   },
   watch: {
@@ -2368,7 +2368,7 @@ export default {
         this.editable =
           this.role === 'manager' &&
           this.gameStatus === 'unlock-alt' &&
-          !this.isViewMode();
+          !this.isViewMode;
         const startedPlayer = this.box.slice(1).map(row => row.name);
         this.possiblePlayers = this.teamInfo.players.filter(
           player => !startedPlayer.includes(player.name),

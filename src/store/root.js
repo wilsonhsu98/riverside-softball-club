@@ -83,6 +83,7 @@ const getters = {
   confirmPromiseResolve: state => state.confirmPromiseResolve,
   confirmPromiseReject: state => state.confirmPromiseReject,
   updateAvailable: state => state.updateAvailable,
+  isViewMode: () => !!window.sessionStorage.getItem('currentTeam'),
 };
 
 const actions = {
@@ -420,12 +421,6 @@ const actions = {
           window.localStorage.setItem('version_hash', currentHash);
         }
       });
-  },
-  setViewMode(undefined, teamCode) {
-    window.sessionStorage.setItem('currentTeam', teamCode);
-  },
-  isViewMode() {
-    return !!window.sessionStorage.getItem('currentTeam');
   },
 };
 
