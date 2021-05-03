@@ -386,8 +386,7 @@
         v-if="
           role === 'manager' &&
             Array.isArray(groupGames_) &&
-            $route.params.team === currentTeam &&
-            !isViewMode()
+            $route.params.team === currentTeam
         "
       >
         <router-link
