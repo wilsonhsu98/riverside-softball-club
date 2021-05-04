@@ -59,8 +59,9 @@
                   <photo :photo="item.icon" :name="item.name" />
                   <a
                     class="link"
-                    target="_blank"
-                    :href="`#/session/${item.teamCode}`"
+                    :href="
+                      `javascript:window.open('#/session/${item.teamCode}')`
+                    "
                     >{{ item.name }}</a
                   >
                 </div>
@@ -358,6 +359,9 @@
   }
   .link {
     color: $error_color;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 .modal {
@@ -444,6 +448,7 @@ export default {
         'gameTags',
         'gamePitcher',
         'gamePitchers',
+        'gameErrors',
         'gameResult',
         'gameOpponentScores',
         'gameMvp',
@@ -479,6 +484,7 @@ export default {
         gameTags: '標籤',
         gamePitcher: '投手',
         gamePitchers: '投手記錄',
+        gameErrors: '守備失誤',
         gameResult: '勝敗',
         gameOpponentScores: '對手分數',
         gameMvp: 'MVP',

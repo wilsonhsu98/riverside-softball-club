@@ -45,6 +45,11 @@
               <i class="fa carousel"><carousel /></i>
             </router-link>
           </li>
+          <li class="logout_link">
+            <a @click="close" :data-label="$t('close_tab_btn')">
+              <i class="fa fa-window-close-o"></i>
+            </a>
+          </li>
         </ul>
       </div>
     </header>
@@ -97,6 +102,10 @@ header {
       &.home {
         order: -1;
       }
+    }
+    .logout_link {
+      margin-left: auto;
+      cursor: pointer;
     }
   }
   a {
@@ -229,6 +238,9 @@ header {
           }
         }
       }
+      .logout_link {
+        margin-left: inherit;
+      }
     }
     a {
       @media (hover: hover) and (pointer: fine) {
@@ -268,6 +280,9 @@ export default {
   },
   methods: {
     ...mapActions(['initFromLS', 'listenTeamChange']),
+    close() {
+      window.close();
+    },
   },
   computed: {
     ...mapGetters(['loading', 'currentTeamIcon']),
