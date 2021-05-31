@@ -116,20 +116,21 @@ resetVH();
 
 const checkThemeMode = isDarkModeOn => {
   const theme = window.localStorage.getItem('pref_theme');
+  const htmlEl = document.documentElement;
   if (['dark', 'light'].includes(theme)) {
     switch (theme) {
       case 'dark':
-        document.body.classList.add('dark');
+        htmlEl.classList.add('dark');
         break;
       case 'light':
-        document.body.classList.remove('dark');
+        htmlEl.classList.remove('dark');
         break;
     }
   } else {
     if (isDarkModeOn) {
-      document.body.classList.add('dark');
+      htmlEl.classList.add('dark');
     } else {
-      document.body.classList.remove('dark');
+      htmlEl.classList.remove('dark');
     }
   }
 };
@@ -142,6 +143,9 @@ window.addEventListener('storage', e => {
   if (e.key === 'pref_theme') {
     checkThemeMode(darkModeMediaQuery.matches);
   }
+});
+window.addEventListener('themeChange', () => {
+  checkThemeMode(darkModeMediaQuery.matches);
 });
 
 const render = () => {

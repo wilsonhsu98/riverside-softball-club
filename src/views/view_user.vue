@@ -4,6 +4,7 @@
     <ad :mode="'user'" />
     <div class="container">
       <template v-if="isAnonymous === false">
+        <theme-switcher class="theme" />
         <div class="avatar">
           <img :src="$cacheImg(accountInfo.photo)" />
           <router-link
@@ -330,6 +331,9 @@
       margin: 12px auto 0;
     }
   }
+  .theme {
+    display: none;
+  }
 }
 
 @media only screen and (max-width: 760px) {
@@ -348,6 +352,14 @@
     }
     .logout-btn {
       display: inline-block;
+    }
+    .theme {
+      display: inline-block;
+      position: absolute;
+      top: 20px;
+      right: 10px;
+      transform-origin: right center;
+      transform: scale(0.7);
     }
   }
 }

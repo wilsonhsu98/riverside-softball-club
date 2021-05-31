@@ -73,6 +73,9 @@
               ></i>
             </router-link>
           </li>
+          <li class="theme">
+            <theme-switcher />
+          </li>
           <li class="logout_link">
             <a @click="logout">{{ $t('logout_btn') }}</a>
           </li>
@@ -150,8 +153,10 @@ header {
         order: -1;
       }
     }
+    .theme {
+      margin: 0 5px 0 auto;
+    }
     .logout_link {
-      margin-left: auto;
       cursor: pointer;
     }
   }
@@ -318,6 +323,7 @@ header {
       > li.home {
         order: 1;
       }
+      .theme,
       .logout_link {
         display: none;
       }

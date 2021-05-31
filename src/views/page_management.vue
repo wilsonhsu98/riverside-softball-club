@@ -217,7 +217,7 @@
   min-width: 100%;
   margin: 0;
   box-sizing: border-box;
-  color: $row_color;
+  color: var(--table-row-color);
   position: relative;
   z-index: 0;
   .header-row {
@@ -260,10 +260,10 @@
   .normal-row {
     display: table-row;
     &:nth-child(2n + 1) .cell {
-      background-color: $row_even_bgcolor;
+      background-color: var(--table-row-even);
     }
     &:nth-child(2n + 2) .cell {
-      background-color: $row_odd_bgcolor;
+      background-color: var(--table-row-odd);
     }
     &.current {
       color: $current_user_color;

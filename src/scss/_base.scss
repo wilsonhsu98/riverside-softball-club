@@ -302,8 +302,8 @@ select::-ms-expand {
   --tip-n-color: #{$tip_n_color};
 }
 
-.dark {
-  --site-bg: #232526;
+:root.dark {
+  --site-bg: #{$dark_black};
   --basic-font-color: #e4e6ea;
   --card-bg: #3a3b3d;
   --input-color: #e4e6ea;
