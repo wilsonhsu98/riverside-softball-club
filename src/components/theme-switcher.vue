@@ -25,7 +25,7 @@
     <label :for="`theme_auto_${uid}`" />
     <label :for="`theme_dark_${uid}`" />
     <span class="dot"
-      ><template v-if="theme === 'auto'">自動</template
+      ><template v-if="theme === 'auto'">{{ $t('auto') }}</template
       ><i
         v-else
         :class="[

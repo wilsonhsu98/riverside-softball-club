@@ -5,6 +5,7 @@
 	"login_github_btn": "使用Github帳號登入",
 	"login_anonymous_btn": "匿名路過",
 	"msg_login_before_join": "請先登入系統<br>之後會引導您加入球隊",
+	"auto": "自動",
 	"logout_btn": "登出",
 	"close_tab_btn": "關閉分頁",
 	"fb_share": "分享",
