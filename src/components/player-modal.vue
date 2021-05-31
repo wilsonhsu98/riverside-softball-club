@@ -93,7 +93,7 @@
   box-sizing: border-box;
   label {
     position: absolute;
-    background-color: #fff;
+    background-color: var(--card-bg);
     color: $input_font;
     font-size: 12px;
     top: -7px;
@@ -105,11 +105,17 @@
   }
   &.current .player {
     cursor: initial;
-    color: $dark_gray;
-    border-color: $dark_gray;
+    color: var(--input-color);
+    border-color: $input_border;
     background-color: transparent;
-    &::v-deep .img {
-      border-color: $dark_gray;
+    &::v-deep {
+      .img {
+        border-color: $input_border;
+      }
+      .input {
+        background-color: var(--card-bg);
+        color: var(--input-color);
+      }
     }
   }
   .delete-wrapper {
@@ -169,6 +175,7 @@
 .modal-wrapper {
   background-color: rgba(0, 0, 0, 0.5);
   ::v-deep .v--modal-box {
+    background-color: var(--card-bg);
     border-radius: 10px;
   }
 }

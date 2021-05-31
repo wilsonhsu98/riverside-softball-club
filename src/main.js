@@ -114,6 +114,36 @@ const resetVH = () => {
 };
 resetVH();
 
+const checkThemeMode = isDarkModeOn => {
+  const theme = window.localStorage.getItem('pref_theme');
+  if (['dark', 'light'].includes(theme)) {
+    switch (theme) {
+      case 'dark':
+        document.body.classList.add('dark');
+        break;
+      case 'light':
+        document.body.classList.remove('dark');
+        break;
+    }
+  } else {
+    if (isDarkModeOn) {
+      document.body.classList.add('dark');
+    } else {
+      document.body.classList.remove('dark');
+    }
+  }
+};
+const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+checkThemeMode(darkModeMediaQuery.matches);
+darkModeMediaQuery.addListener(e => {
+  checkThemeMode(e.matches);
+});
+window.addEventListener('storage', e => {
+  if (e.key === 'pref_theme') {
+    checkThemeMode(darkModeMediaQuery.matches);
+  }
+});
+
 const render = () => {
   new Promise(resolve => {
     resolve(

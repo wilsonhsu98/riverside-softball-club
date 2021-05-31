@@ -152,7 +152,7 @@
   &.focused,
   &.has-value {
     label {
-      background-color: #fff;
+      background-color: var(--card-bg);
       font-size: $input_font_size - 2;
       top: (-$input_font_size + 2)/2;
       padding: 0 4px;
@@ -172,12 +172,13 @@
   }
   input,
   textarea {
+    background-color: var(--card-bg);
+    color: var(--input-color);
     display: block;
     resize: none;
     outline: none;
     border: none;
     box-sizing: border-box;
-    border-radius: 4px;
     font-size: $input_font_size;
     width: 100%;
   }
@@ -252,9 +253,9 @@
       border-radius: 4px;
       position: relative;
       &.vs--single .vs__selected {
+        color: var(--input-color);
         padding: 0;
         margin: 0;
-        color: #000;
         line-height: 36px;
         border: 0;
         width: 99%;
@@ -285,7 +286,7 @@
       &.vs--open,
       &.has-value {
         &:after {
-          background-color: #fff;
+          background-color: var(--card-bg);
           font-size: $input_font_size - 2;
           top: -$input_font_size/2;
           padding: 0 4px;
@@ -308,6 +309,7 @@
       }
     }
     .vs__search {
+      color: var(--input-color);
       padding: 0;
       margin: 0;
       font-size: 16px;
@@ -316,7 +318,7 @@
       box-sizing: border-box;
       border: none;
       &::placeholder {
-        color: #757575;
+        color: $input_font;
         visibility: hidden;
       }
     }
@@ -325,6 +327,7 @@
       border: none;
     }
     .vs__dropdown-menu {
+      background-color: var(--card-bg);
       border: none;
       border-top: 2px solid #3b5998;
       box-shadow: none;
@@ -334,6 +337,7 @@
     }
     .vs__dropdown-option,
     .vs__dropdown-option--highlight {
+      color: var(--input-color);
       padding-left: 9px;
       white-space: nowrap;
       overflow: hidden;
@@ -341,6 +345,7 @@
     }
     .vs__dropdown-option--highlight {
       background-color: $active_bgcolor;
+      color: #fff;
     }
     .vs__selected-options {
       padding: 0 0 0 9px;
@@ -354,9 +359,9 @@
       margin-right: 12px;
     }
     .vs__selected {
+      color: var(--input-color);
       padding: 0;
       margin: 0 5px 0 0;
-      color: #000;
       line-height: 36px;
       border: 0;
       background-color: transparent;
@@ -367,6 +372,11 @@
     }
     .vs__deselect {
       box-shadow: none;
+    }
+    .vs__clear,
+    .vs__deselect,
+    .vs__open-indicator {
+      fill: var(--select-icon);
     }
   }
 }

@@ -129,7 +129,7 @@
 @import '../scss/variable';
 
 .condition {
-  background-color: #fff;
+  background-color: var(--card-bg);
   border-radius: 10px;
   margin: 20px 0;
   padding: 20px;
@@ -177,7 +177,7 @@ i.fa {
     flex: 1;
     min-height: 200px;
     margin: 0 10px;
-    background-color: #fff;
+    background-color: var(--card-bg);
     display: flex;
     flex-direction: column;
     border-radius: 10px;
@@ -197,15 +197,15 @@ i.fa {
         }
       }
       .row {
-        color: $row_color;
+        color: var(--stats-item-row-color);
         line-height: 36px;
         height: 36px;
         display: flex;
         &:nth-child(even) {
-          background-color: $row_even_bgcolor;
+          background-color: var(--stats-item-row-even);
         }
         &:nth-child(odd) {
-          background-color: $row_odd_bgcolor;
+          background-color: var(--stats-item-row-odd);
         }
         .rank {
           width: 20px;
@@ -245,7 +245,7 @@ i.fa {
       .note {
         border-top: 2px dotted $row_color;
         padding: 10px;
-        background-color: $row_even_bgcolor;
+        background-color: var(--card-bg);
         margin-top: auto;
         font-size: 12px;
       }

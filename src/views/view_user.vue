@@ -261,7 +261,7 @@
     flex-wrap: wrap;
     justify-content: space-between;
     label {
-      background-color: #fff;
+      background-color: var(--card-bg);
       color: $input_font;
       font-size: $input_font_size - 2;
       line-height: $input_font_size;

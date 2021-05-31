@@ -94,7 +94,7 @@
   }
   label {
     position: absolute;
-    background-color: #fff;
+    background-color: var(--card-bg);
     color: $input_font;
     font-size: 12px;
     top: -7px;
@@ -160,6 +160,7 @@
 .modal-wrapper {
   background-color: rgba(0, 0, 0, 0.5);
   ::v-deep .v--modal-box {
+    background-color: var(--card-bg);
     border-radius: 10px;
   }
 }

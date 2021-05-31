@@ -291,7 +291,7 @@
 @import '../scss/variable';
 
 .condition {
-  background-color: #fff;
+  background-color: var(--card-bg);
   border-radius: 10px;
   margin: 20px 0;
   padding: 20px;
@@ -346,7 +346,7 @@ i.fa {
   min-width: 100%;
   margin: 0;
   box-sizing: border-box;
-  color: $row_color;
+  color: var(--table-row-color);
   position: relative;
   z-index: 0;
   .header-row {
@@ -426,10 +426,10 @@ i.fa {
   .normal-row {
     display: table-row;
     &:nth-child(2n + 1) .cell {
-      background-color: $row_even_bgcolor;
+      background-color: var(--table-row-even);
     }
     &:nth-child(2n + 2) .cell {
-      background-color: $row_odd_bgcolor;
+      background-color: var(--table-row-odd);
     }
     &.current {
       color: $current_user_color;

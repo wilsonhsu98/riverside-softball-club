@@ -86,59 +86,54 @@
   }
   // &.popover,
   &.info {
-    $color: rgba($gray, .9);
     outline: none;
     .tooltip-inner {
-      background: $color;
+      background: var(--tip-info-color);
       color: white;
       box-shadow: 0 5px 30px rgba(black, .1);
       max-width: calc(100vw - 40px);
     }
     .tooltip-arrow {
-      border-color: $color;
+      border-color: var(--tip-info-color);
     }
   }
   &.box-tip {
     &.win {
-      $color:rgba(239, 16, 16, .7);
       .tooltip-inner {
-        background: $color;
+        background: var(--tip-w-color);
       }
       .tooltip-arrow {
-        border-color: $color;
+        border-color: var(--tip-w-color);
       }
     }
     &.tie {
-      $color: rgba(239, 175, 52, .9);
       .tooltip-inner {
-        background: $color;
+        background: var(--tip-t-color);
       }
       .tooltip-arrow {
-        border-color: $color;
+        border-color: var(--tip-t-color);
       }
     }
     &.lose {
-      $color: rgba(77, 157, 229, .9);
       .tooltip-inner {
-        background: $color;
+        background: var(--tip-l-color);
       }
       .tooltip-arrow {
-        border-color: $color;
+        border-color: var(--tip-l-color);
       }
     }
     outline: none;
     text-align: center;
-    $color: rgba(158, 158,158, 0.9);
     .tooltip-inner {
       color: white;
       padding: 10px;
       box-shadow: 0 5px 30px rgba(black, .1);
       min-width: 300px;
       max-width: calc(100vw - 40px);
-      background: $color;
+      background: var(--tip-n-color);
     }
     .tooltip-arrow {
-      border-color: $color;
+      border-color: var(--tip-n-color);
     }
   }
   ul {

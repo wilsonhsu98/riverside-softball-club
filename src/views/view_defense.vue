@@ -320,7 +320,7 @@
       position: relative;
       > label {
         position: absolute;
-        background-color: #fff;
+        background-color: var(--card-bg);
         color: $input_font;
         font-size: 12px;
         left: 50%;
@@ -368,7 +368,7 @@
     border: 2px solid #ced4da;
     box-sizing: border-box;
     font-size: 16px;
-    color: #000;
+    color: var(--input-color);
     text-align: center;
     padding: 4px 4px 0 4px;
     position: relative;
@@ -486,7 +486,7 @@
         margin: 0 8px 0 0;
         &:before {
           content: attr(data-num);
-          color: #000;
+          color: var(--input-color);
           margin-right: 2px;
         }
       }
@@ -510,7 +510,7 @@
       width: 24px;
       height: 24px;
       line-height: 22px;
-      color: black;
+      color: var(--input-color);
       text-align: center;
       font-size: 16px;
     }
@@ -518,8 +518,8 @@
       width: 24px;
       height: 24px;
       line-height: 22px;
-      background-color: black;
-      color: #fff;
+      background-color: var(--input-color);
+      color: var(--card-bg);
       text-align: center;
       border-radius: 50%;
       font-size: 16px;

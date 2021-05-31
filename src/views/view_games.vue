@@ -425,28 +425,28 @@
   color: $gray;
   box-sizing: border-box;
   border: 5px solid;
-  border-color: $row_odd_bgcolor;
+  border-color: var(--result-border-color);
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
     0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  background-color: #ccc;
-  color: #fff;
+  background-color: var(--result-bg);
+  color: var(--result-font-color);
   text-align: center;
   position: relative;
   &.win {
-    background-color: $hit;
+    background-color: var(--hit);
   }
   &.tie {
-    background-color: $nonpa;
+    background-color: var(--nonpa);
   }
   &.lose {
-    background-color: $ng;
+    background-color: var(--ng);
   }
   .fa-video-camera {
     position: absolute;
     right: -8px;
     bottom: -8px;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    color: $row_color;
+    color: var(--games-camera);
     font-size: 16px;
   }
 }
@@ -463,7 +463,7 @@
       padding-bottom: 50px;
     }
     .cell {
-      color: $row_color;
+      color: var(--games-font-color);
       text-align: center;
       flex: 1;
       font-size: 16px;
@@ -480,7 +480,7 @@
       width: 100%;
       text-align: center;
       text-decoration: underline;
-      color: $gray;
+      color: var(--games-date);
     }
   }
   .summary-container {
@@ -607,7 +607,7 @@
   }
 }
 .condition {
-  background-color: #fff;
+  background-color: var(--card-bg);
   border-radius: 10px;
   margin: 20px 0;
   padding: 20px;
@@ -839,9 +839,9 @@ i.fa {
     box-shadow: none;
     min-height: calc(100vh - 100px);
     min-height: calc(var(--vh, 1vh) * 100 - 100px);
-    .row .cell .result,
+    /* .row .cell .result, */
     .row:after {
-      color: #fff;
+      color: var(--m-games-date);
     }
     .row.first {
       margin-top: 10px;
@@ -874,7 +874,7 @@ i.fa {
     .no-game {
       margin-top: 10px;
       text-align: center;
-      color: $row_color;
+      color: var(--table-row-color);
     }
   }
 }
@@ -923,47 +923,47 @@ const queryFields = [
   {
     field: 'use_team',
     color: '#007bff',
-    invertColor: '#fff',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
     field: 'opponent',
     color: '#f3722c',
-    invertColor: '#fff',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
     field: 'league',
     color: '#28a745',
-    invertColor: '#fff',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
     field: 'group',
     color: '#dc3545',
-    invertColor: '#fff',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
     field: 'place',
     color: '#17a2b8',
-    invertColor: '#fff',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
     field: 'top_bot',
     color: '#813405',
-    invertColor: '#fff',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
     field: 'coach',
     color: '#7678ed',
-    invertColor: '#fff',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
     field: 'recorder',
-    color: '#efaf34',
-    invertColor: '#fff',
+    color: 'rgb(210, 138, 2)',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
     field: 'game_tag',
     color: '#3f00ff',
-    invertColor: '#fff',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
   },
 ];
 

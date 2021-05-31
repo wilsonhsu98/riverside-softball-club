@@ -26,11 +26,20 @@ $input_font_size: 16px;
 $max_width: 400px;
 
 $hit: #ef1010;
-$out: #ff5722;
 $ng: #4d9de5;
 $nonpa: #efaf34;
+$out: #ff5722;
 $rbi: #2497a2;
 $run: #3f00ff;
 $out: #ff695e;
 $gray: #a6a6a6;
 $dark_gray: #777;
+
+$d_hit: #eb4e4ede;
+$d_ng: #4998ddd3;
+$d_nonpa: #efae34c4;
+
+$tip_w_color:rgba(239, 16, 16, .7);
+$tip_t_color: rgba(239, 175, 52, .9);
+$tip_l_color: rgba(77, 157, 229, .9);
+$tip_n_color: rgba(158, 158, 158, .9);

@@ -234,24 +234,24 @@
         margin-left: 3px;
       }
       &.red {
-        color: $hit;
-        border: 3px solid $hit;
+        color: var(--hit);
+        border: 3px solid var(--hit);
         &.select {
-          background-color: $hit;
+          background-color: var(--hit);
         }
       }
       &.yellow {
-        color: $nonpa;
-        border: 3px solid $nonpa;
+        color: var(--nonpa);
+        border: 3px solid var(--nonpa);
         &.select {
-          background-color: $nonpa;
+          background-color: var(--nonpa);
         }
       }
       &.blue {
-        color: $ng;
-        border: 3px solid $ng;
+        color: var(--ng);
+        border: 3px solid var(--ng);
         &.select {
-          background-color: $ng;
+          background-color: var(--ng);
         }
       }
       &.rbi {
@@ -304,7 +304,7 @@
     position: relative;
     > label {
       position: absolute;
-      background-color: #fff;
+      background-color: var(--card-bg);
       color: $input_font;
       font-size: 12px;
       top: -7px;

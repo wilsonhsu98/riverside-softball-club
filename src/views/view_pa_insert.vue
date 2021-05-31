@@ -491,7 +491,7 @@
     left: 50%;
     transform: translateX(-50%);
     font-size: 14px;
-    color: $dark_gray;
+    color: var(--pa-insert-desc);
     visibility: hidden;
     &.show {
       visibility: visible;
@@ -641,7 +641,6 @@
       .player {
         margin: 0 5px;
         border-radius: 4px;
-        background-color: transparent;
       }
       .contents {
         flex: 0 1 100%;
@@ -655,13 +654,13 @@
           margin-right: 2px;
           font-size: 12px;
           &.red {
-            background-color: $hit;
+            background-color: var(--hit);
           }
           &.yellow {
-            background-color: $nonpa;
+            background-color: var(--nonpa);
           }
           &.blue {
-            background-color: $ng;
+            background-color: var(--ng);
           }
           &.gray {
             background-color: $gray;
@@ -721,7 +720,7 @@
         box-sizing: border-box;
         border-radius: 50%;
         font-size: 16px;
-        background-color: #fff;
+        background-color: var(--card-bg);
         cursor: pointer;
       }
       &:after {
@@ -793,24 +792,24 @@
         margin-left: 3px;
       }
       &.red {
-        color: $hit;
-        border: 3px solid $hit;
+        color: var(--hit);
+        border: 3px solid var(--hit);
         &.select {
-          background-color: $hit;
+          background-color: var(--hit);
         }
       }
       &.yellow {
-        color: $nonpa;
-        border: 3px solid $nonpa;
+        color: var(--nonpa);
+        border: 3px solid var(--nonpa);
         &.select {
-          background-color: $nonpa;
+          background-color: var(--nonpa);
         }
       }
       &.blue {
-        color: $ng;
-        border: 3px solid $ng;
+        color: var(--ng);
+        border: 3px solid var(--ng);
         &.select {
-          background-color: $ng;
+          background-color: var(--ng);
         }
       }
       &.gray {
@@ -856,7 +855,7 @@
     position: relative;
     > label {
       position: absolute;
-      background-color: #fff;
+      background-color: var(--card-bg);
       color: $input_font;
       font-size: 12px;
       top: -7px;
@@ -1018,13 +1017,13 @@
     }
   }
   .dialog {
+    background-color: var(--card-bg);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 260px;
     text-align: center;
-    background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 20px 60px -2px rgba(27, 33, 58, 0.4);
     padding: 15px;

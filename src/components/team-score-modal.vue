@@ -50,6 +50,7 @@
 .modal-wrapper {
   background-color: rgba(0, 0, 0, 0.5);
   ::v-deep .v--modal-box {
+    background-color: var(--card-bg);
     border-radius: 10px;
     padding: 10px;
     display: flex;

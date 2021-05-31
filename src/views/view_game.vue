@@ -1015,7 +1015,7 @@
     }
   }
   .box-summary {
-    background-color: #fff;
+    background-color: var(--card-bg);
     border-radius: 10px;
     margin: 20px 0;
     padding: 20px;
@@ -1059,7 +1059,7 @@
         width: auto;
         padding: 0 5px;
         color: $current_user_bgcolor;
-        background-color: white;
+        background-color: var(--card-bg);
         border: 2px solid $current_user_bgcolor;
         border-radius: 4px;
         font-size: 14px;
@@ -1174,7 +1174,7 @@
       box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
         0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
       &.off {
-        background-color: #fff;
+        background-color: rgba(255, 255, 255, 0.7);
         color: $current_user_bgcolor;
         margin-bottom: 10px;
       }
@@ -1187,13 +1187,13 @@
   .player-records {
     height: 36px;
     line-height: 36px;
-    color: $row_color;
+    color: var(--table-row-color);
     display: table-row;
     &:nth-child(even) {
-      background-color: $row_even_bgcolor;
+      background-color: var(--table-row-even);
     }
     &:nth-child(odd) {
-      background-color: $row_odd_bgcolor;
+      background-color: var(--table-row-odd);
     }
     .player {
       display: table-cell;
@@ -1253,13 +1253,13 @@
           height: 34px;
           position: relative;
           &.red {
-            background-color: $hit;
+            background-color: var(--hit);
           }
           &.yellow {
-            background-color: $nonpa;
+            background-color: var(--nonpa);
           }
           &.blue {
-            background-color: $ng;
+            background-color: var(--ng);
           }
           &.gray {
             background-color: $gray;
@@ -1369,14 +1369,14 @@
   }
   .box {
     border-radius: 4px;
-    border: 2px solid #000;
+    border: 2px solid var(--game-box);
+    color: var(--game-box);
     box-sizing: border-box;
-    color: #000;
     display: flex;
     text-align: center;
     padding: 4px 0 4px 4px;
     position: relative;
-    background: #fff;
+    background: var(--game-box-bg);
     .team {
       border: 2px solid transparent;
       text-align: left;
@@ -1390,7 +1390,7 @@
     .inn {
       > div:first-child {
         line-height: 28px;
-        color: #000;
+        color: var(--game-box);
       }
     }
     .gap {
@@ -1411,13 +1411,13 @@
       white-space: nowrap;
       display: inline-block;
       border-radius: 4px;
-      border: 2px solid #000;
+      border: 2px solid var(--game-box);
+      color: var(--game-box);
       box-sizing: border-box;
-      color: #000;
       padding: 4px 8px;
       margin: 10px 0 0 10px;
       line-height: 20px;
-      background: #fff;
+      background: var(--game-box-bg);
     }
     .action {
       margin: 10px 0 0 auto;
@@ -1445,19 +1445,19 @@
     color: $gray;
     box-sizing: border-box;
     border: 5px solid;
-    border-color: $row_odd_bgcolor;
+    border-color: var(--result-border-color);
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
-    background-color: #ccc;
-    color: #fff;
+    background-color: var(--result-bg);
+    color: var(--result-font-color);
     &.win {
-      background-color: $hit;
+      background-color: var(--hit);
     }
     &.tie {
-      background-color: $nonpa;
+      background-color: var(--nonpa);
     }
     &.lose {
-      background-color: $ng;
+      background-color: var(--ng);
     }
     // &.C { border-color: $header_bgcolor; }
     // &.G { border-color: $row_odd_bgcolor; }
@@ -1672,7 +1672,7 @@
       margin: 0;
       padding: 10px 0;
       text-align: center;
-      color: $row_color;
+      color: var(--m-game-box);
       font-size: 14px;
       box-shadow: none;
       min-height: 26px;
@@ -1694,7 +1694,7 @@
           position: absolute;
           top: -12px;
           left: 12px;
-          background-color: #ccc;
+          background-color: var(--site-bg);
           padding: 0 4px;
         }
       }
@@ -1766,18 +1766,18 @@
       }
     }
     .box {
-      color: $row_color;
-      border-color: $row_color;
+      color: var(--m-game-box);
+      border-color: var(--m-game-box);
       margin: 0 10px;
       .inn > div:first-child {
-        color: $row_color;
+        color: var(--m-game-box);
       }
     }
     .tags {
       margin: 0 10px 0 0;
       .tag {
-        color: $row_color;
-        border-color: $row_color;
+        color: var(--m-game-box);
+        border-color: var(--m-game-box);
         font-size: 12px;
         padding: 2px 4px;
       }

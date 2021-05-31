@@ -332,7 +332,7 @@
   }
   .section-header {
     position: absolute;
-    background-color: #fff;
+    background-color: var(--card-bg);
     color: $input_font;
     font-size: 12px;
     top: -7px;
@@ -391,6 +391,8 @@
     display: flex;
     flex-wrap: wrap;
     input[type='text'] {
+      background-color: var(--card-bg);
+      color: var(--input-color);
       display: inline-block;
       resize: none;
       outline: none;

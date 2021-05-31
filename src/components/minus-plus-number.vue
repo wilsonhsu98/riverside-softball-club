@@ -35,7 +35,8 @@
   box-sizing: border-box;
   outline: none;
   border: 2px solid rgb(166, 166, 166);
-  background-color: rgb(248, 248, 248);
+  background-color: var(--card-bg);
+  color: var(--input-color);
   vertical-align: top;
   border-radius: 0;
   position: relative;
@@ -62,7 +63,7 @@
     border-radius: 5px 0 0 5px;
     border-right: none;
     border-color: rgb(166, 166, 166);
-    background-color: #f8f8f8;
+    background-color: var(--card-bg);
     &:after {
       top: 50%;
       left: 8px;
@@ -75,7 +76,7 @@
     border-radius: 0 5px 5px 0;
     border-left: none;
     border-color: rgb(166, 166, 166);
-    background-color: #f8f8f8;
+    background-color: var(--card-bg);
     &:before {
       top: 8px;
       left: 50%;

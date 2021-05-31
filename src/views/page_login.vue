@@ -154,13 +154,13 @@
   left: 0;
   background-color: rgba(0, 0, 0, 0.5);
   .dialog {
+    background-color: var(--card-bg);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     width: 260px;
     text-align: center;
-    background-color: #fff;
     border-radius: 10px;
     box-shadow: 0 20px 60px -2px rgba(27, 33, 58, 0.4);
     padding: 15px;

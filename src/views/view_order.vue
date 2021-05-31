@@ -391,7 +391,7 @@
   text-align: center;
   border-radius: 50%;
   color: $gray;
-  background-color: #fff;
+  background-color: var(--card-bg);
   position: relative;
   left: 50%;
   transform: translateX(-50%);
@@ -634,6 +634,7 @@
     padding-left: 5px;
     box-sizing: border-box;
     > input[type='text'] {
+      background-color: var(--card-bg);
       color: $gray;
       font-size: 16px;
       border: none;
@@ -734,13 +735,13 @@
     color: #fff;
     margin-bottom: 1px;
     &.red {
-      background-color: $hit;
+      background-color: var(--hit);
     }
     &.yellow {
-      background-color: $nonpa;
+      background-color: var(--nonpa);
     }
     &.blue {
-      background-color: $ng;
+      background-color: var(--ng);
     }
     &.exclude {
       opacity: 0.5;

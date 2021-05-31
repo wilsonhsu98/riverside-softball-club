@@ -93,6 +93,7 @@
 .modal-wrapper {
   background-color: rgba(0, 0, 0, 0.5);
   ::v-deep .v--modal-box {
+    background-color: var(--card-bg);
     border-radius: 10px;
     position: fixed;
     top: 20px !important;
@@ -138,6 +139,8 @@
     outline: none;
   }
   .txt-number {
+    background-color: var(--card-bg);
+    color: var(--input-color);
     border: 2px solid $input_border;
     border-radius: 4px;
     box-sizing: border-box;

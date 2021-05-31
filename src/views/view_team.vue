@@ -455,7 +455,7 @@
     color: $input_font;
     position: relative;
     > span {
-      background-color: #fff;
+      background-color: var(--card-bg);
       font-size: $input_font_size - 2;
       position: absolute;
       top: -$input_font_size / 2;
@@ -470,7 +470,7 @@
     }
     label {
       cursor: pointer;
-      color: black;
+      color: var(--input-color);
       > span {
         margin: 0 10px 0 3px;
       }
@@ -530,6 +530,8 @@
     .txt-player,
     .txt-number {
       border: 2px solid $input_border;
+      background-color: var(--card-bg);
+      color: var(--input-color);
       border-radius: 4px;
       box-sizing: border-box;
       font-size: $input_font_size - 4;

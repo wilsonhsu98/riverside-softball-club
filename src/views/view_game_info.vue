@@ -521,7 +521,7 @@
       position: relative;
       > label {
         position: absolute;
-        background-color: #fff;
+        background-color: var(--card-bg);
         color: $input_font;
         font-size: 12px;
         left: 50%;
@@ -549,7 +549,7 @@
     color: $input_font;
     position: relative;
     > span:not(.date-picker) {
-      background-color: #fff;
+      background-color: var(--card-bg);
       font-size: $input_font_size - 2;
       position: absolute;
       top: -$input_font_size / 2;
@@ -564,7 +564,7 @@
     }
     label {
       cursor: pointer;
-      color: black;
+      color: var(--input-color);
       > span {
         margin: 0 10px 0 3px;
       }
@@ -596,7 +596,7 @@
           bottom: 0;
           left: 0;
           padding-left: 10px;
-          color: black;
+          color: var(--input-color);
         }
         & + div {
           flex: 0;
@@ -604,6 +604,8 @@
           position: relative;
           z-index: 1;
           .post-fix {
+            background-color: var(--card-bg);
+            color: var(--input-color);
             border: 1px solid $input_border;
             border-radius: 4px;
             box-sizing: border-box;
@@ -667,7 +669,7 @@
     border: 2px solid #ced4da;
     box-sizing: border-box;
     font-size: 16px;
-    color: #000;
+    color: var(--input-color);
     display: flex;
     text-align: center;
     padding: 4px 0 4px 4px;
@@ -685,7 +687,7 @@
         transform-origin: center center;
         border-color: #3b5998;
         border-radius: 4px;
-        background-color: #fff;
+        background-color: var(--card-bg);
         .input-score {
           width: calc(100% - 4px);
           bottom: 2px;
@@ -706,6 +708,8 @@
       white-space: nowrap;
     }
     .input-score {
+      background-color: var(--card-bg);
+      color: var(--input-color);
       font-size: 16px;
       border: none;
       width: 100%;

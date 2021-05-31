@@ -395,7 +395,7 @@
 @import '../scss/variable';
 
 .condition {
-  background-color: #fff;
+  background-color: var(--card-bg);
   border-radius: 10px;
   margin: 20px 0;
   padding: 20px;
@@ -450,7 +450,7 @@ i.fa {
   min-width: 100%;
   margin: 0;
   box-sizing: border-box;
-  color: $row_color;
+  color: var(--table-row-color);
   position: relative;
   z-index: 0;
   .header-row {
@@ -547,10 +547,10 @@ i.fa {
   .normal-row {
     display: table-row;
     &:nth-child(4n + 4) .cell {
-      background-color: $row_even_bgcolor;
+      background-color: var(--table-row-even);
     }
     &:nth-child(4n + 2) .cell {
-      background-color: $row_odd_bgcolor;
+      background-color: var(--table-row-odd);
     }
     &.current {
       color: $current_user_color;
@@ -563,7 +563,7 @@ i.fa {
         }
       }
       .chart .game {
-        color: $row_color;
+        color: var(--table-row-color);
       }
     }
   }
@@ -640,7 +640,7 @@ i.fa {
     }
   }
   .chart {
-    background-color: #fff;
+    background-color: var(--chart-bg);
     position: absolute;
     left: 110px;
     z-index: 2;
@@ -693,13 +693,13 @@ i.fa {
       margin-bottom: 1px;
       text-align: center;
       &.red {
-        background-color: $hit;
+        background-color: var(--hit);
       }
       &.yellow {
-        background-color: $nonpa;
+        background-color: var(--nonpa);
       }
       &.blue {
-        background-color: $ng;
+        background-color: var(--ng);
       }
       &.exclude {
         opacity: 0.5;
