@@ -428,7 +428,13 @@ header {
   }
   .update {
     right: 0;
+
     bottom: 50px;
+    bottom: calc(50px + constant(safe-area-inset-bottom));
+    /* iOS 11.0 */
+    bottom: calc(50px + env(safe-area-inset-bottom));
+    /* iOS 11.2 */
+
     left: 0;
     border-radius: 0;
     i.fa {
