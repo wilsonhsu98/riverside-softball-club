@@ -6,9 +6,12 @@
           class="icon"
           :src="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
         />
-        <i class="fa fa-search"></i>
       </div>
+      <label class="search-icon" for="toggle-search">
+        <i class="fa fa-search"></i>
+      </label>
       <input
+        id="toggle-search"
         type="checkbox"
         class="toggle-search non-input"
         v-model="toggleSearch"
@@ -729,6 +732,7 @@ i.fa {
 }
 
 .search-bar__container,
+.search-icon,
 .toggle-search {
   display: none;
 }
@@ -766,9 +770,6 @@ i.fa {
     &__container {
       display: block;
       height: 50px;
-      line-height: 50px;
-      text-align: right;
-      padding-right: 14px;
       position: relative;
       .icon {
         max-height: 45px;
@@ -781,17 +782,26 @@ i.fa {
         transform: translateY(-50%);
       }
     }
-    .toggle-search {
+    .search-icon {
       display: block;
       position: absolute;
       top: 0;
+
       right: 0;
+      right: calc(constant(safe-area-inset-right));
+      /* iOS 11.0 */
+      right: calc(env(safe-area-inset-right));
+      /* iOS 11.2 */
+
       z-index: 1;
       height: 50px;
+      line-height: 50px;
       width: 50px;
       margin: 0;
-      opacity: 0;
+      /* opacity: 0; */
       cursor: pointer;
+    }
+    .toggle-search {
       &:checked {
         & ~ .condition__container {
           max-height: 200vh;
@@ -811,7 +821,15 @@ i.fa {
       margin: 0;
       display: flex;
       flex-wrap: wrap;
+
       padding: 3px 10px;
+      padding-right: calc(10px + constant(safe-area-inset-right));
+      padding-left: calc(10px + constant(safe-area-inset-left));
+      /* iOS 11.0 */
+      padding-right: calc(10px + env(safe-area-inset-right));
+      padding-left: calc(10px + env(safe-area-inset-left));
+      /* iOS 11.2 */
+
       box-sizing: border-box;
       position: relative;
       > br {
@@ -865,7 +883,16 @@ i.fa {
   .sticky-table {
     .toggle-row:checked + .normal-row .chart {
       left: -42px;
+
       width: 100vw !important;
+      width: calc(
+        100vw - constant(safe-area-inset-left) - constant(safe-area-inset-right)
+      ) !important;
+      /* iOS 11.0 */
+      width: calc(
+        100vw - env(safe-area-inset-left) - env(safe-area-inset-right)
+      ) !important;
+      /* iOS 11.2 */
     }
   }
 }

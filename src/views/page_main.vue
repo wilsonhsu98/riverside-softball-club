@@ -295,8 +295,8 @@ header {
       100% - env(safe-area-inset-left) - env(safe-area-inset-right) - #{$stage_gap *
         2}
     );
-
     /* iOS 11.2 */
+
     margin-left: $stage_gap;
     margin-left: calc(#{$stage_gap} + constant(safe-area-inset-left));
     /* iOS 11.0 */
@@ -414,8 +414,16 @@ header {
     }
   }
   .content {
+    margin: auto;
+
     width: 100%;
-    margin: 0;
+    width: calc(
+      100% - constant(safe-area-inset-left) - constant(safe-area-inset-right)
+    );
+    /* iOS 11.0 */
+    width: calc(100% - env(safe-area-inset-left) - env(safe-area-inset-right));
+    /* iOS 11.2 */
+
     padding-top: 50px;
   }
   .update {

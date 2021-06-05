@@ -341,6 +341,13 @@
 .manage-container {
   /* height: 0; */
   padding: 10px;
+  padding-right: calc(10px + constant(safe-area-inset-right));
+  padding-left: calc(10px + constant(safe-area-inset-left));
+  /* iOS 11.0 */
+  padding-right: calc(10px + env(safe-area-inset-right));
+  padding-left: calc(10px + env(safe-area-inset-left));
+  /* iOS 11.2 */
+
   text-align: center;
   button {
     background-color: $header_bgcolor;

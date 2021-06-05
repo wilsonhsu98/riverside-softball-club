@@ -57,6 +57,16 @@ header {
 
 @media only screen and (max-width: 760px), (max-height: 480px) {
   header {
+    padding-left: calc(constant(safe-area-inset-left));
+    /* iOS 11.0 */
+    padding-left: calc(env(safe-area-inset-left));
+    /* iOS 11.2 */
+
+    padding-right: calc(constant(safe-area-inset-right));
+    /* iOS 11.0 */
+    padding-right: calc(env(safe-area-inset-right));
+    /* iOS 11.2 */
+
     display: flex;
     align-items: center;
     justify-content: space-between;
