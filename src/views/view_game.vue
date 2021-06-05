@@ -1660,7 +1660,7 @@
     border: 0 none;
   }
 }
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   .gamebox-container {
     font-size: 14px;
     .sticky-display-btn {
@@ -1717,7 +1717,13 @@
     }
     .button-container {
       margin-right: 0;
-      bottom: 50px;
+      bottom: $fixed_bottom;
+      bottom: calc(
+        #{$fixed_bottom} + constant(safe-area-inset-bottom)
+      ); /* iOS 11.0 */
+      bottom: calc(
+        #{$fixed_bottom} + env(safe-area-inset-bottom)
+      ); /* iOS 11.2 */
       span {
         margin: 0 10px 10px 0;
       }

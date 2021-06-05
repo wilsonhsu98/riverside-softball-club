@@ -750,7 +750,7 @@ i.fa {
     }
   }
 }
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   .search-bar {
     background: $header_bgcolor center 2px no-repeat;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.13), 0 0 2px 0 rgba(0, 0, 0, 0.2);

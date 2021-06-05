@@ -50,7 +50,7 @@ img {
   left: 50%;
   transform: translateX(-50%);
 }
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   img {
     width: 300px;
     height: 300px;

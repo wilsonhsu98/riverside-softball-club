@@ -285,12 +285,32 @@ header {
 @media only screen and (max-width: 990px) {
   header .header-container,
   .content {
-    width: calc(100% - 20px);
-    margin-left: 10px;
-    margin-right: 10px;
+    width: calc(100% - #{$stage_gap * 2});
+    width: calc(
+      100% - constant(safe-area-inset-left) - constant(safe-area-inset-right) -
+        #{$stage_gap * 2}
+    );
+    /* iOS 11.0 */
+    width: calc(
+      100% - env(safe-area-inset-left) - env(safe-area-inset-right) - #{$stage_gap *
+        2}
+    );
+
+    /* iOS 11.2 */
+    margin-left: $stage_gap;
+    margin-left: calc(#{$stage_gap} + constant(safe-area-inset-left));
+    /* iOS 11.0 */
+    margin-left: calc(#{$stage_gap} + env(safe-area-inset-left));
+    /* iOS 11.2 */
+
+    margin-right: $stage_gap;
+    margin-right: calc(#{$stage_gap} + constant(safe-area-inset-right));
+    /* iOS 11.0 */
+    margin-right: calc(#{$stage_gap} + env(safe-area-inset-right));
+    /* iOS 11.2 */
   }
 }
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   .main-container {
     padding-top: 0;
     padding-bottom: $footer_menu_height;

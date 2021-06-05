@@ -52,7 +52,7 @@
                   v-for="col in conditionCols"
                   :value="col.name"
                   :key="`col_${col.name}`"
-                  >{{ $t(col.name) }}</option
+                  >{{ getPitcherCol(col.name) }}</option
                 >
               </select>
             </div>
@@ -95,7 +95,7 @@
                 :checked="col.visible"
                 :disabled="col.disabled"
                 @change="toggleColumn_(col.name)"
-              />{{ $t(col.name) }}
+              />{{ getPitcherCol(col.name) }}
             </label>
           </div>
           <template v-if="lastUpdate">
@@ -150,22 +150,7 @@
                 "
                 @click="setSortBy_(col.name)"
               >
-                <div>
-                  <template v-if="['SO', 'R'].includes(col.name)">
-                    {{ $t(`${col.name}_P`) }}
-                  </template>
-                  <template
-                    v-else-if="
-                      ['K7', 'BB7', 'H7'].includes(col.name) &&
-                        teamInfo.pitcherInn === 9
-                    "
-                  >
-                    {{ $t(`${col.name}_9`) }}
-                  </template>
-                  <template v-else>
-                    {{ $t(col.name) }}
-                  </template>
-                </div>
+                <div>{{ getPitcherCol(col.name) }}</div>
               </div>
             </template>
           </div>
@@ -508,7 +493,7 @@ i.fa {
 .toggle-search {
   display: none;
 }
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   .search-bar {
     background: $header_bgcolor center 2px no-repeat;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.13), 0 0 2px 0 rgba(0, 0, 0, 0.2);
@@ -731,6 +716,18 @@ export default {
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectHeight);
+    },
+    getPitcherCol(col) {
+      if (['SO', 'R'].includes(col)) {
+        return this.$t(`${col}_P`);
+      } else if (
+        ['K7', 'BB7', 'H7'].includes(col) &&
+        this.teamInfo.pitcherInn === 9
+      ) {
+        return this.$t(`${col}_9`);
+      } else {
+        return this.$t(col);
+      }
     },
   },
   computed: {

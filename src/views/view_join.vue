@@ -466,7 +466,7 @@
   }
 }
 
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   .container {
     .btn-container {
       position: static;

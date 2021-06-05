@@ -690,7 +690,7 @@ i.fa {
 .toggle-search {
   display: none;
 }
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   .search-bar {
     background: $header_bgcolor center 2px no-repeat;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.13), 0 0 2px 0 rgba(0, 0, 0, 0.2);
@@ -851,10 +851,22 @@ i.fa {
     }
     .summary-container {
       margin-top: 10px;
-      bottom: 60px;
+      bottom: $fixed_bottom;
+      bottom: calc(
+        #{$fixed_bottom} + constant(safe-area-inset-bottom)
+      ); /* iOS 11.0 */
+      bottom: calc(
+        #{$fixed_bottom} + env(safe-area-inset-bottom)
+      ); /* iOS 11.2 */
     }
     .button-container {
-      bottom: 60px;
+      bottom: $fixed_bottom;
+      bottom: calc(
+        #{$fixed_bottom} + constant(safe-area-inset-bottom)
+      ); /* iOS 11.0 */
+      bottom: calc(
+        #{$fixed_bottom} + env(safe-area-inset-bottom)
+      ); /* iOS 11.2 */
       span {
         margin-right: 10px;
       }

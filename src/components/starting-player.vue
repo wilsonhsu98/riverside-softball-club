@@ -43,7 +43,7 @@ img {
   left: 50%;
   transform: translateX(-50%);
 }
-@media only screen and (max-width: 760px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   .fa {
     visibility: hidden;
   }
