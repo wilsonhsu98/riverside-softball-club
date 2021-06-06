@@ -1947,6 +1947,9 @@ export default {
         scrollX: 0,
         width,
         height: this.$refs.container.scrollHeight,
+        backgroundColor: window
+          .getComputedStyle(document.documentElement)
+          .getPropertyValue('--site-bg'),
         ignoreElements: ele =>
           ['fa-video-camera', 'gen-graphic', 'fa-map-marker'].some(cls =>
             ele.classList.contains(cls),

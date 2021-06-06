@@ -94,7 +94,7 @@
     position: absolute;
     top: 0;
     transition: all 0.5s;
-    transform: scale(1.35);
+    transform: scale(1.4);
     border-radius: 50%;
     font-size: 12px;
     i {
