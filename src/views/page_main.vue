@@ -267,7 +267,15 @@ header {
   bottom: 20px;
   background: rgba(0, 0, 0, 0.8);
   color: white;
+
   padding: 20px;
+  padding-left: calc(20px + constant(safe-area-inset-left));
+  padding-right: calc(20px + constant(safe-area-inset-right));
+  /* iOS 11.0 */
+  padding-left: calc(20px + env(safe-area-inset-left));
+  padding-right: calc(20px + env(safe-area-inset-right));
+  /* iOS 11.2 */
+
   border-radius: 4px;
   display: flex;
   align-items: center;
