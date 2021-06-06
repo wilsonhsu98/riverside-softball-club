@@ -879,6 +879,23 @@ i.fa {
   .sticky-table-wrapper {
     height: calc(100vh - 100px) !important;
     height: calc(var(--vh, 1vh) * 100 - 100px) !important;
+    height: calc(
+      100vh - 100px - constant(safe-area-inset-top) -
+        constant(safe-area-inset-bottom)
+    ) !important;
+    height: calc(
+      var(--vh, 1vh) * 100 - 100px - constant(safe-area-inset-top) -
+        constant(safe-area-inset-bottom)
+    ) !important;
+    /* iOS 11.0 */
+    height: calc(
+      100vh - 100px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+    ) !important;
+    height: calc(
+      var(--vh, 1vh) * 100 - 100px - env(safe-area-inset-top) -
+        env(safe-area-inset-bottom)
+    ) !important;
+    /* iOS 11.2 */
   }
   .sticky-table {
     .toggle-row:checked + .normal-row .chart {
