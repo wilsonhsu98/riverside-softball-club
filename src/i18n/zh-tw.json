@@ -281,7 +281,7 @@
 	"btn_delete_team": "刪除球隊 (危險)",
 	"msg_delete_team_condition": "刪除的條件，您必須是最後一個管理者；請先與其他管理者討論，並且解除他們管理者的身份，才可進行刪除。",
 	"msg_not_manager": "您不是管理者",
-	"desc_gen_opacity": "建議上傳去背圖片做為球隊LOGO<br>可以使用<a class='link' target='blank' href='https://www.remove.bg/upload'>免費線上服務</a>",
+	"desc_gen_opacity": "建議上傳去背圖片做為球隊LOGO，可以使用<a class='link' target='blank' href='https://www.remove.bg/upload'>免費線上服務</a>",
 	"tip_player": "將未綁定球員刪除，僅會移除球員名單，不影響過往比賽記錄|將已綁定球員刪除，該球員會被移到非正式球員名單",
 	"tip_bench": "若給予非正式球員名字，便成為正式球員|將非正式球員刪除，該球員等同於被請出球隊",
 	"ttl_score": "完整度",
