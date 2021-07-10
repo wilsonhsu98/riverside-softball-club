@@ -45,38 +45,43 @@
               {{ $t('logout_btn') }}
             </button>
           </div>
-          <a
-            class="link"
-            href="https://drive.google.com/file/d/1fDA9vLOH772eTkzBO5aFfTuSJgh1zuo7/view?usp=sharing"
-            target="_blank"
-            >{{ $t('system_manual') }}</a
-          >
-          <a
-            class="link"
-            href="mailto:riversidesoftballclub.app@gmail.com"
-            style="margin-left: 5px;"
-            >{{ $t('system_mail') }}</a
-          >
-          <a
-            class="link"
-            style="margin-left: 5px;"
-            href="https://docs.google.com/forms/d/e/1FAIpQLSf82txQ_Cqc9GheIU6EPCj3f3xtMc5qI6PF8OB-x6XzuvngFA/viewform"
-            target="_blank"
-            >{{ $t('system_feedback') }}</a
-          >
-          <a
-            v-if="
-              [
-                'Ac1JwgNSkdctBkdoiOC0Fgn3mqE2',
-                '6CMMLMg6adPL3CyUWkWbPzIAYN62',
-              ].includes(userId)
-            "
-            class="link"
-            style="margin-left: 5px;"
-            href="#/management"
-            target="_blank"
-            >後台</a
-          >
+          <div class="links">
+            <a
+              class="link"
+              href="https://www.privacypolicies.com/live/a6db80b5-4d56-4e7e-946a-505db52f9dcd"
+              target="_blank"
+              >{{ $t('system_privacy_policy') }}</a
+            >
+            <a
+              class="link"
+              href="https://drive.google.com/file/d/1fDA9vLOH772eTkzBO5aFfTuSJgh1zuo7/view?usp=sharing"
+              target="_blank"
+              >{{ $t('system_manual') }}</a
+            >
+            <a
+              class="link"
+              href="mailto:riversidesoftballclub.app@gmail.com"
+              >{{ $t('system_mail') }}</a
+            >
+            <a
+              class="link"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSf82txQ_Cqc9GheIU6EPCj3f3xtMc5qI6PF8OB-x6XzuvngFA/viewform"
+              target="_blank"
+              >{{ $t('system_feedback') }}</a
+            >
+            <a
+              v-if="
+                [
+                  'Ac1JwgNSkdctBkdoiOC0Fgn3mqE2',
+                  '6CMMLMg6adPL3CyUWkWbPzIAYN62',
+                ].includes(userId)
+              "
+              class="link"
+              href="#/management"
+              target="_blank"
+              >後台</a
+            >
+          </div>
         </div>
       </template>
       <template v-if="isAnonymous === true">
@@ -181,6 +186,13 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+    }
+  }
+  .links {
+    margin: 0 0 0 -5px;
+    .link {
+      display: inline-block;
+      margin: 0 5px;
     }
   }
   .team {

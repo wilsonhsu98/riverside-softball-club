@@ -38,6 +38,14 @@
         target="_blank"
         >{{ $t('system_feedback') }}</a
       >
+      <div style="margin-top: 5px;">
+        <a
+          class="link"
+          href="https://www.privacypolicies.com/live/a6db80b5-4d56-4e7e-946a-505db52f9dcd"
+          target="_blank"
+          >{{ $t('system_privacy_policy') }}</a
+        >
+      </div>
     </div>
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
