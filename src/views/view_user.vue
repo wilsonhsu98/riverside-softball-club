@@ -48,26 +48,30 @@
           <div class="links">
             <a
               class="link"
+              href="https://drive.google.com/file/d/1fDA9vLOH772eTkzBO5aFfTuSJgh1zuo7/view?usp=sharing"
+              target="_blank"
+              >{{ $t('system_manual') }}</a
+            >
+            <a class="link" href="mailto:riversidesoftballclub.app@gmail.com">{{
+              $t('system_mail')
+            }}</a>
+            <a
+              class="link"
+              href="https://docs.google.com/forms/d/e/1FAIpQLSf82txQ_Cqc9GheIU6EPCj3f3xtMc5qI6PF8OB-x6XzuvngFA/viewform"
+              target="_blank"
+              >{{ $t('system_feedback') }}</a
+            >
+            <a
+              class="link"
               href="https://www.privacypolicies.com/live/a6db80b5-4d56-4e7e-946a-505db52f9dcd"
               target="_blank"
               >{{ $t('system_privacy_policy') }}</a
             >
             <a
               class="link"
-              href="https://drive.google.com/file/d/1fDA9vLOH772eTkzBO5aFfTuSJgh1zuo7/view?usp=sharing"
+              href="https://www.privacypolicies.com/live/f438ae5b-73b5-4b83-b7c0-0d004c7453a2"
               target="_blank"
-              >{{ $t('system_manual') }}</a
-            >
-            <a
-              class="link"
-              href="mailto:riversidesoftballclub.app@gmail.com"
-              >{{ $t('system_mail') }}</a
-            >
-            <a
-              class="link"
-              href="https://docs.google.com/forms/d/e/1FAIpQLSf82txQ_Cqc9GheIU6EPCj3f3xtMc5qI6PF8OB-x6XzuvngFA/viewform"
-              target="_blank"
-              >{{ $t('system_feedback') }}</a
+              >{{ $t('system_term_of_use') }}</a
             >
             <a
               v-if="
