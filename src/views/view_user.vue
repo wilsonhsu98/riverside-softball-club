@@ -62,18 +62,6 @@
               >{{ $t('system_feedback') }}</a
             >
             <a
-              class="link"
-              href="https://www.privacypolicies.com/live/a6db80b5-4d56-4e7e-946a-505db52f9dcd"
-              target="_blank"
-              >{{ $t('system_privacy_policy') }}</a
-            >
-            <a
-              class="link"
-              href="https://www.privacypolicies.com/live/f438ae5b-73b5-4b83-b7c0-0d004c7453a2"
-              target="_blank"
-              >{{ $t('system_term_of_use') }}</a
-            >
-            <a
               v-if="
                 [
                   'Ac1JwgNSkdctBkdoiOC0Fgn3mqE2',
@@ -84,6 +72,19 @@
               href="#/management"
               target="_blank"
               >後台</a
+            >
+            <br />
+            <a
+              class="link"
+              href="https://www.privacypolicies.com/live/a6db80b5-4d56-4e7e-946a-505db52f9dcd"
+              target="_blank"
+              >{{ $t('system_privacy_policy') }}</a
+            >
+            <a
+              class="link"
+              href="https://www.privacypolicies.com/live/f438ae5b-73b5-4b83-b7c0-0d004c7453a2"
+              target="_blank"
+              >{{ $t('system_term_of_use') }}</a
             >
           </div>
         </div>
