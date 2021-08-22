@@ -21,6 +21,7 @@
     "firebase-admin": "^8.4.0",
     "firebase-functions": "^3.2.0",
     "generate-json-webpack-plugin": "^0.3.1",
+    "heatmap.js": "^2.0.5",
     "html2canvas": "^1.0.0-alpha.12",
     "http2": "^3.3.7",
     "idb": "^5.0.0",

@@ -67,6 +67,7 @@ img {
 <script>
 import { getNameNumber } from '../libs/utils';
 import ballIcon from '../images/icon_100.png';
+import HeatmapJS from 'heatmap.js/build/heatmap.min.js';
 const colorMappging = {
   red: '#ef1010',
   blue: '#4d9de5',
@@ -79,7 +80,7 @@ export default {
     'disabled',
     'no_track',
     'fixedSize',
-    'showPercentage',
+    'displayMode',
     'avatar',
     'player',
     'positions',
@@ -668,7 +669,7 @@ export default {
           ballWidth,
         );
       } else {
-        if (this.showPercentage) {
+        if (this.displayMode === 'percentage') {
           const percentage = this.xy.reduce((acc, item, i, self) => {
             const p = {
               ...acc,
@@ -783,7 +784,7 @@ export default {
                 );
               }
             });
-        } else {
+        } else if (this.displayMode !== 'heatmap') {
           this.xy.forEach(item => {
             ctx.beginPath();
             ctx.shadowColor = 'black';
@@ -937,6 +938,25 @@ export default {
         ctx.fillStyle = 'rgba(255, 255, 255, .3)';
         ctx.fillRect(0, 0, base, base);
       }
+
+      if (this.displayMode === 'heatmap') {
+        const heatmapDom = document.createElement('canvas');
+        const factor = 8;
+        heatmapDom.width = 100 * factor;
+        heatmapDom.height = 100 * factor;
+        document.body.appendChild(heatmapDom);
+        const heatmap = HeatmapJS.create({
+          container: heatmapDom,
+          radius: 4 * factor,
+          maxOpacity: 0.8,
+        });
+        heatmap.setData({
+          data: this.xy.map(({ x, y }) => ({ x: x * factor, y: y * factor })),
+        });
+        ctx.drawImage(heatmap._renderer.canvas, 0, 0, base, base);
+        heatmapDom.remove();
+      }
+
       this.imgSrc = canvas.toDataURL('image/png');
     },
     trackXY(event) {
@@ -1040,7 +1060,7 @@ export default {
       }
       this.draw();
     },
-    showPercentage() {
+    displayMode() {
       this.draw();
     },
   },

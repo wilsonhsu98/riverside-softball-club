@@ -312,7 +312,7 @@
                         v-if="item.locations.length"
                         :no_track="true"
                         :values="item.locations"
-                        :showPercentage="isPercentageMode"
+                        :displayMode="locationDisplayMode"
                         fixedSize="144"
                         style="cursor: pointer;"
                         @click.native="
@@ -327,10 +327,13 @@
                         v-if="item.locations.length"
                         class="fa"
                         :class="{
-                          'fa-map-marker': isPercentageMode,
-                          'fa-percent': !isPercentageMode,
+                          'fa-map-marker': ['dot', 'heatmap'].includes(
+                            locationDisplayMode,
+                          ),
+                          'fa-percent': locationDisplayMode === 'percentage',
+                          heatmap: locationDisplayMode === 'heatmap',
                         }"
-                        @click="isPercentageMode = !isPercentageMode"
+                        @click="locationDisplayCount += 1"
                       ></i>
                     </div>
                   </div>
@@ -386,7 +389,7 @@
       <coordination
         :no_track="true"
         :values="coordinates.values"
-        :showPercentage="isPercentageMode"
+        :displayMode="locationDisplayMode"
         :avatar="coordinates.avatar"
         :player="coordinates.player"
       />
@@ -727,6 +730,9 @@ i.fa {
       right: 10px;
       bottom: 10px;
       transform: translateZ(0);
+      &.heatmap {
+        background-color: $error_color;
+      }
     }
   }
 }
@@ -966,7 +972,8 @@ export default {
       lazy: false,
       chartWidth: 0,
       tableHeight: 0,
-      isPercentageMode: false,
+      locationDisplayMode: 'dot', // [dot, heatmap, percentage]
+      locationDisplayCount: 0,
       sum: {},
     };
   },
@@ -1161,6 +1168,11 @@ export default {
         }, 500);
       },
       immediate: true,
+    },
+    locationDisplayCount() {
+      this.locationDisplayMode = ['dot', 'heatmap', 'percentage'][
+        this.locationDisplayCount % 3
+      ];
     },
   },
 };
