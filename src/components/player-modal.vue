@@ -4,6 +4,7 @@
     :adaptive="true"
     :maxWidth="400"
     :minHeight="400"
+    @closed="closed"
     class="modal-wrapper"
   >
     <div class="player-modal">
@@ -55,6 +56,14 @@
       >
         <label>{{ fourth_label }}</label>
         <div class="player-list-container">
+          <div class="add-source" v-if="!!enable_extra">
+            <input
+              type="text"
+              v-model="extra"
+              :placeholder="$t('pla_add_extra')"
+            />
+            <i class="fa fa-plus-circle" @click="selectExtra"></i>
+          </div>
           <player
             v-for="player in fourth.filter(
               player => player.name !== (current || {}).name,
@@ -155,11 +164,48 @@
         rgba(255, 255, 255, 1)
       );
     }
-    .player {
+    .player,
+    .add-source {
       flex: 0 1 calc(33% - 4px);
       &:nth-child(3n) {
         margin-right: 0;
       }
+    }
+  }
+  .add-source {
+    height: 40px;
+    line-height: 36px;
+    border: 2px solid $active_bgcolor;
+    border-radius: 5px;
+    outline: none;
+    text-align: left;
+    color: $active_bgcolor;
+    padding-left: 5px;
+    margin-right: 5px;
+    box-sizing: border-box;
+    > input[type='text'] {
+      background-color: var(--card-bg);
+      color: $gray;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      width: calc(100% - 36px);
+      padding: 0;
+      height: 32px;
+      line-height: 16px;
+      &::placeholder {
+        color: $active_bgcolor;
+      }
+    }
+    > i.fa {
+      width: 28px;
+      height: 36px;
+      line-height: 36px;
+      vertical-align: top;
+      margin-right: 3px;
+      float: right;
+      cursor: pointer;
+      font-size: 28px;
     }
   }
 }
@@ -227,10 +273,13 @@ export default {
     'third_label',
     'fourth',
     'fourth_label',
+    'enable_extra',
   ],
   emits: ['clear', 'select'],
   data() {
-    return {};
+    return {
+      extra: '',
+    };
   },
   methods: {
     clear_() {
@@ -238,6 +287,18 @@ export default {
     },
     select_(player) {
       this.$emit('select', player);
+    },
+    selectExtra() {
+      if (
+        this.extra &&
+        !this.fourth.map(({ name }) => name).includes(this.extra)
+      ) {
+        this.$emit('select', { name: this.extra });
+        this.extra = '';
+      }
+    },
+    closed() {
+      this.extra = '';
     },
   },
 };

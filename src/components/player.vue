@@ -46,6 +46,7 @@
   white-space: nowrap;
   overflow: hidden;
   display: inline-block;
+  vertical-align: top;
   .name {
     margin: 0 15px 0 5px;
     text-align: left;

@@ -247,6 +247,7 @@
       :third_label="$t('ttl_prev5_player')"
       :fourth="benchPlayers"
       :fourth_label="$t('ttl_bench_player')"
+      :enable_extra="true"
       v-on="
         ['first', 'second', 'third'].includes(changeMode) && {
           clear: clearPlayer,

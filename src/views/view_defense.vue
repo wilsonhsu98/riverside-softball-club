@@ -292,6 +292,7 @@
       :current_label="$t('ttl_current_player')"
       :fourth="possiblePlayers"
       :fourth_label="$t('ttl_all_players')"
+      :enable_extra="true"
       @select="selectPlayer"
     ></player-modal>
     <players-modal
@@ -301,6 +302,7 @@
       :current_label="errorLabel"
       :second="benchPlayers"
       :second_label="$t('ttl_other_players')"
+      :enable_extra="true"
       @add="addError"
       @delete="deleteError"
     ></players-modal>

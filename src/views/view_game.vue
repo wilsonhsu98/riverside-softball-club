@@ -847,6 +847,7 @@
       :current_label="$t('ttl_current_option')"
       :fourth="possiblePlayers"
       :fourth_label="$t('ttl_all_players')"
+      :enable_extra="true"
       @select="selectPlayer"
     ></player-modal>
 

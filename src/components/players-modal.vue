@@ -4,6 +4,7 @@
     :adaptive="true"
     :maxWidth="400"
     :minHeight="400"
+    @closed="closed"
     class="modal-wrapper"
   >
     <div class="player-modal">
@@ -48,6 +49,14 @@
       >
         <label>{{ second_label }}</label>
         <div class="player-list-container">
+          <div class="add-source" v-if="!!enable_extra">
+            <input
+              type="text"
+              v-model="extra"
+              :placeholder="$t('pla_add_extra')"
+            />
+            <i class="fa fa-plus-circle" @click="selectExtra"></i>
+          </div>
           <player
             v-for="player in second"
             :key="player.name"
@@ -139,11 +148,48 @@
     display: flex;
     margin-top: 5px;
     position: relative;
-    .player {
+    .player,
+    .add-source {
       flex: 0 1 calc(33% - 4px);
       &:nth-child(3n) {
         margin-right: 0;
       }
+    }
+  }
+  .add-source {
+    height: 40px;
+    line-height: 36px;
+    border: 2px solid $active_bgcolor;
+    border-radius: 5px;
+    outline: none;
+    text-align: left;
+    color: $active_bgcolor;
+    padding-left: 5px;
+    margin-right: 5px;
+    box-sizing: border-box;
+    > input[type='text'] {
+      background-color: var(--card-bg);
+      color: $gray;
+      font-size: 16px;
+      border: none;
+      outline: none;
+      width: calc(100% - 36px);
+      padding: 0;
+      height: 32px;
+      line-height: 16px;
+      &::placeholder {
+        color: $active_bgcolor;
+      }
+    }
+    > i.fa {
+      width: 28px;
+      height: 36px;
+      line-height: 36px;
+      vertical-align: top;
+      margin-right: 3px;
+      float: right;
+      cursor: pointer;
+      font-size: 28px;
     }
   }
 }
@@ -210,10 +256,13 @@ export default {
     'second_label',
     'current',
     'current_label',
+    'enable_extra',
   ],
   emits: ['clear', 'select'],
   data() {
-    return {};
+    return {
+      extra: '',
+    };
   },
   methods: {
     add_(player) {
@@ -221,6 +270,17 @@ export default {
     },
     delete_(player) {
       this.$emit('delete', player);
+    },
+    selectExtra() {
+      if (
+        this.extra &&
+        !this.second.map(({ name }) => name).includes(this.extra)
+      ) {
+        this.$emit('add', { name: this.extra });
+      }
+    },
+    closed() {
+      this.extra = '';
     },
   },
 };

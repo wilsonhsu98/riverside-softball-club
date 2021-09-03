@@ -604,6 +604,9 @@ i.fa {
         display: inline-block;
         width: 100px;
         box-sizing: border-box;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        vertical-align: middle;
       }
       &:after {
         content: '';

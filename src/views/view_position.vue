@@ -143,6 +143,7 @@
       :current_label="$t('ttl_current_player')"
       :fourth="possiblePlayers"
       :fourth_label="$t('ttl_all_players')"
+      :enable_extra="true"
       @select="selectPlayer"
       @clear="clearPlayer"
     ></player-modal>
