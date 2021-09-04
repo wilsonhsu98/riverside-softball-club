@@ -236,16 +236,19 @@
     right: 20px !important;
     width: auto !important;
   }
-  .label-container.multiple .player {
-    flex: 0 1 calc(50% - 4px);
-    &:nth-child(3n) {
-      margin-right: 0;
-    }
-    &:nth-child(even) {
-      margin-right: 0;
-    }
-    &:nth-child(odd) {
-      margin-right: 5px;
+  .label-container.multiple {
+    .player,
+    .add-source {
+      flex: 0 1 calc(50% - 4px);
+      &:nth-child(3n) {
+        margin-right: 0;
+      }
+      &:nth-child(even) {
+        margin-right: 0;
+      }
+      &:nth-child(odd) {
+        margin-right: 5px;
+      }
     }
   }
 }
