@@ -82,6 +82,8 @@ const types = {
   SEARCH_ALL_TEAM: 'TEAM/SEARCH_ALL_TEAM',
   FETCH_REQUESTS: 'TEAM/FETCH_REQUESTS',
   CACHE_TEAMS: 'TEAM/CACHE_TEAMS',
+  SET_CLOCK: 'TEAM/SET_CLOCK',
+  ENABLE_CLOCK: 'TEAM/ENABLE_CLOCK',
 };
 
 const state = {
@@ -106,6 +108,8 @@ const state = {
   allTeams: [],
   requests: [],
   cacheTeamsResponse: undefined,
+  clock: undefined,
+  isClockRunning: false,
 };
 
 const getters = {
@@ -122,6 +126,7 @@ const getters = {
   recentGames: state => state.recentGames,
   allTeams: state => state.allTeams,
   requests: state => state.requests,
+  clock: state => state.clock,
 };
 
 const actions = {
@@ -531,7 +536,7 @@ const actions = {
         commit(rootTypes.LOADING, false);
       });
   },
-  listenTeamChange({ commit }, teamCode) {
+  listenTeamChange({ commit, state }, teamCode) {
     let preUnlockGames;
     if (teamCode) {
       const idbKeyval = dbInit(teamCode);
@@ -548,6 +553,7 @@ const actions = {
               benches: benches_ = {},
               players: players_ = {},
               unlockGames = [],
+              clock,
               ...others
             } = teamDoc.data();
             commit(rootTypes.SET_TEAMICON, icon);
@@ -640,6 +646,32 @@ const actions = {
               unlockGames,
               ...others,
             });
+            if (clock) {
+              const clock_ = new f_timestamp(
+                clock.seconds,
+                clock.nanoseconds,
+              ).toDate();
+              const executeClock = () => {
+                const date = new Date(new Date().getTime() - clock_.getTime());
+                const hours = date.getUTCHours();
+                const minutes = `0${date.getUTCMinutes()}`;
+                const seconds = `0${date.getUTCSeconds()}`;
+                const formattedTime = `${hours}:${minutes.substr(
+                  -2,
+                )}:${seconds.substr(-2)}`;
+                if (state.isClockRunning) {
+                  if (state.clock !== formattedTime) {
+                    commit(types.SET_CLOCK, formattedTime);
+                  }
+                  window.requestAnimationFrame(executeClock);
+                }
+              };
+              commit(types.ENABLE_CLOCK, true);
+              window.requestAnimationFrame(executeClock);
+            } else {
+              commit(types.SET_CLOCK, undefined);
+              commit(types.ENABLE_CLOCK, false);
+            }
           }
         });
     } else {
@@ -1147,6 +1179,16 @@ const actions = {
         commit(rootTypes.LOADING, false);
       });
   },
+  startClock(undefined, teamCode) {
+    db.collection('teams')
+      .doc(teamCode)
+      .set({ clock: timestamp }, { merge: true });
+  },
+  stopClock(undefined, teamCode) {
+    db.collection('teams')
+      .doc(teamCode)
+      .set({ clock: fieldValue.delete() }, { merge: true });
+  },
 };
 
 const mutations = {
@@ -1201,6 +1243,12 @@ const mutations = {
   },
   [types.CACHE_TEAMS](state, data) {
     state.cacheTeamsResponse = data;
+  },
+  [types.SET_CLOCK](state, data) {
+    state.clock = data;
+  },
+  [types.ENABLE_CLOCK](state, data) {
+    state.isClockRunning = data;
   },
 };
 

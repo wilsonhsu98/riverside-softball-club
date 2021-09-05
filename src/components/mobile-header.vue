@@ -2,7 +2,7 @@
   <header>
     <i v-if="$listeners.back" class="fa fa-arrow-left" @click="back_"></i>
     <span v-else></span>
-    <img class="icon" :src="$cacheImg(icon) || $cacheImg(defaultIcon)" />
+    <clock-or-icon :icon="$cacheImg(icon) || $cacheImg(defaultIcon)" />
     <div
       v-if="$listeners.save"
       :class="['save-btn', { disabled, focus }]"
@@ -79,16 +79,6 @@ header {
     z-index: 2;
     box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.13), 0 0 2px 0 rgba(0, 0, 0, 0.2);
     text-align: center;
-    .icon {
-      max-height: 45px;
-      position: absolute;
-      top: 50%;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      margin: 0 auto;
-      transform: translateY(-50%);
-    }
   }
 }
 </style>

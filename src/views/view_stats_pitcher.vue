@@ -2,9 +2,8 @@
   <div>
     <div class="search-bar" ref="searchBar">
       <div class="search-bar__container">
-        <img
-          class="icon"
-          :src="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
+        <clock-or-icon
+          :icon="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
         />
       </div>
       <label class="search-icon" for="toggle-search">
@@ -517,16 +516,6 @@ i.fa {
       display: block;
       height: 50px;
       position: relative;
-      .icon {
-        max-height: 45px;
-        position: absolute;
-        top: 50%;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        margin: 0 auto;
-        transform: translateY(-50%);
-      }
     }
     .search-icon {
       display: block;

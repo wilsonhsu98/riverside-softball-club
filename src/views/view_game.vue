@@ -907,6 +907,9 @@
     <div v-if="firstGuide" class="image-modal" @click="closeFirstGuide">
       <div>
         <p @click="closeFirstGuide">{{ $t('msg_first_guide') }}</p>
+        <button class="btn" @click="startClock_">
+          {{ $t('btn_to_start_clock') }}
+        </button>
         <button
           v-if="['top', ''].includes(topBottom)"
           class="btn"
@@ -1933,6 +1936,7 @@ export default {
       'setBoxDisplay',
       'toggleGameStatus',
       'editGameOrder',
+      'startClock',
     ]),
     screenshot() {
       this.toggleLoading(true);
@@ -2250,6 +2254,9 @@ export default {
       if (e.currentTarget === e.target) {
         this.groupCoordinates = [];
       }
+    },
+    startClock_() {
+      this.startClock(this.$route.params.team);
     },
   },
   computed: {

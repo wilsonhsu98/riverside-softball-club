@@ -3,9 +3,8 @@
     <router-view class="content"></router-view>
     <header>
       <div class="header-container">
-        <img
-          class="icon"
-          :src="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
+        <clock-or-icon
+          :icon="$cacheImg(currentTeamIcon) || $cacheImg(defaultIcon)"
         />
         <ul class="tab">
           <li v-if="currentTeam">
@@ -131,10 +130,20 @@ header {
   .header-container {
     width: $main_width;
     margin: 0 auto;
+    display: flex;
+    align-items: center;
   }
-  .icon {
-    max-height: 60px;
-    vertical-align: middle;
+  &::v-deep {
+    .icon {
+      max-height: 60px;
+    }
+    .icon,
+    .clock {
+      position: unset;
+      top: unset;
+      left: unset;
+      transform: unset;
+    }
   }
   .tab {
     display: inline-flex;
@@ -145,8 +154,8 @@ header {
     background-size: contain;
     height: 100%;
     line-height: 70px;
-    width: calc(100% - 66px);
     vertical-align: middle;
+    flex: 1;
     > li {
       display: inline-block;
       &.home {
@@ -336,8 +345,11 @@ header {
     top: initial;
     padding-bottom: constant(safe-area-inset-bottom); /* iOS 11.0 */
     padding-bottom: env(safe-area-inset-bottom); /* iOS 11.2 */
-    .icon {
-      display: none;
+    &::v-deep {
+      .icon,
+      .clock {
+        display: none;
+      }
     }
     .tab {
       display: flex;
@@ -574,6 +586,7 @@ export default {
       'confirmPromiseReject',
       'isAnonymous',
       'updateAvailable',
+      'clock',
     ]),
   },
   watch: {
