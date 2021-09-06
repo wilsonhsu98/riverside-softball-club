@@ -1,10 +1,11 @@
 <template>
   <fragment>
     <span v-if="!isAnonymous && clock" class="clock">
-      {{ clock }}
+      <i class="fa fa-clock-o"></i>
+      <span class="text">{{ clock }}</span>
       <i
         v-if="currentTeam && role === 'manager'"
-        class="fa fa-stop-circle-o"
+        class="fa fa-stop-circle"
         @click="stopClock_"
       ></i>
     </span>
@@ -32,11 +33,16 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  color: $header_color;
+  .text {
+    margin: 0 5px;
+  }
   .fa {
-    margin-left: 5px;
     font-size: 28px;
-    color: $active_bgcolor;
+  }
+  .fa-stop-circle {
     cursor: pointer;
+    color: $active_bgcolor;
   }
 }
 </style>
