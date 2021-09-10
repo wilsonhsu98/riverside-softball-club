@@ -390,7 +390,7 @@ const actions = {
         commit(types.LOADING, false);
       });
   },
-  purlyLogout() {
+  silentLogout() {
     auth.signOut();
   },
   forceLogin({ commit }, version) {

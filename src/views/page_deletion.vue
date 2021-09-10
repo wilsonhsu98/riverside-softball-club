@@ -7,10 +7,10 @@ import { mapActions } from 'vuex';
 
 export default {
   created() {
-    this.purlyLogout();
+    this.silentLogout();
   },
   methods: {
-    ...mapActions(['purlyLogout']),
+    ...mapActions(['silentLogout']),
   },
 };
 </script>
