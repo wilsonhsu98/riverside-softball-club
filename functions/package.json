@@ -20,6 +20,7 @@
     "request-promise": "^4.2.2",
     "serverless-http": "^2.3.0",
     "simple-oauth2": "^1.5.0",
+    "slugid": "^3.0.0",
     "url": "^0.11.0"
   },
   "private": true,

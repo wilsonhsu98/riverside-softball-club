@@ -160,7 +160,9 @@ const render = () => {
     );
   }).then(() => {
     resetVH();
-    store.dispatch('chkLoginStatus');
+    if (!window.location.href.includes('deletion')) {
+      store.dispatch('chkLoginStatus');
+    }
   });
 };
 

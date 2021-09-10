@@ -218,6 +218,12 @@ const router = new VueRouter({
       ],
     },
     {
+      path: '/deletion',
+      name: 'deletion',
+      component: require('./views/page_deletion').default,
+      meta: { requiresAuth: false },
+    },
+    {
       path: '*',
       redirect: '/main/user',
     },

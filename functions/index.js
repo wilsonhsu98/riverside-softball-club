@@ -168,6 +168,7 @@ const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const url = require('url');
+const slugid = require('slugid');
 
 // Path to the OAuth handlers.
 const OAUTH_REDIRECT_PATH = '/line_oauth';
@@ -479,8 +480,11 @@ router.post('/fb_deletion_callback', (req, res) => {
       .status(500)
       .send('Invalid signature: ' + sig + '. Expected ' + expected_sig);
   }
-  console.log(data);
-  res.json({ url: 'https://riversidesoftballclub.netlify.app/', confirmation_code: '200' });
+  const code = slugid.nice();
+  res.json({
+    url: `https://riversidesoftballclub.netlify.app/#/deletion?id=${code}`,
+    confirmation_code: code,
+  });
 });
 
 app.use('/.netlify/functions/index', router);
