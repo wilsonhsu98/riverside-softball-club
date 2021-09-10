@@ -480,7 +480,7 @@ router.post('/fb_deletion_callback', (req, res) => {
       .send('Invalid signature: ' + sig + '. Expected ' + expected_sig);
   }
   console.log(data);
-  res.json({ url: 'https://riversidesoftballclub.netlify.app/', confirmation_code: 200 });
+  res.json({ url: 'https://riversidesoftballclub.netlify.app/', confirmation_code: '200' });
 });
 
 app.use('/.netlify/functions/index', router);
