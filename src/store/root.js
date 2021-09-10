@@ -390,6 +390,9 @@ const actions = {
         commit(types.LOADING, false);
       });
   },
+  purlyLogout() {
+    auth.signOut();
+  },
   forceLogin({ commit }, version) {
     commit(types.CLEAN_TOKEN, version);
   },

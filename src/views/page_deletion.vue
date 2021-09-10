@@ -3,30 +3,14 @@
 </template>
 
 <script>
-// import { mapGetters, mapActions } from 'vuex';
+import { mapActions } from 'vuex';
 
 export default {
-  data() {
-    return {};
-  },
   created() {
-    // if (this.$route.params.custom) {
-    //   this.lineLoginRedirect(this.$route.params.custom);
-    // }
+    this.purlyLogout();
   },
   methods: {
-    // ...mapActions([
-    //   'anonymousLogin',
-    //   'googleLogin',
-    //   'fbLogin',
-    //   'githubLogin',
-    //   'lineLogin',
-    //   'lineLoginRedirect',
-    //   'alert',
-    // ]),
-  },
-  computed: {
-    // ...mapGetters(['loading', 'alertMsg']),
+    ...mapActions(['purlyLogout']),
   },
 };
 </script>
