@@ -479,7 +479,8 @@ router.post('/fb_deletion_callback', (req, res) => {
       .status(500)
       .send('Invalid signature: ' + sig + '. Expected ' + expected_sig);
   }
-  res.json(data);
+  console.log(data);
+  res.json({ url: 'https://riversidesoftballclub.netlify.app/', confirmation_code: 200 });
 });
 
 app.use('/.netlify/functions/index', router);
