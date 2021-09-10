@@ -25,4 +25,8 @@ module.exports = {
     clientSecret: process.env.VUE_APP_LINE_CLIENTSECRET,
     loginUrl: process.env.VUE_APP_LINE_LOGINGURL,
   },
+
+  fb: {
+    clientSecret: process.env.VUE_APP_FB_CLIENTSECRET,
+  },
 };

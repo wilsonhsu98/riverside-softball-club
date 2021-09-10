@@ -447,6 +447,40 @@ router.get('/delete_anonymous_users', (undefined, res) => {
   deleteAnonymousUsers();
 });
 
+router.post('/fb_deletion_callback', (req, res) => {
+  function base64decode(data) {
+    while (data.length % 4 !== 0) {
+      data += '=';
+    }
+    data = data.replace(/-/g, '+').replace(/_/g, '/');
+    return new Buffer(data, 'base64').toString('utf-8');
+  }
+
+  var encoded_data = req.split('.', 2);
+  // decode the data
+  var sig = encoded_data[0];
+  var json = base64decode(encoded_data[1]);
+  var data = JSON.parse(json);
+  if (!data.algorithm || data.algorithm.toUpperCase() != 'HMAC-SHA256') {
+    throw Error(
+      'Unknown algorithm: ' + data.algorithm + '. Expected HMAC-SHA256',
+    );
+  }
+  var expected_sig = crypto
+    .createHmac('sha256', config.fb.clientSecret)
+    .update(encoded_data[1])
+    .digest('base64')
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace('=', '');
+  if (sig !== expected_sig) {
+    res
+      .status(500)
+      .send('Invalid signature: ' + sig + '. Expected ' + expected_sig);
+  }
+  res.json(data);
+});
+
 app.use('/.netlify/functions/index', router);
 
 /**
