@@ -181,6 +181,7 @@ app.enable('trust proxy');
 app.use(express.static('public'));
 app.use(express.static('node_modules/instafeed.js'));
 app.use(cookieParser());
+app.use(express.urlencoded());
 
 /**
  * Redirects the User to the Instagram authentication consent screen. Also the 'state' cookie is set for later state verification.
@@ -456,7 +457,7 @@ router.post('/fb_deletion_callback', (req, res) => {
     return new Buffer(data, 'base64').toString('utf-8');
   }
 
-  var encoded_data = req.split('.', 2);
+  var encoded_data = req.body.signed_request.split('.', 2);
   // decode the data
   var sig = encoded_data[0];
   var json = base64decode(encoded_data[1]);
