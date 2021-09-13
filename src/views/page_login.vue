@@ -41,7 +41,7 @@
       <div style="margin-top: 5px;">
         <a
           class="link"
-          href="https://www.privacypolicies.com/live/a6db80b5-4d56-4e7e-946a-505db52f9dcd"
+          href="https://riversidesoftballclub.netlify.com/privacy_policy.html"
           target="_blank"
           >{{ $t('system_privacy_policy') }}</a
         >
