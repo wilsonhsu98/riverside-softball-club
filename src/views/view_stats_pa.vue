@@ -1082,7 +1082,7 @@ export default {
           this.chartHeight[ele.id.replace('chart_', '')] = height;
           ele.style.height = '';
         });
-      });
+      }, 500);
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectRect);
