@@ -15,7 +15,11 @@
         class="toggle-search non-input"
         v-model="toggleSearch"
       />
-      <div class="condition__container">
+      <div
+        class="condition__container"
+        ref="conditionContainer"
+        :style="{ '--height': `${conditionContainerHeight}px` }"
+      >
         <div class="condition">
           <div class="condition__label">{{ $t('col_period') }}</div>
           <div class="condition__element" :data-col="$t('col_period')">
@@ -265,7 +269,10 @@
                     class="chart"
                     tabIndex="-1"
                     :id="`chart_${item.name}`"
-                    :style="{ width: `${chartWidth}px` }"
+                    :style="{
+                      width: `${chartWidth}px`,
+                      '--height': `${chartHeight[item.name]}px`,
+                    }"
                     @click="e => e.preventDefault()"
                   >
                     <div class="chart-wrapper">
@@ -545,7 +552,7 @@ i.fa {
         z-index: 3;
       }
       .chart {
-        display: block;
+        height: var(--height);
       }
     }
   }
@@ -655,7 +662,8 @@ i.fa {
     overflow: hidden;
     outline: none;
 
-    display: none;
+    height: 0;
+    transition: height 0.2s ease-in-out;
 
     font-size: 12px;
     padding: 0;
@@ -802,16 +810,13 @@ i.fa {
     .toggle-search {
       &:checked {
         & ~ .condition__container {
-          max-height: 200vh;
-          transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
-          transition-delay: 0s;
+          height: var(--height);
         }
       }
     }
     .condition__container {
-      display: block;
-      max-height: 0;
-      transition: max-height 0.5s cubic-bezier(0, 1, 0, 1) -0.1s;
+      height: 0;
+      transition: height 0.2s ease-in-out;
     }
     .condition {
       background-color: transparent;
@@ -967,6 +972,8 @@ export default {
       locationDisplayMode: 'dot', // [dot, heatmap, percentage]
       locationDisplayCount: 0,
       sum: {},
+      conditionContainerHeight: 0,
+      chartHeight: {},
     };
   },
   created() {},
@@ -976,7 +983,7 @@ export default {
     }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
-    this.detectChartWidth();
+    this.detectRect();
   },
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
@@ -1056,15 +1063,29 @@ export default {
         };
       }
     },
-    detectChartWidth() {
+    detectRect() {
       const { width, top } = this.$refs[
         'sticky-table-wrapper'
       ].getBoundingClientRect();
       this.chartWidth = width - 152;
       this.tableHeight = window.innerHeight - top - 20;
+
+      this.$refs.conditionContainer.style.height = 'auto';
+      const { height } = this.$refs.conditionContainer.getBoundingClientRect();
+      this.conditionContainerHeight = height;
+      this.$refs.conditionContainer.style.height = '';
+
+      setTimeout(() => {
+        Array.from(document.querySelectorAll('.chart')).forEach(ele => {
+          ele.style.height = 'auto';
+          const { height } = ele.getBoundingClientRect();
+          this.chartHeight[ele.id.replace('chart_', '')] = height;
+          ele.style.height = '';
+        });
+      });
     },
     requestAnimationFrame() {
-      window.requestAnimationFrame(this.detectChartWidth);
+      window.requestAnimationFrame(this.detectRect);
     },
   },
   computed: {
@@ -1156,7 +1177,7 @@ export default {
         this.lazy = false;
         setTimeout(() => {
           this.lazy = true;
-          this.detectChartWidth();
+          this.detectRect();
         }, 500);
       },
       immediate: true,

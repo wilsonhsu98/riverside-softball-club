@@ -15,7 +15,11 @@
         class="toggle-search non-input"
         v-model="toggleSearch"
       />
-      <div class="condition__container">
+      <div
+        class="condition__container"
+        ref="conditionContainer"
+        :style="{ '--height': `${conditionContainerHeight}px` }"
+      >
         <div class="condition">
           <div class="condition__label">{{ $t('col_period') }}</div>
           <div class="condition__element" :data-col="$t('col_period')">
@@ -298,9 +302,7 @@ i.fa {
     .toggle-search {
       &:checked {
         & ~ .condition__container {
-          max-height: 200vh;
-          transition-timing-function: cubic-bezier(0.5, 0, 1, 0);
-          transition-delay: 0s;
+          height: var(--height);
           .fa {
             opacity: 1;
             transition-delay: 0.4s;
@@ -309,9 +311,8 @@ i.fa {
       }
     }
     .condition__container {
-      display: block;
-      max-height: 0;
-      transition: max-height 0.5s cubic-bezier(0, 1, 0, 1) -0.1s;
+      height: 0;
+      transition: height 0.2s ease-in-out;
     }
     .condition {
       background-color: transparent;
@@ -458,14 +459,18 @@ export default {
         'WHIP',
         'MVP',
       ]),
+      conditionContainerHeight: 0,
     };
   },
   created() {},
   mounted() {
     document.addEventListener(clickEvent, this.collapseSearch, true);
+    window.addEventListener('resize', this.requestAnimationFrame);
+    this.detectRect();
   },
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
+    window.removeEventListener('resize', this.requestAnimationFrame);
   },
   methods: {
     ...mapActions([
@@ -517,6 +522,15 @@ export default {
         .slice(Math.floor(Math.random() * arr.length))
         .concat(arr)
         .slice(0, arr.length);
+    },
+    detectRect() {
+      this.$refs.conditionContainer.style.height = 'auto';
+      const { height } = this.$refs.conditionContainer.getBoundingClientRect();
+      this.conditionContainerHeight = height;
+      this.$refs.conditionContainer.style.height = '';
+    },
+    requestAnimationFrame() {
+      window.requestAnimationFrame(this.detectRect);
     },
   },
   computed: {
