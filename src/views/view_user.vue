@@ -64,8 +64,12 @@
             <a
               v-if="
                 [
-                  'Ac1JwgNSkdctBkdoiOC0Fgn3mqE2',
-                  '6CMMLMg6adPL3CyUWkWbPzIAYN62',
+                  'Ac1JwgNSkdctBkdoiOC0Fgn3mqE2', // riversidesoftballclub.app@gmail.com
+                  '6CMMLMg6adPL3CyUWkWbPzIAYN62', // wilsonhsu98@gmail.com
+                  'd73r94eHUqcI0TAMbd1qXizdEX62', // 阿哲
+                  'W898Wwv35BZn1KcxNnE1UUIihFE2', // 冠辰
+                  'M3VzysUPmDbsXX5gLgHsvZt8MEw1', // 卡布
+                  'kxZaIGUHPyRacyXMO8TYQKlDVO53', // teddy
                 ].includes(userId)
               "
               class="link"
@@ -82,7 +86,7 @@
             >
             <a
               class="link"
-              href="https://www.privacypolicies.com/live/f438ae5b-73b5-4b83-b7c0-0d004c7453a2"
+              href="https://riversidesoftballclub.netlify.com/terms_and_conditions.html"
               target="_blank"
               >{{ $t('system_term_of_use') }}</a
             >

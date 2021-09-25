@@ -199,6 +199,9 @@
         <button @click="alert('')">{{ $t('btn_noticed') }}</button>
       </div>
     </div>
+    <button style="position: fixed; right: 10px; bottom: 10px;" @click="close">
+      {{ $t('close_tab_btn') }}
+    </button>
   </div>
 </template>
 
@@ -641,6 +644,9 @@ export default {
     },
     setHighlight(team) {
       this.hightlight = team;
+    },
+    close() {
+      window.close();
     },
   },
   computed: {
