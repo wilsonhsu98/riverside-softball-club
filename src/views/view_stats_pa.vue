@@ -1076,12 +1076,14 @@ export default {
       this.$refs.conditionContainer.style.height = '';
 
       setTimeout(() => {
+        const chartHeight = {};
         Array.from(document.querySelectorAll('.chart')).forEach(ele => {
           ele.style.height = 'auto';
           const { height } = ele.getBoundingClientRect();
-          this.chartHeight[ele.id.replace('chart_', '')] = height;
+          chartHeight[ele.id.replace('chart_', '')] = height;
           ele.style.height = '';
         });
+        this.chartHeight = chartHeight;
       }, 500);
     },
     requestAnimationFrame() {
