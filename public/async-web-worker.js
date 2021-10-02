@@ -397,92 +397,96 @@ const genPitcherStatistics = (
     },
     { pitchers: [], records: [] },
   );
-  return pitchers.map(name => {
-    const { OUT, R, H, SO, BB, S, B } = records
-      .filter(p => p.name === name)
-      .reduce(
-        (acc, p) => ({
-          OUT: acc.OUT + sumByInn(p.OUT),
-          R: acc.R + sumByInn(p.R),
-          H: acc.H + sumByInn(p.H),
-          SO: acc.SO + sumByInn(p.SO),
-          BB: acc.BB + sumByInn(p.BB),
-          S: acc.S + sumByInn(p.S),
-          B: acc.B + sumByInn(p.B),
-        }),
-        { OUT: 0, R: 0, H: 0, S: 0, SO: 0, BB: 0, B: 0 },
-      );
-    const { ERA, WHIP, K7, BB7, H7, PIP } = accCalc(
-      [],
-      [
-        {
-          OUT: [OUT],
-          R: [R],
-          H: [H],
-          SO: [SO],
-          BB: [BB],
-          S: [S],
-          B: [B],
-        },
-      ],
-      0,
-      pitcherInn,
-    );
-    return {
-      name,
-      data: (players.find(sub => sub.id === name) || { data: {} }).data,
-      OUT,
-      S,
-      B,
-      W: alltime.filter(
-        g =>
-          (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name &&
-          g.result === 'win',
-      ).length,
-      L: alltime.filter(
-        g =>
-          (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name &&
-          g.result === 'lose',
-      ).length,
-      ERA,
-      G:
-        current.filter(g => g.pitchers.some(p => p.name === name)).length +
-        legacy.filter(
-          g => (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name,
-        ).length,
-      ...(OUT === 0
-        ? {
-            GS: '-',
-            IP: '-',
-            H: '-',
-            R: '-',
-            NP: '-',
-            BB: '-',
-            SO: '-',
-            WHIP: '-',
-            'S%': '-',
-            PIP: '-',
-            K7: '-',
-            BB7: '-',
-            H7: '-',
-          }
-        : {
-            GS: current.filter(g => (g.pitchers[0] || {}).name === name).length,
-            IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
-            H,
-            R,
-            NP: S + B,
-            BB,
-            SO,
-            WHIP,
-            'S%': B === 0 ? '-' : Math.round((S / B) * 100) / 100,
-            PIP,
-            K7,
-            BB7,
-            H7,
+  const currentPlayers = players.map(p => p.id);
+  return pitchers
+    .filter(name => currentPlayers.includes(name))
+    .map(name => {
+      const { OUT, R, H, SO, BB, S, B } = records
+        .filter(p => p.name === name)
+        .reduce(
+          (acc, p) => ({
+            OUT: acc.OUT + sumByInn(p.OUT),
+            R: acc.R + sumByInn(p.R),
+            H: acc.H + sumByInn(p.H),
+            SO: acc.SO + sumByInn(p.SO),
+            BB: acc.BB + sumByInn(p.BB),
+            S: acc.S + sumByInn(p.S),
+            B: acc.B + sumByInn(p.B),
           }),
-    };
-  });
+          { OUT: 0, R: 0, H: 0, S: 0, SO: 0, BB: 0, B: 0 },
+        );
+      const { ERA, WHIP, K7, BB7, H7, PIP } = accCalc(
+        [],
+        [
+          {
+            OUT: [OUT],
+            R: [R],
+            H: [H],
+            SO: [SO],
+            BB: [BB],
+            S: [S],
+            B: [B],
+          },
+        ],
+        0,
+        pitcherInn,
+      );
+      return {
+        name,
+        data: (players.find(sub => sub.id === name) || { data: {} }).data,
+        OUT,
+        S,
+        B,
+        W: alltime.filter(
+          g =>
+            (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name &&
+            g.result === 'win',
+        ).length,
+        L: alltime.filter(
+          g =>
+            (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name &&
+            g.result === 'lose',
+        ).length,
+        ERA,
+        G:
+          current.filter(g => g.pitchers.some(p => p.name === name)).length +
+          legacy.filter(
+            g => (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name,
+          ).length,
+        ...(OUT === 0
+          ? {
+              GS: '-',
+              IP: '-',
+              H: '-',
+              R: '-',
+              NP: '-',
+              BB: '-',
+              SO: '-',
+              WHIP: '-',
+              'S%': '-',
+              PIP: '-',
+              K7: '-',
+              BB7: '-',
+              H7: '-',
+            }
+          : {
+              GS: current.filter(g => (g.pitchers[0] || {}).name === name)
+                .length,
+              IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
+              H,
+              R,
+              NP: S + B,
+              BB,
+              SO,
+              WHIP,
+              'S%': B === 0 ? '-' : Math.round((S / B) * 100) / 100,
+              PIP,
+              K7,
+              BB7,
+              H7,
+            }),
+      };
+    });
 };
 
 const displayGame = (players, records, errors = [], role) => {

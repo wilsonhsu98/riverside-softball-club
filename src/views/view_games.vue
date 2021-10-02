@@ -1051,6 +1051,7 @@ export default {
       if (
         this.toggleSearch &&
         this.$refs &&
+        this.$refs['searchBar'] &&
         !this.$refs['searchBar'].contains(event.target)
       ) {
         this.toggleSearch = false;
@@ -1184,12 +1185,19 @@ export default {
           this.fieldOptions = [];
           break;
       }
+      setTimeout(() => {
+        this.detectRect();
+      });
     },
     detectRect() {
-      this.$refs.conditionContainer.style.height = 'auto';
-      const { height } = this.$refs.conditionContainer.getBoundingClientRect();
-      this.conditionContainerHeight = height;
-      this.$refs.conditionContainer.style.height = '';
+      if (this.$refs.conditionContainer) {
+        this.$refs.conditionContainer.style.height = 'auto';
+        const {
+          height,
+        } = this.$refs.conditionContainer.getBoundingClientRect();
+        this.conditionContainerHeight = height;
+        this.$refs.conditionContainer.style.height = '';
+      }
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectRect);

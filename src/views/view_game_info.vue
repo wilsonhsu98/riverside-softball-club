@@ -474,6 +474,7 @@
       :current_label="$t('ttl_current_option')"
       :fourth="teamInfo.players"
       :fourth_label="$t('ttl_all_players')"
+      :enable_extra="enableExtra"
       @clear="clearPlayer"
       @select="selectPlayer"
     ></player-modal>
@@ -842,6 +843,7 @@ export default {
       isFocusInn: '',
       changeMode: '',
       currentPlayer: undefined,
+      enableExtra: false,
       pitcher: '',
       pitchers: [],
       mvp: '',
@@ -998,6 +1000,7 @@ export default {
       if (['coach', 'recorder', 'pitcher', 'mvp', 'gwrbi'].includes(mode)) {
         this.currentPlayer = this[mode] ? this.getPlayer(this[mode]) : '';
       }
+      this.enableExtra = ['pitcher', 'mvp', 'gwrbi'].includes(mode);
       this.$modal.show('player');
       this.changeMode = mode;
     },
