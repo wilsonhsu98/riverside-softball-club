@@ -1001,6 +1001,7 @@ const execGenPitcherStatistics = state => {
 };
 
 const execItemStats = state => {
+  const currentPlayers = state.players.map(p => p.id);
   const games = (state.period.find(item => item.select).games || []).filter(
     g => !(state.excludedGames || []).includes(g),
   );
@@ -1058,10 +1059,12 @@ const execItemStats = state => {
         },
       };
     }, {});
-  const pitchers = Object.keys(pitcherSet).map(name => ({
-    ...pitcherSet[name],
-    name,
-  }));
+  const pitchers = Object.keys(pitcherSet)
+    .filter(name => currentPlayers.includes(name))
+    .map(name => ({
+      ...pitcherSet[name],
+      name,
+    }));
   return {
     AVG: records
       .filter(item => item.PA !== '-' && item.AVG > 0 && item.PA >= minimunPA)
@@ -1108,7 +1111,10 @@ const execItemStats = state => {
     W: state.games
       .filter(
         item =>
-          games.includes(item.game) && item.result === 'win' && item.pitcher,
+          games.includes(item.game) &&
+          item.result === 'win' &&
+          item.pitcher &&
+          currentPlayers.includes(item.pitcher),
       )
       .map(item =>
         Array.isArray(item.pitcher) ? item.pitcher[0] : item.pitcher,
@@ -1209,7 +1215,12 @@ const execItemStats = state => {
         ).data,
       })),
     MVP: state.games
-      .filter(item => games.includes(item.game) && item.mvp)
+      .filter(
+        item =>
+          games.includes(item.game) &&
+          item.mvp &&
+          currentPlayers.includes(item.mvp),
+      )
       .map(item => item.mvp)
       .reduce((acc, mvp, undefined, self) => {
         if (!acc.find(player => player.mvp === mvp)) {
