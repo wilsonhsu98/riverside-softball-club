@@ -1111,10 +1111,7 @@ const execItemStats = state => {
     W: state.games
       .filter(
         item =>
-          games.includes(item.game) &&
-          item.result === 'win' &&
-          item.pitcher &&
-          currentPlayers.includes(item.pitcher),
+          games.includes(item.game) && item.result === 'win' && item.pitcher,
       )
       .map(item =>
         Array.isArray(item.pitcher) ? item.pitcher[0] : item.pitcher,
@@ -1132,6 +1129,7 @@ const execItemStats = state => {
         }
         return acc;
       }, [])
+      .filter(({ pitcher }) => currentPlayers.includes(pitcher))
       .sort((a, b) =>
         b['W'] === a['W'] ? a['OUT'] - b['OUT'] : b['W'] - a['W'],
       )
