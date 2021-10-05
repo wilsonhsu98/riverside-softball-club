@@ -1,5 +1,6 @@
 const workerCreater = function(cmdObj, callback) {
-  let worker = new Worker('async-web-worker.js');
+  const prevHash = window.localStorage.getItem('version_hash');
+  let worker = new Worker(`async-web-worker.js?${prevHash}`);
 
   worker.addEventListener(
     'message',
