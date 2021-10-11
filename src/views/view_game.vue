@@ -2403,9 +2403,8 @@ export default {
           this.stillCanEditOrder = true;
         }
 
-        this.batterSum = this.box
-          .slice(1)
-          .reduce((acc, record, index, self) => {
+        this.batterSum = this.box.slice(1).reduce(
+          (acc, record, index, self) => {
             const sum = Object.keys(acc).reduce(
               (accObj, k) => ({
                 ...accObj,
@@ -2430,7 +2429,9 @@ export default {
               };
             }
             return sum;
-          }, { AB: 0, H: 0, BB: 0, HR: 0 });
+          },
+          { AB: 0, H: 0, BB: 0, HR: 0 },
+        );
         this.batterSumDesc = `${
           this.batterSum.AVG ? this.batterSum.AVG.toFixed(3) : ''
         } (${this.batterSum.AB}-${this.batterSum.H})${
