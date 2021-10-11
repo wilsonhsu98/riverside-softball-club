@@ -2430,7 +2430,7 @@ export default {
               };
             }
             return sum;
-          }, this.batterSum);
+          }, { AB: 0, H: 0, BB: 0, HR: 0 });
         this.batterSumDesc = `${
           this.batterSum.AVG ? this.batterSum.AVG.toFixed(3) : ''
         } (${this.batterSum.AB}-${this.batterSum.H})${
