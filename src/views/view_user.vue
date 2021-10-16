@@ -62,16 +62,7 @@
               >{{ $t('system_feedback') }}</a
             >
             <a
-              v-if="
-                [
-                  'Ac1JwgNSkdctBkdoiOC0Fgn3mqE2', // riversidesoftballclub.app@gmail.com
-                  '6CMMLMg6adPL3CyUWkWbPzIAYN62', // wilsonhsu98@gmail.com
-                  'd73r94eHUqcI0TAMbd1qXizdEX62', // 阿哲
-                  'W898Wwv35BZn1KcxNnE1UUIihFE2', // 冠辰
-                  'M3VzysUPmDbsXX5gLgHsvZt8MEw1', // 卡布
-                  'kxZaIGUHPyRacyXMO8TYQKlDVO53', // teddy
-                ].includes(userId)
-              "
+              v-if="config.managers.includes(userId)"
               class="link"
               href="#/management"
               target="_blank"
@@ -389,6 +380,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
+import config from '../../config';
 
 export default {
   data() {
@@ -397,6 +389,7 @@ export default {
       dots: undefined,
       keyWord: '',
       defaultIcon,
+      config,
       // dots: [{x: 50, y: 50, color: 'blue'}, {x: 30, y: 30}]
     };
   },

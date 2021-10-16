@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import i18n from './i18n';
 import store from './store';
+import config from '../config';
 
 const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location) {
@@ -255,10 +256,7 @@ router.beforeEach((to, from, next) => {
   } else if (
     (to.path === '/login' && store.getters.token) ||
     (to.path === '/management' &&
-      ![
-        'Ac1JwgNSkdctBkdoiOC0Fgn3mqE2',
-        '6CMMLMg6adPL3CyUWkWbPzIAYN62',
-      ].includes(store.getters.userId)) ||
+      !config.managers.includes(store.getters.userId)) ||
     (to.matched.some(route => route.meta.anonymous === false) &&
       store.getters.isAnonymous) ||
     (to.params.team &&
