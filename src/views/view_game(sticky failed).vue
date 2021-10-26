@@ -263,35 +263,31 @@
       <div class="box-table normal pitcher" v-if="pitchers.length">
         <div class="player-records header">
           <div class="player">
-            <div class="sticky-header">
-              <router-link
-                v-if="editable"
-                :to="{
-                  name: 'edit_defense_info',
-                  params: {
-                    team: $route.params.team,
-                    game: $route.params.game,
-                  },
-                }"
-                class="fa fa-pencil"
-                tag="i"
-              />
-              <span class="order">{{ editable ? '' : '#' }}</span>
-              <span class="name">{{ $t('ttl_pitcher') }}</span>
-            </div>
+            <router-link
+              v-if="editable"
+              :to="{
+                name: 'edit_defense_info',
+                params: {
+                  team: $route.params.team,
+                  game: $route.params.game,
+                },
+              }"
+              class="fa fa-pencil"
+              tag="i"
+            />
+            <span class="order">{{ editable ? '' : '#' }}</span>
+            <span class="name">{{ $t('ttl_pitcher') }}</span>
           </div>
           <div class="records">
-            <div class="sticky-header">
-              <div class="records-flex">
-                <div
-                  class="record"
-                  :key="`header_${colInesx}`"
-                  v-for="(col, colInesx) in pitcherCol"
-                >
-                  <span class="content">{{
-                    ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
-                  }}</span>
-                </div>
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${colInesx}`"
+                v-for="(col, colInesx) in pitcherCol"
+              >
+                <span class="content">{{
+                  ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
+                }}</span>
               </div>
             </div>
           </div>
@@ -302,38 +298,36 @@
           :key="`record_${i}`"
         >
           <div class="player">
-            <div class="contentdiv">
-              <span class="order">
-                {{ i + 1 }}
-                <span
-                  v-if="
-                    pitcher === item.name &&
-                      pitchers.map(p => p.name).indexOf(pitcher) === i
-                  "
-                  :class="`result-icon ${result}`"
-                >
-                  {{ (result && result.slice(0, 1)) || '?' }}
-                </span>
-                <span
-                  v-if="
-                    Array.isArray(pitcher) &&
-                      pitcher[0] === item.name &&
-                      pitcher[1] === i + 1
-                  "
-                  :class="`result-icon ${result}`"
-                >
-                  {{ (result && result.slice(0, 1)) || '?' }}
-                </span>
+            <span class="order">
+              {{ i + 1 }}
+              <span
+                v-if="
+                  pitcher === item.name &&
+                    pitchers.map(p => p.name).indexOf(pitcher) === i
+                "
+                :class="`result-icon ${result}`"
+              >
+                {{ (result && result.slice(0, 1)) || '?' }}
               </span>
-              <span class="name">
-                <photo
-                  :photo="item.data.photo"
-                  :name="item.name"
-                  :number="item.data.number"
-                />
-                {{ item.name }}
+              <span
+                v-if="
+                  Array.isArray(pitcher) &&
+                    pitcher[0] === item.name &&
+                    pitcher[1] === i + 1
+                "
+                :class="`result-icon ${result}`"
+              >
+                {{ (result && result.slice(0, 1)) || '?' }}
               </span>
-            </div>
+            </span>
+            <span class="name">
+              <photo
+                :photo="item.data.photo"
+                :name="item.name"
+                :number="item.data.number"
+              />
+              {{ item.name }}
+            </span>
           </div>
           <div class="records">
             <div class="records-flex">
@@ -594,30 +588,24 @@
       <div class="box-table normal" v-if="box.slice(1).length">
         <div class="player-records header">
           <div class="player">
-            <div class="sticky-header">
-              <span class="order">#</span>
-              <span class="name">{{ $t('box_header_player') }}</span>
-            </div>
+            <span class="order">#</span>
+            <span class="name">{{ $t('box_header_player') }}</span>
           </div>
-          <div v-if="boxSummary.e" class="error">
-            <div class="sticky-header">E</div>
-          </div>
+          <div v-if="boxSummary.e" class="error">E</div>
           <div class="records">
-            <div class="sticky-header">
-              <div class="records-flex">
-                <div
-                  class="record"
-                  :key="`header_${innIndex}`"
-                  v-for="(inn, innIndex) in box[0].slice(0, -1)"
-                >
-                  <span class="content">{{
-                    box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
-                  }}</span>
-                </div>
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${innIndex}`"
+                v-for="(inn, innIndex) in box[0].slice(0, -1)"
+              >
+                <span class="content">{{
+                  box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
+                }}</span>
               </div>
             </div>
           </div>
-          <div class="summary"><div class="sticky-header"></div></div>
+          <div class="summary"></div>
         </div>
         <div
           class="player-records"
@@ -1108,15 +1096,12 @@
       overflow-x: auto;
       border-radius: 0;
       .player-records {
-        &.header .summary {
-          padding: 0;
-        }
-        .sticky-header {
+        &.header > div {
           background-color: $header_bgcolor;
           color: #fff;
+          position: sticky;
+          top: 70px;
           z-index: 1;
-          position: relative;
-          height: 36px;
         }
         .records .record {
           max-width: 85px;
@@ -1218,7 +1203,6 @@
       display: table-cell;
       white-space: nowrap;
       width: 1px;
-      vertical-align: top;
       .order {
         text-align: right;
         width: 30px;
@@ -1257,7 +1241,6 @@
         display: flex;
         align-items: center;
         width: 100%;
-        height: 100%;
       }
       .record {
         width: 80px;
@@ -1724,6 +1707,9 @@
       border-radius: 0;
       &.normal {
         .player-records {
+          &.header > div {
+            top: 50px;
+          }
           &:last-child {
             > :first-child,
             > :last-child {
@@ -1942,10 +1928,6 @@ export default {
   },
   mounted() {
     this.container = this.$refs.container;
-    window.addEventListener('scroll', this.requestAnimationFrame);
-  },
-  beforeDestroy() {
-    window.removeEventListener('scroll', this.requestAnimationFrame);
   },
   methods: {
     ...mapActions([
@@ -2275,40 +2257,6 @@ export default {
     },
     startClock_() {
       this.startClock(this.$route.params.team);
-    },
-    detectSticky() {
-      const { matches } = window.matchMedia(
-        'only screen and (max-width: 760px), (max-height: 480px)',
-      );
-      const fixedValue = matches ? 50 : 70;
-      ['.box-table.normal.pitcher', '.box-table.normal:not(.pitcher)'].forEach(
-        selector => {
-          const table = document.querySelector(selector);
-          const headers = document.querySelectorAll(
-            `${selector} .sticky-header`,
-          );
-          const { y: tableY, height: tableH } = table.getBoundingClientRect();
-          const { height: headerH } = headers[0].getBoundingClientRect();
-          if (tableY < fixedValue) {
-            if (tableH + tableY - headerH > fixedValue) {
-              Array.from(headers).forEach(header => {
-                header.style.transform = `translateY(${fixedValue - tableY}px)`;
-              });
-            } else {
-              Array.from(headers).forEach(header => {
-                header.style.transform = `translateY(${tableH - headerH}px)`;
-              });
-            }
-          } else {
-            Array.from(headers).forEach(header => {
-              header.style.transform = `translateY(0)`;
-            });
-          }
-        },
-      );
-    },
-    requestAnimationFrame() {
-      window.requestAnimationFrame(this.detectSticky);
     },
   },
   computed: {
