@@ -1846,7 +1846,7 @@
     }
   }
 }
-@media only screen and (max-width: 760px),
+@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9),
   (max-height: 480px) and (min-aspect-ratio: 13/9) {
   .gamebox-container {
     .sticky-display-btn {
