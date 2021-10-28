@@ -1249,6 +1249,7 @@
       white-space: nowrap;
       width: 20px;
       text-align: center;
+      vertical-align: top;
     }
     .records {
       display: table-cell;
@@ -1845,7 +1846,8 @@
     }
   }
 }
-@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
+@media only screen and (max-width: 760px),
+  (max-height: 480px) and (min-aspect-ratio: 13/9) {
   .gamebox-container {
     .sticky-display-btn {
       top: 86px;
