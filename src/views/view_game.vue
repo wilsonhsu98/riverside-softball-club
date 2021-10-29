@@ -1039,15 +1039,6 @@
       </div>
     </div>
 
-    <div v-if="positions" class="image-modal" @click="closePositions">
-      <div>
-        <coordination
-          :no_track="true"
-          :positions="positions"
-          :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
-        />
-      </div>
-    </div>
     <div
       v-if="groupCoordinates.length > 0"
       class="image-modal"
