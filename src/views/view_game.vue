@@ -260,38 +260,79 @@
           </div>
         </template>
       </div>
-      <div class="box-table normal pitcher" v-if="pitchers.length">
+      <div
+        class="box-table normal pitcher sticky-header"
+        v-if="pitchers.length"
+        style="display: none"
+        ref="pitchingStickyHeader"
+      >
+        <colgroup>
+          <col
+            v-for="(w, i) in pitchingWidths"
+            :key="i"
+            :style="{ width: `${w}px` }"
+          />
+        </colgroup>
         <div class="player-records header">
           <div class="player">
-            <div class="sticky-header">
-              <router-link
-                v-if="editable"
-                :to="{
-                  name: 'edit_defense_info',
-                  params: {
-                    team: $route.params.team,
-                    game: $route.params.game,
-                  },
-                }"
-                class="fa fa-pencil"
-                tag="i"
-              />
-              <span class="order">{{ editable ? '' : '#' }}</span>
-              <span class="name">{{ $t('ttl_pitcher') }}</span>
-            </div>
+            <router-link
+              v-if="editable"
+              :to="{
+                name: 'edit_defense_info',
+                params: {
+                  team: $route.params.team,
+                  game: $route.params.game,
+                },
+              }"
+              class="fa fa-pencil"
+              tag="i"
+            />
+            <span class="order">{{ editable ? '' : '#' }}</span>
+            <span class="name">{{ $t('ttl_pitcher') }}</span>
           </div>
           <div class="records">
-            <div class="sticky-header">
-              <div class="records-flex">
-                <div
-                  class="record"
-                  :key="`header_${colInesx}`"
-                  v-for="(col, colInesx) in pitcherCol"
-                >
-                  <span class="content">{{
-                    ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
-                  }}</span>
-                </div>
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${colInesx}`"
+                v-for="(col, colInesx) in pitcherCol"
+              >
+                <span class="content">{{
+                  ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
+                }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="box-table normal pitcher" v-if="pitchers.length">
+        <div class="player-records header" ref="pitchingHeader">
+          <div class="player">
+            <router-link
+              v-if="editable"
+              :to="{
+                name: 'edit_defense_info',
+                params: {
+                  team: $route.params.team,
+                  game: $route.params.game,
+                },
+              }"
+              class="fa fa-pencil"
+              tag="i"
+            />
+            <span class="order">{{ editable ? '' : '#' }}</span>
+            <span class="name">{{ $t('ttl_pitcher') }}</span>
+          </div>
+          <div class="records">
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${colInesx}`"
+                v-for="(col, colInesx) in pitcherCol"
+              >
+                <span class="content">{{
+                  ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
+                }}</span>
               </div>
             </div>
           </div>
@@ -591,33 +632,62 @@
           <div></div>
         </div>
       </div>
-      <div class="box-table normal" v-if="box.slice(1).length">
+      <div
+        class="box-table normal sticky-header"
+        v-if="box.slice(1).length"
+        style="display: none"
+        ref="battingStickyHeader"
+      >
+        <colgroup>
+          <col
+            v-for="(w, i) in battingWidths"
+            :key="i"
+            :style="{ width: `${w}px` }"
+          />
+        </colgroup>
         <div class="player-records header">
           <div class="player">
-            <div class="sticky-header">
-              <span class="order">#</span>
-              <span class="name">{{ $t('box_header_player') }}</span>
-            </div>
+            <span class="order">#</span>
+            <span class="name">{{ $t('box_header_player') }}</span>
           </div>
-          <div v-if="boxSummary.e" class="error">
-            <div class="sticky-header">E</div>
-          </div>
+          <div v-if="boxSummary.e" class="error">E</div>
           <div class="records">
-            <div class="sticky-header">
-              <div class="records-flex">
-                <div
-                  class="record"
-                  :key="`header_${innIndex}`"
-                  v-for="(inn, innIndex) in box[0].slice(0, -1)"
-                >
-                  <span class="content">{{
-                    box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
-                  }}</span>
-                </div>
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${innIndex}`"
+                v-for="(inn, innIndex) in box[0].slice(0, -1)"
+              >
+                <span class="content">{{
+                  box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
+                }}</span>
               </div>
             </div>
           </div>
-          <div class="summary"><div class="sticky-header"></div></div>
+          <div class="summary"></div>
+        </div>
+      </div>
+      <div class="box-table normal" v-if="box.slice(1).length">
+        <div class="player-records header" ref="battingHeader">
+          <div class="player">
+            <span class="order">#</span>
+            <span class="name">{{ $t('box_header_player') }}</span>
+          </div>
+          <div v-if="boxSummary.e" class="error">E</div>
+          <div class="records">
+            <div class="records-flex">
+              <div
+                class="record"
+                :key="`header_${innIndex}`"
+                v-for="(inn, innIndex) in box[0].slice(0, -1)"
+              >
+                <span class="content">{{
+                  box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
+                }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="summary"></div>
         </div>
         <div
           class="player-records"
@@ -1108,15 +1178,9 @@
       overflow-x: auto;
       border-radius: 0;
       .player-records {
-        &.header .summary {
-          padding: 0;
-        }
-        .sticky-header {
+        &.header > div {
           background-color: $header_bgcolor;
           color: #fff;
-          z-index: 1;
-          position: relative;
-          height: 36px;
         }
         .records .record {
           max-width: 85px;
@@ -1128,14 +1192,13 @@
             width: 10px;
           }
         }
-        /* &:last-child {
-          > :first-child {
-            border-radius: 0 0 0 10px;
-          }
-          > :last-child {
-            border-radius: 0 0 10px 0;
-          }
-        } */
+      }
+      &.sticky-header {
+        z-index: 1;
+        margin: 0;
+        .player-records {
+          background-color: transparent;
+        }
       }
     }
     &.pitcher {
@@ -1829,8 +1892,8 @@
       &.simple {
         display: table;
       }
-      &.normal {
-        display: none;
+      &.normal:not(.pitcher) {
+        display: none!important;
       }
       &.pitcher {
         display: table;
@@ -1935,6 +1998,8 @@ export default {
       batterSum: { AB: 0, H: 0, BB: 0, HR: 0 },
       batterSumDesc: '',
       groupCoordinates: [],
+      pitchingWidths: [],
+      battingWidths: [],
     };
   },
   created() {
@@ -1944,10 +2009,13 @@ export default {
   },
   mounted() {
     this.container = this.$refs.container;
-    window.addEventListener('scroll', this.requestAnimationFrame);
+    this.detectHeaderWidth();
+    window.addEventListener('resize', this.requestAnimationFrameResize);
+    window.addEventListener('scroll', this.requestAnimationFrameScroll);
   },
   beforeDestroy() {
-    window.removeEventListener('scroll', this.requestAnimationFrame);
+    window.removeEventListener('resize', this.requestAnimationFrameResize);
+    window.removeEventListener('scroll', this.requestAnimationFrameScroll);
   },
   methods: {
     ...mapActions([
@@ -2278,38 +2346,51 @@ export default {
     startClock_() {
       this.startClock(this.$route.params.team);
     },
+    detectHeaderWidth() {
+      this.pitchingWidths = this.$refs.pitchingHeader
+        ? Array.from(this.$refs.pitchingHeader.children).map(
+            node => node.getBoundingClientRect().width,
+          )
+        : [];
+      this.battingWidths = this.$refs.battingHeader
+        ? Array.from(this.$refs.battingHeader.children).map(
+            node => node.getBoundingClientRect().width,
+          )
+        : [];
+    },
+    requestAnimationFrameResize() {
+      window.requestAnimationFrame(this.detectHeaderWidth);
+    },
     detectSticky() {
       const { matches } = window.matchMedia(
         'only screen and (max-width: 760px), (max-height: 480px)',
       );
       const fixedValue = matches ? 50 : 70;
-      ['.box-table.normal.pitcher', '.box-table.normal:not(.pitcher)'].forEach(
-        selector => {
-          const table = document.querySelector(selector);
-          const headers = document.querySelectorAll(
-            `${selector} .sticky-header`,
-          );
+      [
+        [this.$refs.pitchingHeader, this.$refs.pitchingStickyHeader],
+        [this.$refs.battingHeader, this.$refs.battingStickyHeader],
+      ].forEach(([$header, $stickyHeader]) => {
+        if ($header && $stickyHeader) {
+          const table = $header.parentElement;
           const { y: tableY, height: tableH } = table.getBoundingClientRect();
-          const { height: headerH } = headers[0].getBoundingClientRect();
+          const { height: headerH } = $header.getBoundingClientRect();
           if (tableY < fixedValue) {
+            $header.style.visibility = 'hidden';
+            $stickyHeader.style.display = 'block';
+            $stickyHeader.style.position = 'fixed';
             if (tableH + tableY - headerH > fixedValue) {
-              Array.from(headers).forEach(header => {
-                header.style.transform = `translateY(${fixedValue - tableY}px)`;
-              });
+              $stickyHeader.style.top = `${fixedValue}px`;
             } else {
-              Array.from(headers).forEach(header => {
-                header.style.transform = `translateY(${tableH - headerH}px)`;
-              });
+              $stickyHeader.style.top = `${tableH + tableY - headerH}px`;
             }
           } else {
-            Array.from(headers).forEach(header => {
-              header.style.transform = `translateY(0)`;
-            });
+            $header.style.visibility = 'visible';
+            $stickyHeader.style.display = 'none';
           }
-        },
-      );
+        }
+      });
     },
-    requestAnimationFrame() {
+    requestAnimationFrameScroll() {
       window.requestAnimationFrame(this.detectSticky);
     },
   },
@@ -2495,6 +2576,21 @@ export default {
         this.checkLastColumn();
         this.checkEditVideo();
         this.checkFirstGuide();
+        if (this.box.slice(1).length) {
+          this.$nextTick(() => {
+            this.detectHeaderWidth();
+          });
+        }
+      },
+      immediate: true,
+    },
+    pitchers: {
+      handler() {
+        if (this.pitchers.length) {
+          this.$nextTick(() => {
+            this.detectHeaderWidth();
+          });
+        }
       },
       immediate: true,
     },
