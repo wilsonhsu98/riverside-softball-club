@@ -260,46 +260,48 @@
           </div>
         </template>
       </div>
-      <div
-        class="box-table normal pitcher sticky-header"
-        v-if="pitchers.length"
-        style="display: none"
-        ref="pitchingStickyHeader"
-      >
-        <colgroup>
-          <col
-            v-for="(w, i) in pitchingWidths"
-            :key="i"
-            :style="{ width: `${w}px` }"
-          />
-        </colgroup>
-        <div class="player-records header">
-          <div class="player">
-            <router-link
-              v-if="editable"
-              :to="{
-                name: 'edit_defense_info',
-                params: {
-                  team: $route.params.team,
-                  game: $route.params.game,
-                },
-              }"
-              class="fa fa-pencil"
-              tag="i"
+      <div class="sticky-wrapper">
+        <div
+          class="box-table normal pitcher sticky-header"
+          v-if="pitchers.length"
+          style="display: none"
+          ref="pitchingStickyHeader"
+        >
+          <colgroup>
+            <col
+              v-for="(w, i) in pitchingWidths"
+              :key="i"
+              :style="{ width: `${w}px` }"
             />
-            <span class="order">{{ editable ? '' : '#' }}</span>
-            <span class="name">{{ $t('ttl_pitcher') }}</span>
-          </div>
-          <div class="records">
-            <div class="records-flex">
-              <div
-                class="record"
-                :key="`header_${colInesx}`"
-                v-for="(col, colInesx) in pitcherCol"
-              >
-                <span class="content">{{
-                  ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
-                }}</span>
+          </colgroup>
+          <div class="player-records header">
+            <div class="player">
+              <router-link
+                v-if="editable"
+                :to="{
+                  name: 'edit_defense_info',
+                  params: {
+                    team: $route.params.team,
+                    game: $route.params.game,
+                  },
+                }"
+                class="fa fa-pencil"
+                tag="i"
+              />
+              <span class="order">{{ editable ? '' : '#' }}</span>
+              <span class="name">{{ $t('ttl_pitcher') }}</span>
+            </div>
+            <div class="records">
+              <div class="records-flex">
+                <div
+                  class="record"
+                  :key="`header_${colInesx}`"
+                  v-for="(col, colInesx) in pitcherCol"
+                >
+                  <span class="content">{{
+                    ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
+                  }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -632,39 +634,41 @@
           <div></div>
         </div>
       </div>
-      <div
-        class="box-table normal sticky-header"
-        v-if="box.slice(1).length"
-        style="display: none"
-        ref="battingStickyHeader"
-      >
-        <colgroup>
-          <col
-            v-for="(w, i) in battingWidths"
-            :key="i"
-            :style="{ width: `${w}px` }"
-          />
-        </colgroup>
-        <div class="player-records header">
-          <div class="player">
-            <span class="order">#</span>
-            <span class="name">{{ $t('box_header_player') }}</span>
-          </div>
-          <div v-if="boxSummary.e" class="error">E</div>
-          <div class="records">
-            <div class="records-flex">
-              <div
-                class="record"
-                :key="`header_${innIndex}`"
-                v-for="(inn, innIndex) in box[0].slice(0, -1)"
-              >
-                <span class="content">{{
-                  box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
-                }}</span>
+      <div class="sticky-wrapper">
+        <div
+          class="box-table normal sticky-header"
+          v-if="box.slice(1).length"
+          style="display: none"
+          ref="battingStickyHeader"
+        >
+          <colgroup>
+            <col
+              v-for="(w, i) in battingWidths"
+              :key="i"
+              :style="{ width: `${w}px` }"
+            />
+          </colgroup>
+          <div class="player-records header">
+            <div class="player">
+              <span class="order">#</span>
+              <span class="name">{{ $t('box_header_player') }}</span>
+            </div>
+            <div v-if="boxSummary.e" class="error">E</div>
+            <div class="records">
+              <div class="records-flex">
+                <div
+                  class="record"
+                  :key="`header_${innIndex}`"
+                  v-for="(inn, innIndex) in box[0].slice(0, -1)"
+                >
+                  <span class="content">{{
+                    box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
+                  }}</span>
+                </div>
               </div>
             </div>
+            <div class="summary"></div>
           </div>
-          <div class="summary"></div>
         </div>
       </div>
       <div class="box-table normal" v-if="box.slice(1).length">
@@ -1168,6 +1172,9 @@
         white-space: pre-wrap;
       }
     }
+  }
+  .sticky-wrapper {
+    position: relative;
   }
   .box-table {
     &.simple {
@@ -1893,7 +1900,7 @@
         display: table;
       }
       &.normal:not(.pitcher) {
-        display: none!important;
+        display: none !important;
       }
       &.pitcher {
         display: table;
@@ -2357,6 +2364,9 @@ export default {
             node => node.getBoundingClientRect().width,
           )
         : [];
+      this.$nextTick(() => {
+        this.detectSticky();
+      });
     },
     requestAnimationFrameResize() {
       window.requestAnimationFrame(this.detectHeaderWidth);
@@ -2377,11 +2387,12 @@ export default {
           if (tableY < fixedValue) {
             $header.style.visibility = 'hidden';
             $stickyHeader.style.display = 'block';
-            $stickyHeader.style.position = 'fixed';
             if (tableH + tableY - headerH > fixedValue) {
+              $stickyHeader.style.position = 'fixed';
               $stickyHeader.style.top = `${fixedValue}px`;
             } else {
-              $stickyHeader.style.top = `${tableH + tableY - headerH}px`;
+              $stickyHeader.style.position = 'absolute';
+              $stickyHeader.style.top = `${tableH - headerH}px`;
             }
           } else {
             $header.style.visibility = 'visible';
