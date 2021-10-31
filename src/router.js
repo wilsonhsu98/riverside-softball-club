@@ -14,7 +14,10 @@ const position = {};
 const scrollBehavior = (to, from, savedPosition) => {
   return new Promise(resolve => {
     setTimeout(() => {
-      if (from.name === 'game' && to.name === 'games') {
+      if (
+        ['games', 'v_games'].includes(to.name) &&
+        ['game', 'v_game'].includes(from.name)
+      ) {
         resolve(position[to.name]);
       }
       if (savedPosition) {
@@ -232,13 +235,19 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  if (from.name === 'games' && to.name === 'game') {
+  if (
+    ['games', 'v_games'].includes(from.name) &&
+    ['game', 'v_game'].includes(to.name)
+  ) {
     position[from.name] = {
       x: window.pageXOffset,
       y: window.pageYOffset,
     };
   }
-  if (from.name === 'game' && to.name === 'games') {
+  if (
+    ['game', 'v_game'].includes(from.name) &&
+    ['games', 'v_games'].includes(to.name)
+  ) {
     window.localStorage.setItem('focus_game', from.params.game);
   }
   window.scrollTo(0, 0);
