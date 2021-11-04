@@ -228,31 +228,60 @@
                 <template slot="popover">
                   <template v-if="version !== 'import' && topBottom">
                     <div class="team-versus">
-                      <div class="team-name">
-                        <div class="name">
-                          {{ topBottom === 'top' ? useTeam : opponent }}
+                      <template v-if="topBottom === 'top'">
+                        <div class="team-name">
+                          <div class="name">{{ useTeam }}</div>
+                          <div
+                            class="score"
+                            v-if="['win_', 'lose_'].includes(sub.result)"
+                          >
+                            {{ sub.result === 'win_' ? 'N' : 0 }}
+                          </div>
+                          <div class="score" v-else>
+                            {{ sumByInn(scores, inn) }}
+                          </div>
                         </div>
-                        <div class="score">
-                          {{
-                            topBottom === 'top'
-                              ? sumByInn(scores, inn)
-                              : sumByInn(opponentScores, inn)
-                          }}
+                        <div class="versus">:</div>
+                        <div class="team-name">
+                          <div
+                            class="score"
+                            v-if="['win_', 'lose_'].includes(sub.result)"
+                          >
+                            {{ sub.result === 'lose_' ? 'N' : 0 }}
+                          </div>
+                          <div class="score" v-else>
+                            {{ sumByInn(opponentScores, inn) }}
+                          </div>
+                          <div class="name">{{ opponent }}</div>
                         </div>
-                      </div>
-                      <div class="versus">:</div>
-                      <div class="team-name">
-                        <div class="score">
-                          {{
-                            topBottom === 'bot'
-                              ? sumByInn(scores, inn)
-                              : sumByInn(opponentScores, inn)
-                          }}
+                      </template>
+                      <template v-else>
+                        <div class="team-name">
+                          <div class="name">{{ opponent }}</div>
+                          <div
+                            class="score"
+                            v-if="['win_', 'lose_'].includes(sub.result)"
+                          >
+                            {{ sub.result === 'lose_' ? 'N' : 0 }}
+                          </div>
+                          <div class="score" v-else>
+                            {{ sumByInn(opponentScores, inn) }}
+                          </div>
                         </div>
-                        <div class="name">
-                          {{ topBottom === 'bot' ? useTeam : opponent }}
+                        <div class="versus">:</div>
+                        <div class="team-name">
+                          <div
+                            class="score"
+                            v-if="['win_', 'lose_'].includes(sub.result)"
+                          >
+                            {{ sub.result === 'win_' ? 'N' : 0 }}
+                          </div>
+                          <div class="score" v-else>
+                            {{ sumByInn(scores, inn) }}
+                          </div>
+                          <div class="name">{{ useTeam }}</div>
                         </div>
-                      </div>
+                      </template>
                     </div>
                     <div class="box">
                       <div class="team">
@@ -265,48 +294,68 @@
                         </div>
                       </div>
                       <div class="gap"></div>
-                      <div
-                        v-for="(undefined, index) in Array.apply(
-                          null,
-                          Array(inn),
-                        )"
-                        :key="index"
-                        class="inn"
-                      >
-                        <div>{{ index + 1 }}</div>
-                        <div class="cell" v-if="topBottom === 'top'">
-                          {{
-                            scores[index] !== undefined ? scores[index] : '?'
-                          }}
+                      <template v-if="!['win_', 'lose_'].includes(sub.result)">
+                        <div
+                          v-for="(undefined, index) in Array.apply(
+                            null,
+                            Array(inn),
+                          )"
+                          :key="index"
+                          class="inn"
+                        >
+                          <div>{{ index + 1 }}</div>
+                          <div class="cell" v-if="topBottom === 'top'">
+                            {{
+                              scores[index] !== undefined ? scores[index] : '?'
+                            }}
+                          </div>
+                          <div class="cell">
+                            {{
+                              opponentScores[index] !== undefined
+                                ? opponentScores[index]
+                                : topBottom === 'top' && index + 1 === inn
+                                ? 'X'
+                                : '?'
+                            }}
+                          </div>
+                          <div class="cell" v-if="topBottom === 'bot'">
+                            {{
+                              scores[index] !== undefined ? scores[index] : 'X'
+                            }}
+                          </div>
                         </div>
-                        <div class="cell">
-                          {{
-                            opponentScores[index] !== undefined
-                              ? opponentScores[index]
-                              : topBottom === 'top' && index + 1 === inn
-                              ? 'X'
-                              : '?'
-                          }}
-                        </div>
-                        <div class="cell" v-if="topBottom === 'bot'">
-                          {{
-                            scores[index] !== undefined ? scores[index] : 'X'
-                          }}
-                        </div>
-                      </div>
+                      </template>
                       <div class="inn" style="margin-left: auto;">
                         <div class="cell">R</div>
-                        <div class="cell" v-if="topBottom === 'top'">
-                          {{ score }}
-                        </div>
-                        <div class="cell">
-                          {{ opponentScore }}
-                        </div>
-                        <div class="cell" v-if="topBottom === 'bot'">
-                          {{ score }}
-                        </div>
+                        <template
+                          v-if="!['win_', 'lose_'].includes(sub.result)"
+                        >
+                          <div class="cell" v-if="topBottom === 'top'">
+                            {{ score }}
+                          </div>
+                          <div class="cell">
+                            {{ opponentScore }}
+                          </div>
+                          <div class="cell" v-if="topBottom === 'bot'">
+                            {{ score }}
+                          </div>
+                        </template>
+                        <template v-else>
+                          <div class="cell" v-if="topBottom === 'top'">
+                            {{ sub.result === 'win_' ? 'N' : 0 }}
+                          </div>
+                          <div class="cell">
+                            {{ sub.result === 'lose_' ? 'N' : 0 }}
+                          </div>
+                          <div class="cell" v-if="topBottom === 'bot'">
+                            {{ sub.result === 'win_' ? 'N' : 0 }}
+                          </div>
+                        </template>
                       </div>
-                      <div class="inn">
+                      <div
+                        class="inn"
+                        v-if="!['win_', 'lose_'].includes(sub.result)"
+                      >
                         <div class="cell">H</div>
                         <div class="cell" v-if="topBottom === 'top'">
                           {{ hit }}
@@ -318,7 +367,10 @@
                           {{ hit }}
                         </div>
                       </div>
-                      <div class="inn">
+                      <div
+                        class="inn"
+                        v-if="!['win_', 'lose_'].includes(sub.result)"
+                      >
                         <div class="cell">E</div>
                         <div class="cell" v-if="topBottom === 'top'">
                           {{ error === '' ? '?' : error }}
@@ -438,13 +490,15 @@
   color: var(--result-font-color);
   text-align: center;
   position: relative;
-  &.win {
+  &.win,
+  &.win_ {
     background-color: var(--hit);
   }
   &.tie {
     background-color: var(--nonpa);
   }
-  &.lose {
+  &.lose,
+  &.lose_ {
     background-color: var(--ng);
   }
   .fa-video-camera {

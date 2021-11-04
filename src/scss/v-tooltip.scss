@@ -98,7 +98,7 @@
     }
   }
   &.box-tip {
-    &.win {
+    &.win, &.win_ {
       .tooltip-inner {
         background: var(--tip-w-color);
       }
@@ -114,7 +114,7 @@
         border-color: var(--tip-t-color);
       }
     }
-    &.lose {
+    &.lose, &.lose_ {
       .tooltip-inner {
         background: var(--tip-l-color);
       }

@@ -55,31 +55,48 @@
       <div v-if="mode === 'edit'" class="field-wrapper edit">
         <label>{{ $t('ttl_after_game') }}</label>
         <div v-if="version !== 'import' && topBottom" class="team-versus">
-          <div class="team-name">
-            <div class="name">
-              {{ topBottom === 'top' ? useTeam : opponent }}
+          <template v-if="topBottom === 'top'">
+            <div class="team-name">
+              <div class="name">{{ useTeam }}</div>
+              <div class="score" v-if="['win_', 'lose_'].includes(result)">
+                {{ result === 'win_' ? 'N' : 0 }}
+              </div>
+              <div class="score" v-else>
+                {{ sumByInn(scores, inn) }}
+              </div>
             </div>
-            <div class="score">
-              {{
-                topBottom === 'top'
-                  ? sumByInn(scores, inn)
-                  : sumByInn(opponentScores, inn)
-              }}
+            <div class="versus">:</div>
+            <div class="team-name">
+              <div class="score" v-if="['win_', 'lose_'].includes(result)">
+                {{ result === 'lose_' ? 'N' : 0 }}
+              </div>
+              <div class="score" v-else>
+                {{ sumByInn(opponentScores, inn) }}
+              </div>
+              <div class="name">{{ opponent }}</div>
             </div>
-          </div>
-          <div class="versus">:</div>
-          <div class="team-name">
-            <div class="score">
-              {{
-                topBottom === 'bot'
-                  ? sumByInn(scores, inn)
-                  : sumByInn(opponentScores, inn)
-              }}
+          </template>
+          <template v-else>
+            <div class="team-name">
+              <div class="name">{{ opponent }}</div>
+              <div class="score" v-if="['win_', 'lose_'].includes(result)">
+                {{ result === 'lose_' ? 'N' : 0 }}
+              </div>
+              <div class="score" v-else>
+                {{ sumByInn(opponentScores, inn) }}
+              </div>
             </div>
-            <div class="name">
-              {{ topBottom === 'bot' ? useTeam : opponent }}
+            <div class="versus">:</div>
+            <div class="team-name">
+              <div class="score" v-if="['win_', 'lose_'].includes(result)">
+                {{ result === 'win_' ? 'N' : 0 }}
+              </div>
+              <div class="score" v-else>
+                {{ sumByInn(scores, inn) }}
+              </div>
+              <div class="name">{{ useTeam }}</div>
             </div>
-          </div>
+          </template>
         </div>
 
         <div
@@ -193,6 +210,14 @@
             <input type="radio" v-model="result" value="tie" />
             <span>{{ $t('box_tie') }}</span>
           </label>
+          <label>
+            <input type="radio" v-model="result" value="win_" />
+            <span>{{ $t('box_force_win') }}</span>
+          </label>
+          <label>
+            <input type="radio" v-model="result" value="lose_" />
+            <span>{{ $t('box_force_lose') }}</span>
+          </label>
         </div>
 
         <template
@@ -248,7 +273,11 @@
         </template>
 
         <div
-          v-if="mode === 'edit' && version !== 'import' && result"
+          v-if="
+            mode === 'edit' &&
+              version !== 'import' &&
+              ['win', 'lose', 'tie'].includes(result)
+          "
           class="field-wrapper field-wrapper-item"
           :class="mvp ? '' : 'empty'"
           @click="changePlayer('mvp')"
@@ -268,6 +297,11 @@
         />
 
         <custom-input
+          v-if="
+            mode === 'edit' &&
+              version !== 'import' &&
+              !['win_', 'lose_'].includes(result)
+          "
           type="splitting-wording"
           :name="$t('ttl_youtube_videos')"
           :placeholder="$t('pla_split_youtube_videos')"

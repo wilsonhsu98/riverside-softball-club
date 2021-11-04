@@ -106,6 +106,8 @@
 	"box_win": "WIN",
 	"box_lose": "LOSE",
 	"box_tie": "TIE",
+	"box_force_win": "對手棄權",
+	"box_force_lose": "本隊棄權",
 	"box_header_player": "Batters",
 	"box_display_content": "文字",
 	"box_display_code": "代號",

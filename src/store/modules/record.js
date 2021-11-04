@@ -737,8 +737,8 @@ const getters = {
       )
       .reduce(
         ({ win, lose, tie }, item) => {
-          const w = win + (item.result === 'win' ? 1 : 0);
-          const l = lose + (item.result === 'lose' ? 1 : 0);
+          const w = win + (['win', 'win_'].includes(item.result) ? 1 : 0);
+          const l = lose + (['lose', 'lose_'].includes(item.result) ? 1 : 0);
           const t = tie + (item.result === 'tie' ? 1 : 0);
           return {
             win: w,
