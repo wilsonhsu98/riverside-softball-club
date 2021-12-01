@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        background-color: green;
+        margin: 0;
+        padding: 0;
+      }
+      button {
+        vertical-align: top;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="back">Back</button>
+    <script>
+      document.querySelector('#back').addEventListener('click', function() {
+        window.parent.postMessage('closeIframe', '*');
+      });
+    </script>
+  </body>
+</html>
