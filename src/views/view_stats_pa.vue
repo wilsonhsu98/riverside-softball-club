@@ -138,94 +138,96 @@
         :style="{ maxHeight: `${tableHeight}px` }"
       >
         <div class="sticky-table">
-          <div class="header-row">
-            <template v-for="col in displayedCols">
-              <div
-                v-if="col.name === 'Rank'"
-                :key="`header_${col.name}`"
-                class="cell rank"
-                :title="$t(col.name)"
-              >
-                {{ $t(col.name) }}
-              </div>
-              <div
-                v-else-if="col.name === 'name'"
-                :key="`header_${col.name}`"
-                class="cell name"
-                :title="$t(col.name)"
-              >
-                {{ $t(col.name) }}
-              </div>
-              <div
-                v-else
-                :key="`header_${col.name}`"
-                class="cell"
-                :class="{
-                  sort: col.name === sortBy,
-                  [col.name]: true,
-                }"
-                :title="$t(col.name)"
-                @click="setSortBy_(col.name)"
-              >
-                <div>{{ $t(col.name) }}</div>
-              </div>
-            </template>
-          </div>
-          <div class="sum-row" v-if="sum.PA > 0">
-            <template v-for="(col, colIndex) in displayedCols">
-              <div
-                v-if="col.name === 'Rank'"
-                :key="`header_${col.name}`"
-                class="cell rank"
-              ></div>
-              <div
-                v-else-if="col.name === 'name'"
-                :key="`header_${col.name}`"
-                class="cell name"
-                style="text-align: left;"
-              >
-                {{ $t('SUM') }}
-              </div>
-              <div
-                v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
-                class="cell advance"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_sum_${colIndex}`"
-              >
-                <div>
+          <div class="thead">
+            <div class="header-row">
+              <template v-for="col in displayedCols">
+                <div
+                  v-if="col.name === 'Rank'"
+                  :key="`header_${col.name}`"
+                  class="cell rank"
+                  :title="$t(col.name)"
+                >
+                  {{ $t(col.name) }}
+                </div>
+                <div
+                  v-else-if="col.name === 'name'"
+                  :key="`header_${col.name}`"
+                  class="cell name"
+                  :title="$t(col.name)"
+                >
+                  {{ $t(col.name) }}
+                </div>
+                <div
+                  v-else
+                  :key="`header_${col.name}`"
+                  class="cell"
+                  :class="{
+                    sort: col.name === sortBy,
+                    [col.name]: true,
+                  }"
+                  :title="$t(col.name)"
+                  @click="setSortBy_(col.name)"
+                >
+                  <div>{{ $t(col.name) }}</div>
+                </div>
+              </template>
+            </div>
+            <div class="sum-row" v-if="sum.PA > 0">
+              <template v-for="(col, colIndex) in displayedCols">
+                <div
+                  v-if="col.name === 'Rank'"
+                  :key="`header_${col.name}`"
+                  class="cell rank"
+                ></div>
+                <div
+                  v-else-if="col.name === 'name'"
+                  :key="`header_${col.name}`"
+                  class="cell name"
+                  style="text-align: left;"
+                >
+                  {{ $t('SUM') }}
+                </div>
+                <div
+                  v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
+                  class="cell advance"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_sum_${colIndex}`"
+                >
+                  <div>
+                    {{ formatValue(sum[col.name]) }}
+                  </div>
+                  <div>{{ `(${sum[col.name.replace('_', '_DESC_')]})` }}</div>
+                </div>
+                <div
+                  v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
+                  class="cell"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_sum_${colIndex}`"
+                >
                   {{ formatValue(sum[col.name]) }}
                 </div>
-                <div>{{ `(${sum[col.name.replace('_', '_DESC_')]})` }}</div>
-              </div>
-              <div
-                v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
-                class="cell"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_sum_${colIndex}`"
-              >
-                {{ formatValue(sum[col.name]) }}
-              </div>
-              <div
-                v-else-if="col.name === 'LEVEL'"
-                class="cell"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_sum_${colIndex}`"
-              >
-                {{ sum[col.name] }}
-              </div>
-              <div
-                v-else
-                class="cell"
-                :class="{ sort: col.name === sortBy }"
-                :data-label="$t(col.name)"
-                :key="`row_sum_${colIndex}`"
-              >
-                <div class="align-right">{{ sum[col.name] }}</div>
-              </div>
-            </template>
+                <div
+                  v-else-if="col.name === 'LEVEL'"
+                  class="cell"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_sum_${colIndex}`"
+                >
+                  {{ sum[col.name] }}
+                </div>
+                <div
+                  v-else
+                  class="cell"
+                  :class="{ sort: col.name === sortBy }"
+                  :data-label="$t(col.name)"
+                  :key="`row_sum_${colIndex}`"
+                >
+                  <div class="align-right">{{ sum[col.name] }}</div>
+                </div>
+              </template>
+            </div>
           </div>
           <template v-for="(item, itemIndex) in list">
             <input
@@ -465,14 +467,17 @@ i.fa {
   color: var(--table-row-color);
   position: relative;
   z-index: 0;
+  .thead {
+    display: table-header-group;
+    position: sticky;
+    top: 0;
+    z-index: 4;
+  }
   .header-row {
     display: table-row;
     color: $header_color;
     .cell {
       background: $header_bgcolor_noalpha;
-      position: sticky;
-      top: 0;
-      z-index: 4;
       text-align: center;
       &:not(.rank):not(.name) {
         cursor: pointer;
@@ -483,7 +488,6 @@ i.fa {
       }
       &.rank {
         width: 1px;
-        z-index: 5;
         cursor: initial;
       }
       &.name {
@@ -491,7 +495,6 @@ i.fa {
         /* min-width: 110px; */
         padding-left: 0;
         text-align: center;
-        z-index: 5;
         cursor: initial;
       }
       &:nth-child(2n + 3):not(.sort) {
@@ -507,9 +510,6 @@ i.fa {
     color: $header_color;
     .cell {
       background: $header_bgcolor_noalpha;
-      position: sticky;
-      top: 36px;
-      z-index: 4;
       text-align: center;
       &:not(.rank):not(.name) {
         cursor: initial;
@@ -520,14 +520,12 @@ i.fa {
       }
       &.rank {
         width: 1px;
-        z-index: 5;
         cursor: initial;
       }
       &.name {
         min-width: 110px;
         padding-left: 0;
         text-align: center;
-        z-index: 5;
         cursor: initial;
       }
       &:nth-child(2n + 3):not(.sort) {
@@ -558,10 +556,10 @@ i.fa {
   }
   .normal-row {
     display: table-row;
-    &:nth-child(4n + 4) .cell {
+    &:nth-child(4n + 1) .cell {
       background-color: var(--table-row-even);
     }
-    &:nth-child(4n + 2) .cell {
+    &:nth-child(4n + 3) .cell {
       background-color: var(--table-row-odd);
     }
     &.current {
