@@ -1128,9 +1128,10 @@ export default {
       if (this.conditions.find(condition => condition.value === field.value)) {
         this.removeCondition(field.value);
       } else {
-        this.conditions = [...this.conditions, field].filter(
-          (item, index, self) => self.indexOf(item) === index,
-        );
+        this.conditions = [
+          ...this.conditions,
+          { ...field, text: field.text.replace(/\(.+\)/, '') },
+        ].filter((item, index, self) => self.indexOf(item) === index);
         this.setOtherConditions(this.conditions);
       }
     },

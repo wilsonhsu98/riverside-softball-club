@@ -445,9 +445,8 @@
   }
   .field-wrapper-item {
     margin-top: 15px;
-    padding-left: 10px;
-    height: 40px;
-    line-height: 36px;
+    padding: 5px 10px;
+    line-height: 28px;
     border-radius: 4px;
     border: 2px solid $input_border;
     box-sizing: border-box;
@@ -466,11 +465,11 @@
     }
     > div {
       overflow: hidden;
-      height: 36px;
     }
     label {
       cursor: pointer;
       color: var(--input-color);
+      display: inline-block;
       > span {
         margin: 0 10px 0 3px;
       }
