@@ -312,14 +312,11 @@ export default {
       currentTeam: this.$route.params.team,
     };
   },
-  created() {
-    this.initFromLS();
-  },
   mounted() {
     this.listenTeamChange(this.currentTeam);
   },
   methods: {
-    ...mapActions(['initFromLS', 'listenTeamChange']),
+    ...mapActions(['listenTeamChange']),
     close() {
       window.close();
     },

@@ -1202,42 +1202,49 @@ const mutations = {
       ...item,
       select: item.period === data,
     }));
-    window.localStorage.setItem('pref_period', JSON.stringify(state.period));
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem('pref_period', JSON.stringify(state.period));
   },
   [types.SET_GAME_TYPES](state, value) {
     state.gameTypes = state.gameTypes.includes(value)
       ? state.gameTypes.filter(gameType => gameType !== value)
       : [...state.gameTypes, value];
-    window.localStorage.setItem(
-      'pref_game_types',
-      JSON.stringify(state.gameTypes),
-    );
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem(
+        'pref_game_types',
+        JSON.stringify(state.gameTypes),
+      );
   },
   [types.SET_TOP](state, value) {
     state.top = value;
-    window.localStorage.setItem('pref_top', state.top);
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem('pref_top', state.top);
   },
   [types.SET_UNLIMITED_PA](state, value) {
     state.unlimitedPA = value;
-    window.localStorage.setItem('pref_unlimited_pa', state.unlimitedPA);
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem('pref_unlimited_pa', state.unlimitedPA);
   },
   [types.SET_SORTBY](state, value) {
     state.sortBy = value;
-    window.localStorage.setItem('pref_sortby', state.sortBy);
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem('pref_sortby', state.sortBy);
   },
   [types.SET_CHECKALL](state, isCheckAll) {
     state.cols = state.cols.map(item => ({
       ...item,
       visible: ['Rank', 'name', state.sortBy].includes(item.name) || isCheckAll,
     }));
-    window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
   [types.SET_COLS](state, { col, visible }) {
     state.cols = state.cols.map(item => ({
       ...item,
       visible: item.name === col ? visible || !item.visible : item.visible,
     }));
-    window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem('pref_cols', JSON.stringify(state.cols));
   },
   [types.SET_LASTUPDATE](state, date) {
     state.lastUpdate = date;
@@ -1261,7 +1268,8 @@ const mutations = {
   },
   [types.SET_PITCHER_SORTBY](state, value) {
     state.pitcherSortBy = value;
-    window.localStorage.setItem('pref_pitcher_sortby', state.pitcherSortBy);
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem('pref_pitcher_sortby', state.pitcherSortBy);
   },
   [types.SET_PITCHER_CHECKALL](state, isCheckAll) {
     state.pitcherCols = state.pitcherCols.map(item => ({
@@ -1269,20 +1277,22 @@ const mutations = {
       visible:
         ['Rank', 'name', state.pitcherSortBy].includes(item.name) || isCheckAll,
     }));
-    window.localStorage.setItem(
-      'pref_pitcher_cols',
-      JSON.stringify(state.pitcherCols),
-    );
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem(
+        'pref_pitcher_cols',
+        JSON.stringify(state.pitcherCols),
+      );
   },
   [types.SET_PITCHER_COLS](state, { col, visible }) {
     state.pitcherCols = state.pitcherCols.map(item => ({
       ...item,
       visible: item.name === col ? visible || !item.visible : item.visible,
     }));
-    window.localStorage.setItem(
-      'pref_pitcher_cols',
-      JSON.stringify(state.pitcherCols),
-    );
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem(
+        'pref_pitcher_cols',
+        JSON.stringify(state.pitcherCols),
+      );
   },
   [types.SET_PITCHER_GENSTATISTICS](state, data) {
     state.genPitcherStatistics = data;
@@ -1295,14 +1305,16 @@ const mutations = {
   },
   [types.SET_BOX_DISPLAY](state, value) {
     state.boxDisplay = value;
-    window.localStorage.setItem('pref_box_display', state.boxDisplay);
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem('pref_box_display', state.boxDisplay);
   },
   [types.SET_OTHER_CONDITIONS](state, data) {
     state.otherConditions = data;
-    window.localStorage.setItem(
-      'pref_other_conditions',
-      JSON.stringify(state.otherConditions),
-    );
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem(
+        'pref_other_conditions',
+        JSON.stringify(state.otherConditions),
+      );
     state.conditionGames = utils.unionOrIntersect(
       state.unionOrIntersect,
       state.otherConditions,
@@ -1311,7 +1323,11 @@ const mutations = {
   },
   [types.SET_UNION_INTERSECT](state, data) {
     state.unionOrIntersect = data;
-    window.localStorage.setItem('pref_union_intersect', state.unionOrIntersect);
+    !window.sessionStorage.getItem('currentTeam') &&
+      window.localStorage.setItem(
+        'pref_union_intersect',
+        state.unionOrIntersect,
+      );
     state.conditionGames = utils.unionOrIntersect(
       state.unionOrIntersect,
       state.otherConditions,
