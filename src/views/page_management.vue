@@ -636,9 +636,13 @@ export default {
             }
           });
         } else {
-          this.allTeams_ = this.allTeams_.sort(
-            (a, b) => b[sortItem] - a[sortItem],
-          );
+          this.allTeams_ = this.allTeams_.sort((a, b) => {
+            if (a[sortItem] === undefined && b[sortItem] !== undefined)
+              return 1;
+            if (a[sortItem] !== undefined && b[sortItem] === undefined)
+              return -1;
+            return b[sortItem] - a[sortItem];
+          });
         }
       }
     },
