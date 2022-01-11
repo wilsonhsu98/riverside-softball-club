@@ -466,7 +466,7 @@ i.fa {
   position: relative;
   z-index: 0;
   .header-row {
-    display: table-row;
+    display: table-row-group;
     color: $header_color;
     .cell {
       background: $header_bgcolor_noalpha;
@@ -503,7 +503,7 @@ i.fa {
     }
   }
   .sum-row {
-    display: table-row;
+    display: table-row-group;
     color: $header_color;
     .cell {
       background: $header_bgcolor_noalpha;
