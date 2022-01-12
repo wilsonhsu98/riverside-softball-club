@@ -5,31 +5,48 @@
       <div class="box-summary">
         <template v-if="version !== 'import' && topBottom">
           <div class="team-versus">
-            <div class="team-name">
-              <div class="name">
-                {{ topBottom === 'top' ? useTeam : opponent }}
+            <template v-if="topBottom === 'top'">
+              <div class="team-name">
+                <div class="name">{{ useTeam }}</div>
+                <div class="score" v-if="['win_', 'lose_'].includes(result)">
+                  {{ result === 'win_' ? 'N' : 0 }}
+                </div>
+                <div class="score" v-else>
+                  {{ sumByInn(scores, inn) }}
+                </div>
               </div>
-              <div class="score">
-                {{
-                  topBottom === 'top'
-                    ? sumByInn(scores, inn)
-                    : sumByInn(opponentScores, inn)
-                }}
+              <div class="versus">:</div>
+              <div class="team-name">
+                <div class="score" v-if="['win_', 'lose_'].includes(result)">
+                  {{ result === 'lose_' ? 'N' : 0 }}
+                </div>
+                <div class="score" v-else>
+                  {{ sumByInn(opponentScores, inn) }}
+                </div>
+                <div class="name">{{ opponent }}</div>
               </div>
-            </div>
-            <div class="versus">:</div>
-            <div class="team-name">
-              <div class="score">
-                {{
-                  topBottom === 'bot'
-                    ? sumByInn(scores, inn)
-                    : sumByInn(opponentScores, inn)
-                }}
+            </template>
+            <template v-else>
+              <div class="team-name">
+                <div class="name">{{ opponent }}</div>
+                <div class="score" v-if="['win_', 'lose_'].includes(result)">
+                  {{ result === 'lose_' ? 'N' : 0 }}
+                </div>
+                <div class="score" v-else>
+                  {{ sumByInn(opponentScores, inn) }}
+                </div>
               </div>
-              <div class="name">
-                {{ topBottom === 'bot' ? useTeam : opponent }}
+              <div class="versus">:</div>
+              <div class="team-name">
+                <div class="score" v-if="['win_', 'lose_'].includes(result)">
+                  {{ result === 'win_' ? 'N' : 0 }}
+                </div>
+                <div class="score" v-else>
+                  {{ sumByInn(scores, inn) }}
+                </div>
+                <div class="name">{{ useTeam }}</div>
               </div>
-            </div>
+            </template>
           </div>
           <div class="box">
             <div class="team">
@@ -51,41 +68,56 @@
               </div>
             </div>
             <div class="gap"></div>
-            <div
-              v-for="(undefined, index) in Array.apply(null, Array(inn))"
-              :key="index"
-              class="inn"
-            >
-              <div>{{ index + 1 }}</div>
-              <div class="cell" v-if="topBottom === 'top'">
-                {{ scores[index] !== undefined ? scores[index] : '?' }}
+            <template v-if="!['win_', 'lose_'].includes(result)">
+              <div
+                v-for="(undefined, index) in Array.apply(null, Array(inn))"
+                :key="index"
+                class="inn"
+              >
+                <div>{{ index + 1 }}</div>
+                <div class="cell" v-if="topBottom === 'top'">
+                  {{ scores[index] !== undefined ? scores[index] : '?' }}
+                </div>
+                <div class="cell">
+                  {{
+                    opponentScores[index] !== undefined
+                      ? opponentScores[index]
+                      : topBottom === 'top' && index + 1 === inn
+                      ? 'X'
+                      : '?'
+                  }}
+                </div>
+                <div class="cell" v-if="topBottom === 'bot'">
+                  {{ scores[index] !== undefined ? scores[index] : 'X' }}
+                </div>
               </div>
-              <div class="cell">
-                {{
-                  opponentScores[index] !== undefined
-                    ? opponentScores[index]
-                    : topBottom === 'top' && index + 1 === inn
-                    ? 'X'
-                    : '?'
-                }}
-              </div>
-              <div class="cell" v-if="topBottom === 'bot'">
-                {{ scores[index] !== undefined ? scores[index] : 'X' }}
-              </div>
-            </div>
+            </template>
             <div class="inn" style="margin-left: auto;">
               <div class="cell">R</div>
-              <div class="cell" v-if="topBottom === 'top'">
-                {{ score }}
-              </div>
-              <div class="cell">
-                {{ opponentScore }}
-              </div>
-              <div class="cell" v-if="topBottom === 'bot'">
-                {{ score }}
-              </div>
+              <template v-if="!['win_', 'lose_'].includes(result)">
+                <div class="cell" v-if="topBottom === 'top'">
+                  {{ score }}
+                </div>
+                <div class="cell">
+                  {{ opponentScore }}
+                </div>
+                <div class="cell" v-if="topBottom === 'bot'">
+                  {{ score }}
+                </div>
+              </template>
+              <template v-else>
+                <div class="cell" v-if="topBottom === 'top'">
+                  {{ result === 'win_' ? 'N' : 0 }}
+                </div>
+                <div class="cell">
+                  {{ result === 'lose_' ? 'N' : 0 }}
+                </div>
+                <div class="cell" v-if="topBottom === 'bot'">
+                  {{ result === 'win_' ? 'N' : 0 }}
+                </div>
+              </template>
             </div>
-            <div class="inn">
+            <div class="inn" v-if="!['win_', 'lose_'].includes(result)">
               <div class="cell">H</div>
               <div class="cell" v-if="topBottom === 'top'">
                 {{ hit }}
@@ -95,7 +127,7 @@
                 {{ hit }}
               </div>
             </div>
-            <div class="inn">
+            <div class="inn" v-if="!['win_', 'lose_'].includes(result)">
               <div class="cell">E</div>
               <div class="cell" v-if="topBottom === 'top'">
                 {{ error === '' ? '?' : error }}
@@ -141,7 +173,7 @@
             <div v-if="mvp && result === 'win'" class="tag">
               {{ $t('box_mvp', { name: mvp }) }}
             </div>
-            <div v-if="mvp && result !== 'win'" class="tag">
+            <div v-if="mvp && ['lose', 'tie'].includes(result)" class="tag">
               {{ $t('box_best_player', { name: mvp }) }}
             </div>
             <div v-if="coach" class="tag">
@@ -260,8 +292,55 @@
           </div>
         </template>
       </div>
+      <div class="sticky-wrapper">
+        <div
+          class="box-table normal pitcher sticky-header"
+          v-if="pitchers.length"
+          style="display: none"
+          ref="pitchingStickyHeader"
+        >
+          <colgroup>
+            <col
+              v-for="(w, i) in pitchingWidths"
+              :key="i"
+              :style="{ width: `${w}px` }"
+            />
+          </colgroup>
+          <div class="player-records header">
+            <div class="player">
+              <router-link
+                v-if="editable"
+                :to="{
+                  name: 'edit_defense_info',
+                  params: {
+                    team: $route.params.team,
+                    game: $route.params.game,
+                  },
+                }"
+                class="fa fa-pencil"
+                tag="i"
+              />
+              <span class="order">{{ editable ? '' : '#' }}</span>
+              <span class="name">{{ $t('ttl_pitcher') }}</span>
+            </div>
+            <div class="records">
+              <div class="records-flex">
+                <div
+                  class="record"
+                  :key="`header_${colInesx}`"
+                  v-for="(col, colInesx) in pitcherCol"
+                >
+                  <span class="content">{{
+                    ['R', 'SO'].includes(col) ? $t(`${col}_P`) : $t(col)
+                  }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="box-table normal pitcher" v-if="pitchers.length">
-        <div class="player-records header">
+        <div class="player-records header" ref="pitchingHeader">
           <div class="player">
             <router-link
               v-if="editable"
@@ -298,36 +377,38 @@
           :key="`record_${i}`"
         >
           <div class="player">
-            <span class="order">
-              {{ i + 1 }}
-              <span
-                v-if="
-                  pitcher === item.name &&
-                    pitchers.map(p => p.name).indexOf(pitcher) === i
-                "
-                :class="`result-icon ${result}`"
-              >
-                {{ (result && result.slice(0, 1)) || '?' }}
+            <div class="contentdiv">
+              <span class="order">
+                {{ i + 1 }}
+                <span
+                  v-if="
+                    pitcher === item.name &&
+                      pitchers.map(p => p.name).indexOf(pitcher) === i
+                  "
+                  :class="`result-icon ${result}`"
+                >
+                  {{ (result && result.slice(0, 1)) || '?' }}
+                </span>
+                <span
+                  v-if="
+                    Array.isArray(pitcher) &&
+                      pitcher[0] === item.name &&
+                      pitcher[1] === i + 1
+                  "
+                  :class="`result-icon ${result}`"
+                >
+                  {{ (result && result.slice(0, 1)) || '?' }}
+                </span>
               </span>
-              <span
-                v-if="
-                  Array.isArray(pitcher) &&
-                    pitcher[0] === item.name &&
-                    pitcher[1] === i + 1
-                "
-                :class="`result-icon ${result}`"
-              >
-                {{ (result && result.slice(0, 1)) || '?' }}
+              <span class="name">
+                <photo
+                  :photo="item.data.photo"
+                  :name="item.name"
+                  :number="item.data.number"
+                />
+                {{ item.name }}
               </span>
-            </span>
-            <span class="name">
-              <photo
-                :photo="item.data.photo"
-                :name="item.name"
-                :number="item.data.number"
-              />
-              {{ item.name }}
-            </span>
+            </div>
           </div>
           <div class="records">
             <div class="records-flex">
@@ -585,8 +666,45 @@
           <div></div>
         </div>
       </div>
+      <div class="sticky-wrapper">
+        <div
+          class="box-table normal sticky-header"
+          v-if="box.slice(1).length"
+          style="display: none"
+          ref="battingStickyHeader"
+        >
+          <colgroup>
+            <col
+              v-for="(w, i) in battingWidths"
+              :key="i"
+              :style="{ width: `${w}px` }"
+            />
+          </colgroup>
+          <div class="player-records header">
+            <div class="player">
+              <span class="order">#</span>
+              <span class="name">{{ $t('box_header_player') }}</span>
+            </div>
+            <div v-if="boxSummary.e" class="error">E</div>
+            <div class="records">
+              <div class="records-flex">
+                <div
+                  class="record"
+                  :key="`header_${innIndex}`"
+                  v-for="(inn, innIndex) in box[0].slice(0, -1)"
+                >
+                  <span class="content">{{
+                    box[0][innIndex] === box[0][innIndex - 1] ? '' : inn
+                  }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="summary"></div>
+          </div>
+        </div>
+      </div>
       <div class="box-table normal" v-if="box.slice(1).length">
-        <div class="player-records header">
+        <div class="player-records header" ref="battingHeader">
           <div class="player">
             <span class="order">#</span>
             <span class="name">{{ $t('box_header_player') }}</span>
@@ -953,15 +1071,6 @@
       </div>
     </div>
 
-    <div v-if="positions" class="image-modal" @click="closePositions">
-      <div>
-        <coordination
-          :no_track="true"
-          :positions="positions"
-          :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
-        />
-      </div>
-    </div>
     <div
       v-if="groupCoordinates.length > 0"
       class="image-modal"
@@ -1087,6 +1196,9 @@
       }
     }
   }
+  .sticky-wrapper {
+    position: relative;
+  }
   .box-table {
     &.simple {
       display: none;
@@ -1099,9 +1211,6 @@
         &.header > div {
           background-color: $header_bgcolor;
           color: #fff;
-          position: sticky;
-          top: 70px;
-          z-index: 1;
         }
         .records .record {
           max-width: 85px;
@@ -1113,14 +1222,13 @@
             width: 10px;
           }
         }
-        /* &:last-child {
-          > :first-child {
-            border-radius: 0 0 0 10px;
-          }
-          > :last-child {
-            border-radius: 0 0 10px 0;
-          }
-        } */
+      }
+      &.sticky-header {
+        z-index: 1;
+        margin: 0;
+        .player-records {
+          background-color: transparent;
+        }
       }
     }
     &.pitcher {
@@ -1203,6 +1311,7 @@
       display: table-cell;
       white-space: nowrap;
       width: 1px;
+      vertical-align: top;
       .order {
         text-align: right;
         width: 30px;
@@ -1233,6 +1342,7 @@
       white-space: nowrap;
       width: 20px;
       text-align: center;
+      vertical-align: top;
     }
     .records {
       display: table-cell;
@@ -1241,6 +1351,7 @@
         display: flex;
         align-items: center;
         width: 100%;
+        height: 100%;
       }
       .record {
         width: 80px;
@@ -1454,13 +1565,15 @@
       0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
     background-color: var(--result-bg);
     color: var(--result-font-color);
-    &.win {
+    &.win,
+    &.win_ {
       background-color: var(--hit);
     }
     &.tie {
       background-color: var(--nonpa);
     }
-    &.lose {
+    &.lose,
+    &.lose_ {
       background-color: var(--ng);
     }
     // &.C { border-color: $header_bgcolor; }
@@ -1707,9 +1820,6 @@
       border-radius: 0;
       &.normal {
         .player-records {
-          &.header > div {
-            top: 50px;
-          }
           &:last-child {
             > :first-child,
             > :last-child {
@@ -1814,8 +1924,8 @@
       &.simple {
         display: table;
       }
-      &.normal {
-        display: none;
+      &.normal:not(.pitcher) {
+        display: none !important;
       }
       &.pitcher {
         display: table;
@@ -1831,7 +1941,8 @@
     }
   }
 }
-@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9) {
+@media only screen and (max-width: 760px) and (min-aspect-ratio: 13/9),
+  (max-height: 480px) and (min-aspect-ratio: 13/9) {
   .gamebox-container {
     .sticky-display-btn {
       top: 86px;
@@ -1919,6 +2030,8 @@ export default {
       batterSum: { AB: 0, H: 0, BB: 0, HR: 0 },
       batterSumDesc: '',
       groupCoordinates: [],
+      pitchingWidths: [],
+      battingWidths: [],
     };
   },
   created() {
@@ -1928,6 +2041,13 @@ export default {
   },
   mounted() {
     this.container = this.$refs.container;
+    this.detectHeaderWidth();
+    window.addEventListener('resize', this.requestAnimationFrameResize);
+    window.addEventListener('scroll', this.requestAnimationFrameScroll);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.requestAnimationFrameResize);
+    window.removeEventListener('scroll', this.requestAnimationFrameScroll);
   },
   methods: {
     ...mapActions([
@@ -2258,6 +2378,57 @@ export default {
     startClock_() {
       this.startClock(this.$route.params.team);
     },
+    detectHeaderWidth() {
+      this.pitchingWidths = this.$refs.pitchingHeader
+        ? Array.from(this.$refs.pitchingHeader.children).map(
+            node => node.getBoundingClientRect().width,
+          )
+        : [];
+      this.battingWidths = this.$refs.battingHeader
+        ? Array.from(this.$refs.battingHeader.children).map(
+            node => node.getBoundingClientRect().width,
+          )
+        : [];
+      this.$nextTick(() => {
+        this.detectSticky();
+      });
+    },
+    requestAnimationFrameResize() {
+      window.requestAnimationFrame(this.detectHeaderWidth);
+    },
+    detectSticky() {
+      const { matches } = window.matchMedia(
+        'only screen and (max-width: 760px), (max-height: 480px)',
+      );
+      const fixedValue = matches ? 50 : 70;
+      [
+        [this.$refs.pitchingHeader, this.$refs.pitchingStickyHeader],
+        [this.$refs.battingHeader, this.$refs.battingStickyHeader],
+      ].forEach(([$header, $stickyHeader]) => {
+        if ($header && $stickyHeader) {
+          const table = $header.parentElement;
+          const { y: tableY, height: tableH } = table.getBoundingClientRect();
+          const { height: headerH } = $header.getBoundingClientRect();
+          if (tableY < fixedValue) {
+            $header.style.visibility = 'hidden';
+            $stickyHeader.style.display = 'block';
+            if (tableH + tableY - headerH > fixedValue) {
+              $stickyHeader.style.position = 'fixed';
+              $stickyHeader.style.top = `${fixedValue}px`;
+            } else {
+              $stickyHeader.style.position = 'absolute';
+              $stickyHeader.style.top = `${tableH - headerH}px`;
+            }
+          } else {
+            $header.style.visibility = 'visible';
+            $stickyHeader.style.display = 'none';
+          }
+        }
+      });
+    },
+    requestAnimationFrameScroll() {
+      window.requestAnimationFrame(this.detectSticky);
+    },
   },
   computed: {
     ...mapGetters([
@@ -2441,6 +2612,21 @@ export default {
         this.checkLastColumn();
         this.checkEditVideo();
         this.checkFirstGuide();
+        if (this.box.slice(1).length) {
+          this.$nextTick(() => {
+            this.detectHeaderWidth();
+          });
+        }
+      },
+      immediate: true,
+    },
+    pitchers: {
+      handler() {
+        if (this.pitchers.length) {
+          this.$nextTick(() => {
+            this.detectHeaderWidth();
+          });
+        }
       },
       immediate: true,
     },
