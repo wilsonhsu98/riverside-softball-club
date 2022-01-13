@@ -630,6 +630,7 @@
           bottom: 0;
           left: 0;
           padding-left: 10px;
+          line-height: 38px;
           color: var(--input-color);
         }
         & + div {
