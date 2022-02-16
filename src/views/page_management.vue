@@ -38,21 +38,21 @@
         <template v-for="(item, itemIndex) in allTeams_">
           <div
             class="normal-row"
-            :key="`div_${item.name}`"
+            :key="`div_${item.teamCode}`"
             :class="{ current: item.teamCode === hightlight }"
             @click="setHighlight(item.teamCode)"
           >
             <template v-for="(col, colIndex) in displayedCols">
               <div
                 v-if="col === 'Rank'"
-                :key="`row_${item.name}_${colIndex}`"
+                :key="`row_${item.teamCode}_${colIndex}`"
                 class="cell rank"
               >
                 <div class="align-right">{{ itemIndex + 1 }}</div>
               </div>
               <div
                 v-else-if="col === 'name'"
-                :key="`row_${item.name}_${colIndex}`"
+                :key="`row_${item.teamCode}_${colIndex}`"
                 class="cell name"
               >
                 <div class="player">
@@ -70,7 +70,7 @@
                 v-else-if="['createTime', 'lastUpdate'].includes(col)"
                 class="cell"
                 :class="{ sort: col === sortBy }"
-                :key="`row_${item.name}_${colIndex}`"
+                :key="`row_${item.teamCode}_${colIndex}`"
               >
                 <div class="align-right">
                   {{
@@ -84,7 +84,7 @@
                 v-else-if="['teamType'].includes(col)"
                 class="cell"
                 :class="{ sort: col === sortBy }"
-                :key="`row_${item.name}_${colIndex}`"
+                :key="`row_${item.teamCode}_${colIndex}`"
               >
                 <div class="align-right">
                   {{ columnSet[item[col]] }}
@@ -94,7 +94,7 @@
                 v-else
                 class="cell"
                 :class="{ sort: col === sortBy }"
-                :key="`row_${item.name}_${colIndex}`"
+                :key="`row_${item.teamCode}_${colIndex}`"
               >
                 <div class="align-right">
                   {{
