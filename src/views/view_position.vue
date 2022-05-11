@@ -368,7 +368,7 @@
     position: relative;
     height: 40px;
     line-height: 34px;
-    background-color: $row_odd_bgcolor;
+    background-color: var(--player-cheap-bg);
     color: $row_color;
     border: 2px solid $row_color;
     box-sizing: border-box;

@@ -1967,6 +1967,7 @@ export default {
       'toggleGameStatus',
       'editGameOrder',
       'startClock',
+      'alert',
     ]),
     screenshot() {
       this.toggleLoading(true);
@@ -2197,6 +2198,10 @@ export default {
       this.$modal.show('player');
     },
     selectPlayer(player) {
+      if (this.boxSummary.contents.some(({ name }) => name === player.name)) {
+        this.alert(this.$t('msg_duplicate_player'));
+        return;
+      }
       const orders = this.boxSummary.contents.map(content => ({
         ...content,
         name:

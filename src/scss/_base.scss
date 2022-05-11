@@ -286,6 +286,7 @@ select::-ms-expand {
   --stats-item-row-even: #{$row_even_bgcolor};
   --stats-item-row-odd: #{$row_odd_bgcolor};
   --pa-insert-desc: #{$dark_gray};
+  --player-cheap-bg: #{$row_odd_bgcolor};
 
   --result-bg: #ccc;
   --result-font-color: #fff;
@@ -323,6 +324,7 @@ select::-ms-expand {
   --stats-item-row-even: #3a3b3d;
   --stats-item-row-odd: #424346;
   --pa-insert-desc: #e4e6ea;
+  --player-cheap-bg: #{rgba($row_odd_bgcolor, .7)};
 
   --result-bg: #{$dark_gray};
   --result-font-color: #e4e6ea;

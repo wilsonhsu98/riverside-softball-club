@@ -51,7 +51,9 @@
             <p class="team__name">{{ team.name }}</p>
             <p
               class="team__name"
-              v-for="(subName, i) in ellipsisTeams(team.subNames.split(','))"
+              v-for="(subName, i) in ellipsisTeams(
+                team.subNames.split(/[，、,]+/),
+              )"
               :key="`${team.teamCode}_subname_${i}`"
             >
               {{ subName }}
@@ -73,7 +75,15 @@
               $t('ttl_team_intro')
             }}</label>
             <p>{{ teamName }}</p>
-            <p>{{ otherNames }}</p>
+            <p>
+              {{
+                otherNames
+                  .split(/[，、,]+/)
+                  .map(s => s.trim())
+                  .filter(s => s)
+                  .join(', ')
+              }}
+            </p>
           </div>
           <p class="team-intro" v-html="teamIntro.replace(/\n/g, '<br/>')" />
           <div class="team-player" v-if="joined">

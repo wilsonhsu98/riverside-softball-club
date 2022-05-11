@@ -117,7 +117,7 @@ const getters = {
   teamNames: state => [
     state.teamInfo.teamName,
     ...state.teamInfo.otherNames
-      .split(',')
+      .split(/[，、,]+/)
       .filter(team => team)
       .sort((a, b) => a.localeCompare(b)),
   ],
