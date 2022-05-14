@@ -931,7 +931,7 @@
         ></span>
       </div>
     </div>
-    <div style="text-align: center; margin: 14px;">
+    <div v-if="box.slice(1).length === 0 && role === 'manager' && editable" style="text-align: center; margin: 14px;">
       <!-- <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
         <i class="fa fa-facebook-square"></i>
         {{ $t('fb_share') }}
@@ -1261,12 +1261,12 @@
       0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
   }
   .button-container {
-    margin: -60px 10px auto auto;
+    margin: -60px 10px 30px auto;
     padding: 0;
     text-align: right;
     width: 60px;
     position: sticky;
-    bottom: 0;
+    bottom: 20px;
     background: none;
     span {
       display: inline-block;
@@ -1288,7 +1288,6 @@
       &.off {
         background-color: rgba(255, 255, 255, 0.7);
         color: $current_user_bgcolor;
-        margin-bottom: 10px;
       }
     }
   }
@@ -1768,6 +1767,7 @@
   padding-top: 30px;
   height: 0;
   overflow: hidden;
+  margin-top: 20px;
   iframe {
     position: absolute;
     top: 0;
@@ -1839,7 +1839,7 @@
         #{$fixed_bottom} + env(safe-area-inset-bottom)
       ); /* iOS 11.2 */
       span {
-        margin: 0 10px 10px 0;
+        margin: 0 10px 0 0;
       }
     }
     .player-records {
