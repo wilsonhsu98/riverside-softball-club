@@ -61,7 +61,11 @@
                 v-for="order in ORDER"
                 :key="`order_${order}_${sourceList.length}`"
                 class="order-wrapper"
-                :class="{ drag, 'drag-back': dragBack }"
+                :class="{
+                  drag,
+                  'drag-back': dragBack,
+                  cover: order_(order)[0],
+                }"
                 :data-order="order"
               >
                 <div
@@ -272,6 +276,13 @@
       }
       &.drag-back {
         z-index: unset;
+      }
+      &.cover {
+        border-color: transparent;
+        background-color: transparent;
+        > .placeholder {
+          display: none;
+        }
       }
       &.touching {
         transform: scale(1.2);
