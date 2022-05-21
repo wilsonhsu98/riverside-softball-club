@@ -670,10 +670,16 @@ export default {
         );
       } else {
         if (this.displayMode === 'percentage') {
+          const hrToOutField = {
+            l_hr: 'lf',
+            c_hr: 'cf',
+            r_hr: 'rf',
+          };
           const percentage = this.xy.reduce((acc, item, i, self) => {
+            const location = hrToOutField[item.location] || item.location;
             const p = {
               ...acc,
-              [item.location]: (acc[item.location] || 0) + 1,
+              [location]: (acc[location] || 0) + 1,
             };
             if (i === self.length - 1) {
               const values = Object.keys(p).map(key => p[key]);

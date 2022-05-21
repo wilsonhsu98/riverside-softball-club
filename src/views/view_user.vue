@@ -69,18 +69,12 @@
               >後台</a
             >
             <br />
-            <a
-              class="link"
-              href="https://riversidesoftballclub.netlify.com/privacy_policy.html"
-              target="_blank"
-              >{{ $t('system_privacy_policy') }}</a
-            >
-            <a
-              class="link"
-              href="https://riversidesoftballclub.netlify.com/terms_and_conditions.html"
-              target="_blank"
-              >{{ $t('system_term_of_use') }}</a
-            >
+            <router-link class="link" :to="{ path: 'policy/privacy' }">
+              {{ $t('system_privacy_policy') }}
+            </router-link>
+            <router-link class="link" :to="{ path: 'policy/terms' }">
+              {{ $t('system_term_of_use') }}
+            </router-link>
           </div>
         </div>
       </template>

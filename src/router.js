@@ -176,6 +176,12 @@ const router = new VueRouter({
           component: require('./views/view_leave').default,
           meta: { requiresAuth: true, anonymous: false },
         },
+        {
+          path: 'policy/:policy_type',
+          name: 'policy',
+          component: require('./views/view_policy').default,
+          meta: { requiresAuth: false },
+        },
       ],
     },
     {

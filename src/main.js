@@ -133,6 +133,7 @@ const checkThemeMode = isDarkModeOn => {
       htmlEl.classList.remove('dark');
     }
   }
+  window.dispatchEvent(new Event('themeDefined'));
 };
 const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 checkThemeMode(darkModeMediaQuery.matches);
