@@ -1,6 +1,6 @@
 <template>
   <div>
-    <mobile-header :icon="currentTeamIcon" @back="back_" @save="edit_" />
+    <mobile-header @back="back_" />
     <div class="container">
       <iframe
         v-if="policy_type === 'privacy'"
@@ -41,8 +41,6 @@
 </style>
 
 <script>
-import { mapGetters, mapActions } from 'vuex';
-
 export default {
   data() {
     return {
@@ -60,19 +58,14 @@ export default {
     window.removeEventListener('themeDefined', this.setTheme);
   },
   methods: {
-    ...mapActions([]),
     back_() {
       this.$router.back();
     },
-    edit_() {},
     setTheme() {
       this.isDarkMode = Array.from(document.documentElement.classList).includes(
         'dark',
       );
     },
-  },
-  computed: {
-    ...mapGetters(['currentTeamIcon', 'currentTeam']),
   },
 };
 </script>
