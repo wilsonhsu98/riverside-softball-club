@@ -435,11 +435,12 @@
                 :name="item.name"
                 :number="item.data.number"
               />
-              {{ item.name }}
+              <span class="number">{{ item.data.number }}</span>
+              <span>{{ item.name }}</span>
               <div
                 v-if="editable && batchEdit"
                 class="edit-mask editable"
-                style="padding-left: 50px;"
+                style="padding-left: 68px;"
                 @click="changePlayer(item.name)"
               >
                 <i class="fa fa-pencil" :style="genAnimationShuffle()"></i>
@@ -654,11 +655,12 @@
                 :name="item.name"
                 :number="item.data.number"
               />
-              {{ item.name }}
+              <span class="number">{{ item.data.number }}</span>
+              <span>{{ item.name }}</span>
               <div
                 v-if="editable && batchEdit"
                 class="edit-mask editable"
-                style="padding-left: 53px;"
+                style="padding-left: 71px;"
                 @click="changePlayer(item.name)"
               >
                 <i class="fa fa-pencil" :style="genAnimationShuffle()"></i>
@@ -939,7 +941,11 @@
       </div>
     </div>
 
-    <div v-if="firstGuide" class="image-modal" @click="closeFirstGuide">
+    <div
+      v-if="firstGuide"
+      class="image-modal first-guide"
+      @click="closeFirstGuide"
+    >
       <div>
         <p @click="closeFirstGuide">{{ $t('msg_first_guide') }}</p>
         <button class="btn" @click="startClock_">
@@ -1252,6 +1258,13 @@
         overflow: hidden;
         text-overflow: ellipsis;
         vertical-align: top;
+        min-width: 100px;
+        .number {
+          display: inline-block;
+          text-align: center;
+          width: 15px;
+          margin-right: 3px;
+        }
       }
     }
     .error {
@@ -1870,7 +1883,7 @@
       top: 86px;
     }
   }
-  .image-modal > div {
+  .image-modal:not(.first-guide) > div {
     flex-direction: row;
   }
 }
@@ -1952,6 +1965,7 @@ export default {
       batterSum: { AB: 0, H: 0, BB: 0, HR: 0 },
       batterSumDesc: '',
       groupCoordinates: [],
+      hiddenStorageKey: `hidden_list_${this.$route.params.team}_${this.$route.params.game}`,
     };
   },
   created() {
@@ -2105,6 +2119,9 @@ export default {
       });
       this.batchEdit = !value;
       this.editVideoMode = false;
+      if (value === 'unlock-alt') {
+        window.localStorage.removeItem(this.hiddenStorageKey);
+      }
     },
     getPositions() {
       this.positions = Object.keys(this.boxSummary.positions || {}).reduce(

@@ -106,12 +106,12 @@
               <i
                 class="toggle-btn trash"
                 :class="deleteMode && 'on'"
-                @click="deleteMode = !deleteMode"
+                @click="extendHiddenPlayer"
                 ><trash
               /></i>
               <i
                 class="toggle-btn trash-undo"
-                @click="releaseHiddenPlayer()"
+                @click="releaseHiddenPlayer"
                 :data-deletes="
                   (hiddenList || []).length === 0
                     ? undefined
@@ -891,6 +891,8 @@ export default {
       highlight: [],
       currentSimplebar: undefined,
       chartResetkey: new Date().getTime(),
+      hiddenStorageKey: `hidden_list_${this.$route.params.team}_${this.$route.params.game}`,
+      askExtendHiddenPlayer: false,
     };
   },
   created() {
@@ -933,6 +935,7 @@ export default {
       'setSortBy',
       'editGameOrder',
       'alert',
+      'confirm',
     ]),
     back_() {
       this.$router.back();
@@ -1203,16 +1206,58 @@ export default {
     addHiddenPlayer(player) {
       this.hiddenList = [...this.hiddenList, player];
       window.localStorage.setItem(
-        'hidden_list',
+        this.hiddenStorageKey,
         JSON.stringify(
           this.hiddenList.map(({ name, number }) => ({ name, number })),
         ),
       );
       this.doResetSource();
     },
+    extendHiddenPlayer() {
+      const storageHiddenPlayer = Object.keys(window.localStorage)
+        .filter(
+          key =>
+            key.includes(`hidden_list_${this.$route.params.team}_`) &&
+            parseInt(key.replace(/[^0-9]/gi, ''), 10) <
+              parseInt(
+                `${this.$route.params.game}`.replace(/[^0-9]/gi, ''),
+                10,
+              ),
+        )
+        .sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+      const lastHiddenPlayer =
+        JSON.parse(window.localStorage.getItem(storageHiddenPlayer[0])) || [];
+      const hasStorageHiddenPlayer =
+        storageHiddenPlayer.length && lastHiddenPlayer.length > 0;
+      if (
+        this.hiddenList.length === 0 &&
+        this.askExtendHiddenPlayer === false &&
+        hasStorageHiddenPlayer
+      ) {
+        this.askExtendHiddenPlayer = true;
+        this.confirm({
+          msg: this.$t('msg_extend_hidden_player'),
+          y: this.$t('btn_extend_y'),
+          n: this.$t('btn_extend_n'),
+        })
+          .then(() => {
+            this.hiddenList = lastHiddenPlayer;
+            window.localStorage.setItem(
+              this.hiddenStorageKey,
+              JSON.stringify(lastHiddenPlayer),
+            );
+            this.doResetSource();
+          })
+          .catch(() => {
+            this.deleteMode = !this.deleteMode;
+          });
+      } else {
+        this.deleteMode = !this.deleteMode;
+      }
+    },
     releaseHiddenPlayer() {
       this.hiddenList = [];
-      window.localStorage.setItem('hidden_list', JSON.stringify([]));
+      window.localStorage.setItem(this.hiddenStorageKey, JSON.stringify([]));
       this.doResetSource();
     },
     formatValue(value, col) {
@@ -1350,7 +1395,8 @@ export default {
           // 先發球員清空
           // 成績排序 + 沒成績球員
           this.hiddenList =
-            JSON.parse(window.localStorage.getItem('hidden_list')) || [];
+            JSON.parse(window.localStorage.getItem(this.hiddenStorageKey)) ||
+            [];
           this.ORDER.forEach(order => {
             this[`order_${order}`] = [];
           });

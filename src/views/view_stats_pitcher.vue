@@ -171,7 +171,6 @@
                 v-else-if="col.name === 'name'"
                 :key="`header_${col.name}`"
                 class="cell name"
-                style="text-align: left;"
               >
                 {{ $t('SUM') }}
               </div>
@@ -244,7 +243,8 @@
                       :name="item.name"
                       :number="item.data.number"
                     />
-                    {{ item.name }}
+                    <span class="number">{{ item.data.number }}</span>
+                    <span>{{ item.name }}</span>
                   </div>
                 </div>
                 <div
@@ -401,8 +401,8 @@ i.fa {
       }
       &.name {
         min-width: 110px;
-        padding-left: 0;
-        text-align: center;
+        padding-left: 10px;
+        text-align: left;
         z-index: 5;
         cursor: initial;
       }
@@ -461,11 +461,17 @@ i.fa {
         text-align: left;
         line-height: 36px;
         display: inline-block;
-        width: 100px;
+        width: 115px;
         box-sizing: border-box;
         text-overflow: ellipsis;
         overflow: hidden;
         vertical-align: middle;
+        .number {
+          display: inline-block;
+          text-align: center;
+          width: 20px;
+          margin-right: 3px;
+        }
       }
       &:after {
         content: '';

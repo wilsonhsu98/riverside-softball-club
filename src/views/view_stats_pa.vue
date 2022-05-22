@@ -182,7 +182,6 @@
                 v-else-if="col.name === 'name'"
                 :key="`header_${col.name}`"
                 class="cell name"
-                style="text-align: left;"
               >
                 {{ $t('SUM') }}
               </div>
@@ -262,7 +261,8 @@
                       :name="item.name"
                       :number="item.data.number"
                     />
-                    {{ item.name }}
+                    <span class="number">{{ item.data.number }}</span>
+                    <span>{{ item.name }}</span>
                   </div>
                   <div
                     v-if="item.listByGame.length && lazy"
@@ -525,8 +525,8 @@ i.fa {
       }
       &.name {
         min-width: 110px;
-        padding-left: 0;
-        text-align: center;
+        padding-left: 10px;
+        text-align: left;
         z-index: 5;
         cursor: initial;
       }
@@ -608,11 +608,17 @@ i.fa {
         text-align: left;
         line-height: 36px;
         display: inline-block;
-        width: 100px;
+        width: 115px;
         box-sizing: border-box;
         text-overflow: ellipsis;
         overflow: hidden;
         vertical-align: middle;
+        .number {
+          display: inline-block;
+          text-align: center;
+          width: 20px;
+          margin-right: 3px;
+        }
       }
       &:after {
         content: '';
@@ -643,7 +649,7 @@ i.fa {
       }
       &:last-child {
         margin-left: 5px;
-        width: 65px;
+        width: 75px;
         text-align: left;
       }
     }
@@ -657,7 +663,7 @@ i.fa {
   .chart {
     background-color: var(--chart-bg);
     position: absolute;
-    left: 110px;
+    left: 125px;
     z-index: 2;
     overflow: hidden;
     outline: none;
@@ -1067,7 +1073,7 @@ export default {
       const { width, top } = this.$refs[
         'sticky-table-wrapper'
       ].getBoundingClientRect();
-      this.chartWidth = width - 152;
+      this.chartWidth = width - 167;
       this.tableHeight = window.innerHeight - top - 20;
 
       this.$refs.conditionContainer.style.height = 'auto';
