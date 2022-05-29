@@ -1732,7 +1732,7 @@
       }
       &.game-note {
         text-align: left;
-        margin: 0 10px;
+        margin: 20px 10px 0;
         border: 2px solid;
         border-radius: 4px;
         margin-bottom: 10px;
