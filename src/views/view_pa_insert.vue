@@ -156,7 +156,7 @@
           >
           <button
             class="btn right"
-            :disabled="nextStatus()"
+            :disabled="step === steps[steps.length - 1]"
             @click="goNext"
           ></button>
         </div>
@@ -1200,7 +1200,7 @@ export default {
       currentPlayer: undefined,
       reJoinPlayer: undefined,
       prev5Players: [],
-      maxOnbase: undefined,
+      maxOnbase: 1,
       benchPlayers: [],
       step: 1,
       steps: [1, 2, 3],
@@ -1419,6 +1419,7 @@ export default {
           redirect: () => {
             const { team, game } = this.$route.params;
             if (this.onbaseOut === 3) {
+              this.$router.push(`/main/games/${team}/${game}`);
               this.confirm({
                 msg: this.$t('msg_check_opponent_score'),
                 y: this.$t('btn_go_edit'),
@@ -1612,7 +1613,7 @@ export default {
           item => !shouldNotPrev5.find(sub => sub && sub.name === item.name),
         )
         .map(player => this.getPlayer(player.name));
-      if (!this.maxOnbase || reset) {
+      if (this.maxOnbase === 1 || reset) {
         this.maxOnbase =
           onbasePlayers.filter(item => item.name).length ||
           this.prev5Players.length ||
@@ -1681,14 +1682,6 @@ export default {
     closeSetInn(e) {
       if (e.currentTarget === e.target) {
         this.showSetInn = false;
-      }
-    },
-    nextStatus() {
-      if (this.step === this.steps[this.steps.length - 1]) {
-        return true;
-      }
-      if (this.step === 1 && !this.content) {
-        return true;
       }
     },
     goPrev() {
@@ -1895,7 +1888,7 @@ export default {
     resetBasic() {
       this.step = 1;
       this.content = undefined;
-      this.maxOnbase = undefined;
+      this.maxOnbase = 1;
       this.rbi = {
         value: '',
         one: { disabled: true },
