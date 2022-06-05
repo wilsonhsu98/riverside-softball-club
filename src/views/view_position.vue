@@ -526,10 +526,10 @@ export default {
       const errorStr = (this.teamInfo.teamType === 'baseball'
         ? [
             {
-              // if fill the field, only free can be empty
+              // if fill the field, only DH can be empty
               condition:
                 Object.keys(result).length > 0 &&
-                !this.POSITION.filter(key => !['', 'FREE'].includes(key)).every(
+                !this.POSITION.filter(key => !['', 'DH'].includes(key)).every(
                   key => result[key],
                 ),
               err: this.$t('msg_should_fill_position_baseball'),

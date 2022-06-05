@@ -17,7 +17,12 @@
         <div class="separater">
           <label>{{ $t('ttl_current_pa') }}</label>
         </div>
-        <div :class="['current-desc', { show: base['home'].name }]">
+        <div
+          :class="[
+            'current-desc',
+            { show: base['home'].name && !waitRedirect },
+          ]"
+        >
           <div class="summary">
             <div class="box">
               <div class="team">
@@ -1220,6 +1225,7 @@ export default {
       spotlightIcon: undefined,
       spotlightTimer: undefined,
       showInstruction: false,
+      waitRedirect: false,
     };
   },
   created() {
@@ -1435,12 +1441,14 @@ export default {
               this.$route.params.order !== 'new' &&
               this.order < this.boxSummary.contents.length
             ) {
+              this.waitRedirect = true;
               this.resetBasic();
               this.setOrder(this.order + 1);
               this.$router.push(
                 `/main/games/${team}/${game}/${this.order + 1}`,
               );
             } else {
+              this.waitRedirect = true;
               this.resetBasic();
               this.setOrder(this.order + 1);
               this.$router.push(`/main/games/${team}/${game}/new`);
@@ -1632,6 +1640,21 @@ export default {
     selectPlayer(player) {
       switch (this.changeMode) {
         case 'home':
+          if (
+            this.name !== player.name &&
+            this.base.home.name !== player.name &&
+            this.box.some(({ name }) => name === player.name) &&
+            this.reJoinPlayer &&
+            this.reJoinPlayer.name !== player.name
+          ) {
+            this.alert(this.$t('msg_duplicate_before_player'));
+            return;
+          } else if (
+            this.boxSummary.contents.some(({ name }) => name === player.name)
+          ) {
+            this.alert(this.$t('msg_duplicate_player'));
+            return;
+          }
           this.base.home.name = player.name;
           this.preContents = this.boxSummary.contents.filter(
             item => item.name === player.name && item.content,
@@ -1994,6 +2017,11 @@ export default {
       } else {
         clearTimeout(this.spotlightTimer);
         document.querySelector('.content').style.setProperty('position', '');
+      }
+    },
+    name(newVal, oldVal) {
+      if (newVal !== oldVal) {
+        this.waitRedirect = false;
       }
     },
   },

@@ -17,7 +17,12 @@
         ref="input"
       />
       <span v-else class="text">{{ player.name }}</span>
-      <i v-if="isEditMode" class="fa fa-check" @click="confirm"></i>
+      <i
+        v-if="isEditMode"
+        class="fa fa-check"
+        :class="{ disabled: !name }"
+        @click="confirm"
+      ></i>
       <i
         v-if="editable"
         class="fa"
@@ -92,6 +97,10 @@
       font-size: 18px;
       cursor: pointer;
       margin: 0 5px;
+      &.disabled {
+        cursor: not-allowed;
+        opacity: 0.2;
+      }
     }
   }
 }
@@ -112,7 +121,9 @@ export default {
       this.$emit('click', this.player);
     },
     confirm() {
-      this.$emit('edit', { name: this.name });
+      if (this.name) {
+        this.$emit('edit', { name: this.name });
+      }
     },
     toggleMode() {
       this.isEditMode = !this.isEditMode;

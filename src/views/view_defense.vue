@@ -668,7 +668,7 @@ export default {
     this.setGame(this.$route.params.game);
   },
   methods: {
-    ...mapActions(['setGame', 'editGameDefense']),
+    ...mapActions(['setGame', 'editGameDefense', 'alert']),
     back_() {
       if (this.redirectInfo) {
         this.$router.push({
@@ -707,6 +707,15 @@ export default {
     },
     selectPlayer(player) {
       const pIndex = this.currentPitcherIndex;
+      if ((this.pitchers[pIndex - 1] || { name: '' }).name === player.name) {
+        this.alert(this.$t('msg_duplicate_with_prev'));
+        return;
+      } else if (
+        (this.pitchers[pIndex + 1] || { name: '' }).name === player.name
+      ) {
+        this.alert(this.$t('msg_duplicate_with_next'));
+        return;
+      }
       this.pitchers = [
         ...this.pitchers.slice(0, pIndex),
         {
