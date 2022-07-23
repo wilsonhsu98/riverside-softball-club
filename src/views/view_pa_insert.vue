@@ -1567,7 +1567,7 @@ export default {
               ? [...acc, player.name, player.r]
               : [...acc, player.name];
           }, []);
-        if (this.checkReJoin(sameOrderPlayers)) {
+        if (this.checkReJoin([...sameOrderPlayers, this.name])) {
           this.reJoinPlayer = this.getPlayer(sameOrderPlayers[0]);
         }
 
@@ -1650,7 +1650,9 @@ export default {
             this.alert(this.$t('msg_duplicate_before_player'));
             return;
           } else if (
-            this.boxSummary.contents.some(({ name }) => name === player.name)
+            this.boxSummary.contents.some(({ name }) => name === player.name) &&
+            this.reJoinPlayer &&
+            this.reJoinPlayer.name !== player.name
           ) {
             this.alert(this.$t('msg_duplicate_player'));
             return;

@@ -888,7 +888,9 @@ export default {
             this.alert(this.$t('msg_duplicate_before_player'));
             return;
           } else if (
-            this.boxSummary.contents.some(({ name }) => name === player.name)
+            this.boxSummary.contents.some(({ name }) => name === player.name) &&
+            this.reJoinPlayer &&
+            this.reJoinPlayer.name !== player.name
           ) {
             this.alert(this.$t('msg_duplicate_player'));
             return;
