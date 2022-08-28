@@ -61,6 +61,8 @@ const actions = {
       period = '',
       gameNote = '',
       youtubeVideos = '',
+      orders,
+      positions,
     } = data;
     commit(rootTypes.LOADING, true);
     const refNewGameDoc = db.doc(`teams/${teamCode}/games/${newId}`);
@@ -110,6 +112,8 @@ const actions = {
                   },
                 }
               : undefined),
+            ...(orders ? { orders } : undefined),
+            ...(positions ? { positions } : undefined),
           },
           { merge: true },
         );
@@ -140,8 +144,12 @@ const actions = {
         if (prevId && prevId !== newId) {
           router.push(`/main/games/${teamCode}`);
         } else if (!prevId) {
-          router.replace(`/main/games/${teamCode}/${newId}/edit`);
-          router.push(`/main/games/${teamCode}/${newId}/order`);
+          if (orders) {
+            router.push(`/main/games/${teamCode}/${newId}`);
+          } else {
+            router.replace(`/main/games/${teamCode}/${newId}`);
+            router.push(`/main/games/${teamCode}/${newId}/order`);
+          }
         } else {
           router.push(`/main/games/${teamCode}/${newId}`);
         }
@@ -176,43 +184,17 @@ const actions = {
         commit(rootTypes.LOADING, false);
       });
   },
-  editGameOrder({ commit, dispatch }, data) {
-    const { teamCode, gameId, orders, redirect } = data;
+  editGameOrderPosition({ commit, dispatch }, data) {
+    const { teamCode, gameId, orders, positions, redirect } = data;
     commit(rootTypes.LOADING, true);
     const batch = db.batch();
     batch.set(
       db.doc(`teams/${teamCode}/games/${gameId}`),
-      { orders, timestamp },
-      { merge: true },
-    );
-    batch.set(
-      db.doc(`teams/${teamCode}`),
-      { games: { [gameId]: timestamp }, timestamp },
-      { merge: true },
-    );
-    batch
-      .commit()
-      .then(() => {
-        if (typeof redirect === 'function') {
-          redirect();
-        } else {
-          dispatch('setGame', gameId);
-          router.push(`/main/games/${teamCode}/${gameId}`);
-        }
-        commit(rootTypes.LOADING, false);
-      })
-      .catch(error => {
-        console.log('Error editing document:', error);
-        commit(rootTypes.LOADING, false);
-      });
-  },
-  editGamePosition({ commit, dispatch }, data) {
-    const { teamCode, gameId, positions, redirect } = data;
-    commit(rootTypes.LOADING, true);
-    const batch = db.batch();
-    batch.set(
-      db.doc(`teams/${teamCode}/games/${gameId}`),
-      { positions, timestamp },
+      {
+        ...(orders ? { orders } : undefined),
+        ...(positions ? { positions } : undefined),
+        timestamp,
+      },
       { merge: true },
     );
     batch.set(

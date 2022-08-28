@@ -597,7 +597,12 @@ export default {
     this.setPa();
   },
   methods: {
-    ...mapActions(['editGameOrder', 'deleteLastPa', 'alert', 'confirm']),
+    ...mapActions([
+      'editGameOrderPosition',
+      'deleteLastPa',
+      'alert',
+      'confirm',
+    ]),
     toggle(path, value) {
       const setPath = (path, value) =>
         path
@@ -739,7 +744,7 @@ export default {
           },
           tempRecord.slice(i + 1),
         );
-        this.editGameOrder({
+        this.editGameOrderPosition({
           teamCode: this.$route.params.team,
           gameId: this.$route.params.game,
           orders,

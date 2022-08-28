@@ -933,7 +933,7 @@ export default {
       'setTop',
       'setUnlimitedPA',
       'setSortBy',
-      'editGameOrder',
+      'editGameOrderPosition',
       'alert',
       'confirm',
     ]),
@@ -975,7 +975,7 @@ export default {
       }
 
       // call save action
-      this.editGameOrder({
+      this.editGameOrderPosition({
         redirect: () => {
           this.$router.push(
             `/main/games/${this.$route.params.team}/${this.$route.params.game}/position`,

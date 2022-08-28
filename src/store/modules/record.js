@@ -1339,7 +1339,42 @@ const mutations = {
   },
 };
 
-export { types, actions };
+const getLastOrderPosition = async newGameId => {
+  const getLastOrderPosition_ = gameId =>
+    new Promise(resolve => {
+      workerCreater(
+        {
+          cmd: 'Box',
+          games: state.games,
+          game: gameId,
+          players: teamGetters.teamInfo(teamState).players,
+          records: state.records,
+        },
+        data => {
+          resolve({
+            orders: Array.isArray(data)
+              ? data.slice(1).map(row => ({ name: row.name }))
+              : [],
+            positions: (state.games.find(g => g.game === gameId) || {})
+              .positions,
+          });
+        },
+      );
+    });
+  let lastGame;
+  for (let i = state.games.length - 1; i >= 0; i -= 1) {
+    if (
+      parseInt(newGameId.replace('-', '')) >
+      parseInt(state.games[i].game.replace('-', ''))
+    ) {
+      lastGame = state.games[i].game;
+      break;
+    }
+  }
+  return lastGame ? await getLastOrderPosition_(lastGame) : {};
+};
+
+export { types, actions, getLastOrderPosition };
 export default {
   state,
   getters,

@@ -493,7 +493,7 @@ export default {
     }
   },
   methods: {
-    ...mapActions(['editGamePosition', 'setGame', 'alert']),
+    ...mapActions(['editGameOrderPosition', 'setGame', 'alert']),
     back_() {
       const { team, game } = this.$route.params;
       if (this.fromRoute) {
@@ -563,7 +563,7 @@ export default {
       }
 
       // call save action
-      this.editGamePosition({
+      this.editGameOrderPosition({
         redirect: () => {
           const { team, game } = this.$route.params;
           if (this.mode === 'edit') {

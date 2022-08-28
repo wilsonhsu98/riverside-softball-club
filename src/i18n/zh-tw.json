@@ -176,6 +176,8 @@
 	"msg_mobile_download": "[長按]可以另存圖片",
 	"msg_duplicate_player": "名字不得與場上球員重覆<br><br>若要棒次互調，請依照以下方式<br>先將A換成C<br>之後把B換成A<br>最後再把C換成B",
 	"msg_duplicate_before_player": "名字不得與已上場球員重覆",
+	"btn_order_from_last_game": "沿用上一場攻守名單",
+	"msg_order_from_last_game": "是否沿用上一場的攻守名單？",
 
 	"fill_order": "排歐打",
 	"ttl_all_players": "所有球員",

@@ -1236,7 +1236,7 @@ export default {
   },
   methods: {
     ...mapActions([
-      'editGameOrder',
+      'editGameOrderPosition',
       'deleteLastPa',
       'setOrder',
       'alert',
@@ -1421,7 +1421,7 @@ export default {
           },
           tempRecord.slice(i + 1),
         );
-        this.editGameOrder({
+        this.editGameOrderPosition({
           redirect: () => {
             const { team, game } = this.$route.params;
             if (this.onbaseOut === 3) {

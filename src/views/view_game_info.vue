@@ -841,6 +841,7 @@
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import { formatDate, sumByInn } from '../libs/utils';
+import { getLastOrderPosition } from '../store/modules/record';
 
 export default {
   data() {
@@ -967,8 +968,24 @@ export default {
         return;
       }
       // wait for tags component ready
-      setTimeout(() => {
+      setTimeout(async () => {
         if (this.validate()) {
+          const newId = `${this.gameDate}-${this.gamePostfix}`;
+          const lastOrderPosition = await getLastOrderPosition(newId);
+          let choiceOfLastOrderPosition;
+          if (
+            this.mode === 'insert' &&
+            Array.isArray(lastOrderPosition.orders) &&
+            lastOrderPosition.orders.length
+          ) {
+            choiceOfLastOrderPosition = await this.confirm({
+              msg: this.$t('msg_order_from_last_game'),
+              y: this.$t('btn_extend_y'),
+              n: this.$t('btn_extend_n'),
+            })
+              .then(() => lastOrderPosition)
+              .catch(() => undefined);
+          }
           const {
             prevId,
             useTeam,
@@ -995,7 +1012,7 @@ export default {
           this.editGame({
             teamCode: this.$route.params.team,
             prevId,
-            newId: `${this.gameDate}-${this.gamePostfix}`,
+            newId,
             useTeam,
             opponent,
             league,
@@ -1014,6 +1031,7 @@ export default {
             period,
             gameNote,
             youtubeVideos,
+            ...choiceOfLastOrderPosition,
           });
         }
       });

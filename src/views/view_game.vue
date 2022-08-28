@@ -849,22 +849,26 @@
     </div>
     <div
       v-if="box.slice(1).length === 0 && role === 'manager' && editable"
-      style="text-align: center; margin: 14px;"
+      class="btn-order-container"
     >
-      <!-- <button v-if="box.slice(1).length" class="share-btn" @click="screenshot">
-        <i class="fa fa-facebook-square"></i>
-        {{ $t('fb_share') }}
-      </button> -->
-      <router-link
-        v-if="box.slice(1).length === 0 && role === 'manager' && editable"
-        :to="{
-          name: 'game_order',
-          params: { team: $route.params.team, game: $route.params.game },
-        }"
-        class="btn"
-        tag="button"
-        >{{ $t('btn_fill_order') }}</router-link
-      >
+      <div>
+        <router-link
+          :to="{
+            name: 'game_order',
+            params: { team: $route.params.team, game: $route.params.game },
+          }"
+          class="btn"
+          tag="button"
+          >{{ $t('btn_fill_order') }}</router-link
+        >
+        <button
+          v-if="canSetLastOrderPosition"
+          class="btn"
+          @click="saveLastOrderPosition"
+        >
+          {{ $t('btn_order_from_last_game') }}
+        </button>
+      </div>
     </div>
     <div v-if="gameNote" class="gamebox-container">
       <div class="box-summary game-note" :data-column="$t('ttl_game_note')">
@@ -1598,6 +1602,21 @@
     }
   }
 }
+.btn-order-container {
+  display: flex;
+  justify-content: center;
+  > div {
+    display: inline-flex;
+    flex-direction: column;
+  }
+  .btn {
+    width: auto;
+    min-width: 100px;
+    &:not(:first-child) {
+      margin-top: 5px;
+    }
+  }
+}
 .ad {
   margin-bottom: 14px;
 }
@@ -1729,6 +1748,9 @@
         position: initial;
         font-size: 14px;
         display: block;
+        .action {
+          margin-top: 10px;
+        }
       }
       &.game-note {
         text-align: left;
@@ -1895,6 +1917,7 @@ import html2canvas from 'html2canvas';
 import axios from 'axios';
 import config from '../../config';
 import { formatContent, sumByInn } from '../libs/utils';
+import { getLastOrderPosition } from '../store/modules/record';
 
 export default {
   data() {
@@ -1966,6 +1989,8 @@ export default {
       batterSumDesc: '',
       groupCoordinates: [],
       hiddenStorageKey: `hidden_list_${this.$route.params.team}_${this.$route.params.game}`,
+      canSetLastOrderPosition: false,
+      lastOrderPosition: undefined,
     };
   },
   created() {
@@ -1973,8 +1998,18 @@ export default {
       this.setGame(this.$route.params.game);
     }
   },
-  mounted() {
+  async mounted() {
     this.container = this.$refs.container;
+    const lastOrderPosition = await getLastOrderPosition(
+      this.$route.params.game,
+    );
+    if (
+      Array.isArray(lastOrderPosition.orders) &&
+      lastOrderPosition.orders.length
+    ) {
+      this.canSetLastOrderPosition = true;
+      this.lastOrderPosition = lastOrderPosition;
+    }
   },
   methods: {
     ...mapActions([
@@ -1982,7 +2017,7 @@ export default {
       'toggleLoading',
       'setBoxDisplay',
       'toggleGameStatus',
-      'editGameOrder',
+      'editGameOrderPosition',
       'startClock',
       'alert',
     ]),
@@ -2242,7 +2277,7 @@ export default {
             }
           : undefined),
       }));
-      this.editGameOrder({
+      this.editGameOrderPosition({
         redirect: () => {
           this.batchEdit = false;
           this.$modal.hide('player');
@@ -2283,7 +2318,7 @@ export default {
             : undefined),
         };
       });
-      this.editGameOrder({
+      this.editGameOrderPosition({
         redirect: () => {
           this.$modal.hide('video');
         },
@@ -2312,6 +2347,21 @@ export default {
     },
     startClock_() {
       this.startClock(this.$route.params.team);
+    },
+    saveLastOrderPosition() {
+      if (this.canSetLastOrderPosition) {
+        this.editGameOrderPosition({
+          redirect: () => {},
+          teamCode: this.$route.params.team,
+          gameId: this.$route.params.game,
+          ...(Array.isArray(this.lastOrderPosition.orders)
+            ? { orders: this.lastOrderPosition.orders }
+            : undefined),
+          ...(this.lastOrderPosition.positions
+            ? { positions: this.lastOrderPosition.positions }
+            : undefined),
+        });
+      }
     },
   },
   computed: {
