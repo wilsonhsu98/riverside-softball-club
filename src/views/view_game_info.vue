@@ -326,6 +326,7 @@
             v-model="date"
             :popover="{ placement: 'bottom', visibility: 'click' }"
             :attributes="today"
+            :is-dark="isDarkMode"
           >
             <span
               slot="header-title"
@@ -892,6 +893,9 @@ export default {
       gameStatus: 'lock',
       positions: undefined,
       orders: undefined,
+      isDarkMode: Array.from(document.documentElement.classList).includes(
+        'dark',
+      ),
     };
   },
   created() {
@@ -901,6 +905,12 @@ export default {
     ) {
       this.setGame(this.$route.params.game);
     }
+  },
+  mounted() {
+    window.addEventListener('themeChange', this.setDatePickerTheme);
+  },
+  beforeDestroy() {
+    window.removeEventListener('themeChange', this.setDatePickerTheme);
   },
   methods: {
     ...mapActions(['setGame', 'editGame', 'deleteGame', 'alert', 'confirm']),
@@ -1134,6 +1144,11 @@ export default {
     },
     setGwrbiInn(val) {
       this.gwrbiInn = val;
+    },
+    setDatePickerTheme() {
+      this.isDarkMode = Array.from(document.documentElement.classList).includes(
+        'dark',
+      );
     },
   },
   computed: {

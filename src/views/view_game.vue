@@ -886,6 +886,8 @@
     <player-modal
       :current="currentPlayer"
       :current_label="$t('ttl_current_option')"
+      :third="startedPlayers"
+      :third_label="$t('ttl_switch_with_started')"
       :fourth="possiblePlayers"
       :fourth_label="$t('ttl_all_players')"
       :enable_extra="true"
@@ -1960,6 +1962,7 @@ export default {
       orders: undefined,
       hideLastColumn: false,
       currentPlayer: undefined,
+      startedPlayers: [],
       possiblePlayers: [],
       batchEdit: false,
       editVideoMode: false,
@@ -2253,30 +2256,77 @@ export default {
       this.$modal.show('player');
     },
     selectPlayer(player) {
+      let orders;
       if (this.boxSummary.contents.some(({ name }) => name === player.name)) {
-        this.alert(this.$t('msg_duplicate_player'));
-        return;
+        orders = this.boxSummary.contents.map(content => {
+          if (content.name === this.currentPlayer.name) {
+            return {
+              ...content,
+              name: player.name,
+              ...(content.onbase && Array.isArray(content.onbase)
+                ? {
+                    onbase: content.onbase.map(onbase => ({
+                      ...onbase,
+                      ...(onbase.name
+                        ? {
+                            name:
+                              onbase.name === this.currentPlayer.name
+                                ? player.name
+                                : onbase.name,
+                          }
+                        : undefined),
+                    })),
+                  }
+                : undefined),
+            };
+          } else if (content.name === player.name) {
+            return {
+              ...content,
+              name: this.currentPlayer.name,
+              ...(content.onbase && Array.isArray(content.onbase)
+                ? {
+                    onbase: content.onbase.map(onbase => ({
+                      ...onbase,
+                      ...(onbase.name
+                        ? {
+                            name:
+                              onbase.name === player.name
+                                ? this.currentPlayer.name
+                                : onbase.name,
+                          }
+                        : undefined),
+                    })),
+                  }
+                : undefined),
+            };
+          } else {
+            return content;
+          }
+        });
+      } else {
+        orders = this.boxSummary.contents.map(content => ({
+          ...content,
+          name:
+            content.name === this.currentPlayer.name
+              ? player.name
+              : content.name,
+          ...(content.onbase && Array.isArray(content.onbase)
+            ? {
+                onbase: content.onbase.map(onbase => ({
+                  ...onbase,
+                  ...(onbase.name
+                    ? {
+                        name:
+                          onbase.name === this.currentPlayer.name
+                            ? player.name
+                            : onbase.name,
+                      }
+                    : undefined),
+                })),
+              }
+            : undefined),
+        }));
       }
-      const orders = this.boxSummary.contents.map(content => ({
-        ...content,
-        name:
-          content.name === this.currentPlayer.name ? player.name : content.name,
-        ...(content.onbase && Array.isArray(content.onbase)
-          ? {
-              onbase: content.onbase.map(onbase => ({
-                ...onbase,
-                ...(onbase.name
-                  ? {
-                      name:
-                        onbase.name === this.currentPlayer.name
-                          ? player.name
-                          : onbase.name,
-                    }
-                  : undefined),
-              })),
-            }
-          : undefined),
-      }));
       this.editGameOrderPosition({
         redirect: () => {
           this.batchEdit = false;
@@ -2491,9 +2541,13 @@ export default {
           this.role === 'manager' &&
           this.gameStatus === 'unlock-alt' &&
           !this.isViewMode;
-        const startedPlayer = this.box.slice(1).map(row => row.name);
+        const startedPlayers = this.box.slice(1).map(row => row.name);
+        this.startedPlayers = this.box.slice(1).map(player => ({
+          ...player.data,
+          name: player.name,
+        }));
         this.possiblePlayers = this.teamInfo.players.filter(
-          player => !startedPlayer.includes(player.name),
+          player => !startedPlayers.includes(player.name),
         );
         this.checkLastColumn();
       },
