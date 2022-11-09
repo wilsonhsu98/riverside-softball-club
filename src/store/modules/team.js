@@ -973,7 +973,8 @@ const actions = {
               currentTime - lastTime > 86400000 * 30 * 1 && // 1個月前
               playerCount === 1 && // only one binding user
               managerCount === 1 && // is manager
-              team.teamCode !== 'DEMO'
+              team.teamCode !== 'DEMO' &&
+              team.score < 40
             )
               return true;
           })
