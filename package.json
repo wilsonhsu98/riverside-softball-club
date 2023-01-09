@@ -6,7 +6,7 @@
     "start:client": "vue-cli-service serve --port 9527 --open",
     "start:server": "netlify-lambda serve functions -c webpack.server.js",
     "build": "npm run build:client && npm run build:server && cd dist/server && npm install",
-    "build:client": "vue-cli-service build",
+    "build:client": "vue-cli-service build --mode development",
     "build:server": "netlify-lambda build functions -c webpack.server.js",
     "lint": "vue-cli-service lint",
     "format": "prettier --write \"src/**/*.{js,vue}\" \"functions/**/*.js\" \"public/**/*.{js,vue}\""
