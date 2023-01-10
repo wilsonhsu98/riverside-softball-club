@@ -95,14 +95,65 @@ const actions = {
     commit(types.LOADING, { img: true });
     auth.signInAnonymously();
   },
-  googleLogin() {
-    auth.signInWithRedirect(providerMapping['google.com']);
+  loginPopup({ commit }, provider) {
+    auth
+      .signInWithPopup(providerMapping[provider])
+      .then(result => {
+        if (result.credential) {
+          commit(types.SET_PROVIDERID, result.credential.providerId);
+          commit(types.SET_TOKEN, result.credential.accessToken);
+          commit(types.SET_ANONYMOUS, false);
+        }
+      })
+      .catch(error => {
+        if (!isFirst) return; // prevent logout event trigger auth.getRedirectResult()
+        isFirst = false;
+        if (error.code === 'auth/account-exists-with-different-credential') {
+          window.localStorage.setItem(
+            'pendingCred',
+            JSON.stringify(error.credential),
+          );
+          auth.fetchSignInMethodsForEmail(error.email).then(providers => {
+            if (providers[0] === 'password') {
+              db.collection('accounts')
+                .where('email', '==', error.email)
+                .get()
+                .then(querySnapshot => {
+                  querySnapshot.forEach(doc => {
+                    commit(types.LOADING, { img: true });
+                    auth.signInWithEmailAndPassword(
+                      error.email,
+                      doc.data().lineUserID,
+                    );
+                    commit(types.SET_PROVIDERID, 'password');
+                    commit(types.SET_TOKEN, doc.data().accessToken);
+                    commit(types.SET_ANONYMOUS, false);
+                  });
+                });
+            } else {
+              actions.loginPopup({ commit }, providers[0]);
+              // auth.signInWithRedirect(providerMapping[providers[0]]);
+            }
+          });
+        } else {
+          console.log('getRedirectResult error');
+          console.log(error);
+          commit(types.CLEAN_TOKEN);
+          commit(types.LOADING, false);
+        }
+      });
   },
-  fbLogin() {
-    auth.signInWithRedirect(providerMapping['facebook.com']);
+  googleLogin({ commit }) {
+    // auth.signInWithRedirect(providerMapping['google.com']);
+    actions.loginPopup({ commit }, 'google.com');
   },
-  githubLogin() {
-    auth.signInWithRedirect(providerMapping['github.com']);
+  fbLogin({ commit }) {
+    // auth.signInWithRedirect(providerMapping['facebook.com']);
+    actions.loginPopup({ commit }, 'facebook.com');
+  },
+  githubLogin({ commit }) {
+    // auth.signInWithRedirect(providerMapping['github.com']);
+    actions.loginPopup({ commit }, 'github.com');
   },
   lineLogin() {
     window.location = `${lineLoginUrl}?from=${encodeURIComponent(
@@ -170,51 +221,51 @@ const actions = {
     chkLoginStatusDone = true;
     commit(types.INIT_FROM_LS);
     commit(types.LOADING, { img: true });
-    auth
-      .getRedirectResult()
-      .then(result => {
-        if (result.credential) {
-          commit(types.SET_PROVIDERID, result.credential.providerId);
-          commit(types.SET_TOKEN, result.credential.accessToken);
-          commit(types.SET_ANONYMOUS, false);
-        }
-      })
-      .catch(error => {
-        if (!isFirst) return; // prevent logout event trigger auth.getRedirectResult()
-        isFirst = false;
-        if (error.code === 'auth/account-exists-with-different-credential') {
-          window.localStorage.setItem(
-            'pendingCred',
-            JSON.stringify(error.credential),
-          );
-          auth.fetchSignInMethodsForEmail(error.email).then(providers => {
-            if (providers[0] === 'password') {
-              db.collection('accounts')
-                .where('email', '==', error.email)
-                .get()
-                .then(querySnapshot => {
-                  querySnapshot.forEach(doc => {
-                    commit(types.LOADING, { img: true });
-                    auth.signInWithEmailAndPassword(
-                      error.email,
-                      doc.data().lineUserID,
-                    );
-                    commit(types.SET_PROVIDERID, 'password');
-                    commit(types.SET_TOKEN, doc.data().accessToken);
-                    commit(types.SET_ANONYMOUS, false);
-                  });
-                });
-            } else {
-              auth.signInWithRedirect(providerMapping[providers[0]]);
-            }
-          });
-        } else {
-          console.log('getRedirectResult error');
-          console.log(error);
-          commit(types.CLEAN_TOKEN);
-          commit(types.LOADING, false);
-        }
-      });
+    // auth
+    //   .getRedirectResult()
+    //   .then(result => {
+    //     if (result.credential) {
+    //       commit(types.SET_PROVIDERID, result.credential.providerId);
+    //       commit(types.SET_TOKEN, result.credential.accessToken);
+    //       commit(types.SET_ANONYMOUS, false);
+    //     }
+    //   })
+    //   .catch(error => {
+    //     if (!isFirst) return; // prevent logout event trigger auth.getRedirectResult()
+    //     isFirst = false;
+    //     if (error.code === 'auth/account-exists-with-different-credential') {
+    //       window.localStorage.setItem(
+    //         'pendingCred',
+    //         JSON.stringify(error.credential),
+    //       );
+    //       auth.fetchSignInMethodsForEmail(error.email).then(providers => {
+    //         if (providers[0] === 'password') {
+    //           db.collection('accounts')
+    //             .where('email', '==', error.email)
+    //             .get()
+    //             .then(querySnapshot => {
+    //               querySnapshot.forEach(doc => {
+    //                 commit(types.LOADING, { img: true });
+    //                 auth.signInWithEmailAndPassword(
+    //                   error.email,
+    //                   doc.data().lineUserID,
+    //                 );
+    //                 commit(types.SET_PROVIDERID, 'password');
+    //                 commit(types.SET_TOKEN, doc.data().accessToken);
+    //                 commit(types.SET_ANONYMOUS, false);
+    //               });
+    //             });
+    //         } else {
+    //           auth.signInWithRedirect(providerMapping[providers[0]]);
+    //         }
+    //       });
+    //     } else {
+    //       console.log('getRedirectResult error');
+    //       console.log(error);
+    //       commit(types.CLEAN_TOKEN);
+    //       commit(types.LOADING, false);
+    //     }
+    //   });
     auth.onAuthStateChanged(user => {
       if (user) {
         if (user.isAnonymous) {

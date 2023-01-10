@@ -60,7 +60,7 @@
                   <a
                     class="link"
                     :href="
-                      `javascript:window.open('#/session/${item.teamCode}')`
+                      `javascript:window.open(encodeURI('#/session/${item.teamCode}'))`
                     "
                     >{{ item.name }}</a
                   >
