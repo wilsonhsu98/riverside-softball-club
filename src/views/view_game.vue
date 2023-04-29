@@ -310,7 +310,11 @@
                   container: $refs.container,
                 }"
               ></i>
-              <i class="fa fa-bug" @click="debug = true"></i>
+              <i
+                v-if="gameStatus !== 'lock'"
+                class="fa fa-bug"
+                @click="debug = true"
+              ></i>
             </div>
           </div>
         </template>
