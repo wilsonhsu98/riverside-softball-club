@@ -489,6 +489,9 @@
                   <span class="inn">{{ record.innChange }}</span>
                   <router-link
                     v-if="editable && record.content !== 'PR'"
+                    :style="{
+                      display: debug && record.content === 'new' ? 'none' : '',
+                    }"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -1683,7 +1686,7 @@
   }
   .fa-times {
     position: absolute;
-    right: 0;
+    right: 2px;
     top: 0;
   }
 }
