@@ -49,6 +49,7 @@ const state = {
   accessToken: '',
   currentTeamIcon: '',
   alertMsg: '',
+  alertPromiseResolve: () => {},
   confirmMsg: '',
   confirmMsgY: '',
   confirmMsgN: '',
@@ -77,6 +78,7 @@ const getters = {
     return state.isAnonymous;
   },
   alertMsg: state => state.alertMsg,
+  alertPromiseResolve: state => state.alertPromiseResolve,
   confirmMsg: state => state.confirmMsg,
   confirmMsgY: state => state.confirmMsgY,
   confirmMsgN: state => state.confirmMsgN,
@@ -448,7 +450,13 @@ const actions = {
     commit(types.CLEAN_TOKEN, version);
   },
   alert({ commit }, msg) {
-    commit(types.ALERT, msg);
+    if (msg !== '') {
+      return new Promise(resolve => {
+        commit(types.ALERT, { msg, resolve });
+      });
+    } else {
+      commit(types.ALERT, {});
+    }
   },
   confirm({ commit }, msgObj) {
     if (typeof msgObj === 'object' && msgObj.msg) {
@@ -555,8 +563,9 @@ const mutations = {
       state.currentTeam = window.localStorage.getItem('currentTeam');
     }
   },
-  [types.ALERT](state, msg = '') {
+  [types.ALERT](state, { msg = '', resolve = () => {} }) {
     state.alertMsg = msg;
+    state.alertPromiseResolve = resolve;
   },
   [types.CONFIRM](
     state,

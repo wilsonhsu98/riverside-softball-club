@@ -85,7 +85,7 @@
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
         <p class="msg" v-html="alertMsg.replace('\n', '<br>')"></p>
-        <button @click="alert('')">{{ $t('btn_noticed') }}</button>
+        <button @click="alertYes">{{ $t('btn_noticed') }}</button>
       </div>
     </div>
     <div class="modal" v-if="confirmMsg">
@@ -493,6 +493,10 @@ export default {
       'confirm',
       'checkUpdateAvailable',
     ]),
+    alertYes() {
+      this.alertPromiseResolve();
+      this.alert('');
+    },
     confirmYes() {
       this.confirmPromiseResolve();
       this.confirm(undefined);
@@ -579,6 +583,7 @@ export default {
       'teamRequests',
       'teams',
       'alertMsg',
+      'alertPromiseResolve',
       'confirmMsg',
       'confirmMsgY',
       'confirmMsgN',

@@ -3,7 +3,24 @@
     <mobile-header :icon="currentTeamIcon" @back="back_" />
     <div class="gamebox-container" ref="container">
       <div class="box-summary">
-        <template v-if="version !== 'import' && topBottom">
+        <div v-if="debug" class="debug">
+          <h1>進入除錯模式</h1>
+          <ul>
+            <li>觀察可能出錯的打席</li>
+            <li>點選進入該打席，調整正確的打者跟上壘者</li>
+            <li>調整打擊內容，利用[原況][推測]調整壘上情況</li>
+            <li>後序亂掉的壘上情況可能也必須依序往後調整</li>
+            <li>
+              若發現有消失的打席也可<a
+                class="link"
+                @click="showDebugModal = true"
+                >點此輸入</a
+              >直接前往
+            </li>
+          </ul>
+          <i class="fa fa-times" @click="debug = false"></i>
+        </div>
+        <template v-else-if="version !== 'import' && topBottom">
           <div class="team-versus">
             <template v-if="topBottom === 'top'">
               <div class="team-name">
@@ -92,7 +109,7 @@
                 </div>
               </div>
             </template>
-            <div class="inn" style="margin-left: auto;">
+            <div class="inn" style="margin-left: auto">
               <div class="cell">R</div>
               <template v-if="!['win_', 'lose_'].includes(result)">
                 <div class="cell" v-if="topBottom === 'top'">
@@ -221,6 +238,7 @@
                   container: $refs.container,
                 }"
               ></i>
+              <i class="fa fa-bug" @click="debug = true"></i>
             </div>
           </div>
         </template>
@@ -288,6 +306,7 @@
                   container: $refs.container,
                 }"
               ></i>
+              <i class="fa fa-bug" @click="debug = true"></i>
             </div>
           </div>
         </template>
@@ -335,7 +354,7 @@
               <span
                 v-if="
                   pitcher === item.name &&
-                    pitchers.map(p => p.name).indexOf(pitcher) === i
+                  pitchers.map(p => p.name).indexOf(pitcher) === i
                 "
                 :class="`result-icon ${result}`"
               >
@@ -344,8 +363,8 @@
               <span
                 v-if="
                   Array.isArray(pitcher) &&
-                    pitcher[0] === item.name &&
-                    pitcher[1] === i + 1
+                  pitcher[0] === item.name &&
+                  pitcher[1] === i + 1
                 "
                 :class="`result-icon ${result}`"
               >
@@ -398,9 +417,9 @@
         <span
           v-if="
             box.slice(1).length &&
-              !isAnonymous &&
-              gameStatus === 'lock' &&
-              !isViewMode
+            !isAnonymous &&
+            gameStatus === 'lock' &&
+            !isViewMode
           "
           class="gen-graphic share"
           @click="screenshot"
@@ -440,7 +459,7 @@
               <div
                 v-if="editable && batchEdit"
                 class="edit-mask editable"
-                style="padding-left: 68px;"
+                style="padding-left: 68px"
                 @click="changePlayer(item.name)"
               >
                 <i class="fa fa-pencil" :style="genAnimationShuffle()"></i>
@@ -503,7 +522,9 @@
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{
-                      record.content === 'new'
+                      debug
+                        ? record.order
+                        : record.content === 'new'
                         ? '＋'
                         : formatContent_(record.content, record.location)
                     }}
@@ -516,7 +537,7 @@
                     <div
                       v-if="
                         record.onbase &&
-                          record.onbase.filter(onbase => onbase.name).length - 1
+                        record.onbase.filter(onbase => onbase.name).length - 1
                       "
                       :class="[
                         'onbase',
@@ -569,7 +590,7 @@
                     <div
                       v-if="
                         record.onbase &&
-                          record.onbase.filter(onbase => onbase.name).length - 1
+                        record.onbase.filter(onbase => onbase.name).length - 1
                       "
                       :class="[
                         'onbase',
@@ -601,7 +622,7 @@
           <span class="summary">{{ item.summary }}</span>
         </div>
         <div class="player-records sum" v-if="batterSum.AB && batterSumDesc">
-          <div style="white-space: nowrap; padding-left: 5px;">
+          <div style="white-space: nowrap; padding-left: 5px">
             {{ $t('SUM') }}
             <i
               v-if="batterSum.locations.length"
@@ -612,7 +633,7 @@
           <div v-if="boxSummary.e" class="error"></div>
           <div class="records">
             <div class="records-flex">
-              <span style="margin-left: 10px;">{{ batterSumDesc }}</span>
+              <span style="margin-left: 10px">{{ batterSumDesc }}</span>
             </div>
           </div>
           <div></div>
@@ -660,7 +681,7 @@
               <div
                 v-if="editable && batchEdit"
                 class="edit-mask editable"
-                style="padding-left: 71px;"
+                style="padding-left: 71px"
                 @click="changePlayer(item.name)"
               >
                 <i class="fa fa-pencil" :style="genAnimationShuffle()"></i>
@@ -681,6 +702,9 @@
                 <div class="record" v-else :key="`content_${recordIndex}`">
                   <router-link
                     v-if="editable && record.content !== 'PR'"
+                    :style="{
+                      display: debug && record.content === 'new' ? 'none' : '',
+                    }"
                     tag="span"
                     :to="{
                       name: 'pa',
@@ -718,7 +742,9 @@
                     :data-out="`${record.out ? 'X' : ''}`"
                   >
                     {{
-                      record.content === 'new'
+                      debug
+                        ? record.order
+                        : record.content === 'new'
                         ? '＋'
                         : formatContent_(record.content, record.location)
                     }}
@@ -731,7 +757,7 @@
                     <div
                       v-if="
                         record.onbase &&
-                          record.onbase.filter(onbase => onbase.name).length - 1
+                        record.onbase.filter(onbase => onbase.name).length - 1
                       "
                       :class="[
                         'onbase',
@@ -784,7 +810,7 @@
                     <div
                       v-if="
                         record.onbase &&
-                          record.onbase.filter(onbase => onbase.name).length - 1
+                        record.onbase.filter(onbase => onbase.name).length - 1
                       "
                       :class="[
                         'onbase',
@@ -827,7 +853,7 @@
           <div v-if="boxSummary.e" class="error"></div>
           <div class="records">
             <div class="records-flex">
-              <span style="margin-left: 10px;">{{ batterSumDesc }}</span>
+              <span style="margin-left: 10px">{{ batterSumDesc }}</span>
             </div>
           </div>
           <div></div>
@@ -919,9 +945,7 @@
         <div class="iframe">
           <iframe
             v-if="shortVideo"
-            :src="
-              `https://www.youtube.com/embed/${shortVideo.videoID}?start=${shortVideo.start}&end=${shortVideo.end}&rel=0`
-            "
+            :src="`https://www.youtube.com/embed/${shortVideo.videoID}?start=${shortVideo.start}&end=${shortVideo.end}&rel=0`"
             allowfullscreen
           ></iframe>
         </div>
@@ -1011,6 +1035,22 @@
         :fileNamePrefix="`${$route.params.team}_${$route.params.game}`"
       />
     </div>
+
+    <div v-if="showDebugModal" class="image-modal" @click="closeDebugPaModal">
+      <div class="debug">
+        <div>
+          前往第&nbsp;
+          <minus-plus-number
+            :min="1"
+            :max="boxSummary.contents.length"
+            :value="goDebugPa"
+            @change="setGoDebugPa"
+          />
+          &nbsp;打席
+        </div>
+        <button class="btn" @click="goPa">Go</button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1092,7 +1132,9 @@
       &.fa-unlock-alt {
         font-size: 28px;
       }
-      &.fa-info-circle {
+      &.fa-info-circle,
+      &.fa-bug,
+      &.fa-times {
         font-size: 28px;
         color: $input_font;
       }
@@ -1622,6 +1664,25 @@
 .ad {
   margin-bottom: 14px;
 }
+.debug {
+  position: relative;
+  h1 {
+    font-size: 18px;
+    font-weight: normal;
+    margin: 0;
+    text-decoration: underline;
+  }
+  ul {
+    margin: 0;
+    padding-left: 20px;
+    text-align: left;
+  }
+  .fa-times {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
 @keyframes shake1 {
   0% {
     transform: rotate(-3deg);
@@ -1683,6 +1744,27 @@
     transform: translateY(-50%) translateX(-50%);
     display: flex;
     flex-direction: column;
+    &.debug {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(1.5);
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+      white-space: nowrap;
+      > div {
+        display: flex;
+        align-items: center;
+      }
+    }
+    .btn {
+      width: 100%;
+      margin: 5px auto;
+      background-color: $header_bgcolor;
+      padding: 10px 15px;
+      outline: none;
+    }
     p {
       height: 22px;
       line-height: 22px;
@@ -1994,6 +2076,9 @@ export default {
       hiddenStorageKey: `hidden_list_${this.$route.params.team}_${this.$route.params.game}`,
       canSetLastOrderPosition: false,
       lastOrderPosition: undefined,
+      debug: false,
+      showDebugModal: false,
+      goDebugPa: undefined,
     };
   },
   created() {
@@ -2410,6 +2495,27 @@ export default {
           ...(this.lastOrderPosition.positions
             ? { positions: this.lastOrderPosition.positions }
             : undefined),
+        });
+      }
+    },
+    closeDebugPaModal(e) {
+      if (e.currentTarget === e.target) {
+        this.showDebugModal = false;
+      }
+    },
+    setGoDebugPa(val) {
+      this.goDebugPa = val;
+    },
+    goPa() {
+      if (
+        this.goDebugPa > 0 &&
+        this.goDebugPa <= this.boxSummary.contents.length
+      ) {
+        this.$router.push({
+          name: 'pa',
+          params: {
+            order: this.goDebugPa,
+          },
         });
       }
     },

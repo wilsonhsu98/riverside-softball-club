@@ -1464,114 +1464,126 @@ export default {
       this.inn = val;
     },
     setPa() {
-      const last = [...this.boxSummary.contents]
-        .reverse()
-        .find(item => item.content) || { inn: 1 };
-      const getStartedPlayer = name => {
-        const find = this.box.find(b => b.name === name);
-        if (find && find.altOrder) {
-          return this.box.find(b => b.order === find.altOrder);
-        } else {
-          return find;
-        }
-      };
-      const estimate = this.box.find(b =>
-        (b.content || []).some(
-          c => typeof c === 'object' && c.content === 'new',
-        ),
-      );
-
-      this.inn = last.inn || 1;
-      if (!isNaN(parseInt(this.$route.params.order, 10))) {
-        this.order = parseInt(this.$route.params.order, 10);
-        this.base.home.name = this.name = (
-          [...this.boxSummary.contents][this.order - 1] || { name: '' }
-        ).name;
-      } else {
-        this.order = this.boxSummary.contents.length + 1;
-        if (estimate && estimate.name) {
-          this.base.home.name = this.name = estimate.r || estimate.name;
-        }
-      }
-
-      const {
-        opponentScores,
-        useTeam,
-        opponent,
-        topBottom,
-        r,
-      } = this.boxSummary;
-      this.useTeam = useTeam;
-      this.opponent = opponent;
-      this.topBottom = topBottom;
-      this.score = r;
-      this.opponentScore = opponentScores.reduce(
-        (acc, num) => (acc += num || 0),
-        0,
-      );
-      this.preContents = this.boxSummary.contents.filter(
-        item => item.name === this.base.home.name && item.content,
-      );
-      if (this.box.length) {
-        const startedPlayers = this.box.filter(b => !b.altOrder);
-        const one_round = startedPlayers[startedPlayers.length - 1].order;
-        this.next3 = this.boxSummary.contents.reduce((acc, item) => {
-          const player = getStartedPlayer(this.base.home.name);
-          if (item.name === player.name) {
-            const next1 = (this.order + 1) % one_round || one_round;
-            const next2 = (this.order + 2) % one_round || one_round;
-            const next3 = (this.order + 3) % one_round || one_round;
-            return [
-              {
-                name: this.box.find(b => b.order === next1).queue.slice(-1)[0],
-                nextOrder: next1,
-              },
-              {
-                name: this.box.find(b => b.order === next2).queue.slice(-1)[0],
-                nextOrder: next2,
-              },
-              {
-                name: this.box.find(b => b.order === next3).queue.slice(-1)[0],
-                nextOrder: next3,
-              },
-            ];
+      try {
+        const last = [...this.boxSummary.contents]
+          .reverse()
+          .find(item => item.content) || { inn: 1 };
+        const getStartedPlayer = name => {
+          const find = this.box.find(b => b.name === name);
+          if (find && find.altOrder) {
+            return this.box.find(b => b.order === find.altOrder);
+          } else {
+            return find;
           }
-          return acc;
-        }, []);
-      }
-      this.revertOnbase();
+        };
+        const estimate = this.box.find(b =>
+          (b.content || []).some(
+            c => typeof c === 'object' && c.content === 'new',
+          ),
+        );
 
-      const out = this.boxSummary.contents
-        .slice(0, this.order - 1)
-        .filter(item => item.inn === this.inn)
-        .map(sub => sub.onbase)
-        .reduce((acc, sub) => acc.concat(sub), [])
-        .filter(item => item && item.result === 'out');
-      this.out = out.length;
-      if (out.length === 3) {
-        this.inn += 1;
-        this.out = 0;
-        this.revertOnbase();
-      }
-
-      // this.resetBasic();
-
-      if (Array.isArray(this.box[0])) {
-        const startOrder = this.box[0].slice(-1)[0];
-        const sameOrderPlayers = this.boxSummary.contents
-          .filter(
-            content => content.order % startOrder === this.order % startOrder,
-          )
-          .reduce((acc, player) => {
-            return player.r
-              ? [...acc, player.name, player.r]
-              : [...acc, player.name];
-          }, []);
-        if (this.checkReJoin([...sameOrderPlayers, this.name])) {
-          this.reJoinPlayer = this.getPlayer(sameOrderPlayers[0]);
+        this.inn = last.inn || 1;
+        if (!isNaN(parseInt(this.$route.params.order, 10))) {
+          this.order = parseInt(this.$route.params.order, 10);
+          this.base.home.name = this.name = (
+            [...this.boxSummary.contents][this.order - 1] || { name: '' }
+          ).name;
+        } else {
+          this.order = this.boxSummary.contents.length + 1;
+          if (estimate && estimate.name) {
+            this.base.home.name = this.name = estimate.r || estimate.name;
+          }
         }
 
-        this.checkModalPlayer(true);
+        const {
+          opponentScores,
+          useTeam,
+          opponent,
+          topBottom,
+          r,
+        } = this.boxSummary;
+        this.useTeam = useTeam;
+        this.opponent = opponent;
+        this.topBottom = topBottom;
+        this.score = r;
+        this.opponentScore = opponentScores.reduce(
+          (acc, num) => (acc += num || 0),
+          0,
+        );
+        this.preContents = this.boxSummary.contents.filter(
+          item => item.name === this.base.home.name && item.content,
+        );
+        if (this.box.length) {
+          const startedPlayers = this.box.filter(b => !b.altOrder);
+          const one_round = startedPlayers[startedPlayers.length - 1].order;
+          this.next3 = this.boxSummary.contents.reduce((acc, item) => {
+            const player = getStartedPlayer(this.base.home.name);
+            if (item.name === player.name) {
+              const next1 = (this.order + 1) % one_round || one_round;
+              const next2 = (this.order + 2) % one_round || one_round;
+              const next3 = (this.order + 3) % one_round || one_round;
+              return [
+                {
+                  name: this.box
+                    .find(b => b.order === next1)
+                    .queue.slice(-1)[0],
+                  nextOrder: next1,
+                },
+                {
+                  name: this.box
+                    .find(b => b.order === next2)
+                    .queue.slice(-1)[0],
+                  nextOrder: next2,
+                },
+                {
+                  name: this.box
+                    .find(b => b.order === next3)
+                    .queue.slice(-1)[0],
+                  nextOrder: next3,
+                },
+              ];
+            }
+            return acc;
+          }, []);
+        }
+        this.revertOnbase();
+
+        const out = this.boxSummary.contents
+          .slice(0, this.order - 1)
+          .filter(item => item.inn === this.inn)
+          .map(sub => sub.onbase)
+          .reduce((acc, sub) => acc.concat(sub), [])
+          .filter(item => item && item.result === 'out');
+        this.out = out.length;
+        if (out.length === 3) {
+          this.inn += 1;
+          this.out = 0;
+          this.revertOnbase();
+        }
+
+        // this.resetBasic();
+
+        if (Array.isArray(this.box[0])) {
+          const startOrder = this.box[0].slice(-1)[0];
+          const sameOrderPlayers = this.boxSummary.contents
+            .filter(
+              content => content.order % startOrder === this.order % startOrder,
+            )
+            .reduce((acc, player) => {
+              return player.r
+                ? [...acc, player.name, player.r]
+                : [...acc, player.name];
+            }, []);
+          if (this.checkReJoin([...sameOrderPlayers, this.name])) {
+            this.reJoinPlayer = this.getPlayer(sameOrderPlayers[0]);
+          }
+
+          this.checkModalPlayer(true);
+        }
+      } catch {
+        this.alert('發生錯誤: 無法正確計算出下一棒打者').then(() => {
+          this.$router.back();
+        });
       }
     },
     checkReJoin(sameOrderPlayers) {
