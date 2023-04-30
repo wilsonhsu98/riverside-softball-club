@@ -362,7 +362,7 @@
               <span
                 v-if="
                   pitcher === item.name &&
-                  pitchers.map(p => p.name).indexOf(pitcher) === i
+                    pitchers.map(p => p.name).indexOf(pitcher) === i
                 "
                 :class="`result-icon ${result}`"
               >
@@ -371,8 +371,8 @@
               <span
                 v-if="
                   Array.isArray(pitcher) &&
-                  pitcher[0] === item.name &&
-                  pitcher[1] === i + 1
+                    pitcher[0] === item.name &&
+                    pitcher[1] === i + 1
                 "
                 :class="`result-icon ${result}`"
               >
@@ -425,9 +425,9 @@
         <span
           v-if="
             box.slice(1).length &&
-            !isAnonymous &&
-            gameStatus === 'lock' &&
-            !isViewMode
+              !isAnonymous &&
+              gameStatus === 'lock' &&
+              !isViewMode
           "
           class="gen-graphic share"
           @click="screenshot"
@@ -548,7 +548,7 @@
                     <div
                       v-if="
                         record.onbase &&
-                        record.onbase.filter(onbase => onbase.name).length - 1
+                          record.onbase.filter(onbase => onbase.name).length - 1
                       "
                       :class="[
                         'onbase',
@@ -601,7 +601,7 @@
                     <div
                       v-if="
                         record.onbase &&
-                        record.onbase.filter(onbase => onbase.name).length - 1
+                          record.onbase.filter(onbase => onbase.name).length - 1
                       "
                       :class="[
                         'onbase',
@@ -768,7 +768,7 @@
                     <div
                       v-if="
                         record.onbase &&
-                        record.onbase.filter(onbase => onbase.name).length - 1
+                          record.onbase.filter(onbase => onbase.name).length - 1
                       "
                       :class="[
                         'onbase',
@@ -821,7 +821,7 @@
                     <div
                       v-if="
                         record.onbase &&
-                        record.onbase.filter(onbase => onbase.name).length - 1
+                          record.onbase.filter(onbase => onbase.name).length - 1
                       "
                       :class="[
                         'onbase',
@@ -956,7 +956,9 @@
         <div class="iframe">
           <iframe
             v-if="shortVideo"
-            :src="`https://www.youtube.com/embed/${shortVideo.videoID}?start=${shortVideo.start}&end=${shortVideo.end}&rel=0`"
+            :src="
+              `https://www.youtube.com/embed/${shortVideo.videoID}?start=${shortVideo.start}&end=${shortVideo.end}&rel=0`
+            "
             allowfullscreen
           ></iframe>
         </div>
@@ -1764,6 +1766,7 @@
       flex-direction: column;
       text-align: center;
       white-space: nowrap;
+      color: #fff;
       > div {
         display: flex;
         align-items: center;
