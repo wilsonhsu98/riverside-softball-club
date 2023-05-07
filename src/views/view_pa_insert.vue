@@ -12,7 +12,7 @@
         <i class="instruction" @click="showInstruction = true"><help /></i>
         {{ $t('add_pa') }}
       </h1>
-      <div style="width: 100%;"></div>
+      <div style="width: 100%"></div>
       <div class="single-col">
         <div class="separater">
           <label>{{ $t('ttl_current_pa') }}</label>
@@ -206,7 +206,7 @@
               >
                 {{ $t(item) }}
               </span>
-              <span style="cursor: auto;"></span>
+              <span style="cursor: auto"></span>
               <span
                 :key="`item_${item}`"
                 v-for="item in ['UNKNOWN']"
@@ -315,7 +315,7 @@
           </infield>
           <div
             v-if="isBaseNotFulled() && prev5Players.length"
-            style="margin-top: 5px; text-align: center;"
+            style="margin-top: 5px; text-align: center"
           >
             {{
               $t('desc_possible_players', {

@@ -25,6 +25,7 @@
         :options="options"
         :value="value"
         :data-label="name"
+        append-to-body
         @input="input"
         @change="input"
         @search:blur="blur"
@@ -325,27 +326,6 @@
     .vs__dropdown-toggle {
       padding: 0;
       border: none;
-    }
-    .vs__dropdown-menu {
-      background-color: var(--card-bg);
-      border: none;
-      border-top: 2px solid #3b5998;
-      box-shadow: none;
-      position: relative;
-      max-height: 123px;
-      min-width: auto;
-    }
-    .vs__dropdown-option,
-    .vs__dropdown-option--highlight {
-      color: var(--input-color);
-      padding-left: 9px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .vs__dropdown-option--highlight {
-      background-color: $active_bgcolor;
-      color: #fff;
     }
     .vs__selected-options {
       padding: 0 0 0 9px;

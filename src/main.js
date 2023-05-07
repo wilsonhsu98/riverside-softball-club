@@ -22,6 +22,7 @@ import './css/font-awesome.min.css';
 import './scss/_base.scss';
 import './scss/v-tooltip.scss';
 import 'vue-select/dist/vue-select.css';
+import './scss/v-select.scss';
 import 'simplebar/dist/simplebar.min.css';
 import 'vue-range-component/dist/vue-range-slider.css';
 

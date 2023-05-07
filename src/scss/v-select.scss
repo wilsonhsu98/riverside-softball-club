@@ -1,0 +1,22 @@
+@import "variable";
+
+.vs__dropdown-menu {
+  background-color: var(--card-bg);
+  border: 2px solid #3b5998;
+  box-shadow: none;
+  max-height: 40vh;
+  min-width: auto;
+  transform: translateX(-2px);
+}
+.vs__dropdown-option,
+.vs__dropdown-option--highlight {
+  color: var(--input-color);
+  padding-left: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.vs__dropdown-option--highlight {
+  background-color: $active_bgcolor;
+  color: #fff;
+}
