@@ -239,7 +239,7 @@
                 }"
               ></i>
               <i
-                v-if="gameStatus !== 'lock'"
+                v-if="!stillCanEditOrder && editable"
                 class="fa fa-bug"
                 @click="debug = true"
               ></i>
@@ -311,7 +311,7 @@
                 }"
               ></i>
               <i
-                v-if="gameStatus !== 'lock'"
+                v-if="!stillCanEditOrder && editable"
                 class="fa fa-bug"
                 @click="debug = true"
               ></i>
