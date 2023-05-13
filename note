@@ -1,3 +1,6 @@
+==node使用
+12.22.0
+
 ==Firebase OAuth sample
 https://fir-ui-demo-84a6c.firebaseapp.com/
 https://github.com/firebase/custom-auth-samples/tree/master/instagram
@@ -12,8 +15,6 @@ copy root/.env to functions
 yarn deploy
 rollback env and node version
 
-
-
 ==vue widget
 https://github.com/euvl/vue-js-modal
 https://vue-select.org/
@@ -24,3 +25,4 @@ https://github.com/Grsmto/simplebar/tree/master/packages/simplebar-vue
 https://github.com/wlada/vue-carousel-3d
 https://github.com/hellocomet/vue-svg-gauge
 https://github.com/inorganik/CountUp.js
+https://github.com/pencilpix/vue2-clock-picker
