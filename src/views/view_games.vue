@@ -224,6 +224,7 @@
                     <i v-if="sub.youtubeVideos" class="fa fa-video-camera"></i>
                   </div>
                   <div class="name">{{ sub.opponent || sub.game }}</div>
+                  <div v-if="sub.time" class="time">{{ sub.time }}</div>
                 </div>
                 <template slot="popover">
                   <template v-if="version !== 'import' && topBottom">
@@ -532,6 +533,9 @@
         .name {
           padding: 4px 0 0;
           line-height: 18px;
+        }
+        .time {
+          line-height: 16px;
         }
       }
     }

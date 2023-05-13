@@ -1,0 +1,35 @@
+@import "variable";
+
+.clock-picker__input-container {
+  display: none;
+}
+
+.clock-picker__dialog-content {
+  text-align: center;
+}
+
+.clock-picker__dialog-body {
+  background-color: var(--card-bg);
+}
+
+.clock-picker__dialog-actions {
+  gap: 8px;
+}
+
+.clock-picker__dialog-action {
+  background-color: $header_bgcolor;
+  padding: 10px 15px;
+  outline: none;
+  font-weight: inherit;
+  line-height: normal;
+  font-size: 13px;
+  color: #fff !important;
+
+  &:hover {
+    background-color: $header_bgcolor;
+  }
+
+  &[disabled] {
+    background-color: $header_bgcolor;
+  }
+}

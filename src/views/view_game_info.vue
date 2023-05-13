@@ -352,6 +352,32 @@
           </div>
         </div>
       </div>
+
+      <div
+        class="field-wrapper field-wrapper-item"
+        :class="time ? '' : 'empty'"
+        @click="openClockPicker"
+      >
+        <span>{{ $t('ttl_time') }}</span>
+        <label v-if="time" class="time">
+          <i class="fa fa-clock-o"></i>
+          <span>{{ time }}</span>
+          <i class="fa fa-times" @click="clearTime"></i>
+        </label>
+        <vue-clock-picker
+          ref="clockPicker"
+          close-on-overlay
+          close-on-esc
+          v-model="time"
+          :done-text="$t('btn_confirm')"
+          :cancel-text="$t('btn_cancel')"
+          active-color="#408288"
+          disabled-color="inherit"
+          @close="closeClockPicker"
+        >
+        </vue-clock-picker>
+      </div>
+
       <div v-if="gameId_err" class="field-wrapper field-wrapper-message">
         {{ gameId_err }}
       </div>
@@ -602,6 +628,18 @@
       display: inline-block;
       > span {
         margin: 0 10px 0 3px;
+      }
+      &.time {
+        display: flex;
+        align-items: center;
+        span {
+          margin-left: 9px;
+        }
+        .fa-times {
+          margin-left: auto;
+          margin-right: 3px;
+          color: var(--select-icon);
+        }
       }
     }
     @media (hover: hover) and (pointer: fine) {
@@ -896,6 +934,8 @@ export default {
       isDarkMode: Array.from(document.documentElement.classList).includes(
         'dark',
       ),
+      time: undefined,
+      isClockOpen: false,
     };
   },
   created() {
@@ -998,6 +1038,7 @@ export default {
           }
           const {
             prevId,
+            time,
             useTeam,
             opponent,
             league,
@@ -1023,6 +1064,7 @@ export default {
             teamCode: this.$route.params.team,
             prevId,
             newId,
+            time,
             useTeam,
             opponent,
             league,
@@ -1150,6 +1192,21 @@ export default {
         'dark',
       );
     },
+    openClockPicker() {
+      if (!this.isClockOpen) {
+        this.$refs.clockPicker.open();
+        this.isClockOpen = true;
+      }
+    },
+    closeClockPicker() {
+      setTimeout(() => {
+        this.isClockOpen = false;
+      });
+    },
+    clearTime(e) {
+      e.stopPropagation();
+      this.time = undefined;
+    },
   },
   computed: {
     ...mapGetters([
@@ -1176,6 +1233,7 @@ export default {
             scores,
             opponentScores,
             game,
+            time,
             league,
             group,
             useTeam,
@@ -1208,6 +1266,7 @@ export default {
           this.prevId = game;
           this.gameDate = game.split('-')[0];
           this.gamePostfix = game.split('-')[1];
+          this.time = time;
           this.league = league;
           this.group = group;
           this.useTeam = useTeam;

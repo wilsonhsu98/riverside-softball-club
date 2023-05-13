@@ -17,6 +17,7 @@ import { VueSvgGauge } from 'vue-svg-gauge';
 import VueQrcodeReader from 'vue-qrcode-reader';
 import smoothscroll from 'smoothscroll-polyfill';
 import icon from './components/icon';
+import VueClockPicker from '@pencilpix/vue2-clock-picker';
 import '../public/font.css';
 import './css/font-awesome.min.css';
 import './scss/_base.scss';
@@ -25,6 +26,8 @@ import 'vue-select/dist/vue-select.css';
 import './scss/v-select.scss';
 import 'simplebar/dist/simplebar.min.css';
 import 'vue-range-component/dist/vue-range-slider.css';
+import '@pencilpix/vue2-clock-picker/dist/vue2-clock-picker.min.css';
+import './scss/v-clock-picker.scss';
 
 const componentsReq = require.context('./components/', false, /\.vue$/);
 componentsReq.keys().forEach(path => {
@@ -44,6 +47,7 @@ Vue.component('v-select', vSelect);
 Vue.component('simplebar', simplebar);
 Vue.component('vue-range-slider', VueRangeSlider);
 Vue.component('vue-svg-gauge', VueSvgGauge);
+Vue.component('vue-clock-picker', VueClockPicker);
 const tootipConfig = {
   defaultTrigger: 'hover focus click',
   disposeTimeout: 1000,

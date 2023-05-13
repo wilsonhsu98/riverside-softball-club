@@ -165,6 +165,9 @@
             </div>
             <div v-if="gameType" class="tag">{{ gameType }}</div>
             <div v-if="place" class="tag">{{ place }}</div>
+            <div v-if="time" class="tag">
+              {{ time }}
+            </div>
             <div v-if="pitcher && result === 'win'" class="tag">
               {{
                 $t('box_pitcher_w', {
@@ -2039,6 +2042,7 @@ export default {
       group: '',
       gameType: '',
       place: '',
+      time: undefined,
       coach: '',
       recorder: '',
       pitcher: '',
@@ -2578,6 +2582,7 @@ export default {
             gameNote,
             e,
             opponentE,
+            time,
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -2610,6 +2615,7 @@ export default {
             this.$t('ttl_home'),
             '',
           ][['1', '3', '4', ''].indexOf(place)];
+          this.time = time;
           this.coach = coach;
           this.recorder = recorder;
           this.pitcher = pitcher;

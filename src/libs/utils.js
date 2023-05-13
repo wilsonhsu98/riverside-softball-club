@@ -97,12 +97,16 @@ const genGameList = (games, filterGames = []) => {
       );
     })
     .map(item => {
+      const games_ = games.filter(
+        sub =>
+          sub.game.split('-')[0] === item && filterGames.includes(sub.game),
+      );
+      const bothHaveTime = games_.every(sub => sub.time);
       return {
         date: item,
-        games: games.filter(
-          sub =>
-            sub.game.split('-')[0] === item && filterGames.includes(sub.game),
-        ),
+        games: bothHaveTime
+          ? games_.sort((a, b) => a.time.localeCompare(b.time))
+          : games_,
       };
     });
   return temp;
