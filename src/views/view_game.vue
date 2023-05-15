@@ -1427,7 +1427,8 @@
         &:first-child {
           text-align: right;
         }
-        &:nth-child(2) {
+        &:nth-child(2),
+        &:nth-child(3) {
           font-weight: bold;
         }
       }
@@ -2623,22 +2624,25 @@ export default {
             ...p,
             data: this.getPlayer(p.name),
           }));
-          this.pitcherSum = pitchers.reduce((acc, record, index, self) => {
-            const sum = Object.keys(acc).reduce(
-              (accObj, k) => ({
-                ...accObj,
-                [k]: acc[k] + (Number.isInteger(record[k]) ? record[k] : 0),
-              }),
-              {},
-            );
-            if (index === self.length - 1) {
-              return {
-                ...sum,
-                IP: `${Math.floor(sum.OUT / 3)}.${sum.OUT % 3}`,
-              };
-            }
-            return sum;
-          }, this.pitcherSum);
+          this.pitcherSum = pitchers.reduce(
+            (acc, record, index, self) => {
+              const sum = Object.keys(acc).reduce(
+                (accObj, k) => ({
+                  ...accObj,
+                  [k]: acc[k] + (Number.isInteger(record[k]) ? record[k] : 0),
+                }),
+                {},
+              );
+              if (index === self.length - 1) {
+                return {
+                  ...sum,
+                  IP: `${Math.floor(sum.OUT / 3)}.${sum.OUT % 3}`,
+                };
+              }
+              return sum;
+            },
+            { OUT: 0, H: 0, R: 0, BB: 0, SO: 0 },
+          );
           this.opponentH = pitchers.reduce((acc, p) => acc + p.H, 0);
           this.mvp = mvp;
           this.gwrbi = gwrbi;
