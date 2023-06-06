@@ -242,7 +242,7 @@
                 }"
               ></i>
               <i
-                v-if="!stillCanEditOrder && editable"
+                v-if="box.slice(1).length > 0 && !stillCanEditOrder && editable"
                 class="fa fa-bug"
                 @click="debug = true"
               ></i>
@@ -314,7 +314,7 @@
                 }"
               ></i>
               <i
-                v-if="!stillCanEditOrder && editable"
+                v-if="box.slice(1).length > 0 && !stillCanEditOrder && editable"
                 class="fa fa-bug"
                 @click="debug = true"
               ></i>

@@ -353,6 +353,10 @@
         </div>
       </div>
 
+      <div v-if="gameId_err" class="field-wrapper field-wrapper-message">
+        {{ gameId_err }}
+      </div>
+
       <div
         class="field-wrapper field-wrapper-item"
         :class="time ? '' : 'empty'"
@@ -376,10 +380,6 @@
           @close="closeClockPicker"
         >
         </vue-clock-picker>
-      </div>
-
-      <div v-if="gameId_err" class="field-wrapper field-wrapper-message">
-        {{ gameId_err }}
       </div>
 
       <custom-input

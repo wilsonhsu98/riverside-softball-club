@@ -521,6 +521,14 @@ const accCalc = (beforePitchers = [], pitchers = [], currentIndex, inn = 7) => {
   };
 };
 
+const cleanData = data =>
+  Object.entries(data)
+    .filter(([_, value]) => value !== undefined)
+    .reduce((obj, [key, value]) => {
+      obj[key] = value;
+      return obj;
+    }, {});
+
 export default {
   parseGame,
   genGameList,
@@ -539,4 +547,5 @@ export {
   formatDate,
   sumByInn,
   accCalc,
+  cleanData,
 };

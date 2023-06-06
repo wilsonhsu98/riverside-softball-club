@@ -8,6 +8,7 @@ import {
 } from '../root';
 import { db, auth, fieldValue, timestamp } from '../../firebase';
 import router from '../../router';
+import { cleanData } from '../../libs/utils';
 
 // const types = {
 //   FETCH_TEAM: 'TEAM/FETCH_TEAM',
@@ -110,7 +111,7 @@ const actions = {
                   createInfo: {
                     creator: auth.currentUser.uid,
                     location: window.location.href,
-                    data,
+                    data: cleanData(data),
                   },
                 }
               : undefined),
