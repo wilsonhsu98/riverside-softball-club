@@ -393,7 +393,27 @@
       @select="selectPlayer"
     ></player-modal>
     <div class="modal" v-if="showSetInn" @click="closeSetInn">
-      <minus-plus-number :value="inn" @change="setInn" />
+      <div class="normal" style="margin-top: 23px">
+        <minus-plus-number :value="inn" @change="setInn" />
+        <label>
+          <input
+            type="radio"
+            :value="true"
+            :checked="forcast"
+            @change="setForcast($event.target.value)"
+          />
+          <span>{{ '預判壘上與出局情況' }}</span>
+        </label>
+        <label>
+          <input
+            type="radio"
+            :value="false"
+            :checked="!forcast"
+            @change="setForcast($event.target.value)"
+          />
+          <span>{{ '乾淨一局' }}</span>
+        </label>
+      </div>
     </div>
     <div class="modal" v-if="showNextOnbase">
       <div class="dialog">
@@ -1013,6 +1033,11 @@
       transform: translateY(-50%) translateX(-50%);
       display: flex;
       flex-direction: column;
+      & > .wrapper {
+        transform: scale(2) translateY(-5px);
+        transform-origin: center bottom;
+        text-align: center;
+      }
     }
     .btn {
       width: 100%;
@@ -1226,6 +1251,7 @@ export default {
       spotlightTimer: undefined,
       showInstruction: false,
       waitRedirect: false,
+      forcast: true,
     };
   },
   created() {
@@ -1444,6 +1470,7 @@ export default {
               this.waitRedirect = true;
               this.resetBasic();
               this.setOrder(this.order + 1);
+              this.forcast = true;
               this.$router.push(
                 `/main/games/${team}/${game}/${this.order + 1}`,
               );
@@ -1451,6 +1478,7 @@ export default {
               this.waitRedirect = true;
               this.resetBasic();
               this.setOrder(this.order + 1);
+              this.forcast = true;
               this.$router.push(`/main/games/${team}/${game}/new`);
             }
           },
@@ -1464,6 +1492,15 @@ export default {
       this.inn = val;
     },
     setPa() {
+      if (!this.forcast) {
+        ['first', 'second', 'third'].forEach(b => {
+          this.base[b].name = '';
+          this.base[b].result = '';
+        });
+        this.out = 0;
+        this.maxOnbase = 1;
+        return;
+      }
       try {
         const last = [...this.boxSummary.contents]
           .reverse()
@@ -1955,6 +1992,10 @@ export default {
         this.spotlightIcon = undefined;
       }, 3000);
       this.showInstruction = false;
+    },
+    setForcast(val) {
+      this.forcast = val === 'true';
+      this.setPa();
     },
   },
   watch: {
