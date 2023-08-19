@@ -19,7 +19,7 @@
 
       <div
         class="request"
-        :key="`request_${request.teamCode}`"
+        :key="`request_${request.id}`"
         v-for="request in teamRequests"
       >
         <img :src="$cacheImg(request.photo)" />

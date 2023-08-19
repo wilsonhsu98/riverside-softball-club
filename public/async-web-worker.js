@@ -1200,6 +1200,7 @@ const execItemStats = state => {
         }
         return acc;
       }, [])
+      .filter(({ batter }) => currentPlayers.includes(batter))
       .sort((a, b) =>
         b['GWRBI'] === a['GWRBI'] ? a['PA'] - b['PA'] : b['GWRBI'] - a['GWRBI'],
       )

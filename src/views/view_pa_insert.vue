@@ -1037,6 +1037,12 @@
         transform: scale(2) translateY(-5px);
         transform-origin: center bottom;
         text-align: center;
+        & ~ label {
+          color: #fff;
+          font-size: 20px;
+          white-space: nowrap;
+          cursor: pointer;
+        }
       }
     }
     .btn {
