@@ -26,3 +26,8 @@ https://github.com/wlada/vue-carousel-3d
 https://github.com/hellocomet/vue-svg-gauge
 https://github.com/inorganik/CountUp.js
 https://github.com/pencilpix/vue2-clock-picker
+
+==oauth在ios16.1之後沒辦法使用signInWithRedirect
+https://github.com/firebase/firebase-js-sdk/issues/6716
+https://firebase.google.com/docs/auth/web/redirect-best-practices?hl=zh-tw#web-version-8
+https://github.com/firebase/firebase-js-sdk/issues/6443
