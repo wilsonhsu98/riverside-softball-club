@@ -7,457 +7,457 @@ import { state as teamState, getters as teamGetters } from './team';
 import utils, { sumByInn, accCalc } from '../../libs/utils';
 import workerCreater from '../../web-worker';
 
-// const formatColor = content => {
-//   if (['1H', '2H', '3H', 'HR'].includes(content)) {
-//     return 'red';
-//   }
-//   if (['BB', 'SF'].includes(content)) {
-//     return 'yellow';
-//   }
-//   if (content === 'UNKNOWN') {
-//     return 'gray';
-//   }
-//   return 'blue';
-// };
-// const displayGame = (players, records, errors = [], role) => {
-//   const assumedOrder = 12;
-//   const checkRunOut = (self, i, item) => {
-//     const selfAndNext5 = self
-//       .slice(i, i + 6)
-//       .filter(sub => sub.inn === item.inn)
-//       .map(sub => sub.onbase)
-//       .flat();
-//     return {
-//       r:
-//         item.r ||
-//         (selfAndNext5.find(
-//           sub => sub && sub.name === item.name && sub.result === 'run',
-//         )
-//           ? item.name
-//           : ''),
-//       out: selfAndNext5.find(
-//         sub => sub && sub.name === item.name && sub.result === 'out',
-//       )
-//         ? true
-//         : false,
-//     };
-//   };
-//   const recordsWithAltRun = records.reduce((acc, item, i, self) => {
-//     const prev5 = self
-//       .slice(Math.max(i - 5, 0), i)
-//       .filter(sub => sub.inn === item.inn);
-//     const prev5name = prev5.map(sub => sub.name);
-//     const prev5outOrRun = prev5
-//       .map(sub => sub.onbase)
-//       .flat()
-//       .filter(
-//         sub => typeof sub === 'object' && ['out', 'run'].includes(sub.result),
-//       )
-//       .map(sub => sub.name);
-//     const currentOnbase = (item.onbase || [])
-//       .slice(1)
-//       .filter(sub => sub.name && sub.result)
-//       .map(sub => sub.name)
-//       .reverse();
-//     // .concat(shouldSetLegacyAltRunner ? [r] : []);
-//     const candidate = prev5name.filter(n => !prev5outOrRun.includes(n));
-//     return currentOnbase.reduce((acc, name, ii) => {
-//       if (candidate.includes(name)) {
-//         return acc;
-//       }
-//       const { r, out } = checkRunOut(self, i, { name, inn: item.inn });
-//       const find = acc.filter(
-//         s =>
-//           s.inn === item.inn &&
-//           (s.original === candidate[ii] || s.name === candidate[ii]),
-//       );
+const formatColor = content => {
+  if (['1H', '2H', '3H', 'HR'].includes(content)) {
+    return 'red';
+  }
+  if (['BB', 'SF'].includes(content)) {
+    return 'yellow';
+  }
+  if (['UNKNOWN', 'PR', 'FR'].includes(content)) {
+    return 'gray';
+  }
+  return 'blue';
+};
+const displayGame = (players, records, errors = [], role) => {
+  const assumedOrder = 12;
+  const checkRunOut = (self, i, item) => {
+    const selfAndNext5 = self
+      .slice(i, i + 6)
+      .filter(sub => sub.inn === item.inn)
+      .map(sub => sub.onbase)
+      .flat();
+    return {
+      r:
+        item.r ||
+        (selfAndNext5.find(
+          sub => sub && sub.name === item.name && sub.result === 'run',
+        )
+          ? item.name
+          : ''),
+      out: selfAndNext5.find(
+        sub => sub && sub.name === item.name && sub.result === 'out',
+      )
+        ? true
+        : false,
+    };
+  };
+  const recordsWithAltRun = records.reduce((acc, item, i, self) => {
+    const prev5 = self
+      .slice(Math.max(i - 5, 0), i)
+      .filter(sub => sub.inn === item.inn);
+    const prev5name = prev5.map(sub => sub.name);
+    const prev5outOrRun = prev5
+      .map(sub => sub.onbase)
+      .flat()
+      .filter(
+        sub => typeof sub === 'object' && ['out', 'run'].includes(sub.result),
+      )
+      .map(sub => sub.name);
+    const currentOnbase = (item.onbase || [])
+      .slice(1)
+      .filter(sub => sub.name && sub.result)
+      .map(sub => sub.name)
+      .reverse();
+    // .concat(shouldSetLegacyAltRunner ? [r] : []);
+    const candidate = prev5name.filter(n => !prev5outOrRun.includes(n));
+    return currentOnbase.reduce((acc, name, ii) => {
+      if (candidate.includes(name)) {
+        return acc;
+      }
+      const { r, out } = checkRunOut(self, i, { name, inn: item.inn });
+      const find = acc.filter(
+        s =>
+          s.inn === item.inn &&
+          (s.original === candidate[ii] || s.name === candidate[ii]),
+      );
 
-//       const findIndex = acc.indexOf(find[find.length - 1]);
-//       const isDuplicate = acc.find(
-//         sub => sub.inn === item.inn && sub.name === name,
-//       );
-//       if (findIndex > -1 && !isDuplicate) {
-//         return [
-//           ...acc.slice(0, findIndex + 1),
-//           {
-//             inn: item.inn,
-//             altOrder: acc[findIndex].order || acc[findIndex].altOrder,
-//             original: candidate[ii],
-//             name,
-//             r,
-//             out,
-//             content: 'PR',
-//           },
-//           ...acc.slice(findIndex + 1),
-//         ];
-//       } else {
-//         return acc;
-//       }
-//     }, acc);
-//   }, records);
-//   console.log(recordsWithAltRun);
-//   return recordsWithAltRun.reduce(
-//     (acc, item, i, self) => {
-//       const { arr, startOrder: prevStartOrder, prevInn, isSetNewContent } = acc;
-//       const order = !item.order
-//         ? arr.filter(s => !s.altOrder).length + 1
-//         : item.order;
-//       const startOrder = item.break ? order - 1 : prevStartOrder;
+      const findIndex = acc.indexOf(find[find.length - 1]);
+      const isDuplicate = acc.find(
+        sub => sub.inn === item.inn && sub.name === name,
+      );
+      if (findIndex > -1 && !isDuplicate) {
+        console.log(item);
+        return [
+          ...acc.slice(0, findIndex + 1),
+          {
+            inn: item.inn,
+            altOrder: acc[findIndex].order || acc[findIndex].altOrder,
+            original: candidate[ii],
+            name,
+            r,
+            out,
+            content: candidate[ii] ? 'PR' : 'FR',
+          },
+          ...acc.slice(findIndex + 1),
+        ];
+      } else {
+        return acc;
+      }
+    }, acc);
+  }, records);
+  return recordsWithAltRun.reduce(
+    (acc, item, i, self) => {
+      const { arr, startOrder: prevStartOrder, prevInn, isSetNewContent } = acc;
+      const order = !item.order
+        ? arr.filter(s => !s.altOrder).length + 1
+        : item.order;
+      const startOrder = item.break ? order - 1 : prevStartOrder;
 
-//       const find = arr.find(sub => sub.name === item.name);
-//       const findIndex = arr.indexOf(find);
-//       const canPushPlayer =
-//         !find && startOrder === 0 && !item.break && item.content !== 'PR';
-//       const shouldSetStartOrder = (find && startOrder === 0) || item.break;
-//       const shouldSetInnChange = item.inn !== prevInn;
-//       const shouldSetNewContent =
-//         role === 'manager' && !item.content && !isSetNewContent;
-//       const { r, out } = checkRunOut(self, i, item);
-//       const { name, inn, rbi, location, onbase, video } = item;
-//       const newItem = {
-//         name,
-//         inn,
-//         order,
-//         content: shouldSetNewContent ? 'new' : item.content,
-//         rbi,
-//         r,
-//         out,
-//         location,
-//         onbase,
-//         video,
-//         color: formatColor(item.content),
-//         // 換局
-//         ...(shouldSetInnChange && {
-//           innChange: item.inn,
-//         }),
-//       };
+      const find = arr.find(sub => sub.name === item.name);
+      const findIndex = arr.indexOf(find);
+      const canPushPlayer =
+        !find && startOrder === 0 && !item.break && item.content !== 'PR';
+      const shouldSetStartOrder = (find && startOrder === 0) || item.break;
+      const shouldSetInnChange = item.inn !== prevInn;
+      const shouldSetNewContent =
+        role === 'manager' && !item.content && !isSetNewContent;
+      const { r, out } = checkRunOut(self, i, item);
+      const { name, inn, rbi, location, onbase, video } = item;
+      const newItem = {
+        name,
+        inn,
+        order,
+        content: shouldSetNewContent ? 'new' : item.content,
+        rbi,
+        r,
+        out,
+        location,
+        onbase,
+        video,
+        color: formatColor(item.content),
+        // 換局
+        ...(shouldSetInnChange && {
+          innChange: item.inn,
+        }),
+      };
 
-//       const alt = arr
-//         .map(
-//           sub =>
-//             (sub.altOrder &&
-//               sub.altOrder === (order % startOrder || startOrder)) ||
-//             sub.order === (order % startOrder || startOrder),
-//         )
-//         .lastIndexOf(true);
-//       const altR = arr
-//         .map(
-//           sub =>
-//             (sub.altOrder &&
-//               sub.altOrder === (item.altOrder % startOrder || item.altOrder)) ||
-//             sub.order === (item.altOrder % startOrder || item.altOrder) ||
-//             sub.order % startOrder === item.altOrder % startOrder,
-//         )
-//         .lastIndexOf(true);
-//       const shouldSetAltBatter = !find && alt > -1 && item.content !== 'PR';
-//       const shouldSetAltRunner = !find && altR > -1 && item.content === 'PR';
-//       const shouldSetLegacyAltRunner = r && r !== item.name && alt > -1;
-//       const isLast = i === self.length - 1;
-//       const order_ = !item.order ? item.altOrder || i + 1 : item.order;
-//       const midLen = Math.ceil(order_ / (startOrder || assumedOrder) - 1);
+      const alt = arr
+        .map(
+          sub =>
+            (sub.altOrder &&
+              sub.altOrder === (order % startOrder || startOrder)) ||
+            sub.order === (order % startOrder || startOrder),
+        )
+        .lastIndexOf(true);
+      const altR = arr
+        .map(
+          sub =>
+            (sub.altOrder &&
+              sub.altOrder === (item.altOrder % startOrder || item.altOrder)) ||
+            sub.order === (item.altOrder % startOrder || item.altOrder) ||
+            sub.order % startOrder === item.altOrder % startOrder,
+        )
+        .lastIndexOf(true);
+      const shouldSetAltBatter = !find && alt > -1 && item.content !== 'PR';
+      const shouldSetAltRunner = !find && altR > -1 && item.content === 'PR';
+      const shouldSetLegacyAltRunner = r && r !== item.name && alt > -1;
+      const isLast = i === self.length - 1;
+      const order_ = !item.order ? item.altOrder || i + 1 : item.order;
+      const midLen = Math.ceil(order_ / (startOrder || assumedOrder) - 1);
 
-//       const result = {
-//         ...acc,
-//         prevInn: item.inn,
-//         // 第一輪加入球員
-//         ...(canPushPlayer && {
-//           arr: [
-//             ...arr,
-//             {
-//               name: item.name,
-//               data: (players.find(sub => sub.id === item.name) || { data: {} })
-//                 .data,
-//               order,
-//               content: [newItem],
-//               queue: [item.name],
-//             },
-//           ],
-//         }),
-//         // 第二輪找到原本球員並加入打擊內容
-//         ...(find && {
-//           arr: [
-//             ...arr.slice(0, findIndex),
-//             {
-//               ...find,
-//               /*
-//                * https://stackoverflow.com/questions/34559918/spread-syntax-es6
-//                * Array.prototype.concat will preserve the empty slots in the array
-//                * while the Spread will replace them with undefined values.
-//                */
-//               content: find.content.concat(
-//                 Array(Math.max(midLen - find.content.length, 0)),
-//                 newItem,
-//               ),
-//               queue: [
-//                 ...(find.queue || []),
-//                 item.name,
-//                 ...(shouldSetLegacyAltRunner ? [r] : []),
-//               ],
-//             },
-//             // 舊代跑
-//             ...(shouldSetLegacyAltRunner
-//               ? [
-//                   {
-//                     name: r,
-//                     data: (players.find(sub => sub.id === r) || { data: {} })
-//                       .data,
-//                     order,
-//                     altOrder: item.order % startOrder || startOrder,
-//                     content: Array(midLen).concat({
-//                       inn: item.inn,
-//                       name: r,
-//                       order,
-//                       r,
-//                       color: 'gray',
-//                       content: 'PR',
-//                     }),
-//                   },
-//                 ]
-//               : []),
-//             ...arr.slice(findIndex + 1),
-//           ],
-//         }),
-//         // 代打
-//         ...(shouldSetAltBatter && {
-//           arr: [
-//             ...arr.slice(0, alt + 1),
-//             {
-//               name: item.name,
-//               data: (players.find(sub => sub.id === item.name) || { data: {} })
-//                 .data,
-//               order,
-//               altOrder: order % startOrder || startOrder,
-//               content: Array(midLen).concat(newItem),
-//             },
-//             ...arr.slice(alt + 1),
-//           ].map(row => ({
-//             ...row,
-//             ...(row.order === (order % startOrder || startOrder)
-//               ? {
-//                   queue: [...row.queue, item.name],
-//                 }
-//               : undefined),
-//           })),
-//         }),
-//         // 代跑
-//         ...(shouldSetAltRunner && {
-//           arr: [
-//             ...arr.slice(0, altR + 1),
-//             {
-//               name: item.name,
-//               data: (players.find(sub => sub.id === item.name) || { data: {} })
-//                 .data,
-//               altOrder: item.altOrder % startOrder || item.altOrder,
-//               content: Array(midLen).concat({
-//                 inn: item.inn,
-//                 name: item.name,
-//                 r: item.r,
-//                 color: 'gray',
-//                 content: item.content,
-//               }),
-//             },
-//             ...arr.slice(altR + 1),
-//           ].map(row => ({
-//             ...row,
-//             ...(row.order === (item.altOrder % startOrder || item.altOrder)
-//               ? {
-//                   queue: [...row.queue, item.name],
-//                 }
-//               : undefined),
-//           })),
-//         }),
-//         // 一輪有幾棒
-//         ...(shouldSetStartOrder && {
-//           startOrder: item.break
-//             ? order - 1
-//             : order - (find.order || find.altOrder),
-//         }),
-//         // 設定第一個內容為空的球員 打擊內容為 new
-//         ...(shouldSetNewContent && {
-//           isSetNewContent: true,
-//         }),
-//       };
-//       if (isLast) {
-//         /*
-//          * 最後一round
-//          * 取得單場最多次打席數
-//          * 加header & start order
-//          * 修正所有content array長度至最多打席數
-//          * h / ab
-//          * 失誤總數
-//          */
-//         const { arr, startOrder: prevStartOrder, isSetNewContent } = result;
-//         const selfLen = self.filter(s => s.altOrder === undefined).length;
-//         const startOrder = item.break ? order - 1 : prevStartOrder;
-//         const paMax =
-//           Math.ceil(selfLen / (startOrder || selfLen)) +
-//           (selfLen % (startOrder || selfLen) === 0 && role === 'manager'
-//             ? 1
-//             : 0);
-//         const header = Array(20)
-//           .fill(undefined)
-//           .reduce((acc, item, i) => {
-//             if (startOrder === 0) {
-//               const inns = records
-//                 .filter(record => record.inn)
-//                 .map(record => record.inn);
-//               const maxInn = inns.length ? Math.max(...inns) : 1;
-//               return Array.apply(null, Array(maxInn)).map(
-//                 (undefined, i) => i + 1,
-//               );
-//             }
-//             if (i) {
-//               return [
-//                 ...acc,
-//                 ...Array(
-//                   Math.ceil(
-//                     (records.filter(record => record.inn === i).length +
-//                       (i === (records[records.length - 1] || {}).inn &&
-//                       role === 'manager'
-//                         ? 1
-//                         : 0)) /
-//                       startOrder,
-//                   ),
-//                 )
-//                   .fill(undefined)
-//                   .map(() => i),
-//               ];
-//             }
-//             return acc;
-//           }, []);
-//         return [
-//           [...header, startOrder],
-//           ...arr.map(sub => {
-//             const { ab, h, BB, HR, locations } = sub.content.reduce(
-//               ({ ab, h, BB, HR, locations }, item) => ({
-//                 ab:
-//                   ab +
-//                   ([
-//                     '1H',
-//                     '2H',
-//                     '3H',
-//                     'HR',
-//                     'FO',
-//                     'GO',
-//                     'K',
-//                     'FOUL',
-//                     'E',
-//                     'FC',
-//                     'DP',
-//                     'TP',
-//                   ].includes(item.content)
-//                     ? 1
-//                     : 0),
-//                 h:
-//                   h + (['1H', '2H', '3H', 'HR'].includes(item.content) ? 1 : 0),
-//                 BB: BB + (item.content === 'BB' ? 1 : 0),
-//                 HR: HR + (item.content === 'HR' ? 1 : 0),
-//                 locations:
-//                   item.location && item.location.x
-//                     ? [
-//                         ...locations,
-//                         {
-//                           x: item.location.x,
-//                           y: item.location.y,
-//                           location: item.location.location,
-//                           color: formatColor(item.content),
-//                           borderColor:
-//                             item.content === 'HR' ? 'white' : 'black',
-//                         },
-//                       ]
-//                     : locations,
-//               }),
-//               { ab: 0, h: 0, BB: 0, HR: 0, locations: [] },
-//             );
-//             const preBatter =
-//               self.find(
-//                 s => s.order === item.order - (startOrder || item.order) + 1,
-//               ) || self[self.length - (startOrder || self.length)];
-//             const newBatter =
-//               preBatter.r && preBatter.name !== preBatter.r
-//                 ? preBatter.r
-//                 : arr.some(
-//                     r =>
-//                       r.altOrder ===
-//                       (preBatter.order % startOrder || preBatter.order),
-//                   )
-//                 ? arr
-//                     .filter(
-//                       r =>
-//                         r.altOrder ===
-//                         (preBatter.order % startOrder || preBatter.order),
-//                     )
-//                     .reverse()[0].name
-//                 : preBatter.name;
-//             const shouldSetLastNew =
-//               role === 'manager' && sub.name === newBatter;
-//             const newContent =
-//               !isSetNewContent && shouldSetLastNew
-//                 ? [
-//                     ...sub.content,
-//                     {
-//                       content: 'new',
-//                       name: newBatter,
-//                       inn: self[self.length - 1].inn,
-//                     },
-//                   ]
-//                 : sub.content;
-
-//             newContent.length = paMax || 1;
-//             return {
-//               ...sub,
-//               content: newContent,
-//               contentNormal: header.reduce((acc, inn, i, self) => {
-//                 const filter = newContent.filter(sub => sub && sub.inn === inn);
-//                 const hasPrev = newContent.some(sub => sub && sub.inn < inn);
-//                 const arr = [];
-//                 arr.length = 1;
-//                 if (i && self[i - 1] === inn) {
-//                   if (filter.length > 1) {
-//                     return acc;
-//                   } else {
-//                     return acc.concat(arr);
-//                   }
-//                 } else if (filter.length) {
-//                   return acc.concat(filter);
-//                 } else {
-//                   if (
-//                     role === 'manager' &&
-//                     startOrder === 0 &&
-//                     i === self.length - 1 &&
-//                     !hasPrev
-//                   ) {
-//                     return acc.concat(newContent);
-//                   } else {
-//                     return acc.concat(arr);
-//                   }
-//                 }
-//               }, []),
-//               summary: `${ab}-${h}`,
-//               error: errors.some(e => e.hasOwnProperty('count'))
-//                 ? (errors.find(({ name }) => name === sub.name) || {}).count
-//                 : errors.filter(({ name }) => name === sub.name).length,
-//               /* for group summary */
-//               AB: ab,
-//               H: h,
-//               BB,
-//               HR,
-//               locations,
-//             };
-//           }),
-//         ];
-//       } else {
-//         return result;
-//       }
-//     },
-//     {
-//       arr: [],
-//       startOrder: 0,
-//       prevInn: 0,
-//       isSetNewContent: false,
-//     },
-//   );
-// };
+      const result = {
+        ...acc,
+        prevInn: item.inn,
+        // 第一輪加入球員
+        ...(canPushPlayer && {
+          arr: [
+            ...arr,
+            {
+              name: item.name,
+              data: (players.find(sub => sub.id === item.name) || { data: {} })
+                .data,
+              order,
+              content: [newItem],
+              queue: [item.name],
+            },
+          ],
+        }),
+        // 第二輪找到原本球員並加入打擊內容
+        ...(find && {
+          arr: [
+            ...arr.slice(0, findIndex),
+            {
+              ...find,
+              /*
+               * https://stackoverflow.com/questions/34559918/spread-syntax-es6
+               * Array.prototype.concat will preserve the empty slots in the array
+               * while the Spread will replace them with undefined values.
+               */
+              content: find.content.concat(
+                Array(Math.max(midLen - find.content.length, 0)),
+                newItem,
+              ),
+              queue: [
+                ...(find.queue || []),
+                item.name,
+                ...(shouldSetLegacyAltRunner ? [r] : []),
+              ],
+            },
+            // 舊代跑
+            ...(shouldSetLegacyAltRunner
+              ? [
+                  {
+                    name: r,
+                    data: (players.find(sub => sub.id === r) || { data: {} })
+                      .data,
+                    order,
+                    altOrder: item.order % startOrder || startOrder,
+                    content: Array(midLen).concat({
+                      inn: item.inn,
+                      name: r,
+                      order,
+                      r,
+                      color: 'gray',
+                      content: 'PR',
+                    }),
+                  },
+                ]
+              : []),
+            ...arr.slice(findIndex + 1),
+          ],
+        }),
+        // 代打
+        ...(shouldSetAltBatter && {
+          arr: [
+            ...arr.slice(0, alt + 1),
+            {
+              name: item.name,
+              data: (players.find(sub => sub.id === item.name) || { data: {} })
+                .data,
+              order,
+              altOrder: order % startOrder || startOrder,
+              content: Array(midLen).concat(newItem),
+            },
+            ...arr.slice(alt + 1),
+          ].map(row => ({
+            ...row,
+            ...(row.order === (order % startOrder || startOrder)
+              ? {
+                  queue: [...row.queue, item.name],
+                }
+              : undefined),
+          })),
+        }),
+        // 代跑
+        ...(shouldSetAltRunner && {
+          arr: [
+            ...arr.slice(0, altR + 1),
+            {
+              name: item.name,
+              data: (players.find(sub => sub.id === item.name) || { data: {} })
+                .data,
+              altOrder: item.altOrder % startOrder || item.altOrder,
+              content: Array(midLen).concat({
+                inn: item.inn,
+                name: item.name,
+                r: item.r,
+                color: 'gray',
+                content: item.content,
+              }),
+            },
+            ...arr.slice(altR + 1),
+          ].map(row => ({
+            ...row,
+            ...(row.order === (item.altOrder % startOrder || item.altOrder)
+              ? {
+                  queue: [...row.queue, item.name],
+                }
+              : undefined),
+          })),
+        }),
+        // 一輪有幾棒
+        ...(shouldSetStartOrder && {
+          startOrder: item.break
+            ? order - 1
+            : order - (find.order || find.altOrder),
+        }),
+        // 設定第一個內容為空的球員 打擊內容為 new
+        ...(shouldSetNewContent && {
+          isSetNewContent: true,
+        }),
+      };
+      if (isLast) {
+        /*
+         * 最後一round
+         * 取得單場最多次打席數
+         * 加header & start order
+         * 修正所有content array長度至最多打席數
+         * h / ab
+         * 失誤總數
+         */
+        const { arr, startOrder: prevStartOrder, isSetNewContent } = result;
+        const selfLen = self.filter(s => s.altOrder === undefined).length;
+        const startOrder = item.break ? order - 1 : prevStartOrder;
+        const paMax =
+          Math.ceil(selfLen / (startOrder || selfLen)) +
+          (selfLen % (startOrder || selfLen) === 0 && role === 'manager'
+            ? 1
+            : 0);
+        const header = Array(20)
+          .fill(undefined)
+          .reduce((acc, item, i) => {
+            if (startOrder === 0) {
+              const inns = records
+                .filter(record => record.inn)
+                .map(record => record.inn);
+              const maxInn = inns.length ? Math.max(...inns) : 1;
+              return Array.apply(null, Array(maxInn)).map(
+                (undefined, i) => i + 1,
+              );
+            }
+            if (i) {
+              return [
+                ...acc,
+                ...Array(
+                  Math.ceil(
+                    (records.filter(record => record.inn === i).length +
+                      (i === (records[records.length - 1] || {}).inn &&
+                      role === 'manager'
+                        ? 1
+                        : 0)) /
+                      startOrder,
+                  ),
+                )
+                  .fill(undefined)
+                  .map(() => i),
+              ];
+            }
+            return acc;
+          }, []);
+        return [
+          [...header, startOrder],
+          ...arr.map(sub => {
+            const { ab, h, BB, HR, locations } = sub.content.reduce(
+              ({ ab, h, BB, HR, locations }, item) => ({
+                ab:
+                  ab +
+                  ([
+                    '1H',
+                    '2H',
+                    '3H',
+                    'HR',
+                    'FO',
+                    'GO',
+                    'K',
+                    'FOUL',
+                    'E',
+                    'FC',
+                    'DP',
+                    'TP',
+                  ].includes(item.content)
+                    ? 1
+                    : 0),
+                h:
+                  h + (['1H', '2H', '3H', 'HR'].includes(item.content) ? 1 : 0),
+                BB: BB + (item.content === 'BB' ? 1 : 0),
+                HR: HR + (item.content === 'HR' ? 1 : 0),
+                locations:
+                  item.location && item.location.x
+                    ? [
+                        ...locations,
+                        {
+                          x: item.location.x,
+                          y: item.location.y,
+                          location: item.location.location,
+                          color: formatColor(item.content),
+                          borderColor:
+                            item.content === 'HR' ? 'white' : 'black',
+                        },
+                      ]
+                    : locations,
+              }),
+              { ab: 0, h: 0, BB: 0, HR: 0, locations: [] },
+            );
+            const preBatter =
+              self.find(
+                s => s.order === item.order - (startOrder || item.order) + 1,
+              ) || self[self.length - (startOrder || self.length)];
+            const newBatter =
+              preBatter.r && preBatter.name !== preBatter.r
+                ? preBatter.r
+                : arr.some(
+                    r =>
+                      r.altOrder ===
+                      (preBatter.order % startOrder || preBatter.order),
+                  )
+                ? arr
+                    .filter(
+                      r =>
+                        r.altOrder ===
+                        (preBatter.order % startOrder || preBatter.order),
+                    )
+                    .reverse()[0].name
+                : preBatter.name;
+            const shouldSetLastNew =
+              role === 'manager' && sub.name === newBatter;
+            const newContent =
+              !isSetNewContent && shouldSetLastNew
+                ? [
+                    ...sub.content,
+                    {
+                      content: 'new',
+                      name: newBatter,
+                      inn: self[self.length - 1].inn,
+                    },
+                  ]
+                : sub.content;
+            const newContent_ = [...newContent];
+            newContent_.length = paMax || 1;
+            return {
+              ...sub,
+              content: newContent_,
+              contentNormal: header.reduce((acc, inn, i, self) => {
+                const filter = newContent.filter(sub => sub && sub.inn === inn);
+                const hasPrev = newContent.some(sub => sub && sub.inn < inn);
+                const arr = [];
+                arr.length = 1;
+                if (i && self[i - 1] === inn) {
+                  if (filter.length > 1) {
+                    return acc;
+                  } else {
+                    return acc.concat(arr);
+                  }
+                } else if (filter.length) {
+                  return acc.concat(filter);
+                } else {
+                  if (
+                    role === 'manager' &&
+                    startOrder === 0 &&
+                    i === self.length - 1 &&
+                    !hasPrev
+                  ) {
+                    return acc.concat(newContent);
+                  } else {
+                    return acc.concat(arr);
+                  }
+                }
+              }, []),
+              summary: `${ab}-${h}`,
+              error: errors.some(e => e.hasOwnProperty('count'))
+                ? (errors.find(({ name }) => name === sub.name) || {}).count
+                : errors.filter(({ name }) => name === sub.name).length,
+              /* for group summary */
+              AB: ab,
+              H: h,
+              BB,
+              HR,
+              locations,
+            };
+          }),
+        ];
+      } else {
+        return result;
+      }
+    },
+    {
+      arr: [],
+      startOrder: 0,
+      prevInn: 0,
+      isSetNewContent: false,
+    },
+  );
+};
 
 const types = {
   INIT_FROM_LS: 'RECORD/INIT_FROM_LS',
@@ -1057,19 +1057,19 @@ const actions = {
   workerBox({ commit }) {
     // commit(rootTypes.LOADING, true);
     if (state.game && state.records.some(item => item._table === state.game)) {
-      // const boxSummary =
-      //   state.games.length &&
-      //   state.game &&
-      //   state.games.find(item => item.game === state.game);
-      // const data = displayGame(
-      //   state.players,
-      //   state.records.filter(item => item._table === state.game),
-      //   boxSummary.errors,
-      //   state.role,
-      // );
-      // console.log(data);
-      // commit(types.SET_BOX, data);
-      // return;
+      const boxSummary =
+        state.games.length &&
+        state.game &&
+        state.games.find(item => item.game === state.game);
+      const data = displayGame(
+        state.players,
+        state.records.filter(item => item._table === state.game),
+        boxSummary.errors,
+        rootState.role,
+      );
+      console.log(data);
+      commit(types.SET_BOX, data);
+      return;
       workerCreater(
         {
           cmd: 'Box',

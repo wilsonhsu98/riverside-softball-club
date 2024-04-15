@@ -241,7 +241,7 @@
     <player-modal
       :current="currentPlayer"
       :current_label="$t('ttl_current_player')"
-      :second="reJoinPlayer"
+      :second="changeMode === 'home' && reJoinPlayer"
       :second_label="$t('ttl_rejoin_player')"
       :third="['first', 'second', 'third'].includes(changeMode) && prev5Players"
       :third_label="$t('ttl_prev5_player')"
@@ -881,6 +881,7 @@ export default {
       this.changeMode = mode;
     },
     selectPlayer(player) {
+      console.log('in');
       switch (this.changeMode) {
         case 'home':
           if (

@@ -61,7 +61,8 @@
                     },
                   ]"
                   @click="
-                    (isBaseNotFulled() || base[b].name) && changePlayer(b)
+                    (isBaseNotFulled() || base[b].name || isForcedMode) &&
+                      changePlayer(b)
                   "
                 />
               </div>
@@ -378,7 +379,7 @@
     <player-modal
       :current="currentPlayer"
       :current_label="$t('ttl_current_player')"
-      :second="reJoinPlayer"
+      :second="changeMode === 'home' && reJoinPlayer"
       :second_label="$t('ttl_rejoin_player')"
       :third="['first', 'second', 'third'].includes(changeMode) && prev5Players"
       :third_label="$t('ttl_prev5_player')"
@@ -470,7 +471,14 @@
         <button class="btn" @click="highlight('batter')">
           {{ $t('btn_change_batter') }}
         </button>
+        <button class="btn" @click="openShowForcedMode">
+          {{ '開啟突破僵局' }}
+        </button>
       </div>
+    </div>
+
+    <div v-if="showForcedMode" class="modal" @click="showForcedMode = false">
+      123
     </div>
 
     <div
@@ -1257,6 +1265,8 @@ export default {
       spotlightTimer: undefined,
       showInstruction: false,
       waitRedirect: false,
+      showForcedMode: false,
+      isForcedMode: false,
       forcast: true,
     };
   },
@@ -1671,11 +1681,13 @@ export default {
           item => item && ['out', 'run'].includes(item.result) && item.name,
         )
         .concat(onbasePlayers);
-      this.prev5Players = tempPrev5
-        .filter(
-          item => !shouldNotPrev5.find(sub => sub && sub.name === item.name),
-        )
-        .map(player => this.getPlayer(player.name));
+      if (!this.isForcedMode) {
+        this.prev5Players = tempPrev5
+          .filter(
+            item => !shouldNotPrev5.find(sub => sub && sub.name === item.name),
+          )
+          .map(player => this.getPlayer(player.name));
+      }
       if (this.maxOnbase === 1 || reset) {
         this.maxOnbase =
           onbasePlayers.filter(item => item.name).length ||
@@ -1720,6 +1732,16 @@ export default {
         case 'first':
         case 'second':
         case 'third':
+          // 不得是已上場的球員 除了 可能在壘上球員 或 再上場球員
+          // if (
+          //   !this.prev5Players.some(({ name }) => name === player.name) &&
+          //   this.boxSummary.contents.some(({ name }) => name === player.name)
+          //   // &&
+          //   // !(this.reJoinPlayer && this.reJoinPlayer.name === player.name)
+          // ) {
+          //   this.alert(this.$t('msg_duplicate_before_player'));
+          //   return;
+          // }
           this.base[this.changeMode].name = player.name;
           this.base[this.changeMode].result = this.changeMode;
           break;
@@ -1998,6 +2020,16 @@ export default {
         this.spotlightIcon = undefined;
       }, 3000);
       this.showInstruction = false;
+    },
+    openShowForcedMode() {
+      this.showInstruction = false;
+      this.isForcedMode = true;
+      this.prev5Players = this.boxSummary.contents
+        .slice(Math.max(this.order - 4, 0), this.order - 1)
+        .map(player => this.getPlayer(player.name));
+      //       this.$nextTick(() => {
+      // this.showForcedMode = true;
+      //       });
     },
     setForcast(val) {
       this.forcast = val === 'true';
