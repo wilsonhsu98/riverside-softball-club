@@ -41,14 +41,14 @@
       <div style="margin-top: 5px;">
         <a
           class="link"
-          href="https://riversidesoftballclub.netlify.com/privacy_policy.html"
+          href="https://riversidesoftballclub.netlify.app/privacy_policy.html"
           target="_blank"
           >{{ $t('system_privacy_policy') }}</a
         >
         <a
           class="link"
           style="margin-left: 5px;"
-          href="https://riversidesoftballclub.netlify.com/terms_and_conditions.html"
+          href="https://riversidesoftballclub.netlify.app/terms_and_conditions.html"
           target="_blank"
           >{{ $t('system_term_of_use') }}</a
         >
@@ -223,12 +223,15 @@ export default {
     ...mapActions([
       'anonymousLogin',
       'googleLogin',
-      'fbLogin',
+      // 'fbLogin',
       'githubLogin',
       'lineLogin',
       'lineLoginRedirect',
       'alert',
     ]),
+    fbLogin() {
+      this.alert(this.$t('msg_fb_disallow'));
+    },
   },
   computed: {
     ...mapGetters(['loading', 'alertMsg']),

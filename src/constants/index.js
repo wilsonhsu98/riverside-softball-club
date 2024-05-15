@@ -13,5 +13,19 @@ export const GET_URL = parameters => {
 };
 
 const DELETE_ANNONYMOUS_USERS_URL =
-  'https://riversidesoftballclub.netlify.com/.netlify/functions/index/delete_anonymous_users';
+  'https://riversidesoftballclub.netlify.app/.netlify/functions/index/delete_anonymous_users';
 export const DELETE_ANNONYMOUS_USERS_URL_PROXY = `https://script.google.com/macros/s/AKfycbzwB6fT7ZHjlNENz9KwYqtOrWm6jV_DSnR5Vzvieyf1eSyIERbS/exec?url=${DELETE_ANNONYMOUS_USERS_URL}`;
+
+export const PROVIDER = {
+  google: 'google.com',
+  fb: 'facebook.com',
+  github: 'github.com',
+  line: 'password',
+};
+
+export const PROVIDER_NAME_MAP = {
+  [PROVIDER.google]: 'Google',
+  [PROVIDER.fb]: 'FaceBook',
+  [PROVIDER.github]: 'Github',
+  [PROVIDER.line]: 'LINE',
+};

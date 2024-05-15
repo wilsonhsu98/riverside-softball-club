@@ -289,6 +289,11 @@ const actions = {
             },
             {},
           );
+          const preBenches = data.preBenches.reduce((acc, player) => {
+            const { uid } = player;
+            acc[uid] = fieldValue.delete();
+            return acc;
+          }, {});
           const benches = [
             ...data.benches.filter(player => !player.name),
             ...players2benches,
@@ -296,7 +301,7 @@ const actions = {
             const { msg, uid, photo } = player;
             acc[uid] = { msg, uid, photo };
             return acc;
-          }, {});
+          }, preBenches);
           batch.set(
             refTeamDoc,
             {
@@ -691,9 +696,8 @@ const actions = {
             icon: data.icon,
             name: data.name,
             subNames: data.subNames,
-            keyword: `${data.name}${
-              data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
-            }`,
+            keyword: `${data.name}${data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
+              }`,
           };
           commit(types.FETCH_DEMO_TEAM, demoTeam);
           commit(userTypes.FETCH_TEAMS, [demoTeam]);
@@ -729,9 +733,8 @@ const actions = {
                 icon: data.icon,
                 name: data.name,
                 subNames: data.subNames,
-                keyword: `${data.name}${
-                  data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
-                }`,
+                keyword: `${data.name}${data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
+                  }`,
                 score: data.score,
               };
             });
@@ -745,11 +748,11 @@ const actions = {
           if (['***', '＊＊＊'].includes(keyword)) return true;
           return keyword
             ? team.keyword.match(
-                new RegExp(
-                  keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-                  'ig',
-                ),
-              )
+              new RegExp(
+                keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+                'ig',
+              ),
+            )
             : false;
         })
         .map(team => {
@@ -851,7 +854,7 @@ const actions = {
               db.collection('accounts').doc(data.uid),
               {
                 teamRoles: {
-                  [data.teamCode]: 'player',
+                  [data.teamCode]: data.teamRole,
                 },
                 teams: fieldValue.arrayUnion(data.teamCode),
               },
