@@ -1,4 +1,4 @@
-# riversids-softball-club
+# riverside-softball-club
 
 ## Project setup
 ```
