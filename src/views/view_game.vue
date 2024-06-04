@@ -2285,7 +2285,10 @@ export default {
       this.orders = this.box
         .slice(1)
         .filter(record => !record.hasOwnProperty('altOrder'))
-        .map(({ name }) => this.getPlayer(name));
+        .map(({ name }) => ({
+          ...this.getPlayer(name),
+          position: this.getPosition(name),
+        }));
     },
     closeOrders(e) {
       if (e.currentTarget === e.target) {
@@ -2298,6 +2301,11 @@ export default {
           player => player.name && player.name === name,
         ) || { name, number: '' }
       );
+    },
+    getPosition(name) {
+      return (
+        (Object.entries(this.boxSummary.positions).find(
+          ([, value]) => value === name)) || ['EP'])[0];
     },
     checkLastColumn() {
       if (this.box.length && !this.editable) {

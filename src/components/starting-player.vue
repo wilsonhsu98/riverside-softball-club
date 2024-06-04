@@ -114,15 +114,20 @@ export default {
   },
   methods: {
     draw(nameMaxWidth) {
-      const width = 108 + nameMaxWidth;
-      const height = this.list.length * 45 - 3;
       const scale = 2;
+      const lineWidth = 2 * scale;
+      const orderWidth = 27 * scale;
+      const orderHeight = 40 * scale;
+      const nameWidth = (81 + nameMaxWidth) * scale;
+      const positionWidth = 40 * scale;
+      const borderRadius = 5 * scale;
+      const canvasWidth = orderWidth + nameWidth + positionWidth;
+      const canvasHeight = (this.list.length * 45 - 3) * scale;
       const canvas = document.createElement('canvas');
-      canvas.width = width * scale;
-      canvas.height = height * scale;
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
       const ctx = canvas.getContext('2d');
 
-      const orderWidth = 27 * scale;
       const avatarRadius = 16 * scale;
       const diameter = avatarRadius * 2;
       const avatarBackgroundColor = 'rgba(237, 247, 248, 1)'; // $row_odd_bgcolor
@@ -152,32 +157,47 @@ export default {
       // ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       this.list.forEach((player, index) => {
+        const yAxis = 2 + 45 * scale * index;
         ctx.save();
 
         ctx.strokeStyle = orderBorderColor;
-        ctx.lineWidth = 2 * scale;
+        ctx.lineWidth = lineWidth;
         canvasRadius(
           2,
-          2 + 45 * scale * index,
+          yAxis,
           orderWidth,
-          40 * scale,
-          5 * scale,
+          orderHeight,
+          borderRadius,
           0,
           0,
-          5 * scale,
+          borderRadius,
+          '#fff',
+        );
+
+        ctx.strokeStyle = orderBorderColor;
+        ctx.lineWidth = lineWidth;
+        canvasRadius(
+          orderWidth + nameWidth - 2,
+          yAxis,
+          positionWidth,
+          orderHeight,
+          0,
+          borderRadius,
+          borderRadius,
+          0,
           '#fff',
         );
 
         ctx.strokeStyle = avatarBorderColor;
-        ctx.lineWidth = 2 * scale;
+        ctx.lineWidth = lineWidth;
         canvasRadius(
           2 + orderWidth,
-          2 + 45 * scale * index,
-          canvas.width - 4 - orderWidth,
-          40 * scale,
+          yAxis,
+          nameWidth - 4,
+          orderHeight,
           0,
-          5 * scale,
-          5 * scale,
+          0,
+          0,
           0,
           avatarBackgroundColor,
         );
@@ -189,6 +209,16 @@ export default {
         ctx.fillText(
           index + 1,
           14.5 * scale,
+          (diameter + 13 * scale) * index + 27 * scale,
+        );
+
+        ctx.beginPath();
+        ctx.fillStyle = orderBorderColor;
+        ctx.font = `${16 * scale}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.fillText(
+          this.$t(player.position),
+          orderWidth + nameWidth + 18.5 * scale,
           (diameter + 13 * scale) * index + 27 * scale,
         );
 
