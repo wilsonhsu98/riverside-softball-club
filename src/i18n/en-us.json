@@ -246,6 +246,7 @@
 	"msg_onbase_empty": "尚有未選擇壘上情況的球員",
 	"msg_onbase_offside": "壘上發生越位情況",
 	"msg_onbase_confirm": "請再抬頭看看壘上跑者，下個打席的壘上情況是否為設定的結果",
+	"msg_onbase_morethan3": "似乎超過3人出局，請調整正確出局的人選",
 	"btn_onbase_confirm": "沒錯",
 	"btn_onbase_cancel": "好像不對",
 	"msg_onbase_inn_change": "3人出局 換局",
