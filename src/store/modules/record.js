@@ -1353,7 +1353,10 @@ const getLastOrderPosition = async newGameId => {
         data => {
           resolve({
             orders: Array.isArray(data)
-              ? data.slice(1).map(row => ({ name: row.name }))
+              ? data
+                  .slice(1)
+                  .filter(row => !Boolean(row.altOrder))
+                  .map(row => ({ name: row.name }))
               : [],
             positions: (state.games.find(g => g.game === gameId) || {})
               .positions,
