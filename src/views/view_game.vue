@@ -2369,6 +2369,16 @@ export default {
     },
     selectPlayer(player) {
       let orders;
+      let positions = this.boxSummary.positions || {};
+      Object.entries(positions).some(([position, name]) => {
+        if (name === this.currentPlayer.name) {
+          positions = {
+            ...this.boxSummary.positions,
+            [position]: player.name,
+          };
+          return true;
+        }
+      });
       if (this.boxSummary.contents.some(({ name }) => name === player.name)) {
         orders = this.boxSummary.contents.map(content => {
           if (content.name === this.currentPlayer.name) {
@@ -2447,6 +2457,7 @@ export default {
         teamCode: this.$route.params.team,
         gameId: this.$route.params.game,
         orders,
+        positions,
       });
     },
     toggleEditVideoMode(value) {
