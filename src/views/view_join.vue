@@ -119,7 +119,7 @@
             <div
               class="team-player-item"
               :class="{
-                binded: !!player.uid,
+                // binded: !!player.uid, // allow switching binding user
                 current: bindPlayer && bindPlayer.name === player.name,
               }"
               :key="`search_${i}`"
@@ -141,10 +141,18 @@
             <div class="team-player-item"></div>
             <div class="team-player-item"></div>
             <div v-if="bindPlayer" style="margin-top: 5px; width: 100%;">
-              <label>
-                <input type="radio" v-model="choice" value="bind" />
-                {{ $t('msg_join_bind', { name: bindPlayer.name }) }}
-              </label>
+              <div v-if="bindPlayer.uid" class="radio-option" >
+                <label>
+                  <input type="radio" v-model="choice" value="re-bind" />
+                  <div>{{ $t('msg_re_bind', { name: bindPlayer.name, provider: PROVIDER_NAME_MAP[providerId] }) }}</div>
+                </label>
+              </div>
+              <div v-else class="radio-option" >
+                <label>
+                  <input type="radio" v-model="choice" value="bind" />
+                  <div>{{ $t('msg_join_bind', { name: bindPlayer.name }) }}</div>
+                </label>
+              </div>
             </div>
           </div>
           <div class="team-player" v-if="joined && benches.length">
@@ -173,15 +181,17 @@
           </div>
           <div class="team-other" v-if="!joined">
             <label class="section-header">{{ $t('ttl_or') }}</label>
-            <div>
+            <div class="radio-option" >
               <label>
                 <input type="radio" v-model="choice" value="join" />
-                {{ $t('msg_just_join') }}
-                <input
-                  type="text"
-                  v-model="otherPlayer"
-                  @focus="() => (this.choice = 'join')"
-                />
+                <div>
+                  {{ $t('msg_just_join') }}
+                  <input
+                    type="text"
+                    v-model="otherPlayer"
+                    @focus="() => (this.choice = 'join')"
+                  />
+                </div>
               </label>
             </div>
           </div>
@@ -198,6 +208,13 @@
           @click="joinTeam_"
         >
           {{ $t('btn_join') }}
+        </button>
+        <button
+          v-else-if="choice === 're-bind'"
+          class="btn join"
+          @click="joinTeam_"
+        >
+          {{ $t('btn_re_bind') }}
         </button>
       </div>
     </div>
@@ -451,6 +468,16 @@
       }
     }
   }
+  .radio-option > label {
+    display: flex;
+    align-items: baseline;
+    & > input {
+      bottom: 0;
+    }
+    & > div {
+      margin-left: 5px;
+    }
+  }
   .current {
     color: $active_bgcolor;
     &::v-deep .img {
@@ -492,6 +519,7 @@
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
 import { scrollTo } from '../libs/utils';
+import { PROVIDER_NAME_MAP } from '../constants';
 
 export default {
   data() {
@@ -515,6 +543,7 @@ export default {
       selected: '',
       redirectMode: !!this.$route.query.teamCode,
       isShowScanner: false,
+      PROVIDER_NAME_MAP,
     };
   },
   created() {
@@ -553,9 +582,18 @@ export default {
       const obj = {};
       if (this.choice === 'join') {
         obj.msg = `${this.$t('msg_just_join')}${this.otherPlayer}`;
+        obj.teamRole = 'player';
       } else {
         obj.name = this.bindPlayer.name;
-        obj.msg = this.$t('msg_join_bind', { name: this.bindPlayer.name });
+        obj.teamRole = this.bindPlayer.manager ? 'manager' : 'player';
+        switch (this.choice) {
+          case 'bind':
+            obj.msg = this.$t('msg_join_bind', { name: this.bindPlayer.name });
+            break;
+          case 're-bind':
+            obj.msg = this.$t('msg_re_bind', { name: this.bindPlayer.name, provider: PROVIDER_NAME_MAP[this.providerId] });
+            break;
+        }
       }
       this.requestJoin({
         ...obj,
@@ -576,13 +614,17 @@ export default {
       this.searchTeams({ keyword: this.keyWord, type: 'join' });
     },
     bindPlayer_(player) {
-      if (player.uid) return;
+      // if (player.uid) return; // allow switching binding user
       if (JSON.stringify(this.bindPlayer) === JSON.stringify(player)) {
         this.bindPlayer = undefined;
         this.choice = '';
       } else {
         this.bindPlayer = player;
-        this.choice = 'bind';
+        if (player.uid) {
+          this.choice = 're-bind';
+        } else {
+          this.choice = 'bind';
+        }
       }
     },
     deleteRequest_(requestId) {
@@ -637,6 +679,7 @@ export default {
       'accountInfo',
       'userId',
       'requests',
+      'providerId',
     ]),
   },
   watch: {

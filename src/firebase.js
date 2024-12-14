@@ -3,6 +3,7 @@ import 'firebase/auth';
 import 'firebase/firestore';
 import 'firebase/messaging';
 import config from '../config';
+import { PROVIDER } from './constants';
 
 firebase.initializeApp(config.firebase);
 
@@ -19,15 +20,15 @@ const auth = firebase.auth();
 auth.useDeviceLanguage();
 
 const providerMapping = {
-  'google.com': new firebase.auth.GoogleAuthProvider(),
-  'facebook.com': new firebase.auth.FacebookAuthProvider(),
-  'github.com': new firebase.auth.GithubAuthProvider(),
+  [PROVIDER.google]: new firebase.auth.GoogleAuthProvider(),
+  [PROVIDER.fb]: new firebase.auth.FacebookAuthProvider(),
+  [PROVIDER.github]: new firebase.auth.GithubAuthProvider(),
 };
 const credentialMapping = {
-  'google.com': token =>
+  [PROVIDER.google]: token =>
     firebase.auth.GoogleAuthProvider.credential(null, token),
-  'facebook.com': token => firebase.auth.FacebookAuthProvider.credential(token),
-  'github.com': token => firebase.auth.GithubAuthProvider.credential(token),
+  [PROVIDER.fb]: token => firebase.auth.FacebookAuthProvider.credential(token),
+  [PROVIDER.github]: token => firebase.auth.GithubAuthProvider.credential(token),
 };
 
 const messaging = (() => {

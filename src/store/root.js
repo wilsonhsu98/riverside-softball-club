@@ -9,6 +9,7 @@ import {
 import router from '../router';
 import config from '../../config';
 import { state as userState, actions as userActions } from './modules/user';
+import { PROVIDER } from '../constants';
 // const lineLoginUrl = config.line.loginUrl;
 const lineLoginUrl =
   process.env.NODE_ENV === 'production'
@@ -68,6 +69,7 @@ const getters = {
     state.accountInfo ||
     JSON.parse(window.localStorage.getItem('accountInfo')) ||
     {},
+  providerId: state => state.providerId || window.localStorage.getItem('providerId') || '',    
   currentTeam: state => state.currentTeam,
   currentTeamIcon: state => state.currentTeamIcon,
   role: state => state.role,
@@ -147,15 +149,15 @@ const actions = {
   },
   googleLogin({ commit }) {
     // auth.signInWithRedirect(providerMapping['google.com']);
-    actions.loginPopup({ commit }, 'google.com');
+    actions.loginPopup({ commit }, PROVIDER.google);
   },
   fbLogin({ commit }) {
     // auth.signInWithRedirect(providerMapping['facebook.com']);
-    actions.loginPopup({ commit }, 'facebook.com');
+    actions.loginPopup({ commit }, PROVIDER.fb);
   },
   githubLogin({ commit }) {
     // auth.signInWithRedirect(providerMapping['github.com']);
-    actions.loginPopup({ commit }, 'github.com');
+    actions.loginPopup({ commit }, PROVIDER.github);
   },
   lineLogin() {
     window.location = `${lineLoginUrl}?from=${encodeURIComponent(

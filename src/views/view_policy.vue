@@ -5,7 +5,7 @@
       <iframe
         v-if="policy_type === 'privacy'"
         :src="
-          `https://riversidesoftballclub.netlify.com/privacy_policy.html#${
+          `https://riversidesoftballclub.netlify.app/privacy_policy.html#${
             isDarkMode ? 'dark' : 'light'
           }`
         "
@@ -13,7 +13,7 @@
       <iframe
         v-if="policy_type === 'terms'"
         :src="
-          `https://riversidesoftballclub.netlify.com/terms_and_conditions.html#${
+          `https://riversidesoftballclub.netlify.app/terms_and_conditions.html#${
             isDarkMode ? 'dark' : 'light'
           }`
         "

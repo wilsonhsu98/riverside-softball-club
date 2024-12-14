@@ -459,6 +459,14 @@
         </button>
       </div>
     </div>
+    <div class="modal" v-if="showMoreThan3Outs">
+      <div class="dialog">
+        <p class="msg">{{ $t('msg_onbase_morethan3') }}</p>
+        <button @click="showMoreThan3Outs = false">
+          {{ $t('btn_noticed') }}
+        </button>
+      </div>
+    </div>
 
     <div v-if="showInstruction" class="modal" @click="showInstruction = false">
       <div class="normal">
@@ -503,11 +511,13 @@
   flex-wrap: wrap;
   justify-content: space-evenly;
   align-content: flex-start;
+
   h1 {
     max-width: $max_width;
     width: 100%;
     margin: 0 auto;
     position: relative;
+
     .instruction {
       width: 26px;
       height: 26px;
@@ -516,6 +526,7 @@
       cursor: pointer;
     }
   }
+
   .current-desc {
     width: 280px;
     min-height: 113px;
@@ -527,13 +538,16 @@
     font-size: 14px;
     color: var(--pa-insert-desc);
     visibility: hidden;
+
     &.show {
       visibility: visible;
     }
+
     .summary {
       display: flex;
       justify-content: space-between;
     }
+
     .box {
       border-radius: 4px;
       border: 2px solid $input_font;
@@ -543,30 +557,36 @@
       overflow: hidden;
       padding: 0 5px;
       min-width: 90px;
+
       .team {
         text-align: left;
         overflow: hidden;
         margin-right: auto;
       }
+
       .inn {
         width: 18px;
         text-align: center;
         margin-left: 5px;
       }
+
       .team,
       .inn {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
       }
+
       .cell {
         white-space: nowrap;
         text-overflow: ellipsis;
         overflow: hidden;
       }
     }
+
     .inn-out-onbase {
       position: relative;
+
       .onbase {
         width: 62px;
         height: 62px;
@@ -578,6 +598,7 @@
         transform: rotate(45deg) scale(0.7) translateX(-50%);
         position: relative;
         left: 50%;
+
         .base {
           width: 29px;
           height: 29px;
@@ -585,15 +606,18 @@
           border-radius: 4px;
           box-sizing: border-box;
           cursor: pointer;
+
           &.has-player {
             background-color: $active_bgcolor;
           }
+
           &.disabled {
             border-color: $input_font;
             cursor: not-allowed;
           }
         }
       }
+
       .inn-out {
         display: flex;
         position: absolute;
@@ -601,12 +625,14 @@
         left: 50%;
         transform: translateX(-50%);
         line-height: 18px;
+
         .inn {
           cursor: pointer;
           white-space: nowrap;
           color: $row_color;
           font-weight: bold;
         }
+
         .top-bottom {
           display: inline-block;
           width: 0;
@@ -616,14 +642,17 @@
           position: relative;
           margin-left: 2px;
         }
+
         .top {
           border-width: 0 8px 10px 8px;
           border-color: transparent transparent $input_font transparent;
         }
+
         .bottom {
           border-width: 10px 8px 0 8px;
           border-color: $input_font transparent transparent transparent;
         }
+
         .out {
           display: inline-block;
           width: 18px;
@@ -632,11 +661,13 @@
           box-sizing: border-box;
           border-radius: 50%;
           border: 2px solid $input_font;
+
           &.selected {
             background-color: $out;
           }
         }
       }
+
       &:after {
         content: '';
         display: block;
@@ -644,6 +675,7 @@
         height: 0;
       }
     }
+
     .next3 {
       flex: 0;
       display: flex;
@@ -651,34 +683,42 @@
       white-space: nowrap;
       justify-content: space-around;
       line-height: 17px;
+
       &-title {
         margin-left: 30px;
       }
+
       &-order {
         display: inline-block;
         width: 30px;
         text-align: right;
       }
+
       &-num {
         display: inline-block;
         width: 20px;
         text-align: center;
       }
     }
+
     .batter {
       margin-top: 5px;
       display: flex;
       align-items: center;
+
       .order {
         white-space: nowrap;
       }
+
       .player {
         margin: 0 5px;
         border-radius: 4px;
       }
+
       .contents {
         flex: 0 1 100%;
         display: flex;
+
         .content {
           color: #fff;
           line-height: 26px;
@@ -687,28 +727,36 @@
           text-align: center;
           margin-right: 2px;
           font-size: 12px;
+
           &.red {
             background-color: var(--hit);
           }
+
           &.yellow {
             background-color: var(--nonpa);
           }
+
           &.blue {
             background-color: var(--ng);
           }
+
           &.gray {
             background-color: $gray;
           }
+
           &.current {
             animation: currentContent 1s linear infinite;
           }
+
           @keyframes currentContent {
             0% {
               box-shadow: 0 0 15px $input_font;
             }
+
             50% {
               box-shadow: none;
             }
+
             100% {
               box-shadow: 0 0 15px $input_font;
             }
@@ -717,32 +765,40 @@
       }
     }
   }
+
   .step-bar {
     display: flex;
     justify-content: space-around;
     margin: 0 auto 10px;
     max-width: 300px;
-    > span {
+
+    >span {
       text-align: center;
       color: $row_color;
       font-size: 14px;
       position: relative;
       flex: 1;
+
       &.current {
         color: $active_bgcolor;
+
         &:before {
           border-color: $active_bgcolor;
         }
-        ~ span {
+
+        ~span {
           color: $input_font;
+
           &:before {
             border-color: $input_font;
           }
+
           &:after {
             background-color: $input_font;
           }
         }
       }
+
       &:before {
         content: attr(data-step);
         display: block;
@@ -757,6 +813,7 @@
         background-color: var(--card-bg);
         cursor: pointer;
       }
+
       &:after {
         content: '';
         display: block;
@@ -768,15 +825,18 @@
         right: 50%;
         z-index: -1;
       }
+
       &:first-of-type:after {
         content: none;
       }
     }
-    > .btn {
+
+    >.btn {
       display: block;
       width: 20px;
       height: 20px;
       padding: 0;
+
       &:before {
         content: '';
         border: solid #fff;
@@ -785,31 +845,38 @@
         padding: 3px;
         vertical-align: middle;
       }
+
       &:after {
         content: '';
         display: inline-block;
         height: 100%;
         vertical-align: middle;
       }
+
       &.left:before {
         transform: translateX(2px) rotate(135deg);
       }
+
       &.right:before {
         transform: translateX(-2px) rotate(-45deg);
       }
     }
   }
+
   .coordination-step {
     height: 400px;
   }
+
   .content {
     margin: 0;
     display: block;
+
     div {
       display: flex;
       justify-content: center;
       margin-bottom: 3px;
     }
+
     span {
       font-size: 12px;
       text-align: center;
@@ -822,72 +889,90 @@
       border-radius: 5px;
       box-sizing: border-box;
       cursor: pointer;
+
       &:not(:first-child) {
         margin-left: 3px;
       }
+
       &.red {
         color: var(--hit);
         border: 3px solid var(--hit);
+
         &.select {
           background-color: var(--hit);
         }
       }
+
       &.yellow {
         color: var(--nonpa);
         border: 3px solid var(--nonpa);
+
         &.select {
           background-color: var(--nonpa);
         }
       }
+
       &.blue {
         color: var(--ng);
         border: 3px solid var(--ng);
+
         &.select {
           background-color: var(--ng);
         }
       }
+
       &.gray {
         color: $gray;
         border: 3px solid $gray;
+
         &.select {
           background-color: $gray;
         }
       }
+
       &.rbi {
         color: $rbi;
         border: 3px solid $rbi;
+
         &.select {
           background-color: $rbi;
         }
       }
+
       &.select {
         color: #fff;
       }
+
       &.disabled {
         opacity: 0.2;
         cursor: not-allowed;
       }
     }
+
     &.wide span {
       width: 72px;
     }
   }
+
   .coordination {
     margin: 0;
     text-align: center;
   }
+
   .single-col {
     max-width: $max_width;
     width: 100%;
     margin: 0 auto;
   }
+
   .separater {
     border: 1px solid $input_border;
     border-width: 1px 0 0;
     margin: 20px auto 0;
     padding-bottom: 15px;
     position: relative;
-    > label {
+
+    >label {
       position: absolute;
       background-color: var(--card-bg);
       color: $input_font;
@@ -898,6 +983,7 @@
       padding: 0 4px;
       line-height: 14px;
     }
+
     .fa-info-circle {
       font-size: 24px;
       vertical-align: top;
@@ -911,19 +997,22 @@
   margin: 0 auto;
   left: 50%;
   transform: translateX(-50%);
+
   .player-container {
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
+
     .on-base-player {
       position: absolute;
       display: flex;
       flex-wrap: wrap;
       width: 120px;
       justify-content: center;
-      > span {
+
+      >span {
         font-size: 12px;
         text-align: center;
         white-space: nowrap;
@@ -938,56 +1027,70 @@
         flex: 1;
         margin: 1px;
         border-radius: 5px;
+
         &.name {
           flex: 0 1 100%;
         }
+
         &.run {
           color: $run;
           border-color: $run;
         }
+
         &.out {
           color: $out;
           border-color: $out;
         }
+
         &.select {
           color: #fff;
+
           &.run {
             background-color: $run;
           }
+
           &.out {
             background-color: $out;
           }
+
           &.base {
             background-color: $dark_gray;
           }
         }
+
         &.disabled {
           opacity: 0.2;
           cursor: not-allowed;
         }
+
         &.nobase {
           font-size: 0;
         }
       }
+
       &.first {
         top: 62px;
         right: 3px;
       }
+
       &.second {
         top: 3px;
         left: 50%;
         transform: translateX(-50%);
       }
+
       &.third {
         top: 62px;
         left: 3px;
       }
+
       &.home {
         bottom: 3px;
         left: 50%;
         transform: translateX(-50%);
       }
     }
+
     .player {
       width: 110px;
       margin: 0;
@@ -995,24 +1098,29 @@
       background-color: rgba(237, 247, 248, 0.5);
       font-size: 14px;
       cursor: auto;
+
       &.first {
         top: 62px;
         right: 3px;
       }
+
       &.second {
         top: 6px;
         left: 50%;
         transform: translateX(-50%);
       }
+
       &.third {
         top: 62px;
         left: 3px;
       }
     }
+
     .inn-change-msg {
       margin: 0;
       line-height: 180px;
     }
+
     .btn {
       display: inline-block;
       width: auto;
@@ -1030,10 +1138,12 @@
   bottom: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.5);
-  > div {
+
+  >div {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(2);
+
     &.normal {
       position: absolute;
       top: 50%;
@@ -1041,11 +1151,13 @@
       transform: translateY(-50%) translateX(-50%);
       display: flex;
       flex-direction: column;
-      & > .wrapper {
+
+      &>.wrapper {
         transform: scale(2) translateY(-5px);
         transform-origin: center bottom;
         text-align: center;
-        & ~ label {
+
+        &~label {
           color: #fff;
           font-size: 20px;
           white-space: nowrap;
@@ -1053,6 +1165,7 @@
         }
       }
     }
+
     .btn {
       width: 100%;
       margin: 5px auto;
@@ -1061,6 +1174,7 @@
       outline: none;
     }
   }
+
   .dialog {
     background-color: var(--card-bg);
     position: absolute;
@@ -1075,19 +1189,23 @@
     box-sizing: border-box;
     display: flex;
     flex-wrap: wrap;
+
     &::v-deep {
-      .outer-container > :first-child {
+      .outer-container> :first-child {
         left: -35px;
       }
     }
   }
+
   .msg {
     margin: 0 0 15px;
     text-align: left;
     width: 100%;
   }
+
   .infield {
     margin: 0 0 15px;
+
     .inn-out {
       display: flex;
       position: absolute;
@@ -1095,12 +1213,14 @@
       bottom: 20px;
       left: 20px;
       line-height: 18px;
+
       .inn {
         white-space: nowrap;
         color: white;
         font-weight: bold;
         margin-right: auto;
       }
+
       .top-bottom {
         display: inline-block;
         width: 0;
@@ -1110,14 +1230,17 @@
         position: relative;
         margin-left: 2px;
       }
+
       .top {
         border-width: 0 8px 10px 8px;
         border-color: transparent transparent white transparent;
       }
+
       .bottom {
         border-width: 10px 8px 0 8px;
         border-color: white transparent transparent transparent;
       }
+
       .out {
         display: inline-block;
         width: 18px;
@@ -1126,18 +1249,21 @@
         box-sizing: border-box;
         border-radius: 50%;
         border: 2px solid white;
+
         &.selected {
           background-color: $out;
         }
       }
     }
   }
+
   button:not(.btn) {
     background-color: $header_bgcolor;
     padding: 10px;
     margin: 0;
     outline: none;
     flex: 1;
+
     &:nth-of-type(2) {
       margin-left: 10px;
     }
@@ -1151,6 +1277,7 @@
   bottom: 0;
   left: 0;
   z-index: 3;
+
   .fa-hand-o-right {
     position: absolute;
     color: $active_bgcolor;
@@ -1158,37 +1285,45 @@
     font-size: 28px;
     transform: rotate(45deg);
   }
+
   .focus {
     position: absolute;
     box-shadow: 0px 0px 0px 99999px rgba(50, 50, 50, 0.8);
   }
 }
 
-@media only screen and (max-width: 760px), (max-height: 480px) {
+@media only screen and (max-width: 760px),
+(max-height: 480px) {
   .container {
     .step-bar {
       width: 100%;
     }
+
     .coordination-step {
       height: 300px;
     }
+
     .content {
       width: 100%;
+
       &.wide span {
         width: calc((100vw - 50px - 9px) / 4);
         max-width: unset;
       }
+
       span {
         width: calc((100vw - 30px - 12px) / 5);
         max-width: 58px;
       }
     }
+
     .single-col .coordination {
       margin: 0;
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
     }
+
     .btn-container {
       display: none;
     }
@@ -1257,6 +1392,7 @@ export default {
       next3: [],
       showSetInn: false,
       showNextOnbase: false,
+      showMoreThan3Outs: false,
       onbasePlayers: [],
       onbaseInn: 1,
       onbaseOut: 0,
@@ -1388,23 +1524,27 @@ export default {
             );
             return find
               ? {
-                  ...acc,
-                  [b]: this.base[find].name,
-                }
+                ...acc,
+                [b]: this.base[find].name,
+              }
               : acc;
           }, {});
-          this.onbaseOut = Math.min(
+          this.onbaseOut =
             this.out +
-              ['home', 'first', 'second', 'third'].filter(
-                bb => this.base[bb].result === 'out',
-              ).length,
-            3,
-          );
-          this.onbaseInn = this.onbaseOut === 3 ? this.inn + 1 : this.inn;
-          if (this.content === 'K') {
+            ['home', 'first', 'second', 'third'].filter(
+              bb => this.base[bb].result === 'out',
+            ).length;
+          if (this.onbaseOut > 3) {
             this.showNextOnbase = false;
+            this.showMoreThan3Outs = true;
+            return;
+          } else {
+            this.onbaseInn = this.onbaseOut === 3 ? this.inn + 1 : this.inn;
+            if (this.content === 'K') {
+              this.showNextOnbase = false;
+            }
+            if (this.showNextOnbase === true) return;
           }
-          if (this.showNextOnbase === true) return;
         }
         this.showNextOnbase = false;
         const rbi = (() => {
@@ -1444,9 +1584,9 @@ export default {
           this.name !== this.base.home.name &&
           this.order % this.box[this.box.length - 1].order === 1 &&
           this.order ===
-            (this.order % this.box[this.box.length - 1].order) +
-              this.box.length -
-              1;
+          (this.order % this.box[this.box.length - 1].order) +
+          this.box.length -
+          1;
         const orders = tempRecord.slice(0, i).concat(
           {
             inn: this.inn,
@@ -1457,8 +1597,8 @@ export default {
             onbase,
             ...(this.location[0] &&
               !['BB', 'K', 'FOUL'].includes(this.content) && {
-                location: this.location[0],
-              }),
+              location: this.location[0],
+            }),
             ...(breakOrder && { break: true }),
           },
           tempRecord.slice(i + 1),
