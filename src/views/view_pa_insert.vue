@@ -1119,6 +1119,7 @@
     .inn-change-msg {
       margin: 0;
       line-height: 180px;
+      color: var(--always-dark-font-color);
     }
 
     .btn {

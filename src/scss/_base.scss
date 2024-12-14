@@ -268,6 +268,7 @@ select::-ms-expand {
 :root {
   --site-bg: #ccc;
   --basic-font-color: #000;
+  --always-dark-font-color: #000;
   --card-bg: #fff;
   --input-color: #000;
   --select-icon: #{$gray};
@@ -306,6 +307,7 @@ select::-ms-expand {
 :root.dark {
   --site-bg: #{$dark_black};
   --basic-font-color: #e4e6ea;
+  --always-dark-font-color: #000;
   --card-bg: #3a3b3d;
   --input-color: #e4e6ea;
   --select-icon: #e4e6ea;
