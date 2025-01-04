@@ -168,6 +168,9 @@
             <div v-if="time" class="tag">
               {{ time }}
             </div>
+            <div v-if="isForcedMode" class="tag">
+              {{ $t('box_forced_mode') }}
+            </div>
             <div v-if="pitcher && result === 'win'" class="tag">
               {{
                 $t('box_pitcher_w', {
@@ -393,11 +396,9 @@
           </div>
           <div class="records">
             <div class="records-flex">
-              <template v-for="(col, colIndex) in pitcherCol">
-                <div class="record" :key="`content_${colIndex}`">
-                  {{ item[col] }}
-                </div>
-              </template>
+              <div class="record" v-for="(col, colIndex) in pitcherCol" :key="`content_${colIndex}`">
+                {{ item[col] }}
+              </div>
             </div>
           </div>
         </div>
@@ -492,10 +493,14 @@
                   v-if="record === undefined || !record.content"
                   :key="`content_${recordIndex}`"
                 ></div>
-                <div class="record" v-else :key="`content_${recordIndex}`">
+                <div
+                  class="record"
+                  v-else
+                  :key="`content_simple_${recordIndex}`"
+                >
                   <span class="inn">{{ record.innChange }}</span>
                   <router-link
-                    v-if="editable && record.content !== 'PR'"
+                    v-if="editable && !['PR', 'FR'].includes(record.content)"
                     :style="{
                       display: debug && record.content === 'new' ? 'none' : '',
                     }"
@@ -713,9 +718,13 @@
                   v-if="record === undefined || !record.content"
                   :key="`content_${recordIndex}`"
                 ></div>
-                <div class="record" v-else :key="`content_${recordIndex}`">
+                <div
+                  class="record"
+                  v-else
+                  :key="`content_normal_${recordIndex}`"
+                >
                   <router-link
-                    v-if="editable && record.content !== 'PR'"
+                    v-if="editable && !['PR', 'FR'].includes(record.content)"
                     :style="{
                       display: debug && record.content === 'new' ? 'none' : '',
                     }"
@@ -2098,6 +2107,7 @@ export default {
       debug: false,
       showDebugModal: false,
       goDebugPa: undefined,
+      isForcedMode: false,
     };
   },
   created() {
@@ -2570,6 +2580,7 @@ export default {
       'userId',
       'isAnonymous',
       'isViewMode',
+      'records',
     ]),
   },
   watch: {
@@ -2603,6 +2614,7 @@ export default {
             e,
             opponentE,
             time,
+            isForcedMode,
           } = this.boxSummary;
           this.version = version;
           this.inn = Math.max(scores.length, opponentScores.length);
@@ -2672,6 +2684,7 @@ export default {
             .map(item => item.trim())
             .filter(item => !!item);
           this.gameNote = gameNote;
+          this.isForcedMode = isForcedMode;
 
           this.checkEditVideo();
           this.checkFirstGuide();
@@ -2754,11 +2767,4 @@ export default {
     },
   },
 };
-// <svg width="33" height="44" viewBox="0 0 33 44" version="1.1" xmlns="http://www.w3.org/2000/svg"><title>crack</title><g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"><g fill="#FFF"><g><path d="M.697 5.664L9.094 0 7.989 12.922l10.12 2.746 1.878 14.107 9.728 3.575 2.45 10.193-5.817-6.22-9.547-1.697-3.5-14.623L.645 17.876z"/></g></g></g></svg>
-// background-image: url(//d35aaqx5ub95lt.cloudfront.net/images/skill-crack.svg);
-// background-position: 29% 10%;
-// background-repeat: no-repeat;
-// background-size: 69%;
-// pointer-events: none;
-// transform: rotate(77deg);
 </script>

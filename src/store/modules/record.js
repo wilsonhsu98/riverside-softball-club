@@ -20,7 +20,6 @@ const formatColor = content => {
   return 'blue';
 };
 const displayGame = (players, records, errors = [], role) => {
-  const assumedOrder = 12;
   const checkRunOut = (self, i, item) => {
     const selfAndNext5 = self
       .slice(i, i + 6)
@@ -42,7 +41,7 @@ const displayGame = (players, records, errors = [], role) => {
         : false,
     };
   };
-  const recordsWithAltRun = records.reduce((acc, item, i, self) => {
+  const recordsWithAltRun = records.reduce((recordsAcc, item, i, self) => {
     const prev5 = self
       .slice(Math.max(i - 5, 0), i)
       .filter(sub => sub.inn === item.inn);
@@ -59,275 +58,326 @@ const displayGame = (players, records, errors = [], role) => {
       .filter(sub => sub.name && sub.result)
       .map(sub => sub.name)
       .reverse();
-    // .concat(shouldSetLegacyAltRunner ? [r] : []);
     const candidate = prev5name.filter(n => !prev5outOrRun.includes(n));
-    return currentOnbase.reduce((acc, name, ii) => {
+    return currentOnbase.reduce((currentOnbaseAcc, name, ii) => {
       if (candidate.includes(name)) {
-        return acc;
+        return currentOnbaseAcc;
       }
       const { r, out } = checkRunOut(self, i, { name, inn: item.inn });
-      const find = acc.filter(
+      const find = currentOnbaseAcc.filter(
         s =>
           s.inn === item.inn &&
           (s.original === candidate[ii] || s.name === candidate[ii]),
       );
 
-      const findIndex = acc.indexOf(find[find.length - 1]);
-      const isDuplicate = acc.find(
+      const findIndex = currentOnbaseAcc.indexOf(find[find.length - 1]);
+      const isDuplicate = currentOnbaseAcc.find(
         sub => sub.inn === item.inn && sub.name === name,
       );
-      if (findIndex > -1 && !isDuplicate) {
-        console.log(item);
+      if (item.isForcedMode) {
+        const assumePrevCount = currentOnbase.length;
+        const prev3 = self
+          .slice(Math.max(i - 3, 0), i)
+          .filter(sub => sub.inn === item.inn - 1);
+        const prev3name = prev3.map(sub => sub.name);
+        const currentIndex = currentOnbaseAcc.indexOf(item);
         return [
-          ...acc.slice(0, findIndex + 1),
+          ...currentOnbaseAcc.slice(0, currentIndex),
           {
             inn: item.inn,
-            altOrder: acc[findIndex].order || acc[findIndex].altOrder,
+            ...(!prev3name.includes(name) && {
+              altOrder: item.order + ii - assumePrevCount,
+            }),
+            name,
+            r,
+            out,
+            content: 'FR',
+            isForcedMode: true,
+          },
+          ...currentOnbaseAcc.slice(currentIndex),
+        ];
+      } else if (findIndex > -1 && !isDuplicate) {
+        return [
+          ...currentOnbaseAcc.slice(0, findIndex + 1),
+          {
+            inn: item.inn,
+            altOrder:
+              currentOnbaseAcc[findIndex].order ||
+              currentOnbaseAcc[findIndex].altOrder,
             original: candidate[ii],
             name,
             r,
             out,
-            content: candidate[ii] ? 'PR' : 'FR',
+            content: 'PR',
           },
-          ...acc.slice(findIndex + 1),
+          ...currentOnbaseAcc.slice(findIndex + 1),
         ];
       } else {
-        return acc;
+        return currentOnbaseAcc;
       }
-    }, acc);
+    }, recordsAcc);
   }, records);
-  return recordsWithAltRun.reduce(
-    (acc, item, i, self) => {
-      const { arr, startOrder: prevStartOrder, prevInn, isSetNewContent } = acc;
-      const order = !item.order
-        ? arr.filter(s => !s.altOrder).length + 1
-        : item.order;
-      const startOrder = item.break ? order - 1 : prevStartOrder;
+  let startOrder = 0;
+  records.some((item, i, self) => {
+    if (item.break) {
+      startOrder = item.order - 1;
+      return true;
+    }
+    if (self.findIndex(player => player.name === item.name) < i) {
+      startOrder = i;
+      return true;
+    }
+    if (i === self.length - 1) {
+      startOrder = self.length;
+    }
+  });
 
-      const find = arr.find(sub => sub.name === item.name);
-      const findIndex = arr.indexOf(find);
-      const canPushPlayer =
-        !find && startOrder === 0 && !item.break && item.content !== 'PR';
-      const shouldSetStartOrder = (find && startOrder === 0) || item.break;
-      const shouldSetInnChange = item.inn !== prevInn;
-      const shouldSetNewContent =
-        role === 'manager' && !item.content && !isSetNewContent;
-      const { r, out } = checkRunOut(self, i, item);
-      const { name, inn, rbi, location, onbase, video } = item;
-      const newItem = {
-        name,
-        inn,
-        order,
-        content: shouldSetNewContent ? 'new' : item.content,
-        rbi,
-        r,
-        out,
-        location,
-        onbase,
-        video,
-        color: formatColor(item.content),
-        // 換局
-        ...(shouldSetInnChange && {
-          innChange: item.inn,
-        }),
-      };
+  const displayGame_ = (recordsWithAltRun_, records_) => {
+    return recordsWithAltRun_.reduce(
+      (recordsWithAltRunAcc, item, i, self) => {
+        const {
+          arr,
+          prevInn,
+          isSetNewContent,
+          isForcedMode,
+        } = recordsWithAltRunAcc;
+        const order = !item.order
+          ? arr.filter(
+              s => !s.altOrder && s.content !== 'FR', // 非代打 非突破僵局跑者
+            ).length + 1
+          : item.order;
 
-      const alt = arr
-        .map(
-          sub =>
-            (sub.altOrder &&
-              sub.altOrder === (order % startOrder || startOrder)) ||
-            sub.order === (order % startOrder || startOrder),
-        )
-        .lastIndexOf(true);
-      const altR = arr
-        .map(
-          sub =>
-            (sub.altOrder &&
-              sub.altOrder === (item.altOrder % startOrder || item.altOrder)) ||
-            sub.order === (item.altOrder % startOrder || item.altOrder) ||
-            sub.order % startOrder === item.altOrder % startOrder,
-        )
-        .lastIndexOf(true);
-      const shouldSetAltBatter = !find && alt > -1 && item.content !== 'PR';
-      const shouldSetAltRunner = !find && altR > -1 && item.content === 'PR';
-      const shouldSetLegacyAltRunner = r && r !== item.name && alt > -1;
-      const isLast = i === self.length - 1;
-      const order_ = !item.order ? item.altOrder || i + 1 : item.order;
-      const midLen = Math.ceil(order_ / (startOrder || assumedOrder) - 1);
+        const find = arr.find(sub => sub.name === item.name);
+        const findIndex = arr.indexOf(find);
+        const canPushPlayer =
+          !find &&
+          !item.break &&
+          !['PR', 'FR'].includes(item.content) &&
+          !item.altOrder;
+        const shouldSetInnChange = item.inn !== prevInn;
+        const shouldSetNewContent =
+          role === 'manager' && !item.content && !isSetNewContent;
+        const { r, out } = checkRunOut(self, i, item);
+        const { name, inn, rbi, location, onbase, video } = item;
+        const newItem = {
+          name,
+          inn,
+          order: shouldSetNewContent
+            ? Math.max(...self.map(({ order }) => order).filter(Boolean), 0) + 1
+            : order,
+          content: shouldSetNewContent ? 'new' : item.content,
+          rbi,
+          r,
+          out,
+          location,
+          onbase,
+          video,
+          color: formatColor(item.content),
+          // 換局
+          ...(shouldSetInnChange && {
+            innChange: item.inn,
+          }),
+        };
 
-      const result = {
-        ...acc,
-        prevInn: item.inn,
-        // 第一輪加入球員
-        ...(canPushPlayer && {
-          arr: [
-            ...arr,
-            {
-              name: item.name,
-              data: (players.find(sub => sub.id === item.name) || { data: {} })
-                .data,
-              order,
-              content: [newItem],
-              queue: [item.name],
-            },
-          ],
-        }),
-        // 第二輪找到原本球員並加入打擊內容
-        ...(find && {
-          arr: [
-            ...arr.slice(0, findIndex),
-            {
-              ...find,
-              /*
-               * https://stackoverflow.com/questions/34559918/spread-syntax-es6
-               * Array.prototype.concat will preserve the empty slots in the array
-               * while the Spread will replace them with undefined values.
-               */
-              content: find.content.concat(
-                Array(Math.max(midLen - find.content.length, 0)),
-                newItem,
-              ),
-              queue: [
-                ...(find.queue || []),
-                item.name,
-                ...(shouldSetLegacyAltRunner ? [r] : []),
-              ],
-            },
-            // 舊代跑
-            ...(shouldSetLegacyAltRunner
-              ? [
-                  {
-                    name: r,
-                    data: (players.find(sub => sub.id === r) || { data: {} })
-                      .data,
-                    order,
-                    altOrder: item.order % startOrder || startOrder,
-                    content: Array(midLen).concat({
-                      inn: item.inn,
-                      name: r,
-                      order,
-                      r,
-                      color: 'gray',
-                      content: 'PR',
-                    }),
-                  },
-                ]
-              : []),
-            ...arr.slice(findIndex + 1),
-          ],
-        }),
-        // 代打
-        ...(shouldSetAltBatter && {
-          arr: [
-            ...arr.slice(0, alt + 1),
-            {
-              name: item.name,
-              data: (players.find(sub => sub.id === item.name) || { data: {} })
-                .data,
-              order,
-              altOrder: order % startOrder || startOrder,
-              content: Array(midLen).concat(newItem),
-            },
-            ...arr.slice(alt + 1),
-          ].map(row => ({
-            ...row,
-            ...(row.order === (order % startOrder || startOrder)
-              ? {
-                  queue: [...row.queue, item.name],
-                }
-              : undefined),
-          })),
-        }),
-        // 代跑
-        ...(shouldSetAltRunner && {
-          arr: [
-            ...arr.slice(0, altR + 1),
-            {
-              name: item.name,
-              data: (players.find(sub => sub.id === item.name) || { data: {} })
-                .data,
-              altOrder: item.altOrder % startOrder || item.altOrder,
-              content: Array(midLen).concat({
-                inn: item.inn,
+        const alt = arr
+          .map(
+            sub =>
+              (sub.altOrder &&
+                sub.altOrder === (order % startOrder || startOrder)) ||
+              sub.order === (order % startOrder || startOrder),
+          )
+          .lastIndexOf(true);
+        const altR = arr
+          .map(
+            sub =>
+              (sub.altOrder &&
+                sub.altOrder ===
+                  (item.altOrder % startOrder || item.altOrder)) ||
+              sub.order === (item.altOrder % startOrder || item.altOrder) ||
+              sub.order % startOrder === item.altOrder % startOrder,
+          )
+          .lastIndexOf(true);
+        const shouldSetAltBatter =
+          !find && alt > -1 && !['PR', 'FR'].includes(item.content);
+        const shouldSetAltRunner =
+          !find && altR > -1 && ['PR', 'FR'].includes(item.content);
+        const shouldSetLegacyAltRunner = r && r !== item.name && alt > -1;
+        const isLast = i === self.length - 1;
+        const order_ = !item.order ? item.altOrder || i + 1 : item.order;
+        const midLen = Math.ceil(order_ / startOrder - 1);
+        if (['吳秉璋', '王建鈞'].includes(item.name)) {
+          // console.log('name', item, order, arr, arr
+          //   .map(
+          //     sub =>
+          //       (sub.altOrder &&
+          //         sub.altOrder ===
+          //           (item.altOrder % startOrder || item.altOrder)) ||
+          //       sub.order === (item.altOrder % startOrder || item.altOrder) ||
+          //       sub.order % startOrder === item.altOrder % startOrder,
+          //   ));
+          // console.log('canPushPlayer', canPushPlayer)
+          // console.log('shouldSetAltBatter', shouldSetAltBatter)
+          // console.log('shouldSetAltRunner', shouldSetAltRunner)
+        }
+        const result = {
+          ...recordsWithAltRunAcc,
+          prevInn: item.inn,
+          // 第一輪加入球員
+          ...(canPushPlayer && {
+            arr: [
+              ...arr,
+              {
                 name: item.name,
-                r: item.r,
-                color: 'gray',
-                content: item.content,
-              }),
-            },
-            ...arr.slice(altR + 1),
-          ].map(row => ({
-            ...row,
-            ...(row.order === (item.altOrder % startOrder || item.altOrder)
-              ? {
-                  queue: [...row.queue, item.name],
-                }
-              : undefined),
-          })),
-        }),
-        // 一輪有幾棒
-        ...(shouldSetStartOrder && {
-          startOrder: item.break
-            ? order - 1
-            : order - (find.order || find.altOrder),
-        }),
-        // 設定第一個內容為空的球員 打擊內容為 new
-        ...(shouldSetNewContent && {
-          isSetNewContent: true,
-        }),
-      };
-      if (isLast) {
-        /*
-         * 最後一round
-         * 取得單場最多次打席數
-         * 加header & start order
-         * 修正所有content array長度至最多打席數
-         * h / ab
-         * 失誤總數
-         */
-        const { arr, startOrder: prevStartOrder, isSetNewContent } = result;
-        const selfLen = self.filter(s => s.altOrder === undefined).length;
-        const startOrder = item.break ? order - 1 : prevStartOrder;
-        const paMax =
-          Math.ceil(selfLen / (startOrder || selfLen)) +
-          (selfLen % (startOrder || selfLen) === 0 && role === 'manager'
-            ? 1
-            : 0);
-        const header = Array(20)
-          .fill(undefined)
-          .reduce((acc, item, i) => {
-            if (startOrder === 0) {
-              const inns = records
-                .filter(record => record.inn)
-                .map(record => record.inn);
-              const maxInn = inns.length ? Math.max(...inns) : 1;
-              return Array.apply(null, Array(maxInn)).map(
-                (undefined, i) => i + 1,
-              );
-            }
-            if (i) {
-              return [
-                ...acc,
-                ...Array(
-                  Math.ceil(
-                    (records.filter(record => record.inn === i).length +
-                      (i === (records[records.length - 1] || {}).inn &&
-                      role === 'manager'
-                        ? 1
-                        : 0)) /
-                      startOrder,
+                data: (
+                  players.find(sub => sub.id === item.name) || { data: {} }
+                ).data,
+                order,
+                content: [newItem],
+                queue: [item.name],
+              },
+            ],
+          }),
+          // 第二輪找到原本球員並加入打擊內容
+          ...(find && {
+            arr: [
+              ...arr.slice(0, findIndex),
+              {
+                ...find,
+                /*
+                 * https://stackoverflow.com/questions/34559918/spread-syntax-es6
+                 * Array.prototype.concat will preserve the empty slots in the array
+                 * while the Spread will replace them with undefined values.
+                 */
+                content: find.content.concat(
+                  Array(
+                    ['FR', 'new', undefined].includes(newItem.content)
+                      ? 0
+                      : Math.max(midLen - find.content.length, 0),
                   ),
-                )
-                  .fill(undefined)
-                  .map(() => i),
-              ];
-            }
-            return acc;
-          }, []);
-        return [
-          [...header, startOrder],
-          ...arr.map(sub => {
+                  newItem,
+                ),
+                queue: [
+                  ...(find.queue || []),
+                  item.name,
+                  ...(shouldSetLegacyAltRunner ? [r] : []),
+                ],
+              },
+              // 舊代跑
+              ...(shouldSetLegacyAltRunner
+                ? [
+                    {
+                      name: r,
+                      data: (players.find(sub => sub.id === r) || { data: {} })
+                        .data,
+                      order,
+                      altOrder: item.order % startOrder || startOrder,
+                      content: Array(midLen).concat({
+                        inn: item.inn,
+                        name: r,
+                        order,
+                        r,
+                        color: 'gray',
+                        content: 'PR',
+                      }),
+                    },
+                  ]
+                : []),
+              ...arr.slice(findIndex + 1),
+            ],
+          }),
+          // 代打
+          ...(shouldSetAltBatter && {
+            arr: [
+              ...arr.slice(0, alt + 1),
+              {
+                name: item.name,
+                data: (
+                  players.find(sub => sub.id === item.name) || { data: {} }
+                ).data,
+                order,
+                altOrder: order % startOrder || startOrder,
+                content: Array(midLen).concat(newItem),
+              },
+              ...arr.slice(alt + 1),
+            ].map(row => ({
+              ...row,
+              ...(row.order === (order % startOrder || startOrder)
+                ? {
+                    queue: [...(row.queue || []), item.name],
+                  }
+                : undefined),
+            })),
+          }),
+          // 代跑
+          ...(shouldSetAltRunner && {
+            arr: [
+              ...arr.slice(0, altR + 1),
+              {
+                name: item.name,
+                data: (
+                  players.find(sub => sub.id === item.name) || { data: {} }
+                ).data,
+                altOrder: item.altOrder % startOrder || item.altOrder,
+                content: Array(midLen).concat({
+                  inn: item.inn,
+                  name: item.name,
+                  r: item.r,
+                  color: 'gray',
+                  content: item.content,
+                  // 換局
+                  ...(shouldSetInnChange && {
+                    innChange: item.inn,
+                  }),
+                }),
+              },
+              ...arr.slice(altR + 1),
+            ].map(row => ({
+              ...row,
+              ...(row.order === (item.altOrder % startOrder || item.altOrder)
+                ? {
+                    queue: [...(row.queue || []), item.name],
+                  }
+                : undefined),
+            })),
+          }),
+          // 設定第一個內容為空的球員 打擊內容為 new
+          ...(shouldSetNewContent && {
+            isSetNewContent: true,
+          }),
+          isForcedMode: isForcedMode || Boolean(item.isForcedMode),
+        };
+        if (isLast) {
+          /*
+           * 最後一round
+           * 加header & start order
+           * 修正所有content array長度
+           * h / ab
+           * 失誤總數
+           */
+          const { arr, isSetNewContent, isForcedMode } = result;
+          const header = Array(20)
+            .fill(undefined)
+            .reduce((acc, item, i) => {
+              if (i) {
+                return [
+                  ...acc,
+                  ...Array(
+                    Math.ceil(
+                      (records_.filter(record => record.inn === i).length +
+                        (i === (records_[records_.length - 1] || {}).inn &&
+                        role === 'manager'
+                          ? 1
+                          : 0)) /
+                        startOrder,
+                    ),
+                  )
+                    .fill(undefined)
+                    .map(() => i),
+                ];
+              }
+              return acc;
+            }, []);
+          const rows = arr.map(sub => {
             const { ab, h, BB, HR, locations } = sub.content.reduce(
               ({ ab, h, BB, HR, locations }, item) => ({
                 ab:
@@ -370,9 +420,8 @@ const displayGame = (players, records, errors = [], role) => {
               { ab: 0, h: 0, BB: 0, HR: 0, locations: [] },
             );
             const preBatter =
-              self.find(
-                s => s.order === item.order - (startOrder || item.order) + 1,
-              ) || self[self.length - (startOrder || self.length)];
+              self.find(s => s.order === item.order - startOrder + 1) ||
+              self[self.length - startOrder];
             const newBatter =
               preBatter.r && preBatter.name !== preBatter.r
                 ? preBatter.r
@@ -403,7 +452,6 @@ const displayGame = (players, records, errors = [], role) => {
                   ]
                 : sub.content;
             const newContent_ = [...newContent];
-            newContent_.length = paMax || 1;
             return {
               ...sub,
               content: newContent_,
@@ -421,13 +469,8 @@ const displayGame = (players, records, errors = [], role) => {
                 } else if (filter.length) {
                   return acc.concat(filter);
                 } else {
-                  if (
-                    role === 'manager' &&
-                    startOrder === 0 &&
-                    i === self.length - 1 &&
-                    !hasPrev
-                  ) {
-                    return acc.concat(newContent);
+                  if (role === 'manager' && i === self.length - 1 && !hasPrev) {
+                    return acc.concat(newContent.filter(sub => sub));
                   } else {
                     return acc.concat(arr);
                   }
@@ -444,19 +487,44 @@ const displayGame = (players, records, errors = [], role) => {
               HR,
               locations,
             };
-          }),
-        ];
-      } else {
-        return result;
-      }
-    },
-    {
-      arr: [],
-      startOrder: 0,
-      prevInn: 0,
-      isSetNewContent: false,
-    },
-  );
+          });
+
+          let maxLen = 0;
+          rows.forEach(({ content }) => {
+            const contentLen = (content || []).length;
+            if (contentLen > maxLen) {
+              maxLen = contentLen;
+            }
+          });
+
+          return [
+            [...header, startOrder],
+            ...rows.map(({ content, contentNormal, ...rest }) => {
+              const newContent_ = [...content];
+              newContent_.length = maxLen;
+              return {
+                ...rest,
+                contentNormal,
+                content: isForcedMode ? contentNormal : newContent_,
+              };
+            }),
+          ];
+        } else {
+          return result;
+        }
+      },
+      {
+        arr: [],
+        prevInn: 0,
+        isSetNewContent: false,
+        isForcedMode: false,
+      },
+    );
+  };
+
+  const displayedRecords = displayGame_(recordsWithAltRun, records);
+
+  return displayedRecords;
 };
 
 const types = {
@@ -719,6 +787,7 @@ const getters = {
               };
             })
           : [],
+      isForcedMode: game.some(({ isForcedMode }) => Boolean(isForcedMode)),
     };
   },
   games: state => state.games,
@@ -1057,19 +1126,18 @@ const actions = {
   workerBox({ commit }) {
     // commit(rootTypes.LOADING, true);
     if (state.game && state.records.some(item => item._table === state.game)) {
-      const boxSummary =
-        state.games.length &&
-        state.game &&
-        state.games.find(item => item.game === state.game);
-      const data = displayGame(
-        state.players,
-        state.records.filter(item => item._table === state.game),
-        boxSummary.errors,
-        rootState.role,
-      );
-      console.log(data);
-      commit(types.SET_BOX, data);
-      return;
+      // const boxSummary =
+      //   state.games.length &&
+      //   state.game &&
+      //   state.games.find(item => item.game === state.game);
+      // const data = displayGame(
+      //   state.players,
+      //   state.records.filter(item => item._table === state.game),
+      //   boxSummary.errors,
+      //   rootState.role,
+      // );
+      // commit(types.SET_BOX, data);
+      // return;
       workerCreater(
         {
           cmd: 'Box',

@@ -175,7 +175,7 @@ const formatColor = content => {
   if (['BB', 'SF'].includes(content)) {
     return 'yellow';
   }
-  if (['UNKNOWN', 'PR'].includes(content)) {
+  if (['UNKNOWN', 'PR', 'FR'].includes(content)) {
     return 'gray';
   }
   return 'blue';
