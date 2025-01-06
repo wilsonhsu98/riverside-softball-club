@@ -11,7 +11,7 @@
       <h1>{{ $t('edit_pa') }}</h1>
       <div class="single-col">
         <div class="separater">
-          <label>{{ $t('ttl_current_pa') }}</label>
+          <label>{{ isForcedMode ? $t('ttl_current_pa_forced_mode') : $t('ttl_current_pa') }}</label>
         </div>
         <div class="desc">
           <div>
@@ -591,6 +591,8 @@ export default {
       prev5Players: [],
       maxOnbase: undefined,
       benchPlayers: [],
+      isForcedMode: false,
+      predefinedOut: 0,
     };
   },
   created() {
@@ -726,6 +728,8 @@ export default {
           ...(item.onbase !== undefined && { onbase: item.onbase }),
           ...(item.location !== undefined && { location: item.location }),
           ...(item.break !== undefined && { break: item.break }),
+          ...(item.isForcedMode !== undefined && { isForcedMode: item.isForcedMode }),
+          ...(item.predefinedOut !== undefined && { predefinedOut: item.predefinedOut }),
         }));
         tempRecord.length = Math.max(i, tempRecord.length);
         const orders = tempRecord.slice(0, i).concat(
@@ -741,9 +745,14 @@ export default {
                 location: this.location[0],
               }),
             ...(this.break && { break: true }),
+            ...(this.isForcedMode === true && this.isForcedMode === this.pa.isForcedMode && {
+              isForcedMode: true,
+              predefinedOut: this.predefinedOut,
+            }),
           },
           tempRecord.slice(i + 1),
         );
+        console.log(orders)
         this.editGameOrderPosition({
           teamCode: this.$route.params.team,
           gameId: this.$route.params.game,
@@ -779,6 +788,8 @@ export default {
       this.content = this.pa.content === 'new' ? '' : this.pa.content;
       this.rbi.value = this.pa.rbi;
       this.break = this.pa.break;
+      this.isForcedMode = this.pa.isForcedMode;
+      this.predefinedOut = this.pa.predefinedOut;
       if (typeof this.pa.location === 'object')
         this.location = [].concat(this.pa.location);
       ['home', 'first', 'second', 'third'].forEach((b, i) => {
@@ -788,13 +799,21 @@ export default {
         }
       });
 
-      const out = this.boxSummary.contents
+      const sameInnContents = this.boxSummary.contents
         .slice(0, this.order - 1)
-        .filter(item => item.inn === this.inn)
+        .filter(item => item.inn === this.inn);
+      const out = sameInnContents
         .map(sub => sub.onbase)
         .reduce((acc, sub) => acc.concat(sub), [])
         .filter(item => item && item.result === 'out');
-      this.out = out.length;
+      sameInnContents.some((content) => {
+        if (content.isForcedMode) {
+          this.isForcedMode = true;
+          this.predefinedOut = content.predefinedOut;
+          return true;
+        }
+      });
+      this.out = out.length + this.predefinedOut;
 
       if (Array.isArray(this.box[0])) {
         const startOrder = this.box[0].slice(-1)[0];
@@ -881,7 +900,6 @@ export default {
       this.changeMode = mode;
     },
     selectPlayer(player) {
-      console.log('in');
       switch (this.changeMode) {
         case 'home':
           if (

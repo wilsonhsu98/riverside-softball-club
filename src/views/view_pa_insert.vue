@@ -15,7 +15,7 @@
       <div style="width: 100%"></div>
       <div class="single-col">
         <div class="separater">
-          <label>{{ $t('ttl_current_pa') }}</label>
+          <label>{{ isForcedMode ? $t('ttl_current_pa_forced_mode') : $t('ttl_current_pa') }}</label>
         </div>
         <div
           :class="[
@@ -48,7 +48,7 @@
                 </div>
               </div>
             </div>
-            <div class="inn-out-onbase">
+            <div class="inn-out-onbase" ref="inn-out-onbase">
               <div class="onbase" ref="runner">
                 <div
                   v-for="(b, bi) in ['second', 'first', 'third']"
@@ -57,11 +57,11 @@
                     'base',
                     {
                       'has-player': base[b].name,
-                      disabled: !(isBaseNotFulled() || base[b].name),
+                      disabled: !(isBaseNotFulled() || base[b].name || (canOpenForcedMode && isForcedMode)),
                     },
                   ]"
                   @click="
-                    (isBaseNotFulled() || base[b].name || isForcedMode) &&
+                    (isBaseNotFulled() || base[b].name || (canOpenForcedMode && isForcedMode)) &&
                       changePlayer(b)
                   "
                 />
@@ -79,8 +79,8 @@
                   ></div>
                   <span v-else>?</span>
                 </div>
-                <div :class="['out', { selected: out > 0 }]"></div>
-                <div :class="['out', { selected: out > 1 }]"></div>
+                <div :class="['out', { selected: out > 0 || (canOpenForcedMode && isForcedMode && predefinedOut > 0), 'forced-mode': canOpenForcedMode && isForcedMode }]" @click="togglePredefinedOut(1)"></div>
+                <div :class="['out', { selected: out > 1 || (canOpenForcedMode && isForcedMode && predefinedOut > 1), 'forced-mode': canOpenForcedMode && isForcedMode }]" @click="togglePredefinedOut(2)"></div>
               </div>
             </div>
             <div class="next3">
@@ -470,35 +470,60 @@
 
     <div v-if="showInstruction" class="modal" @click="showInstruction = false">
       <div class="normal">
-        <button class="btn" @click="highlight('inn')">
+        <button class="btn" @click="highlight(['inn'])">
           {{ $t('btn_change_inn') }}
         </button>
-        <button class="btn" @click="highlight('runner')">
+        <button class="btn" @click="highlight(['runner'])">
           {{ $t('btn_change_runner') }}
         </button>
-        <button class="btn" @click="highlight('batter')">
+        <button class="btn" @click="highlight(['batter'])">
           {{ $t('btn_change_batter') }}
         </button>
-        <button class="btn" @click="openShowForcedMode">
-          {{ '開啟突破僵局' }}
+        <button class="btn" @click="openShowForcedModeDialog" :disabled="!canOpenForcedMode">
+          {{ isForcedMode ? $t('btn_close_forced_mode') : $t('btn_show_forced_mode') }}
         </button>
       </div>
     </div>
 
-    <div v-if="showForcedMode" class="modal" @click="showForcedMode = false">
-      123
+    <div v-if="showForcedModeDialog" class="modal">
+      <div class="dialog">
+        <p class="msg">{{ $t('msg_forced_mode') }}</p>
+        <button @click="closeShowForcedModeDialog">
+          {{ $t('btn_noticed') }}
+        </button>
+      </div>
     </div>
 
     <div
-      v-show="spotlight"
+      v-show="spotlights.length"
       class="spotlight"
       @click="
-        spotlight = undefined;
-        spotlightIcon = undefined;
+        spotlights = [];
+        spotlightIcons = [];
       "
     >
-      <i class="fa fa-hand-o-right" :style="spotlightIcon" />
-      <div class="focus" :style="spotlight" />
+      <i
+        v-for="(spotlightIcon, i) in spotlightIcons"
+        :key="`spotlightIcon_${i}`"
+        class="fa fa-hand-o-right"
+        :style="spotlightIcon"
+      />
+      <!-- <div class="focus" :style="spotlights" /> -->
+      <svg width="100%" height="100%">
+        <defs>
+          <mask id="multi-hole-mask">
+            <rect width="100%" height="100%" fill="white" />
+            <rect 
+              v-for="({ top, left, width, height }, i) in spotlights" :key="`spotlight_${i}`"
+              :x="left"
+              :y="top"
+              :width="width"
+              :height="height"
+              fill="black"
+            />
+          </mask>
+        </defs>
+      </svg>
     </div>
   </div>
 </template>
@@ -664,6 +689,9 @@
 
           &.selected {
             background-color: $out;
+          }
+          &.forced-mode {
+            cursor: pointer;
           }
         }
       }
@@ -1278,6 +1306,8 @@
   bottom: 0;
   left: 0;
   z-index: 3;
+  background-color: rgba(50, 50, 50, 0.8);
+  mask: url(#multi-hole-mask);
 
   .fa-hand-o-right {
     position: absolute;
@@ -1285,11 +1315,6 @@
     z-index: 1;
     font-size: 28px;
     transform: rotate(45deg);
-  }
-
-  .focus {
-    position: absolute;
-    box-shadow: 0px 0px 0px 99999px rgba(50, 50, 50, 0.8);
   }
 }
 
@@ -1397,13 +1422,15 @@ export default {
       onbasePlayers: [],
       onbaseInn: 1,
       onbaseOut: 0,
-      spotlight: undefined,
-      spotlightIcon: undefined,
+      spotlights: [],
+      spotlightIcons: [],
       spotlightTimer: undefined,
       showInstruction: false,
       waitRedirect: false,
-      showForcedMode: false,
+      canOpenForcedMode: false,
+      showForcedModeDialog: false,
       isForcedMode: false,
+      predefinedOut: 0,
       forcast: true,
     };
   },
@@ -1579,6 +1606,8 @@ export default {
           ...(item.onbase !== undefined && { onbase: item.onbase }),
           ...(item.location !== undefined && { location: item.location }),
           ...(item.break !== undefined && { break: item.break }),
+          ...(item.isForcedMode !== undefined && { isForcedMode: item.isForcedMode }),
+          ...(item.predefinedOut !== undefined && { predefinedOut: item.predefinedOut }),
         }));
         tempRecord.length = Math.max(i, tempRecord.length);
         const breakOrder =
@@ -1600,7 +1629,10 @@ export default {
               !['BB', 'K', 'FOUL'].includes(this.content) && {
               location: this.location[0],
             }),
-            ...(breakOrder && { break: true }),
+            ...(this.canOpenForcedMode && this.isForcedMode && {
+              isForcedMode: true,
+              predefinedOut: this.predefinedOut,
+            }),
           },
           tempRecord.slice(i + 1),
         );
@@ -1742,17 +1774,31 @@ export default {
         }
         this.revertOnbase();
 
-        const out = this.boxSummary.contents
+        const sameInnContents = this.boxSummary.contents
           .slice(0, this.order - 1)
-          .filter(item => item.inn === this.inn)
+          .filter(item => item.inn === this.inn);
+        const out = sameInnContents
           .map(sub => sub.onbase)
           .reduce((acc, sub) => acc.concat(sub), [])
           .filter(item => item && item.result === 'out');
-        this.out = out.length;
-        if (out.length === 3) {
+        sameInnContents.some((content) => {
+          if (content.isForcedMode) {
+            this.isForcedMode = true;
+            this.predefinedOut = content.predefinedOut;
+            return true;
+          }
+        });
+        const currentOut = out.length + this.predefinedOut;
+        this.out = currentOut;
+        if (currentOut === 3) {
           this.inn += 1;
           this.out = 0;
           this.revertOnbase();
+          this.canOpenForcedMode = true;
+          this.isForcedMode = false;
+          this.predefinedOut = 0;
+        } else {
+          this.canOpenForcedMode = false;
         }
 
         // this.resetBasic();
@@ -2140,41 +2186,71 @@ export default {
         four: { disabled: true },
       };
       this.location = [];
+
+      // forced mode
+      this.isForcedMode = false;
+      this.predefinedOut = 0;
+      this.canOpenForcedMode = false;
     },
-    highlight(ref) {
-      const el =
-        this.$refs[ref] instanceof Vue ? this.$refs[ref].$el : this.$refs[ref];
-      const { top, left, width, height: h } = el.getBoundingClientRect();
-      const height = ref === 'runner' ? h - 20 : h;
-      this.spotlight = {
-        top: `${top + window.pageYOffset - 5}px`,
-        left: `${left + window.pageXOffset - 5}px`,
-        width: `${width + 10}px`,
-        height: `${height + 10}px`,
-      };
-      this.spotlightIcon = {
-        top: `${top + window.pageYOffset - 35}px`,
-        left: `${left + window.pageXOffset - 35}px`,
-      };
+    highlight(refs = []) {
+      refs.forEach((ref) => {
+        const el =
+          this.$refs[ref] instanceof Vue ? this.$refs[ref].$el : this.$refs[ref];
+        const { top, left, width, height: h } = el.getBoundingClientRect();
+        const height = ref === 'runner' ? h - 20 : h;
+        this.spotlights.push({
+          top: top + window.pageYOffset - 5,
+          left: left + window.pageXOffset - 5,
+          width: width + 10,
+          height: height + 10,
+        });
+        this.spotlightIcons.push({
+          top: `${top + window.pageYOffset - 35}px`,
+          left: `${left + window.pageXOffset - 35}px`,
+        });
+      });
       this.spotlightTimer = setTimeout(() => {
-        this.spotlight = undefined;
-        this.spotlightIcon = undefined;
+        this.spotlights = [];
+        this.spotlightIcons = [];
       }, 3000);
       this.showInstruction = false;
     },
-    openShowForcedMode() {
+    openShowForcedModeDialog() {
+      if (this.isForcedMode) {
+        this.isForcedMode = false;
+        this.predefinedOut = 0;
+        ['first', 'second', 'third'].forEach(b => {
+          this.base[b].name = '';
+          this.base[b].result = '';
+        });
+        this.maxOnbase = 1;
+        return;
+      }
       this.showInstruction = false;
       this.isForcedMode = true;
       this.prev5Players = this.boxSummary.contents
         .slice(Math.max(this.order - 4, 0), this.order - 1)
         .map(player => this.getPlayer(player.name));
-      //       this.$nextTick(() => {
-      // this.showForcedMode = true;
-      //       });
+      this.$nextTick(() => {
+        this.showForcedModeDialog = true;
+      });
+    },
+    closeShowForcedModeDialog() {
+      this.showForcedModeDialog = false;
+      this.highlight(['inn-out-onbase', 'batter'])
     },
     setForcast(val) {
       this.forcast = val === 'true';
       this.setPa();
+    },
+    togglePredefinedOut(val) {
+      if (this.canOpenForcedMode && this.isForcedMode) {
+        if (this.predefinedOut === val) {
+          this.predefinedOut -= 1;
+        } else {
+          this.predefinedOut = val;
+        }
+      }
     },
   },
   watch: {
@@ -2243,8 +2319,8 @@ export default {
         }, 500);
       }
     },
-    spotlight() {
-      if (this.spotlight) {
+    spotlights() {
+      if (this.spotlights.length > 0) {
         document
           .querySelector('.content')
           .style.setProperty('position', 'static');

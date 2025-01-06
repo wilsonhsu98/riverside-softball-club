@@ -186,6 +186,7 @@
 	"tip_lock_game": "解鎖後，才可編輯比賽與打席內容|比賽上鎖，才會正常顯示勝負",
 	"btn_batch_edit": "打者批次改名",
 	"btn_show_forced_mode": "開啟突破僵局",
+	"btn_close_forced_mode": "關閉突破僵局",
 	"msg_forced_mode": "在一局的開始之前設定，調整壘上跑者，起始出局數，以及目前打者，該局第一打席記錄之後無法再重新設定",
 	"btn_gen_position": "先發守位圖",
 	"btn_gen_order": "先發棒次圖",
