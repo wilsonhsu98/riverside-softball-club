@@ -355,7 +355,7 @@ const displayGame = (players, records, errors = [], role) => {
            * 失誤總數
            */
           const { arr, isSetNewContent, isForcedMode } = result;
-          const header = Array(20)
+          let header = Array(20)
             .fill(undefined)
             .reduce((acc, item, i) => {
               if (i) {
@@ -377,6 +377,9 @@ const displayGame = (players, records, errors = [], role) => {
               }
               return acc;
             }, []);
+          if (header.length === 0 && role === 'manager') {
+            header = [1];
+          }
           const rows = arr.map(sub => {
             const { ab, h, BB, HR, locations } = sub.content.reduce(
               ({ ab, h, BB, HR, locations }, item) => ({
