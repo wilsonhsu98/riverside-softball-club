@@ -752,7 +752,6 @@ export default {
           },
           tempRecord.slice(i + 1),
         );
-        console.log(orders)
         this.editGameOrderPosition({
           teamCode: this.$route.params.team,
           gameId: this.$route.params.game,
