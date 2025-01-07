@@ -11,6 +11,9 @@
       <h1>
         <i class="instruction" @click="showInstruction = true"><help /></i>
         {{ $t('add_pa') }}
+        <button class="btn btn-forced" @click="openShowForcedModeDialog" :style="{ visibility: canOpenForcedMode ? 'visible' : 'hidden' }">
+          {{ isForcedMode ? $t('btn_close_forced_mode') : $t('btn_show_forced_mode') }}
+        </button>
       </h1>
       <div style="width: 100%"></div>
       <div class="single-col">
@@ -479,9 +482,6 @@
         <button class="btn" @click="highlight(['batter'])">
           {{ $t('btn_change_batter') }}
         </button>
-        <button class="btn" @click="openShowForcedModeDialog" :disabled="!canOpenForcedMode">
-          {{ isForcedMode ? $t('btn_close_forced_mode') : $t('btn_show_forced_mode') }}
-        </button>
       </div>
     </div>
 
@@ -542,6 +542,9 @@
     width: 100%;
     margin: 0 auto;
     position: relative;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
 
     .instruction {
       width: 26px;
@@ -1018,6 +1021,13 @@
       margin: -7px 0 0 2px;
     }
   }
+
+  .btn-forced {
+    position: absolute;
+    right: 0;
+    width: auto;
+    margin: 0;
+  }
 }
 
 .infield {
@@ -1352,6 +1362,10 @@
 
     .btn-container {
       display: none;
+    }
+
+    .btn-forced {
+      display: block;
     }
   }
 }
