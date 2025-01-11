@@ -7,7 +7,7 @@
       @back="back_"
       @save="edit_"
     />
-    <div class="container" ref="container" :style="{ position: spotlights.length ? 'fixed' : '' }">
+    <div class="container" ref="container">
       <h1>
         <i class="instruction" @click="showInstruction = true"><help /></i>
         {{ $t('add_pa') }}
@@ -1308,7 +1308,7 @@
 }
 
 .spotlight {
-  position: fixed;
+  position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
@@ -2331,12 +2331,12 @@ export default {
     },
     spotlights() {
       if (this.spotlights.length > 0) {
-        document
-          .querySelector('.content')
-          .style.setProperty('position', 'static');
+        document.querySelector('.content').style.setProperty('position', 'static');
+        document.body.style.setProperty('overflow', 'hidden');
       } else {
         clearTimeout(this.spotlightTimer);
         document.querySelector('.content').style.setProperty('position', '');
+        document.body.style.setProperty('overflow', '');
       }
     },
     name(newVal, oldVal) {
