@@ -7,7 +7,7 @@
       @back="back_"
       @save="edit_"
     />
-    <div class="container" ref="container">
+    <div class="container" ref="container" :style="{ position: spotlights.length ? 'fixed' : '' }">
       <h1>
         <i class="instruction" @click="showInstruction = true"><help /></i>
         {{ $t('add_pa') }}
@@ -508,21 +508,19 @@
         class="fa fa-hand-o-right"
         :style="spotlightIcon"
       />
-      <!-- <div class="focus" :style="spotlights" /> -->
       <svg width="100%" height="100%">
-        <defs>
-          <mask id="multi-hole-mask">
-            <rect width="100%" height="100%" fill="white" />
-            <rect 
-              v-for="({ top, left, width, height }, i) in spotlights" :key="`spotlight_${i}`"
-              :x="left"
-              :y="top"
-              :width="width"
-              :height="height"
-              fill="black"
-            />
-          </mask>
-        </defs>
+        <rect width="100%" height="100%" mask="url(#multi-hole-mask)"/>
+        <mask id="multi-hole-mask">
+          <rect width="100%" height="100%" fill="white" fill-opacity="0.6"/>
+          <rect 
+            v-for="({ top, left, width, height }, i) in spotlights" :key="`spotlight_${i}`"
+            :x="left"
+            :y="top"
+            :width="width"
+            :height="height"
+            fill="black"
+          />
+        </mask>
       </svg>
     </div>
   </div>
@@ -1310,14 +1308,12 @@
 }
 
 .spotlight {
-  position: absolute;
+  position: fixed;
   top: 0;
   right: 0;
   bottom: 0;
   left: 0;
   z-index: 3;
-  background-color: rgba(50, 50, 50, 0.8);
-  mask: url(#multi-hole-mask);
 
   .fa-hand-o-right {
     position: absolute;
