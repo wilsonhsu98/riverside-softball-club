@@ -1002,9 +1002,13 @@ const actions = {
       })
       .reduce((a, b) => a.concat(b), []);
     const period = changedData.map(item => {
-      const { orders, ...others } = item.data;
-      orders;
-      return { ...others, game: item.id };
+      const { orders = [], tags = [], ...others } = item.data;
+      const hasForcedModeGame = orders.some(({ isForcedMode }) => isForcedMode);
+      return {
+        ...others,
+        tags: hasForcedModeGame ? [...tags, 'hasForcedModeGame'] : tags,
+        game: item.id,
+      };
     });
     commit(types.GET_PERIOD, period);
     commit(types.GET_RECORDS, records);

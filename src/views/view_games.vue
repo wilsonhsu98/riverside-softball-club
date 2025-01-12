@@ -1234,7 +1234,7 @@ export default {
           break;
         case 'game_tag':
           this.fieldOptions = this.gameOptions.tags.map(({ text, count }) => ({
-            text: `${text}(${count})`,
+            text: `${text === 'hasForcedModeGame' ? this.$t('ttl_forced_mode_game') : text}(${count})`,
             value: `tags:${text}`,
             color,
             invertColor,

@@ -179,6 +179,7 @@
 	"ttl_youtube_videos": "YouTube video IDs",
 	"pla_split_youtube_videos": "請使用逗點,分隔多個video_id",
 	"ttl_game_tag": "標籤",
+	"ttl_forced_mode_game": "突破僵局",
 	"pla_game_tag": "可選擇多個標籤，或直接輸入",
 	"msg_duplicate_game": "日期場次重覆",
 	"msg_delete_warning": "刪除後無法復原，確定刪除？",
