@@ -2678,7 +2678,7 @@ export default {
           this.mvp = mvp;
           this.gwrbi = gwrbi;
           this.result = result;
-          this.tags = tags || [];
+          this.tags = (tags || []).filter((tag) => tag !== 'hasForcedModeGame');
           this.videoIDs = (youtubeVideos || '')
             .split(',')
             .map(item => item.trim())

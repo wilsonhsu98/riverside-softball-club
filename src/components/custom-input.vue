@@ -15,7 +15,7 @@
         ref="select"
         :class="[
           {
-            'has-value': (value && value.length) || typeof value === 'object',
+            'has-value': (value && value.length) || (Array.isArray(value) && value.length),
             'has-error': error,
           },
         ]"

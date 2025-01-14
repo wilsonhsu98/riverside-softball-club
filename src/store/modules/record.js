@@ -529,6 +529,7 @@ const displayGame = (players, records, errors = [], role) => {
 
   return displayedRecords;
 };
+displayGame;
 
 const types = {
   INIT_FROM_LS: 'RECORD/INIT_FROM_LS',
@@ -1430,7 +1431,7 @@ const getLastOrderPosition = async newGameId => {
             orders: Array.isArray(data)
               ? data
                   .slice(1)
-                  .filter(row => !Boolean(row.altOrder))
+                  .filter(row => !row.altOrder)
                   .map(row => ({ name: row.name }))
               : [],
             positions: (state.games.find(g => g.game === gameId) || {})

@@ -514,7 +514,7 @@
         type="select"
         taggable
         multiple
-        :options="gameOptions.tags.map(({ text }) => text)"
+        :options="gameOptions.tags.filter(({ text }) => text !== 'hasForcedModeGame').map(({ text }) => text)"
         :name="$t('ttl_game_tag')"
         :placeholder="$t('pla_game_tag')"
         v-model="tags"
@@ -1276,7 +1276,7 @@ export default {
           this.topBottom = topBottom;
           this.coach = coach;
           this.recorder = recorder;
-          this.tags = tags;
+          this.tags = (tags || []).filter((tag) => tag !== 'hasForcedModeGame');
           this.pitcher = Array.isArray(pitcher)
             ? {
                 code: pitcher,
