@@ -918,7 +918,6 @@ const actions = {
             timestamp: data.timestamp.toDate(),
           };
         });
-        console.log('allTeams', allTeams)
 
         const today = formatDate(new Date());
         const nextDay = formatDate(
