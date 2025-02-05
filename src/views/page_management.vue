@@ -14,7 +14,7 @@
             </div>
             <div
               v-else-if="col === 'name'"
-              :key="`header_${col}`"
+              :key="`header_elseif_${col}`"
               class="cell name"
               :title="$t(col)"
             >
@@ -22,7 +22,7 @@
             </div>
             <div
               v-else
-              :key="`header_${col}`"
+              :key="`header_else_${col}`"
               class="cell"
               :class="{
                 sort: col === sortBy,
@@ -35,80 +35,79 @@
             </div>
           </template>
         </div>
-        <template v-for="(item, itemIndex) in allTeams_">
-          <div
-            class="normal-row"
-            :key="`div_${item.teamCode}`"
-            :class="{ current: item.teamCode === hightlight }"
-            @click="setHighlight(item.teamCode)"
-          >
-            <template v-for="(col, colIndex) in displayedCols">
-              <div
-                v-if="col === 'Rank'"
-                :key="`row_${item.teamCode}_${colIndex}`"
-                class="cell rank"
-              >
-                <div class="align-right">{{ itemIndex + 1 }}</div>
+        <div
+          v-for="(item, itemIndex) in allTeams_"
+          :key="`div_${item.teamCode}`"
+          class="normal-row"
+          :class="{ current: item.teamCode === hightlight }"
+          @click="setHighlight(item.teamCode)"
+        >
+          <template v-for="(col, colIndex) in displayedCols">
+            <div
+              v-if="col === 'Rank'"
+              :key="`row_rank_${item.teamCode}_${colIndex}`"
+              class="cell rank"
+            >
+              <div class="align-right">{{ itemIndex + 1 }}</div>
+            </div>
+            <div
+              v-else-if="col === 'name'"
+              :key="`row_name_${item.teamCode}_${colIndex}`"
+              class="cell name"
+            >
+              <div class="player">
+                <photo :photo="item.icon" :name="item.name" />
+                <a
+                  class="link"
+                  :href="
+                    `javascript:window.open(encodeURI('#/session/${item.teamCode}'))`
+                  "
+                  >{{ item.name }}</a
+                >
               </div>
-              <div
-                v-else-if="col === 'name'"
-                :key="`row_${item.teamCode}_${colIndex}`"
-                class="cell name"
-              >
-                <div class="player">
-                  <photo :photo="item.icon" :name="item.name" />
-                  <a
-                    class="link"
-                    :href="
-                      `javascript:window.open(encodeURI('#/session/${item.teamCode}'))`
-                    "
-                    >{{ item.name }}</a
-                  >
-                </div>
+            </div>
+            <div
+              v-else-if="['createTime', 'lastUpdate'].includes(col)"
+              class="cell"
+              :class="{ sort: col === sortBy }"
+              :key="`row_${col}_${item.teamCode}`"
+            >
+              <div class="align-right">
+                {{
+                  new Date(item[col]).toString() === 'Invalid Date'
+                    ? ''
+                    : new Date(item[col]).toLocaleDateString()
+                }}
               </div>
-              <div
-                v-else-if="['createTime', 'lastUpdate'].includes(col)"
-                class="cell"
-                :class="{ sort: col === sortBy }"
-                :key="`row_${item.teamCode}_${colIndex}`"
-              >
-                <div class="align-right">
-                  {{
-                    new Date(item[col]).toString() === 'Invalid Date'
-                      ? ''
-                      : new Date(item[col]).toLocaleDateString()
-                  }}
-                </div>
+            </div>
+            <div
+              v-else-if="['teamType'].includes(col)"
+              class="cell"
+              :class="{ sort: col === sortBy }"
+              :key="`row_teamType_${item.teamCode}`"
+            >
+              <div class="align-right">
+                {{ columnSet[item[col]] }}
               </div>
-              <div
-                v-else-if="['teamType'].includes(col)"
-                class="cell"
-                :class="{ sort: col === sortBy }"
-                :key="`row_${item.teamCode}_${colIndex}`"
-              >
-                <div class="align-right">
-                  {{ columnSet[item[col]] }}
-                </div>
+            </div>
+            <div
+              v-else
+              class="cell"
+              :class="{ sort: col === sortBy }"
+              :key="`row_${col}_${item.teamCode}_${colIndex}`"
+            >
+              <div class="align-right">
+                {{
+                  typeof item[col] === 'boolean'
+                    ? item[col]
+                      ? '●'
+                      : ''
+                    : item[col]
+                }}
               </div>
-              <div
-                v-else
-                class="cell"
-                :class="{ sort: col === sortBy }"
-                :key="`row_${item.teamCode}_${colIndex}`"
-              >
-                <div class="align-right">
-                  {{
-                    typeof item[col] === 'boolean'
-                      ? item[col]
-                        ? '●'
-                        : ''
-                      : item[col]
-                  }}
-                </div>
-              </div>
-            </template>
-          </div>
-        </template>
+            </div>
+          </template>
+        </div>
       </div>
     </simplebar>
     <!-- <button @click="deleteAnonymousUsers()">
@@ -456,6 +455,7 @@ export default {
         'gameCoach',
         'gameRecorder',
         'gameTags',
+        'gameForcedMode',
         'gamePitcher',
         'gamePitchers',
         'gameErrors',
@@ -492,6 +492,7 @@ export default {
         gameCoach: '教練',
         gameRecorder: '記錄',
         gameTags: '標籤',
+        gameForcedMode: '突破僵局',
         gamePitcher: '投手',
         gamePitchers: '投手記錄',
         gameErrors: '守備失誤',
