@@ -13,6 +13,7 @@ import { types as recordTypes } from './record';
 import record from './record';
 import router from '../../router';
 import { db, timestamp } from '../../firebase';
+import config from '../../../config';
 
 const types = {
   FETCH_TEAMS: 'TEAM/FETCH_TEAMS',
@@ -133,9 +134,32 @@ const actions = {
           window.trackRead('fetchUser: accounts', 1);
           const data = snapshot.data();
           if (data) {
-            const { accessToken, teams, teamRoles, ...other } = data;
+            const {
+              accessToken,
+              teams,
+              teamRoles: teamRoles_,
+              ...other
+            } = data;
+            let teamRoles = teamRoles_;
             accessToken;
             teams;
+            let otherTeams = [];
+            if (config.managers.includes(userId)) {
+              otherTeams = (window.localStorage.getItem('otherTeams') || '')
+                .split(',')
+                .filter(Boolean)
+                .reduce(
+                  (acc, teamCode) => ({
+                    ...acc,
+                    [teamCode]: 'manager',
+                  }),
+                  {},
+                );
+              teamRoles = {
+                ...teamRoles,
+                ...otherTeams,
+              };
+            }
             commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
 
             // prevent reload teams if teams not changed
@@ -176,7 +200,8 @@ const actions = {
                         });
                     });
                   }),
-                ).then(teams => {
+                ).then(teams_ => {
+                  const teams = teams_.filter(({ name }) => name);
                   window.trackRead(
                     'fetchUser: user belongs teams',
                     teams.length || 1,

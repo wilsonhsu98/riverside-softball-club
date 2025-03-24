@@ -127,7 +127,7 @@
           <p
             class="team__name"
             v-for="(subName, i) in ellipsisTeams(
-              team.subNames.split(/[，、,]+/),
+              (team.subNames || '').split(/[，、,]+/),
             )"
             :key="`${team.teamCode}_subname_${i}`"
           >
