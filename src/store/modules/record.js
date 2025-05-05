@@ -985,7 +985,7 @@ const actions = {
   initFromLS({ commit }) {
     commit(types.INIT_FROM_LS);
   },
-  operateGames({ commit }, changedData) {
+  operateGames({ commit, isSilent = false }, changedData) {
     const dates = changedData
       .filter(item => item.data.timestamp)
       .map(item => new Date(item.data.timestamp.seconds * 1000));
@@ -1014,9 +1014,9 @@ const actions = {
     commit(types.GET_PERIOD, period);
     commit(types.GET_RECORDS, records);
     commit(types.GET_GAMELIST, period);
-    actions.workerGenStatistics({ commit });
-    actions.workerGenPitcherStatistics({ commit });
-    actions.workerItemStats({ commit });
+    actions.workerGenStatistics({ commit, isSilent });
+    actions.workerGenPitcherStatistics({ commit, isSilent });
+    actions.workerItemStats({ commit, isSilent });
     actions.workerBox({ commit });
   },
   setPeriod({ commit }, value) {
@@ -1057,8 +1057,8 @@ const actions = {
   setOrder({ commit }, order) {
     commit(types.SET_ORDER, order);
   },
-  workerGenStatistics({ commit }) {
-    commit(rootTypes.LOADING, true);
+  workerGenStatistics({ commit, isSilent = false }) {
+    if (!isSilent) commit(rootTypes.LOADING, true);
     workerCreater(
       {
         cmd: 'GenStatistics',
@@ -1089,8 +1089,8 @@ const actions = {
   togglePitcherColumn({ commit }, col) {
     commit(types.SET_PITCHER_COLS, { col });
   },
-  workerGenPitcherStatistics({ commit }) {
-    commit(rootTypes.LOADING, true);
+  workerGenPitcherStatistics({ commit, isSilent = false }) {
+    if (!isSilent) commit(rootTypes.LOADING, true);
     workerCreater(
       {
         cmd: 'GenPitcherStatistics',
@@ -1109,8 +1109,8 @@ const actions = {
       },
     );
   },
-  workerItemStats({ commit }) {
-    commit(rootTypes.LOADING, true);
+  workerItemStats({ commit, isSilent = false }) {
+    if (!isSilent) commit(rootTypes.LOADING, true);
     workerCreater(
       {
         cmd: 'ItemStats',

@@ -618,7 +618,7 @@ const actions = {
                     .then(() => idbKeyval.getAll())
                     .then(records => {
                       recordActions.operateGames(
-                        { commit },
+                        { commit, isSilent: true },
                         records.map(({ id, ...data }) => ({
                           id,
                           data: { ...data },
