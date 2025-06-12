@@ -69,7 +69,8 @@ const getters = {
     state.accountInfo ||
     JSON.parse(window.localStorage.getItem('accountInfo')) ||
     {},
-  providerId: state => state.providerId || window.localStorage.getItem('providerId') || '',    
+  providerId: state =>
+    state.providerId || window.localStorage.getItem('providerId') || '',
   currentTeam: state => state.currentTeam,
   currentTeamIcon: state => state.currentTeamIcon,
   role: state => state.role,
@@ -594,18 +595,26 @@ const promiseImage = (img, type) => {
       const formData = new FormData();
       formData.append('image', img.split(',')[1]);
       formData.append('album', config.imgur[mapping[type.toLowerCase()]]);
-      return axios
-        .post(config.imgur.postUrl, formData, {
-          headers: {
-            Authorization: `Client-ID ${config.imgur.clientId}`,
-          },
-        })
-        .then(res => {
-          resolve(res.data.data.link);
-        })
-        .catch(e => {
-          reject(e);
-        });
+      return (
+        axios
+          // .post(config.imgur.postUrl, formData, {
+          //   headers: {
+          //     Authorization: `Client-ID ${config.imgur.clientId}`,
+          //   },
+          // })
+          .post(
+            'https://riversidesoftballclub.netlify.app/.netlify/functions/index/upload_to_imgur',
+            formData,
+          )
+          .then(res => {
+            console.log('res', res);
+            resolve(res.data.data.link);
+          })
+          .catch(e => {
+            console.log('catch', e);
+            reject(e);
+          })
+      );
     } else {
       resolve(img);
     }

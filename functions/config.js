@@ -29,4 +29,9 @@ module.exports = {
   fb: {
     clientSecret: process.env.VUE_APP_FB_CLIENTSECRET,
   },
+
+  imgur: {
+    postUrl: process.env.VUE_APP_IMGUR_POSTURL,
+    clientSecret: process.env.VUE_APP_IMGUR_CLIENTID,
+  },
 };

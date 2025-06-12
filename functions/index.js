@@ -1,6 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const config = require('./config');
+const FormData = require('form-data');
 admin.initializeApp({
   ...functions.config().firebase,
   credential: admin.credential.cert(config.serviceAccount),
@@ -487,6 +488,42 @@ router.post('/fb_deletion_callback', (req, res) => {
   });
 });
 
+const multer = require('multer');
+const upload = multer();
+router.post('/upload_to_imgur', upload.none(), async (req, res) => {
+  try {
+    const { image, album } = req.body;
+
+    if (!image) {
+      return res.status(400).send('Missing base64 image');
+    }
+
+    const form = new FormData();
+    form.append('image', image);
+    if (album) form.append('album', album);
+
+    const response = await rp({
+      method: 'POST',
+      uri: config.imgur.postUrl,
+      headers: {
+        Authorization: `Client-ID ${config.imgur.clientSecret}`,
+      },
+      body: form,
+      json: true,
+    });
+
+    return res.status(200).json(response.data);
+  } catch (error) {
+    console.error('Upload error:', error.response?.data || error.message);
+    return res.status(500).json({
+      success: false,
+      error: error.response?.data || error.message,
+    });
+  }
+});
+
+const cors = require('cors');
+app.use(cors({ origin: '*' }));
 app.use('/.netlify/functions/index', router);
 
 /**

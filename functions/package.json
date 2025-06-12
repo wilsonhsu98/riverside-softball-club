@@ -10,12 +10,15 @@
   },
   "dependencies": {
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^8.2.0",
     "express": "^4.16.2",
     "firebase-admin": "^8.4.0",
     "firebase-functions": "^3.3.0",
+    "form-data": "^4.0.3",
     "jsonwebtoken": "^8.4.0",
+    "multer": "^2.0.1",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
     "serverless-http": "^2.3.0",
@@ -26,5 +29,11 @@
   "private": true,
   "engines": {
     "node": "10"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.27.2",
+    "@babel/core": "^7.27.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
+    "@babel/preset-env": "^7.27.2"
   }
 }
