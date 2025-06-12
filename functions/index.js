@@ -501,7 +501,15 @@ router.post('/upload_to_imgur', upload.none(), async (req, res) => {
     const form = new FormData();
     form.append('image', image);
     if (album) form.append('album', album);
-
+console.log('options', {
+  method: 'POST',
+  uri: config.imgur.postUrl,
+  headers: {
+    Authorization: `Client-ID ${config.imgur.clientSecret}`,
+  },
+  form,
+  json: true,
+})
     const response = await rp({
       method: 'POST',
       uri: config.imgur.postUrl,
