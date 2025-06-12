@@ -508,7 +508,8 @@ router.post('/upload_to_imgur', upload.none(), async (req, res) => {
       headers: {
         Authorization: `Client-ID ${config.imgur.clientSecret}`,
       },
-      body: form,
+      form,
+      json: true,
     });
 
     return res.status(200).json(response.data);
