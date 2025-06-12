@@ -51,6 +51,10 @@
     "vuex": "^3.0.1"
   },
   "devDependencies": {
+    "@babel/cli": "^7.27.2",
+    "@babel/core": "^7.27.4",
+    "@babel/plugin-proposal-optional-chaining": "^7.21.0",
+    "@babel/preset-env": "^7.27.2",
     "@vue/cli-plugin-babel": "^3.1.1",
     "@vue/cli-plugin-eslint": "^3.1.5",
     "@vue/cli-service": "^3.1.4",
@@ -63,11 +67,11 @@
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-vue": "^5.2.3",
     "netlify-lambda": "^1.6.3",
+    "postcss-import": "^11.1.0",
+    "postcss-url": "^7.3.2",
     "prettier": "^1.18.2",
     "sass": "^1.51.0",
     "sass-loader": "^7.0.1",
-    "postcss-import": "^11.1.0",
-    "postcss-url": "^7.3.2",
     "vue-template-compiler": "^2.5.17"
   },
   "eslintConfig": {
