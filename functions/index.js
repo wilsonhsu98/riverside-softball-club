@@ -524,7 +524,7 @@ router.post('/upload_to_imgur', upload.none(), async (req, res) => {
 const cors = require('cors');
 const allowedOrigins = [
   'http://localhost:9527',
-  'https://riversidesoftballclub.netlify.app/',
+  'https://riversidesoftballclub.netlify.app',
 ];
 const corsOptions = {
   origin: (origin, callback) => {
