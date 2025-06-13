@@ -1,7 +1,7 @@
 const functions = require('firebase-functions');
 const admin = require('firebase-admin');
 const config = require('./config');
-const FormData = require('form-data');
+// const FormData = require('form-data');
 admin.initializeApp({
   ...functions.config().firebase,
   credential: admin.credential.cert(config.serviceAccount),
@@ -498,30 +498,26 @@ router.post('/upload_to_imgur', upload.none(), async (req, res) => {
       return res.status(400).send('Missing base64 image');
     }
 
-    const form = new FormData();
-    form.append('image', image);
-    if (album) form.append('album', album);
-console.log('options', {
-  method: 'POST',
-  uri: config.imgur.postUrl,
-  headers: {
-    Authorization: `Client-ID ${config.imgur.clientSecret}`,
-  },
-  form,
-  json: true,
-})
+    // const form = new FormData();
+    // form.append('image', image);
+    // if (album) form.append('album', album);
+
     const response = await rp({
       method: 'POST',
       uri: config.imgur.postUrl,
       headers: {
         Authorization: `Client-ID ${config.imgur.clientSecret}`,
       },
-      form,
+      form: {
+        image,
+        ...(album ? { album } : undefined),
+      },
       json: true,
     });
 
     return res.status(200).json(response.data);
   } catch (error) {
+    console.log('error', error);
     console.error('Upload error:', error.response?.data || error.message);
     return res.status(500).json({
       success: false,
