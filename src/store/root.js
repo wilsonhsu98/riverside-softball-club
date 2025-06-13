@@ -607,7 +607,6 @@ const promiseImage = (img, type) => {
             formData,
           )
           .then(res => {
-            console.log('res', res);
             resolve(res.data.data.link);
           })
           .catch(e => {

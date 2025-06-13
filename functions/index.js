@@ -522,7 +522,22 @@ router.post('/upload_to_imgur', upload.none(), async (req, res) => {
 });
 
 const cors = require('cors');
-app.use(cors({ origin: '*' }));
+const allowedOrigins = [
+  'http://localhost:9527',
+  'https://riversidesoftballclub.netlify.app/',
+];
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+};
+app.use(cors(corsOptions));
 app.use('/.netlify/functions/index', router);
 
 /**

@@ -331,6 +331,7 @@ const actions = {
         }
       })
       .catch(error => {
+        commit(rootTypes.LOADING, false);
         console.log('Error getting document:', error);
       });
   },
