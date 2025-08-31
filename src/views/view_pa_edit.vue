@@ -788,7 +788,7 @@ export default {
       this.rbi.value = this.pa.rbi;
       this.break = this.pa.break;
       this.isForcedMode = this.pa.isForcedMode;
-      this.predefinedOut = this.pa.predefinedOut;
+      this.predefinedOut = this.pa.predefinedOut || 0;
       if (typeof this.pa.location === 'object')
         this.location = [].concat(this.pa.location);
       ['home', 'first', 'second', 'third'].forEach((b, i) => {
