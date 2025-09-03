@@ -72,6 +72,13 @@ const colorMappging = {
   red: '#ef1010',
   blue: '#4d9de5',
   yellow: '#efaf34',
+  gray: '#a6a6a6',
+};
+const darkColorMappging = {
+  red: '#eb4e4ede',
+  blue: '#4998ddd3',
+  yellow: '#efae34c4',
+  gray: '#a6a6a6',
 };
 
 export default {
@@ -98,6 +105,9 @@ export default {
       thirdImage: '',
       avatarImage: '',
       positions_: this.positions || {},
+      isDarkMode: Array.from(document.documentElement.classList).includes(
+        'dark',
+      ),
     };
   },
   mounted() {
@@ -173,6 +183,9 @@ export default {
   },
   methods: {
     draw() {
+      const colorMappging_ = this.isDarkMode
+        ? darkColorMappging
+        : colorMappging;
       const img = this.$refs.img;
       if (!img) return;
       const { width } = img.getBoundingClientRect();
@@ -419,53 +432,14 @@ export default {
       ctx.fillStyle = white;
       ctx.fill();
 
-      if (
-        typeof this.xy[0] === 'object' &&
-        this.xy[0].onbase &&
-        this.xy[0].onbase[0].name
-      ) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.translate(c.x - avatarRadius, c.y + aBase - avatarRadius);
-        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
-        if (this.homeImage) {
-          ctx.clip();
-          ctx.drawImage(
-            this.homeImage,
-            0,
-            0,
-            avatarRadius * 2,
-            avatarRadius * 2,
-          );
-        } else {
-          // ctx.fillStyle = avatarBackgroundColor;
-          // ctx.fill();
-          // ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
-          // ctx.fillStyle = avatarBorderColor;
-          // ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
-          // ctx.lineWidth = avatarRadius * 0.1;
-          // ctx.strokeStyle = avatarBorderColor;
-          // ctx.stroke();
-          ctx.fillStyle = avatarBorderColor;
-          ctx.textAlign = 'center';
-          ctx.fill();
-          ctx.font = `${16 * scale}px Arial`;
-          ctx.fillStyle = '#fff';
-          ctx.shadowBlur = 0;
-          ctx.fillText(
-            getNameNumber({
-              name: this.xy[0].onbase[0].name,
-              number: this.xy[0].onbase[0].number,
-            }),
-            avatarRadius * 1,
-            avatarRadius * 1.25,
-          );
-          ctx.lineWidth = avatarRadius * 0.1;
-          ctx.strokeStyle = avatarBorderColor;
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
+      this.drawOnbasePlayer({
+        base,
+        ctx,
+        idx: 0,
+        x: c.x - avatarRadius,
+        y: c.y + aBase - avatarRadius,
+        img: this.homeImage,
+      });
 
       // p
       ctx.beginPath();
@@ -485,53 +459,14 @@ export default {
       ctx.fillRect(0, 0, rotateBase, rotateBase);
       ctx.restore();
 
-      if (
-        typeof this.xy[0] === 'object' &&
-        this.xy[0].onbase &&
-        this.xy[0].onbase[1].name
-      ) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.translate(p.x + clip - avatarRadius, p.y - aBase - avatarRadius);
-        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
-        if (this.firstImage) {
-          ctx.clip();
-          ctx.drawImage(
-            this.firstImage,
-            0,
-            0,
-            avatarRadius * 2,
-            avatarRadius * 2,
-          );
-        } else {
-          // ctx.fillStyle = avatarBackgroundColor;
-          // ctx.fill();
-          // ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
-          // ctx.fillStyle = avatarBorderColor;
-          // ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
-          // ctx.lineWidth = avatarRadius * 0.1;
-          // ctx.strokeStyle = avatarBorderColor;
-          // ctx.stroke();
-          ctx.fillStyle = avatarBorderColor;
-          ctx.textAlign = 'center';
-          ctx.fill();
-          ctx.font = `${16 * scale}px Arial`;
-          ctx.fillStyle = '#fff';
-          ctx.shadowBlur = 0;
-          ctx.fillText(
-            getNameNumber({
-              name: this.xy[0].onbase[1].name,
-              number: this.xy[0].onbase[1].number,
-            }),
-            avatarRadius * 1,
-            avatarRadius * 1.25,
-          );
-          ctx.lineWidth = avatarRadius * 0.1;
-          ctx.strokeStyle = avatarBorderColor;
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
+      this.drawOnbasePlayer({
+        base,
+        ctx,
+        idx: 1,
+        x: p.x + clip - avatarRadius,
+        y: p.y - aBase - avatarRadius,
+        img: this.firstImage,
+      });
 
       // 2B
       ctx.save();
@@ -541,53 +476,14 @@ export default {
       ctx.fillRect(0, 0, rotateBase, rotateBase);
       ctx.restore();
 
-      if (
-        typeof this.xy[0] === 'object' &&
-        this.xy[0].onbase &&
-        this.xy[0].onbase[2].name
-      ) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.translate(p.x - avatarRadius, p.y - clip - aBase - avatarRadius);
-        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
-        if (this.secondImage) {
-          ctx.clip();
-          ctx.drawImage(
-            this.secondImage,
-            0,
-            0,
-            avatarRadius * 2,
-            avatarRadius * 2,
-          );
-        } else {
-          // ctx.fillStyle = avatarBackgroundColor;
-          // ctx.fill();
-          // ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
-          // ctx.fillStyle = avatarBorderColor;
-          // ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
-          // ctx.lineWidth = avatarRadius * 0.1;
-          // ctx.strokeStyle = avatarBorderColor;
-          // ctx.stroke();
-          ctx.fillStyle = avatarBorderColor;
-          ctx.textAlign = 'center';
-          ctx.fill();
-          ctx.font = `${16 * scale}px Arial`;
-          ctx.fillStyle = '#fff';
-          ctx.shadowBlur = 0;
-          ctx.fillText(
-            getNameNumber({
-              name: this.xy[0].onbase[2].name,
-              number: this.xy[0].onbase[2].number,
-            }),
-            avatarRadius * 1,
-            avatarRadius * 1.25,
-          );
-          ctx.lineWidth = avatarRadius * 0.1;
-          ctx.strokeStyle = avatarBorderColor;
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
+      this.drawOnbasePlayer({
+        base,
+        ctx,
+        idx: 2,
+        x: p.x - avatarRadius,
+        y: p.y - clip - aBase - avatarRadius,
+        img: this.secondImage,
+      });
 
       // 3B
       ctx.save();
@@ -597,53 +493,14 @@ export default {
       ctx.fillRect(0, 0, rotateBase, rotateBase);
       ctx.restore();
 
-      if (
-        typeof this.xy[0] === 'object' &&
-        this.xy[0].onbase &&
-        this.xy[0].onbase[3].name
-      ) {
-        ctx.save();
-        ctx.beginPath();
-        ctx.translate(p.x - clip - avatarRadius, p.y - aBase - avatarRadius);
-        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
-        if (this.thirdImage) {
-          ctx.clip();
-          ctx.drawImage(
-            this.thirdImage,
-            0,
-            0,
-            avatarRadius * 2,
-            avatarRadius * 2,
-          );
-        } else {
-          // ctx.fillStyle = avatarBackgroundColor;
-          // ctx.fill();
-          // ctx.font = `${avatarRadius * 1.2}px FontAwesome`;
-          // ctx.fillStyle = avatarBorderColor;
-          // ctx.fillText('\uF2C0', avatarRadius * 0.5, avatarRadius * 1.4);
-          // ctx.lineWidth = avatarRadius * 0.1;
-          // ctx.strokeStyle = avatarBorderColor;
-          // ctx.stroke();
-          ctx.fillStyle = avatarBorderColor;
-          ctx.textAlign = 'center';
-          ctx.fill();
-          ctx.font = `${16 * scale}px Arial`;
-          ctx.fillStyle = '#fff';
-          ctx.shadowBlur = 0;
-          ctx.fillText(
-            getNameNumber({
-              name: this.xy[0].onbase[3].name,
-              number: this.xy[0].onbase[3].number,
-            }),
-            avatarRadius * 1,
-            avatarRadius * 1.25,
-          );
-          ctx.lineWidth = avatarRadius * 0.1;
-          ctx.strokeStyle = avatarBorderColor;
-          ctx.stroke();
-        }
-        ctx.restore();
-      }
+      this.drawOnbasePlayer({
+        base,
+        ctx,
+        idx: 3,
+        x: p.x - clip - avatarRadius,
+        y: p.y - aBase - avatarRadius,
+        img: this.thirdImage,
+      });
 
       if (this.xy.length === 1 && this.xy[0].click) {
         const drawingDot = this.xy[0];
@@ -783,6 +640,7 @@ export default {
                   ctx.fillStyle = 'yellow';
                 }
                 ctx.textAlign = 'center';
+                ctx.textBaseline = 'alphabetic';
                 ctx.fillText(
                   percentage[key],
                   (textLocation[key].x / 100) * base,
@@ -802,7 +660,8 @@ export default {
               0,
               2 * Math.PI,
             );
-            ctx.fillStyle = colorMappging[item.color] || item.color || 'yellow';
+            ctx.fillStyle =
+              colorMappging_[item.color] || item.color || 'yellow';
             ctx.fill();
             ctx.arc(
               (item.x / 100) * base,
@@ -837,6 +696,7 @@ export default {
           Object.keys(this.positions_).forEach(key => {
             ctx.fillStyle = '#fff';
             ctx.textAlign = 'center';
+            ctx.textBaseline = 'alphabetic';
             ctx.fillText(
               `${this.positions_[key].number} ${this.positions_[key].name}`,
               (textLocation[key].x / 100) * base,
@@ -879,8 +739,9 @@ export default {
               // ctx.stroke();
               ctx.fillStyle = avatarBorderColor;
               ctx.textAlign = 'center';
+              ctx.textBaseline = 'alphabetic';
               ctx.fill();
-              ctx.font = `${14 * scale}px Arial`;
+              ctx.font = `${avatarRadius * 0.5}px Arial`;
               ctx.fillStyle = '#fff';
               ctx.shadowBlur = 0;
               ctx.fillText(
@@ -963,7 +824,324 @@ export default {
         heatmapDom.remove();
       }
 
+      if (Array.isArray(this.values) && typeof this.values[0] === 'object') {
+        let x = base;
+        let y = base;
+        if (this.values[0].rbi) {
+          const text =
+            this.values[0].rbi === 1 ? 'RBI' : `${this.values[0].rbi} RBI`;
+          ctx.font = `${avatarRadius * 0.5}px Arial`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowBlur = 0;
+
+          const {
+            width: textWidth,
+            fontBoundingBoxAscent: textHeight,
+          } = ctx.measureText(text);
+          const textWidth_ = textWidth * 0.8 * scale;
+          const textHeight_ = (textHeight + 10) * scale;
+          x = x - textWidth_ - 10 * scale;
+          y = y - textHeight_ - 10 * scale;
+          ctx.fillStyle = '#2497a2';
+          ctx.fillRect(x, y, textWidth_, textHeight_);
+          ctx.fillStyle = '#fff';
+          ctx.fillText(text, x + textWidth_ / 2, y + textHeight_ / 2);
+        }
+        if (this.values[0].result) {
+          const text = this.values[0].result;
+          ctx.font = `${avatarRadius * 0.5}px Arial`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.shadowBlur = 0;
+
+          const {
+            width: textWidth,
+            fontBoundingBoxAscent: textHeight,
+          } = ctx.measureText(text);
+          const textWidth_ = textWidth * 0.8 * scale;
+          const textHeight_ = (textHeight + 10) * scale;
+          x = x - textWidth_ - 10 * scale;
+          y = base - textHeight_ - 10 * scale;
+          ctx.fillStyle = colorMappging_[this.values[0].color];
+          ctx.fillRect(x, y, textWidth_, textHeight_);
+          ctx.fillStyle = '#fff';
+          ctx.fillText(text, x + textWidth_ / 2, y + textHeight_ / 2);
+        }
+
+        if (
+          this.values[0].opponent &&
+          this.values[0].useTeam &&
+          this.values[0].topBottom
+        ) {
+          const measureWidth = text => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            ctx.font = `${avatarRadius * 0.5}px Arial`;
+            return ctx.measureText(text).width + avatarRadius * 0.7;
+          };
+          const nameWidths = [
+            this.values[0].opponent,
+            this.values[0].useTeam,
+          ].map(measureWidth);
+          const scoreWidths = [
+            this.values[0].opponentScore,
+            this.values[0].score,
+          ].map(measureWidth);
+          const textMap =
+            this.values[0].topBottom === 'bot'
+              ? [
+                  [this.values[0].opponent, this.values[0].opponentScore],
+                  [this.values[0].useTeam, this.values[0].score],
+                ]
+              : [
+                  [this.values[0].useTeam, this.values[0].score],
+                  [this.values[0].opponent, this.values[0].opponentScore],
+                ];
+
+          const rows = 3; // 行數
+          const cols = 2; // 列數
+          let cellWidths = [Math.max(...nameWidths), Math.max(...scoreWidths)];
+          const cellHeight =
+            ctx.measureText(this.values[0].opponent).fontBoundingBoxAscent +
+            avatarRadius * 0.7;
+          let totalWidth = cellWidths.reduce((a, b) => a + b, 0);
+          if (totalWidth < 165) {
+            const scoreWidth = Math.max(...scoreWidths);
+            cellWidths = [165 - scoreWidth, scoreWidth];
+            totalWidth = cellWidths.reduce((a, b) => a + b, 0);
+          }
+
+          // === 畫格線 ===
+          ctx.strokeStyle = '#fff';
+          ctx.lineWidth = avatarRadius * 0.1;
+          ctx.translate(10 * scale, base - 10 * scale - cellHeight * 3);
+
+          // 橫線（不變）
+          for (let r = 0; r <= rows; r++) {
+            ctx.beginPath();
+            ctx.moveTo(0, r * cellHeight);
+            ctx.lineTo(totalWidth, r * cellHeight);
+            ctx.stroke();
+          }
+
+          // 直線（第3列要跨欄 → 不畫中間那條）
+          let accWidth = 0;
+          for (let c = 0; c <= cols; c++) {
+            ctx.beginPath();
+            ctx.moveTo(accWidth, 0);
+
+            // 如果是第 1 條（x=cellWidth），就畫到第 2 列為止
+            if (c === 1) {
+              ctx.lineTo(accWidth, 2 * cellHeight);
+            } else {
+              ctx.lineTo(accWidth, rows * cellHeight);
+            }
+
+            ctx.stroke();
+
+            accWidth += cellWidths[c];
+          }
+
+          ctx.textAlign = 'center';
+          ctx.shadowBlur = (1 / 100) * base;
+          for (let r = 0; r < rows; r++) {
+            accWidth = 0;
+            for (let c = 0; c < cols; c++) {
+              // 第三列 (r==2) → 跨兩欄，只畫一次就好
+              if (r === 2 && c === 0) {
+                const x = 20;
+                const y = r * cellHeight + cellHeight / 2;
+
+                // 局數文字
+                ctx.fillStyle = '#fff';
+                ctx.textAlign = 'left';
+                ctx.shadowBlur = 0;
+                ctx.fillText(this.values[0].inn, x, y + 1);
+
+                // === 畫三角形 ===
+                const size = 8 * scale;
+                ctx.beginPath();
+                const paddingLeft = 35;
+                if (this.values[0].topBottom === 'top') {
+                  ctx.beginPath();
+                  ctx.moveTo(x + paddingLeft - size, y - 2 + size / 2); // 左下角
+                  ctx.lineTo(x + paddingLeft + size, y - 2 + size / 2); // 右下角
+                  ctx.lineTo(x + paddingLeft, y - 2 - size / 2); // 上方尖角
+                  ctx.closePath();
+                  ctx.fillStyle = '#fff';
+                  ctx.fill();
+                } else {
+                  ctx.beginPath();
+                  ctx.moveTo(x + paddingLeft - size, y - size / 2); // 左上角
+                  ctx.lineTo(x + paddingLeft + size, y - size / 2); // 右上角
+                  ctx.lineTo(x + paddingLeft, y + size / 2); // 底部尖角
+                  ctx.closePath();
+                  ctx.fillStyle = '#fff';
+                  ctx.fill();
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                // === 畫出局圓圈 ===
+                const outs = this.values[0].out;
+                const circleR = 6 * scale;
+                for (let i = 0; i < 2; i++) {
+                  const cx = x + paddingLeft * 2 + 10 + i * (circleR * 2 + 10);
+                  const cy = y;
+                  ctx.beginPath();
+                  ctx.arc(cx, cy, circleR, 0, Math.PI * 2);
+                  ctx.closePath();
+                  if (i < outs) {
+                    ctx.fillStyle = colorMappging_['yellow'];
+                    ctx.fill();
+                    ctx.strokeStyle = '#fff';
+                    // ctx.shadowBlur = (1 / 100) * base;
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                  } else {
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 5;
+                    ctx.stroke();
+                  }
+                }
+              } else if (r === 2 && c === 1) {
+                // 第二個格子跳過
+                continue;
+              } else {
+                const x = accWidth + cellWidths[c] / 2;
+                const y = r * cellHeight + cellHeight / 2;
+                ctx.fillText(textMap[r][c], x, y);
+              }
+              accWidth += cellWidths[c];
+            }
+          }
+        }
+      }
+
       this.imgSrc = canvas.toDataURL('image/png');
+    },
+    drawOnbasePlayer({ base, ctx, idx, x, y, img }) {
+      const scale = 2;
+      const avatarRadius = base * 0.07;
+      const avatarBorderColor = 'rgba(50, 122, 129, 1)'; // $row_color
+      if (
+        typeof this.xy[0] === 'object' &&
+        this.xy[0].onbase &&
+        this.xy[0].onbase[idx].name
+      ) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.translate(x, y);
+        ctx.arc(avatarRadius, avatarRadius, avatarRadius, 0, Math.PI * 2, true);
+        if (img) {
+          const text = `${this.xy[0].onbase[idx].number} ${this.xy[0].onbase[idx].name}`;
+          ctx.font = `${avatarRadius * 0.5}px Arial`;
+          ctx.shadowColor = '#000';
+          ctx.shadowBlur = (1 / 100) * base;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = '#fff';
+          ctx.fillText(text, avatarRadius, -10 * scale);
+
+          ctx.clip();
+          ctx.drawImage(img, 0, 0, avatarRadius * 2, avatarRadius * 2);
+          ctx.restore();
+        } else {
+          ctx.fillStyle = avatarBorderColor;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'alphabetic';
+          ctx.fill();
+          ctx.font = `${avatarRadius * 0.5}px Arial`;
+          ctx.fillStyle = '#fff';
+          ctx.shadowBlur = 0;
+          ctx.fillText(
+            getNameNumber({
+              name: this.xy[0].onbase[idx].name,
+              number: this.xy[0].onbase[idx].number,
+            }),
+            avatarRadius * 1,
+            avatarRadius * 1.25,
+          );
+          ctx.lineWidth = avatarRadius * 0.1;
+          ctx.strokeStyle = avatarBorderColor;
+          ctx.stroke();
+          ctx.restore();
+        }
+
+        switch (this.xy[0].onbase[idx].result) {
+          case 'run': {
+            ctx.save();
+            ctx.beginPath();
+            ctx.translate(x, y);
+            ctx.arc(
+              avatarRadius,
+              avatarRadius,
+              avatarRadius,
+              0,
+              Math.PI * 2,
+              true,
+            );
+            const text = 'R';
+            ctx.font = `${avatarRadius * 0.5}px Arial`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+
+            ctx.fillStyle = '#3f00ff';
+            const {
+              width: textWidth,
+              fontBoundingBoxAscent: textHeight,
+            } = ctx.measureText(text);
+            const textWidth_ = textWidth + 8;
+            const textHeight_ = textHeight + 8;
+            ctx.fillRect(
+              2 * avatarRadius - textWidth_,
+              2 * avatarRadius - textHeight_,
+              textWidth_,
+              textHeight_,
+            );
+            ctx.fillStyle = '#fff';
+            ctx.fillText(
+              text,
+              2 * avatarRadius - textWidth_ + 4,
+              2 * avatarRadius - 6,
+            );
+            break;
+          }
+          case 'out': {
+            ctx.save();
+            ctx.beginPath();
+            ctx.translate(x, y);
+            ctx.arc(
+              avatarRadius,
+              avatarRadius,
+              avatarRadius,
+              0,
+              Math.PI * 2,
+              true,
+            );
+            const text = 'X';
+            ctx.font = `${avatarRadius * 0.5}px Arial`;
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'alphabetic';
+
+            ctx.fillStyle = idx === 0 ? '#ff695e' : 'black';
+            const {
+              width: textWidth,
+              fontBoundingBoxAscent: textHeight,
+            } = ctx.measureText(text);
+            const textWidth_ = textWidth + 8;
+            const textHeight_ = textHeight + 8;
+            ctx.fillRect(0, 0, textWidth_, textHeight_);
+            ctx.fillStyle = '#fff';
+            ctx.fillText(text, 4, textHeight_ - 6);
+            break;
+          }
+          default:
+            break;
+        }
+        ctx.restore();
+      }
     },
     trackXY(event) {
       if (this.disabled || this.no_track) return;

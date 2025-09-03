@@ -1370,7 +1370,7 @@
 <script>
 import Vue from 'vue';
 import { mapGetters, mapActions } from 'vuex';
-import { formatContent, formatColor } from '../libs/utils';
+import { formatContent, formatColor, calcCurrentOut } from '../libs/utils';
 
 export default {
   data() {
@@ -1754,7 +1754,7 @@ export default {
           const one_round = startedPlayers[startedPlayers.length - 1].order;
           this.next3 = this.boxSummary.contents.reduce((acc, item) => {
             const player = getStartedPlayer(this.base.home.name);
-            if (item.name === player.name) {
+            if (item.name === player?.name) {
               const next1 = (this.order + 1) % one_round || one_round;
               const next2 = (this.order + 2) % one_round || one_round;
               const next3 = (this.order + 3) % one_round || one_round;
@@ -1784,22 +1784,18 @@ export default {
         }
         this.revertOnbase();
 
-        const sameInnContents = this.boxSummary.contents
-          .slice(0, this.order - 1)
-          .filter(item => item.inn === this.inn);
-        const out = sameInnContents
-          .map(sub => sub.onbase)
-          .reduce((acc, sub) => acc.concat(sub), [])
-          .filter(item => item && item.result === 'out');
-        sameInnContents.some((content) => {
-          if (content.isForcedMode) {
-            this.isForcedMode = true;
-            this.predefinedOut = content.predefinedOut;
-            return true;
-          }
-        });
-        const currentOut = out.length + this.predefinedOut;
+        const { currentOut, isForcedMode, predefinedOut } = calcCurrentOut(
+          this.boxSummary.contents,
+          this.order,
+          this.inn,
+          this.isForcedMode,
+          this.predefinedOut,
+        );
+
+        this.isForcedMode = isForcedMode;
+        this.predefinedOut = predefinedOut;
         this.out = currentOut;
+
         if (currentOut === 3) {
           this.inn += 1;
           this.out = 0;
@@ -1830,7 +1826,8 @@ export default {
 
           this.checkModalPlayer(true);
         }
-      } catch {
+      } catch(e) {
+        console.log(e)
         this.alert('發生錯誤: 無法正確計算出下一棒打者').then(() => {
           this.$router.back();
         });

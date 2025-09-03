@@ -545,6 +545,7 @@
 
 <script>
 import { mapGetters, mapActions } from 'vuex';
+import { calcCurrentOut } from '../libs/utils';
 
 export default {
   data() {
@@ -798,21 +799,17 @@ export default {
         }
       });
 
-      const sameInnContents = this.boxSummary.contents
-        .slice(0, this.order - 1)
-        .filter(item => item.inn === this.inn);
-      const out = sameInnContents
-        .map(sub => sub.onbase)
-        .reduce((acc, sub) => acc.concat(sub), [])
-        .filter(item => item && item.result === 'out');
-      sameInnContents.some((content) => {
-        if (content.isForcedMode) {
-          this.isForcedMode = true;
-          this.predefinedOut = content.predefinedOut;
-          return true;
-        }
-      });
-      this.out = out.length + this.predefinedOut;
+      const { currentOut, isForcedMode, predefinedOut } = calcCurrentOut(
+        this.boxSummary.contents,
+        this.order,
+        this.inn,
+        this.isForcedMode,
+        this.predefinedOut,
+      );
+
+      this.isForcedMode = isForcedMode;
+      this.predefinedOut = predefinedOut;
+      this.out = currentOut;
 
       if (Array.isArray(this.box[0])) {
         const startOrder = this.box[0].slice(-1)[0];

@@ -1,9 +1,9 @@
 <template>
   <div class="loading-mask">
-    <div v-if="img" class="logo">
-      <img :src="$cacheImg(defaultIcon)" />
+    <div class="logo">
+      <img :src="defaultIcon" />
     </div>
-    <div v-else class="sk-cube-grid">
+    <!-- <div v-else class="sk-cube-grid">
       <div class="sk-cube sk-cube1"></div>
       <div class="sk-cube sk-cube2"></div>
       <div class="sk-cube sk-cube3"></div>
@@ -13,7 +13,7 @@
       <div class="sk-cube sk-cube7"></div>
       <div class="sk-cube sk-cube8"></div>
       <div class="sk-cube sk-cube9"></div>
-    </div>
+    </div> -->
     <span v-if="text" class="text">{{ text }}</span>
   </div>
 </template>
@@ -39,10 +39,10 @@
     width: 320px;
     display: inline-block;
     vertical-align: middle;
-    animation-name: spin;
-    animation-duration: 2000ms;
-    animation-iteration-count: infinite;
-    animation-timing-function: linear;
+    // animation-name: spin;
+    // animation-duration: 2000ms;
+    // animation-iteration-count: infinite;
+    // animation-timing-function: linear;
   }
   &:after {
     content: '';
@@ -155,7 +155,7 @@
 </style>
 
 <script>
-import defaultIcon from '../images/icon.png';
+import defaultIcon from '../images/Baseball.gif';
 export default {
   props: ['text', 'img'],
   data() {

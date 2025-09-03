@@ -120,8 +120,10 @@
                 : team.score
             "
           >
-            <img :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)" />
-            <i v-if="team.teamCode === currentTeam" class="fa fa-check" />
+            <span style="display: inline-block; position: relative">
+              <img :src="$cacheImg(team.icon) || $cacheImg(defaultIcon)" />
+              <i v-if="team.teamCode === currentTeam" class="fa fa-check" />
+            </span>
           </div>
           <p class="team__name">{{ team.name }}</p>
           <p

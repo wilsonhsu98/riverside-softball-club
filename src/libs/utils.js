@@ -538,6 +538,36 @@ const cleanData = data =>
       return obj;
     }, {});
 
+const calcCurrentOut = (
+  boxSummaryContents,
+  order,
+  inn,
+  isForcedMode,
+  predefinedOut = 0,
+) => {
+  let isForceMode_ = isForcedMode;
+  let predefinedOut_ = predefinedOut;
+  const sameInnContents = boxSummaryContents
+    .slice(0, order - 1)
+    .filter(item => item.inn === inn);
+  const out = sameInnContents
+    .map(sub => sub.onbase)
+    .reduce((acc, sub) => acc.concat(sub), [])
+    .filter(item => item && item.result === 'out');
+  sameInnContents.some(content => {
+    if (content.isForcedMode) {
+      isForceMode_ = true;
+      predefinedOut_ = content.predefinedOut;
+      return true;
+    }
+  });
+  return {
+    currentOut: out.length + predefinedOut_,
+    isForcedMode: isForceMode_,
+    predefinedOut: predefinedOut_,
+  };
+};
+
 export default {
   parseGame,
   genGameList,
@@ -557,4 +587,5 @@ export {
   sumByInn,
   accCalc,
   cleanData,
+  calcCurrentOut,
 };

@@ -285,7 +285,7 @@ export default {
     },
     download() {
       const downloadLink = document.createElement('a');
-      downloadLink.download = `${this.fileNamePrefix}_starting_players.png`;
+      downloadLink.download = `${this.fileNamePrefix}_lineup.png`;
       downloadLink.href = this.imgSrc;
       downloadLink.click();
     },

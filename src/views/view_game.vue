@@ -396,7 +396,11 @@
           </div>
           <div class="records">
             <div class="records-flex">
-              <div class="record" v-for="(col, colIndex) in pitcherCol" :key="`content_${colIndex}`">
+              <div
+                class="record"
+                v-for="(col, colIndex) in pitcherCol"
+                :key="`content_${colIndex}`"
+              >
                 {{ item[col] }}
               </div>
             </div>
@@ -592,7 +596,11 @@
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
-                    :style="{ cursor: !!record.location ? 'pointer' : 'auto' }"
+                    :style="{
+                      cursor: ['PR', 'FR'].includes(record.content)
+                        ? 'auto'
+                        : 'pointer',
+                    }"
                     @click="setLocationVideo(record)"
                   >
                     {{
@@ -816,7 +824,11 @@
                     :data-rbi="record.rbi"
                     :data-run="`${record.r === record.name ? 'R' : ''}`"
                     :data-out="`${record.out ? 'X' : ''}`"
-                    :style="{ cursor: !!record.location ? 'pointer' : 'auto' }"
+                    :style="{
+                      cursor: ['PR', 'FR'].includes(record.content)
+                        ? 'auto'
+                        : 'pointer',
+                    }"
                     @click="setLocationVideo(record)"
                   >
                     {{
@@ -2027,7 +2039,7 @@ import { mapGetters, mapActions } from 'vuex';
 import html2canvas from 'html2canvas';
 import axios from 'axios';
 import config from '../../config';
-import { formatContent, sumByInn } from '../libs/utils';
+import { calcCurrentOut, formatContent, sumByInn } from '../libs/utils';
 import { getLastOrderPosition } from '../store/modules/record';
 
 export default {
@@ -2200,23 +2212,67 @@ export default {
       return sumByInn(scores, inn);
     },
     setLocationVideo(record) {
-      if (record.location) {
-        this.coordinate = {
-          ...record.location,
-          onbase: Array.apply(null, Array(4)).reduce(
-            (acc, undefined, i) => ({
-              ...acc,
-              [i]: {
-                ...record.onbase[i],
-                ...(record.onbase[i].name
-                  ? this.getPlayer(record.onbase[i].name)
-                  : undefined),
-              },
-            }),
-            {},
-          ),
-        };
-      }
+      if (['PR', 'FR'].includes(record.content)) return;
+      const { currentOut } = calcCurrentOut(
+        this.boxSummary.contents,
+        record.order,
+        record.inn,
+        this.boxSummary.contents[record.order - 1].isForcedMode,
+        this.boxSummary.contents[record.order - 1].predefinedOut,
+      );
+      const { topBottom, useTeam, opponent } = this.boxSummary;
+      const opponentScore = this.boxSummary.opponentScores.reduce(
+        (acc, score, index) => {
+          switch (topBottom) {
+            case 'top':
+              if (index < record.inn - 1) {
+                return acc + score;
+              }
+              break;
+            case 'bot':
+              if (index < record.inn) {
+                return acc + score;
+              }
+              break;
+          }
+          return acc;
+        },
+        0,
+      );
+      const score = this.boxSummary.contents
+        .filter(item => item.order < record.order && Array.isArray(item.onbase))
+        .reduce((acc, item) => {
+          if (item.onbase[0].result === 'run') acc += 1;
+          if (item.onbase[1].result === 'run') acc += 1;
+          if (item.onbase[2].result === 'run') acc += 1;
+          if (item.onbase[3].result === 'run') acc += 1;
+          return acc;
+        }, 0);
+      this.coordinate = {
+        ...record.location,
+        onbase: Array.apply(null, Array(4)).reduce(
+          (acc, undefined, i) => ({
+            ...acc,
+            [i]: {
+              ...record.onbase?.[i],
+              ...(record.onbase?.[i].name
+                ? this.getPlayer(record.onbase?.[i].name)
+                : undefined),
+            },
+          }),
+          {},
+        ),
+        result: this.formatContent_(record.content, undefined, record.rbi),
+        rbi: record.rbi,
+        color: record.color,
+        out: currentOut,
+        opponent,
+        opponentScore,
+        useTeam,
+        score,
+        inn: record.inn,
+        topBottom,
+      };
       if (record.video) {
         this.shortVideo = record.video;
       }
@@ -2227,9 +2283,12 @@ export default {
         this.shortVideo = undefined;
       }
     },
-    formatContent_(content, location = {}) {
+    formatContent_(content, location = {}, rbi) {
       if (content === 'UNKNOWN') {
         return this.boxDisplay === 'code' ? '？' : this.$t(content);
+      }
+      if (content === 'HR' && rbi === 4) {
+        return this.boxDisplay === 'code' ? 'GS' : this.$t('HR_GS');
       }
       switch (this.boxDisplay) {
         case 'code':
@@ -2313,9 +2372,13 @@ export default {
       );
     },
     getPosition(name) {
-      return (
-        (Object.entries(this.boxSummary.positions).find(
-          ([, value]) => value === name)) || ['EP'])[0];
+      if (this.boxSummary.positions) {
+        return (Object.entries(this.boxSummary.positions).find(
+          ([, value]) => value === name,
+        ) || ['EP'])[0];
+      } else {
+        return '?';
+      }
     },
     checkLastColumn() {
       if (this.box.length && !this.editable) {
@@ -2678,7 +2741,7 @@ export default {
           this.mvp = mvp;
           this.gwrbi = gwrbi;
           this.result = result;
-          this.tags = (tags || []).filter((tag) => tag !== 'hasForcedModeGame');
+          this.tags = (tags || []).filter(tag => tag !== 'hasForcedModeGame');
           this.videoIDs = (youtubeVideos || '')
             .split(',')
             .map(item => item.trim())
