@@ -2154,12 +2154,12 @@ export default {
       this.toggleLoading(true);
       const actionBar = document.querySelector('.action');
       if (actionBar) actionBar.style.visibility = 'hidden';
-      const { width, top } = this.$refs.container.getBoundingClientRect();
+      const { width } = this.$refs.container.getBoundingClientRect();
       html2canvas(this.$refs.container, {
         useCORS: true,
         logging: false,
-        y: window.scrollY + top,
-        x: (window.innerWidth - width) / 2,
+        // y: window.scrollY + top,
+        // x: (window.innerWidth - width) / 2,
         scrollY: 0,
         scrollX: 0,
         width,
@@ -2173,6 +2173,7 @@ export default {
           ),
       })
         .then(canvas => {
+          // document.body.appendChild(canvas);
           const actionBar = document.querySelector('.action');
           if (actionBar) actionBar.style.visibility = '';
           const formData = new FormData();
@@ -2181,11 +2182,10 @@ export default {
             canvas.toDataURL('image/jpeg', 1.0).split(',')[1],
           );
           formData.append('album', config.imgur.albumShare);
-          return axios.post(config.imgur.postUrl, formData, {
-            headers: {
-              Authorization: `Client-ID ${config.imgur.clientId}`,
-            },
-          });
+          return axios.post(
+            'https://riversidesoftballclub.netlify.app/.netlify/functions/index/upload_to_imgur',
+            formData,
+          );
         })
         .then(res => {
           this.toggleLoading(false);
