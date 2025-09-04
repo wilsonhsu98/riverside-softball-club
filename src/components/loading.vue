@@ -1,7 +1,7 @@
 <template>
   <div class="loading-mask">
     <div class="logo">
-      <img :src="defaultIcon" />
+      <div class="img" :style="{ backgroundImage: `url(${defaultIcon})` }" />
     </div>
     <!-- <div v-else class="sk-cube-grid">
       <div class="sk-cube sk-cube1"></div>
@@ -35,20 +35,34 @@
   height: calc(var(--vh, 1vh) * 100);
   /* height: -webkit-fill-available; */
   text-align: center;
-  img {
-    width: 320px;
-    display: inline-block;
-    vertical-align: middle;
+  .img {
+    width: 500px;
+    height: 500px;
     // animation-name: spin;
     // animation-duration: 2000ms;
     // animation-iteration-count: infinite;
     // animation-timing-function: linear;
+    position: relative;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(calc(320 / 500));
+    background-repeat: no-repeat;
+    animation: play 2s steps(140) infinite;
   }
   &:after {
     content: '';
     height: 100%;
     display: inline-block;
     vertical-align: middle;
+  }
+}
+
+@keyframes play {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -70000px 0;
   }
 }
 
@@ -155,7 +169,8 @@
 </style>
 
 <script>
-import defaultIcon from '../images/Baseball.gif';
+// import defaultIcon from '../images/Baseball.gif';
+import defaultIcon from '../images/Baseball_sprite.png';
 export default {
   props: ['text', 'img'],
   data() {
