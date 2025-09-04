@@ -27,6 +27,7 @@
     "html2canvas": "^1.0.0-alpha.12",
     "http2": "^3.3.7",
     "idb": "5.0.0",
+    "lottie-web": "^5.13.0",
     "multer": "^2.0.1",
     "qrcode": "^1.4.4",
     "request-promise": "^4.2.4",
