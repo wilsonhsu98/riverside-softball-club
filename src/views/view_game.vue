@@ -2186,11 +2186,29 @@ export default {
         })
         .then(res => {
           this.toggleLoading(false);
-          window.FB.ui({
-            method: 'share',
-            href: res.data.data.link,
-            display: 'popup',
-          });
+          const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+          const url = res.data.data.link;
+          if (isMobile) {
+            // 手機：直接跳轉到 Facebook App / Mobile Web 分享頁
+            const shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+            window.location.href = shareUrl;
+          } else {
+            // 桌機：用 FB.ui 開 popup
+            if (window.FB) {
+              window.FB.ui({
+                method: 'share',
+                href: url,
+                display: 'popup',
+              });
+            } else {
+              // fallback: 直接開新視窗
+              window.open(
+                `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+                'fbshare',
+                'width=600,height=600',
+              );
+            }
+          }
         })
         .catch(err => {
           console.log(err);
