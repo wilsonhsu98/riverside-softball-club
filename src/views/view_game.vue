@@ -2151,7 +2151,6 @@ export default {
       'alert',
     ]),
     screenshot() {
-      this.sharePopup = window.open('', '_blank', 'width=600,height=600');
       this.toggleLoading(true);
       const actionBar = document.querySelector('.action');
       if (actionBar) actionBar.style.visibility = 'hidden';
@@ -2187,21 +2186,11 @@ export default {
         })
         .then(res => {
           this.toggleLoading(false);
-          const shareUrl = res.data.data.link;
-
-          // 用一開始就開好的 popup 來載入 FB share
-          if (this.sharePopup) {
-            this.sharePopup.location.href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
-              shareUrl,
-            )}`;
-          } else {
-            // 保險：如果 popup 沒開成功，直接呼叫 FB.ui
-            window.FB.ui({
-              method: 'share',
-              href: shareUrl,
-              display: 'popup',
-            });
-          }
+          window.FB.ui({
+            method: 'share',
+            href: res.data.data.link,
+            display: 'popup',
+          });
         })
         .catch(err => {
           console.log(err);
