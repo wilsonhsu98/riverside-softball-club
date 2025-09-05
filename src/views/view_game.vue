@@ -2178,10 +2178,7 @@ export default {
           const actionBar = document.querySelector('.action');
           if (actionBar) actionBar.style.visibility = '';
           const formData = new FormData();
-          formData.append(
-            'image',
-            canvas.toDataURL('image/jpeg', 1.0).split(',')[1],
-          );
+          formData.append('image', canvas.toDataURL('image/png').split(',')[1]);
           formData.append('album', config.imgur.albumShare);
           return axios.post(
             'https://riversidesoftballclub.netlify.app/.netlify/functions/index/upload_to_imgur',
