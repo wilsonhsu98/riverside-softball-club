@@ -985,7 +985,7 @@ const actions = {
   initFromLS({ commit }) {
     commit(types.INIT_FROM_LS);
   },
-  operateGames({ commit, isSilent = false }, changedData) {
+  operateGames({ commit }, changedData) {
     const dates = changedData
       .filter(item => item.data.timestamp)
       .map(item => new Date(item.data.timestamp.seconds * 1000));
@@ -1014,35 +1014,58 @@ const actions = {
     commit(types.GET_PERIOD, period);
     commit(types.GET_RECORDS, records);
     commit(types.GET_GAMELIST, period);
-    actions.workerGenStatistics({ commit, isSilent });
-    actions.workerGenPitcherStatistics({ commit, isSilent });
-    actions.workerItemStats({ commit, isSilent });
-    actions.workerBox({ commit });
+    Promise.all([
+      actions.workerGenStatistics({ commit }),
+      actions.workerGenPitcherStatistics({ commit }),
+      actions.workerItemStats({ commit }),
+      actions.workerBox({ commit }),
+    ]).then(() => {
+      commit(rootTypes.LOADING, false);
+    });
   },
   setPeriod({ commit }, value) {
+    commit(rootTypes.LOADING, true);
     commit(types.SET_PERIOD, value);
-    actions.workerGenStatistics({ commit });
-    actions.workerGenPitcherStatistics({ commit });
-    actions.workerItemStats({ commit });
+    Promise.all([
+      actions.workerGenStatistics({ commit }),
+      actions.workerGenPitcherStatistics({ commit }),
+      actions.workerItemStats({ commit }),
+    ]).then(() => {
+      commit(rootTypes.LOADING, false);
+    });
   },
   setGameTypes({ commit }, value) {
+    commit(rootTypes.LOADING, true);
     commit(types.SET_GAME_TYPES, value);
-    actions.workerGenStatistics({ commit });
-    actions.workerGenPitcherStatistics({ commit });
-    actions.workerItemStats({ commit });
+    Promise.all([
+      actions.workerGenStatistics({ commit }),
+      actions.workerGenPitcherStatistics({ commit }),
+      actions.workerItemStats({ commit }),
+    ]).then(() => {
+      commit(rootTypes.LOADING, false);
+    });
   },
   setTop({ commit }, value) {
+    commit(rootTypes.LOADING, true);
     commit(types.SET_TOP, value);
-    actions.workerGenStatistics({ commit });
+    actions.workerGenStatistics({ commit }).then(() => {
+      commit(rootTypes.LOADING, false);
+    });
   },
   setUnlimitedPA({ commit }, value) {
+    commit(rootTypes.LOADING, true);
     commit(types.SET_UNLIMITED_PA, value);
-    actions.workerGenStatistics({ commit });
+    actions.workerGenStatistics({ commit }).then(() => {
+      commit(rootTypes.LOADING, false);
+    });
   },
   setSortBy({ commit }, value) {
+    commit(rootTypes.LOADING, true);
     commit(types.SET_SORTBY, value);
     commit(types.SET_COLS, { col: value, visible: true });
-    actions.workerGenStatistics({ commit });
+    actions.workerGenStatistics({ commit }).then(() => {
+      commit(rootTypes.LOADING, false);
+    });
   },
   setCheckAll({ commit }, isCheckAll) {
     commit(types.SET_CHECKALL, isCheckAll);
@@ -1057,31 +1080,35 @@ const actions = {
   setOrder({ commit }, order) {
     commit(types.SET_ORDER, order);
   },
-  workerGenStatistics({ commit, isSilent = false }) {
-    if (!isSilent) commit(rootTypes.LOADING, true);
-    workerCreater(
-      {
-        cmd: 'GenStatistics',
-        players: state.players,
-        records: state.records,
-        unlimitedPA: state.unlimitedPA,
-        top: state.top,
-        period: state.period,
-        sortBy: state.sortBy,
-        excludedGames: state.games
-          .filter(g => !state.gameTypes.includes(g.gameType))
-          .map(g => g.game),
-      },
-      data => {
-        commit(types.SET_GENSTATISTICS, data);
-        commit(rootTypes.LOADING, false);
-      },
-    );
+  workerGenStatistics({ commit }) {
+    return new Promise(resolve => {
+      workerCreater(
+        {
+          cmd: 'GenStatistics',
+          players: state.players,
+          records: state.records,
+          unlimitedPA: state.unlimitedPA,
+          top: state.top,
+          period: state.period,
+          sortBy: state.sortBy,
+          excludedGames: state.games
+            .filter(g => !state.gameTypes.includes(g.gameType))
+            .map(g => g.game),
+        },
+        data => {
+          commit(types.SET_GENSTATISTICS, data);
+          resolve();
+        },
+      );
+    });
   },
   setPitcherSortBy({ commit }, value) {
+    commit(rootTypes.LOADING, true);
     commit(types.SET_PITCHER_SORTBY, value);
     commit(types.SET_PITCHER_COLS, { col: value, visible: true });
-    actions.workerGenPitcherStatistics({ commit });
+    actions.workerGenPitcherStatistics({ commit }).then(() => {
+      commit(rootTypes.LOADING, false);
+    });
   },
   setPitcherCheckAll({ commit }, isCheckAll) {
     commit(types.SET_PITCHER_CHECKALL, isCheckAll);
@@ -1089,80 +1116,87 @@ const actions = {
   togglePitcherColumn({ commit }, col) {
     commit(types.SET_PITCHER_COLS, { col });
   },
-  workerGenPitcherStatistics({ commit, isSilent = false }) {
-    if (!isSilent) commit(rootTypes.LOADING, true);
-    workerCreater(
-      {
-        cmd: 'GenPitcherStatistics',
-        players: state.players,
-        games: state.games,
-        period: state.period,
-        sortBy: state.pitcherSortBy,
-        excludedGames: state.games
-          .filter(g => !state.gameTypes.includes(g.gameType))
-          .map(g => g.game),
-        pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
-      },
-      data => {
-        commit(types.SET_PITCHER_GENSTATISTICS, data);
-        commit(rootTypes.LOADING, false);
-      },
-    );
-  },
-  workerItemStats({ commit, isSilent = false }) {
-    if (!isSilent) commit(rootTypes.LOADING, true);
-    workerCreater(
-      {
-        cmd: 'ItemStats',
-        players: state.players,
-        records: state.records,
-        period: state.period,
-        games: state.games,
-        excludedGames: state.games
-          .filter(g => !state.gameTypes.includes(g.gameType))
-          .map(g => g.game),
-        pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
-      },
-      data => {
-        const { pitcherGameCount, ...others } = data;
-        commit(types.SET_ITEMSTATS, others);
-        commit(types.SET_SUPPORT_PITCHERS, pitcherGameCount);
-        commit(rootTypes.LOADING, false);
-      },
-    );
-  },
-  workerBox({ commit }) {
-    // commit(rootTypes.LOADING, true);
-    if (state.game && state.records.some(item => item._table === state.game)) {
-      // const boxSummary =
-      //   state.games.length &&
-      //   state.game &&
-      //   state.games.find(item => item.game === state.game);
-      // const data = displayGame(
-      //   state.players,
-      //   state.records.filter(item => item._table === state.game),
-      //   boxSummary.errors,
-      //   rootState.role,
-      // );
-      // commit(types.SET_BOX, data);
-      // return;
+  workerGenPitcherStatistics({ commit }) {
+    return new Promise(resolve => {
       workerCreater(
         {
-          cmd: 'Box',
-          games: state.games,
-          game: state.game,
+          cmd: 'GenPitcherStatistics',
           players: state.players,
-          records: state.records,
-          role: rootState.role,
+          games: state.games,
+          period: state.period,
+          sortBy: state.pitcherSortBy,
+          excludedGames: state.games
+            .filter(g => !state.gameTypes.includes(g.gameType))
+            .map(g => g.game),
+          pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
         },
         data => {
-          commit(types.SET_BOX, data);
-          // commit(rootTypes.LOADING, false);
+          commit(types.SET_PITCHER_GENSTATISTICS, data);
+          resolve();
         },
       );
-    } else {
-      commit(types.SET_BOX, []);
-    }
+    });
+  },
+  workerItemStats({ commit }) {
+    return new Promise(resolve => {
+      workerCreater(
+        {
+          cmd: 'ItemStats',
+          players: state.players,
+          records: state.records,
+          period: state.period,
+          games: state.games,
+          excludedGames: state.games
+            .filter(g => !state.gameTypes.includes(g.gameType))
+            .map(g => g.game),
+          pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
+        },
+        data => {
+          const { pitcherGameCount, ...others } = data;
+          commit(types.SET_ITEMSTATS, others);
+          commit(types.SET_SUPPORT_PITCHERS, pitcherGameCount);
+          resolve();
+        },
+      );
+    });
+  },
+  workerBox({ commit }) {
+    return new Promise(resolve => {
+      if (
+        state.game &&
+        state.records.some(item => item._table === state.game)
+      ) {
+        // const boxSummary =
+        //   state.games.length &&
+        //   state.game &&
+        //   state.games.find(item => item.game === state.game);
+        // const data = displayGame(
+        //   state.players,
+        //   state.records.filter(item => item._table === state.game),
+        //   boxSummary.errors,
+        //   rootState.role,
+        // );
+        // commit(types.SET_BOX, data);
+        // return;
+        workerCreater(
+          {
+            cmd: 'Box',
+            games: state.games,
+            game: state.game,
+            players: state.players,
+            records: state.records,
+            role: rootState.role,
+          },
+          data => {
+            commit(types.SET_BOX, data);
+            resolve();
+          },
+        );
+      } else {
+        commit(types.SET_BOX, []);
+        resolve();
+      }
+    });
   },
   setBoxDisplay({ commit }, value) {
     commit(types.SET_BOX_DISPLAY, value);

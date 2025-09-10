@@ -1,37 +1,15 @@
 <template>
   <div class="loading-mask">
-    <div class="logo">
-      <div class="img" ref="baseball" />
-    </div>
-    <span v-if="text" class="text">{{ text }}</span>
+    <iframe
+      class="loading-iframe"
+      :srcdoc="iframeContent"
+      frameborder="0"
+    ></iframe>
   </div>
 </template>
 
 <style lang="scss" scoped>
 @import '../scss/variable';
-
-.text {
-  text-align: center;
-  line-height: calc(100vh + 73px);
-  line-height: calc(var(--vh, 1vh) * 100 + 73px);
-  color: #fff;
-  font-size: 24px;
-  display: block;
-}
-
-.logo {
-  height: 100vh;
-  height: calc(var(--vh, 1vh) * 100);
-  text-align: center;
-  .img {
-    width: 320px;
-    height: 320px;
-    position: relative;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-  }
-}
 
 .loading-mask {
   position: fixed;
@@ -42,21 +20,55 @@
   background-color: rgba(50, 122, 129, 0.2);
   z-index: 2;
 }
+
+.loading-iframe {
+  width: 100vw;
+  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
+}
 </style>
 
 <script>
-import Lottie from 'lottie-web';
 import baseballLottieData from '../images/baseballLottieData.json';
 export default {
-  props: ['text', 'img'],
-  mounted() {
-    Lottie.loadAnimation({
-      container: this.$refs.baseball,
-      renderer: 'svg',
-      loop: true,
-      autoplay: true,
-      animationData: baseballLottieData,
-    });
+  computed: {
+    iframeContent() {
+      return `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="UTF-8" \/>
+          <style>
+            html, body {
+              margin: 0;
+              padding: 0;
+              background: transparent;
+              height: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+            }
+            #baseball {
+              width: 320px;
+              height: 320px;
+            }
+          <\/style>
+        <\/head>
+        <body>
+          <div id="baseball"><\/div>
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.13.0/lottie.min.js"><\/script>
+          <script>
+            lottie.loadAnimation({
+              container: document.getElementById('baseball'),
+              renderer: 'svg',
+              loop: true,
+              autoplay: true,
+              animationData: ${JSON.stringify(baseballLottieData)},
+            });
+          <\/script>
+        <\/body>
+      <\/html>`;
+    },
   },
 };
 </script>

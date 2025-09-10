@@ -1,5 +1,5 @@
 <template>
-  <loading v-if="loading" :img="loading.img"></loading>
+  <loading v-if="loading" />
   <div v-else class="login-container">
     <div></div>
     <button class="signin-btn google" @click="googleLogin">

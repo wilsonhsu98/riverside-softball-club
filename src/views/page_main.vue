@@ -81,7 +81,7 @@
         </ul>
       </div>
     </header>
-    <loading v-if="loading" :text="loading.text"></loading>
+    <loading :style="{ visibility: loading ? 'visible' : 'hidden' }" />
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
         <p class="msg" v-html="alertMsg.replace('\n', '<br>')"></p>

@@ -191,7 +191,7 @@
     <button @click="handleRollback" :disabled="rollbackJSON === null">
       Rollback
     </button>
-    <loading v-if="loading"></loading>
+    <loading :style="{ visibility: loading ? 'visible' : 'hidden' }" />
     <div class="modal" v-if="alertMsg">
       <div class="dialog">
         <p class="msg" v-html="alertMsg"></p>

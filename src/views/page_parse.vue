@@ -53,7 +53,7 @@
         :style="{ visibility: done.includes(item.game) ? 'visible' : 'hidden' }"
       ></i>
     </div>
-    <loading v-if="loading"></loading>
+    <loading :style="{ visibility: loading ? 'visible' : 'hidden' }" />
   </div>
 </template>
 

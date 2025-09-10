@@ -97,7 +97,7 @@ const actions = {
   },
   anonymousLogin({ commit }) {
     window.localStorage.removeItem('currentTeam');
-    commit(types.LOADING, { img: true });
+    commit(types.LOADING, true);
     auth.signInAnonymously();
   },
   loginPopup({ commit }, provider) {
@@ -125,7 +125,7 @@ const actions = {
                 .get()
                 .then(querySnapshot => {
                   querySnapshot.forEach(doc => {
-                    commit(types.LOADING, { img: true });
+                    commit(types.LOADING, true);
                     auth.signInWithEmailAndPassword(
                       error.email,
                       doc.data().lineUserID,
@@ -166,7 +166,7 @@ const actions = {
     )}`;
   },
   lineLoginRedirect({ commit }, token) {
-    commit(types.LOADING, { img: true });
+    commit(types.LOADING, true);
     auth.signInWithCustomToken(token).then(result => {
       const user = result.user;
       if (user) {
@@ -225,7 +225,7 @@ const actions = {
 
     chkLoginStatusDone = true;
     commit(types.INIT_FROM_LS);
-    commit(types.LOADING, { img: true });
+    commit(types.LOADING, true);
     // auth
     //   .getRedirectResult()
     //   .then(result => {
@@ -250,7 +250,7 @@ const actions = {
     //             .get()
     //             .then(querySnapshot => {
     //               querySnapshot.forEach(doc => {
-    //                 commit(types.LOADING, { img: true });
+    //                 commit(types.LOADING, true);
     //                 auth.signInWithEmailAndPassword(
     //                   error.email,
     //                   doc.data().lineUserID,
@@ -388,7 +388,7 @@ const actions = {
       } else {
         if (isLogout === true || router.history.current.params.custom) {
           isLogout = false;
-          commit(types.LOADING, { img: true });
+          commit(types.LOADING, true);
         } else {
           // wait for signin
           commit(types.CLEAN_TOKEN);
@@ -401,7 +401,7 @@ const actions = {
   },
   logout({ commit, state, getters }) {
     isLogout = true;
-    commit(types.LOADING, { img: true });
+    commit(types.LOADING, true);
     Object.keys(snapShot).forEach(key => {
       if (typeof snapShot[key] === 'function') snapShot[key]();
     });
