@@ -622,6 +622,35 @@ const promiseImage = (img, type) => {
 
 const snapShot = {};
 const snapShotRequest = {};
+const snapShotReconnect = {};
+const snapShotRequestReconnect = {};
+
+document.addEventListener('visibilitychange', () => {
+  switch (document.visibilityState) {
+    case 'hidden':
+      // console.log('=== tab hidden ===');
+      Object.values(snapShot).forEach(value => {
+        if (typeof value === 'function') value();
+      });
+      Object.values(snapShotRequest).forEach(value => {
+        if (typeof value === 'function') value();
+      });
+      break;
+    case 'visible':
+      // console.log('=== tab visible ===');
+      Object.entries(snapShot).forEach(([key, value]) => {
+        if (typeof value === 'function') value();
+        if (typeof snapShotReconnect[key] === 'function')
+          snapShot[key] = snapShotReconnect[key]();
+      });
+      Object.entries(snapShotRequest).forEach(([key, value]) => {
+        if (typeof value === 'function') value();
+        if (typeof snapShotRequestReconnect[key] === 'function')
+          snapShotRequest[key] = snapShotRequestReconnect[key]();
+      });
+      break;
+  }
+});
 
 export {
   types,
@@ -632,4 +661,6 @@ export {
   promiseImage,
   snapShot,
   snapShotRequest,
+  snapShotReconnect,
+  snapShotRequestReconnect,
 };

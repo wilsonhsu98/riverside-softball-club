@@ -7,6 +7,8 @@ import {
   promiseImage,
   snapShot,
   snapShotRequest,
+  snapShotReconnect,
+  snapShotRequestReconnect,
 } from '../root';
 import { DELETE_ANNONYMOUS_USERS_URL_PROXY } from '../../constants/index';
 import { types as recordTypes } from './record';
@@ -127,130 +129,138 @@ const actions = {
     const userId = rootGetters.userId(rootState);
     if (userId) {
       if (typeof snapShot.account === 'function') snapShot.account();
-      snapShot.account = db
-        .collection('accounts')
-        .doc(userId)
-        .onSnapshot(snapshot => {
-          window.trackRead('fetchUser: accounts', 1);
-          const data = snapshot.data();
-          if (data) {
-            const {
-              accessToken,
-              teams,
-              teamRoles: teamRoles_,
-              ...other
-            } = data;
-            let teamRoles = teamRoles_;
-            accessToken;
-            teams;
-            let otherTeams = [];
-            if (config.managers.includes(userId)) {
-              otherTeams = (window.localStorage.getItem('otherTeams') || '')
-                .split(',')
-                .filter(Boolean)
-                .reduce(
-                  (acc, teamCode) => ({
-                    ...acc,
-                    [teamCode]: 'manager',
-                  }),
-                  {},
-                );
-              teamRoles = {
-                ...teamRoles,
-                ...otherTeams,
-              };
-            }
-            commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
+      snapShotReconnect.account = () =>
+        db
+          .collection('accounts')
+          .doc(userId)
+          .onSnapshot(snapshot => {
+            window.trackRead('fetchUser: accounts', 1);
+            const data = snapshot.data();
+            if (data) {
+              const {
+                accessToken,
+                teams,
+                teamRoles: teamRoles_,
+                ...other
+              } = data;
+              let teamRoles = teamRoles_;
+              accessToken;
+              teams;
+              let otherTeams = [];
+              if (config.managers.includes(userId)) {
+                otherTeams = (window.localStorage.getItem('otherTeams') || '')
+                  .split(',')
+                  .filter(Boolean)
+                  .reduce(
+                    (acc, teamCode) => ({
+                      ...acc,
+                      [teamCode]: 'manager',
+                    }),
+                    {},
+                  );
+                teamRoles = {
+                  ...teamRoles,
+                  ...otherTeams,
+                };
+              }
+              commit(rootTypes.SET_ACCOUNT_INFO, { ...other });
 
-            // prevent reload teams if teams not changed
-            const currentTeamsContext = JSON.stringify(teamRoles);
-            if (currentTeamsContext !== preTeamsContext) {
-              preTeamsContext = currentTeamsContext;
-              if (
-                typeof teamRoles === 'object' &&
-                Object.keys(teamRoles).length
-              ) {
-                Promise.all(
-                  Object.keys(teamRoles).map(teamCode => {
-                    return new Promise(resolve => {
-                      db.collection('teams')
-                        .doc(teamCode)
-                        .get()
-                        .then(teamsDoc => {
-                          if (teamsDoc.exists) {
-                            resolve({
-                              role: teamRoles[teamCode],
-                              teamCode: teamCode,
-                              ...teamsDoc.data(),
-                            });
-                          } else {
-                            setTimeout(() => {
-                              db.collection('teams')
-                                .doc(teamCode)
-                                .get()
-                                .then(teamsDoc => {
-                                  resolve({
-                                    role: teamRoles[teamCode],
-                                    teamCode: teamCode,
-                                    ...teamsDoc.data(),
+              // prevent reload teams if teams not changed
+              const currentTeamsContext = JSON.stringify(teamRoles);
+              if (currentTeamsContext !== preTeamsContext) {
+                preTeamsContext = currentTeamsContext;
+                if (
+                  typeof teamRoles === 'object' &&
+                  Object.keys(teamRoles).length
+                ) {
+                  Promise.all(
+                    Object.keys(teamRoles).map(teamCode => {
+                      return new Promise(resolve => {
+                        db.collection('teams')
+                          .doc(teamCode)
+                          .get()
+                          .then(teamsDoc => {
+                            if (teamsDoc.exists) {
+                              resolve({
+                                role: teamRoles[teamCode],
+                                teamCode: teamCode,
+                                ...teamsDoc.data(),
+                              });
+                            } else {
+                              setTimeout(() => {
+                                db.collection('teams')
+                                  .doc(teamCode)
+                                  .get()
+                                  .then(teamsDoc => {
+                                    resolve({
+                                      role: teamRoles[teamCode],
+                                      teamCode: teamCode,
+                                      ...teamsDoc.data(),
+                                    });
                                   });
-                                });
-                            }, 100);
-                          }
-                        });
-                    });
-                  }),
-                ).then(teams_ => {
-                  const teams = teams_.filter(({ name }) => name);
-                  window.trackRead(
-                    'fetchUser: user belongs teams',
-                    teams.length || 1,
-                  );
-                  commit(
-                    types.FETCH_TEAMS,
-                    [...teams].sort((a, b) => b.name.localeCompare(a.name)),
-                  );
-                  commit(rootTypes.SET_AUTH, teams);
-                  record.actions.workerBox({ commit });
-                  teams.forEach(team => {
-                    if (typeof snapShotRequest[team.teamCode] === 'function')
-                      snapShotRequest[team.teamCode]();
-                    if (team.role !== 'manager') return;
-                    snapShotRequest[team.teamCode] = db
-                      .collection('requests')
-                      .where('teamCode', '==', team.teamCode)
-                      .onSnapshot(requestsCollection => {
-                        window.trackRead(
-                          `fetchUser: listen ${team.teamCode} request`,
-                          requestsCollection.docs.length || 1,
-                        );
-                        commit(types.SET_TEAM_REQUEST, {
-                          teamCode: team.teamCode,
-                          requests: requestsCollection.docs
-                            .map(doc => {
-                              const { timestamp, ...data } = doc.data();
-                              return {
-                                timestamp: timestamp.toDate(),
-                                ...data,
-                                id: doc.id,
-                              };
-                            })
-                            .filter(
-                              request =>
-                                !['denied', 'deleted'].includes(request.status),
-                            )
-                            .sort((a, b) => b.timestamp - a.timestamp),
-                        });
+                              }, 100);
+                            }
+                          });
                       });
+                    }),
+                  ).then(teams_ => {
+                    const teams = teams_.filter(({ name }) => name);
+                    window.trackRead(
+                      'fetchUser: user belongs teams',
+                      teams.length || 1,
+                    );
+                    commit(
+                      types.FETCH_TEAMS,
+                      [...teams].sort((a, b) => b.name.localeCompare(a.name)),
+                    );
+                    commit(rootTypes.SET_AUTH, teams);
+                    record.actions.workerBox({ commit });
+                    teams.forEach(team => {
+                      if (typeof snapShotRequest[team.teamCode] === 'function')
+                        snapShotRequest[team.teamCode]();
+                      if (team.role !== 'manager') return;
+                      snapShotRequestReconnect[team.teamCode] = () =>
+                        db
+                          .collection('requests')
+                          .where('teamCode', '==', team.teamCode)
+                          .onSnapshot(requestsCollection => {
+                            window.trackRead(
+                              `fetchUser: listen ${team.teamCode} request`,
+                              requestsCollection.docs.length || 1,
+                            );
+                            commit(types.SET_TEAM_REQUEST, {
+                              teamCode: team.teamCode,
+                              requests: requestsCollection.docs
+                                .map(doc => {
+                                  const { timestamp, ...data } = doc.data();
+                                  return {
+                                    timestamp: timestamp.toDate(),
+                                    ...data,
+                                    id: doc.id,
+                                  };
+                                })
+                                .filter(
+                                  request =>
+                                    !['denied', 'deleted'].includes(
+                                      request.status,
+                                    ),
+                                )
+                                .sort((a, b) => b.timestamp - a.timestamp),
+                            });
+                          });
+                      snapShotRequest[team.teamCode] = snapShotRequestReconnect[
+                        team.teamCode
+                      ]();
+                    });
                   });
-                });
-              } else {
-                commit(rootTypes.SET_AUTH);
-                commit(types.FETCH_TEAMS);
+                } else {
+                  commit(rootTypes.SET_AUTH);
+                  commit(types.FETCH_TEAMS);
+                }
               }
             }
-          }
-        });
+          });
+      snapShot.account = snapShotReconnect.account();
     }
   },
   switchTeam({ commit, state }, teamCode) {

@@ -6,6 +6,7 @@ import {
   // state as rootState,
   promiseImage,
   snapShot,
+  snapShotReconnect,
 } from '../root';
 import { types as userTypes } from './user';
 import { actions as recordActions, types as recordTypes } from './record';
@@ -547,139 +548,145 @@ const actions = {
     if (teamCode) {
       const idbKeyval = dbInit(teamCode);
       if (typeof snapShot.team === 'function') snapShot.team();
-      snapShot.team = db
-        .collection('teams')
-        .doc(teamCode)
-        .onSnapshot(teamDoc => {
-          if (teamDoc.exists) {
-            window.trackRead('listenTeamChange: team', 1);
-            const {
-              icon,
-              games = {},
-              benches: benches_ = {},
-              players: players_ = {},
-              unlockGames = [],
-              clock,
-              ...others
-            } = teamDoc.data();
-            commit(rootTypes.SET_TEAMICON, icon);
-            commit(
-              recordTypes.GET_PLAYERS,
-              Object.keys(players_).map(name => ({
-                id: name,
-                data: players_[name],
-              })),
-            );
+      snapShotReconnect.team = () =>
+        db
+          .collection('teams')
+          .doc(teamCode)
+          .onSnapshot(teamDoc => {
+            if (teamDoc.exists) {
+              window.trackRead('listenTeamChange: team', 1);
+              const {
+                icon,
+                games = {},
+                benches: benches_ = {},
+                players: players_ = {},
+                unlockGames = [],
+                clock,
+                ...others
+              } = teamDoc.data();
+              commit(rootTypes.SET_TEAMICON, icon);
+              commit(
+                recordTypes.GET_PLAYERS,
+                Object.keys(players_).map(name => ({
+                  id: name,
+                  data: players_[name],
+                })),
+              );
 
-            if (
-              preUnlockGames === undefined ||
-              JSON.stringify(preUnlockGames) === JSON.stringify(unlockGames)
-            ) {
-              idbKeyval.getAll().then(localGames => {
-                // if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                //   alert(458);
-                // }
-                const localIds = localGames.map(game => game.id);
-                const gameShouldUpdates = localGames
-                  .filter(
-                    game =>
-                      !game.timestamp ||
-                      (games[game.id] &&
-                        game.timestamp &&
-                        !games[game.id].isEqual(game.timestamp)),
-                  )
-                  .map(game => game.id)
-                  .concat(
-                    Object.keys(games).filter(game => !localIds.includes(game)),
-                  );
-                // delete
-                const gameShouldDeletes = localGames
-                  .filter(game => !Object.keys(games).includes(game.id))
-                  .map(game => game.id);
-                // update if needed
-                Promise.all(
-                  gameShouldUpdates.map(game =>
-                    db.doc(`teams/${teamCode}/games/${game}`).get(),
-                  ),
-                ).then(gameDocs => {
-                  window.trackRead(
-                    'listenTeamChange: games need to update',
-                    gameDocs.length || 1,
-                  );
-                  const setGames = gameDocs.map(gameDoc => {
-                    return idbKeyval.set(gameDoc.id, {
-                      id: gameDoc.id,
-                      ...gameDoc.data(),
+              if (
+                preUnlockGames === undefined ||
+                JSON.stringify(preUnlockGames) === JSON.stringify(unlockGames)
+              ) {
+                idbKeyval.getAll().then(localGames => {
+                  // if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
+                  //   alert(458);
+                  // }
+                  const localIds = localGames.map(game => game.id);
+                  const gameShouldUpdates = localGames
+                    .filter(
+                      game =>
+                        !game.timestamp ||
+                        (games[game.id] &&
+                          game.timestamp &&
+                          !games[game.id].isEqual(game.timestamp)),
+                    )
+                    .map(game => game.id)
+                    .concat(
+                      Object.keys(games).filter(
+                        game => !localIds.includes(game),
+                      ),
+                    );
+                  // delete
+                  const gameShouldDeletes = localGames
+                    .filter(game => !Object.keys(games).includes(game.id))
+                    .map(game => game.id);
+                  // update if needed
+                  Promise.all(
+                    gameShouldUpdates.map(game =>
+                      db.doc(`teams/${teamCode}/games/${game}`).get(),
+                    ),
+                  ).then(gameDocs => {
+                    window.trackRead(
+                      'listenTeamChange: games need to update',
+                      gameDocs.length || 1,
+                    );
+                    const setGames = gameDocs.map(gameDoc => {
+                      return idbKeyval.set(gameDoc.id, {
+                        id: gameDoc.id,
+                        ...gameDoc.data(),
+                      });
                     });
-                  });
-                  const delGames = gameShouldDeletes.map(gameId => {
-                    return idbKeyval.delete(gameId);
-                  });
-                  Promise.all([...setGames, ...delGames])
-                    .then(() => idbKeyval.getAll())
-                    .then(records => {
-                      recordActions.operateGames(
-                        { commit },
-                        records.map(({ id, ...data }) => ({
-                          id,
-                          data: { ...data },
-                        })),
-                      );
+                    const delGames = gameShouldDeletes.map(gameId => {
+                      return idbKeyval.delete(gameId);
                     });
+                    Promise.all([...setGames, ...delGames])
+                      .then(() => idbKeyval.getAll())
+                      .then(records => {
+                        recordActions.operateGames(
+                          { commit },
+                          records.map(({ id, ...data }) => ({
+                            id,
+                            data: { ...data },
+                          })),
+                        );
+                      });
+                  });
                 });
-              });
-            }
-            preUnlockGames = unlockGames;
+              }
+              preUnlockGames = unlockGames;
 
-            const players = Object.keys(players_).map(name => ({
-              name,
-              manager: players_[name].manager,
-              number: players_[name].number,
-              uid: players_[name].uid,
-              photo: players_[name].photo,
-            }));
-            const benches = Object.keys(benches_).map(uid => ({
-              uid,
-              msg: benches_[uid].msg,
-              photo: benches_[uid].photo,
-            }));
-            commit(types.FETCH_TEAM, {
-              id: teamDoc.id,
-              icon,
-              players,
-              benches,
-              games,
-              unlockGames,
-              ...others,
-            });
-            if (clock) {
-              const clock_ = new f_timestamp(
-                clock.seconds,
-                clock.nanoseconds,
-              ).toDate();
-              const executeClock = () => {
-                const date = new Date(new Date().getTime() - clock_.getTime());
-                const hours = date.getUTCHours();
-                const minutes = `0${date.getUTCMinutes()}`;
-                const seconds = `0${date.getUTCSeconds()}`;
-                const formattedTime = `${hours}:${minutes.substr(
-                  -2,
-                )}:${seconds.substr(-2)}`;
-                if (state.isClockRunning) {
-                  if (state.clock !== formattedTime) {
-                    commit(types.SET_CLOCK, formattedTime);
+              const players = Object.keys(players_).map(name => ({
+                name,
+                manager: players_[name].manager,
+                number: players_[name].number,
+                uid: players_[name].uid,
+                photo: players_[name].photo,
+              }));
+              const benches = Object.keys(benches_).map(uid => ({
+                uid,
+                msg: benches_[uid].msg,
+                photo: benches_[uid].photo,
+              }));
+              commit(types.FETCH_TEAM, {
+                id: teamDoc.id,
+                icon,
+                players,
+                benches,
+                games,
+                unlockGames,
+                ...others,
+              });
+              if (clock) {
+                const clock_ = new f_timestamp(
+                  clock.seconds,
+                  clock.nanoseconds,
+                ).toDate();
+                const executeClock = () => {
+                  const date = new Date(
+                    new Date().getTime() - clock_.getTime(),
+                  );
+                  const hours = date.getUTCHours();
+                  const minutes = `0${date.getUTCMinutes()}`;
+                  const seconds = `0${date.getUTCSeconds()}`;
+                  const formattedTime = `${hours}:${minutes.substr(
+                    -2,
+                  )}:${seconds.substr(-2)}`;
+                  if (state.isClockRunning) {
+                    if (state.clock !== formattedTime) {
+                      commit(types.SET_CLOCK, formattedTime);
+                    }
+                    window.requestAnimationFrame(executeClock);
                   }
-                  window.requestAnimationFrame(executeClock);
-                }
-              };
-              commit(types.ENABLE_CLOCK, true);
-              window.requestAnimationFrame(executeClock);
-            } else {
-              commit(types.SET_CLOCK, undefined);
-              commit(types.ENABLE_CLOCK, false);
+                };
+                commit(types.ENABLE_CLOCK, true);
+                window.requestAnimationFrame(executeClock);
+              } else {
+                commit(types.SET_CLOCK, undefined);
+                commit(types.ENABLE_CLOCK, false);
+              }
             }
-          }
-        });
+          });
+      snapShot.team = snapShotReconnect.team();
     } else {
       commit(rootTypes.SET_TEAMICON, '');
     }
@@ -697,8 +704,9 @@ const actions = {
             icon: data.icon,
             name: data.name,
             subNames: data.subNames,
-            keyword: `${data.name}${data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
-              }`,
+            keyword: `${data.name}${
+              data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
+            }`,
           };
           commit(types.FETCH_DEMO_TEAM, demoTeam);
           commit(userTypes.FETCH_TEAMS, [demoTeam]);
@@ -734,8 +742,9 @@ const actions = {
                 icon: data.icon,
                 name: data.name,
                 subNames: data.subNames,
-                keyword: `${data.name}${data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
-                  }`,
+                keyword: `${data.name}${
+                  data.subNames ? `${data.subNames.replace(/,/g, '')}` : ''
+                }`,
                 score: data.score,
               };
             });
@@ -749,11 +758,11 @@ const actions = {
           if (['***', '＊＊＊'].includes(keyword)) return true;
           return keyword
             ? team.keyword.match(
-              new RegExp(
-                keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
-                'ig',
-              ),
-            )
+                new RegExp(
+                  keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),
+                  'ig',
+                ),
+              )
             : false;
         })
         .map(team => {
@@ -811,27 +820,29 @@ const actions = {
   fetchPersonalRequests({ commit }, uid) {
     commit(rootTypes.LOADING, true);
     if (typeof snapShot.request === 'function') snapShot.request();
-    snapShot.request = db
-      .collection('requests')
-      .where('uid', '==', uid)
-      .onSnapshot(querySnapshot => {
-        window.trackRead(
-          'fetchPersonalRequests',
-          querySnapshot.docs.length || 1,
-        );
-        const requests = querySnapshot.docs
-          .map(doc => {
-            const { timestamp, ...data } = doc.data();
-            return {
-              timestamp: timestamp.toDate(),
-              ...data,
-              id: doc.id,
-            };
-          })
-          .sort((a, b) => b.timestamp - a.timestamp);
-        commit(types.FETCH_REQUESTS, requests);
-        commit(rootTypes.LOADING, false);
-      });
+    snapShotReconnect.request = () =>
+      db
+        .collection('requests')
+        .where('uid', '==', uid)
+        .onSnapshot(querySnapshot => {
+          window.trackRead(
+            'fetchPersonalRequests',
+            querySnapshot.docs.length || 1,
+          );
+          const requests = querySnapshot.docs
+            .map(doc => {
+              const { timestamp, ...data } = doc.data();
+              return {
+                timestamp: timestamp.toDate(),
+                ...data,
+                id: doc.id,
+              };
+            })
+            .sort((a, b) => b.timestamp - a.timestamp);
+          commit(types.FETCH_REQUESTS, requests);
+          commit(rootTypes.LOADING, false);
+        });
+    snapShot.request = snapShotReconnect.request();
   },
   disconnectPersonalRequests() {
     if (typeof snapShot.request === 'function') snapShot.request();
