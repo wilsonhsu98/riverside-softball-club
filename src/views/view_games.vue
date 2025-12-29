@@ -307,12 +307,16 @@
                         <div>{{ index + 1 }}</div>
                         <div class="cell" v-if="topBottom === 'top'">
                           {{
-                            scores[index] !== undefined ? scores[index] : '?'
+                            ![undefined, '', null].includes(scores[index])
+                              ? scores[index]
+                              : '?'
                           }}
                         </div>
                         <div class="cell">
                           {{
-                            opponentScores[index] !== undefined
+                            ![undefined, '', null].includes(
+                              opponentScores[index],
+                            )
                               ? opponentScores[index]
                               : topBottom === 'top' && index + 1 === inn
                               ? 'X'
@@ -321,7 +325,9 @@
                         </div>
                         <div class="cell" v-if="topBottom === 'bot'">
                           {{
-                            scores[index] !== undefined ? scores[index] : 'X'
+                            ![undefined, '', null].includes(scores[index])
+                              ? scores[index]
+                              : 'X'
                           }}
                         </div>
                       </div>

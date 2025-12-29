@@ -94,7 +94,7 @@
                 <div>{{ index + 1 }}</div>
                 <div class="cell" v-if="topBottom === 'top'">
                   {{
-                    ![undefined, '', null].includes(score[index])
+                    ![undefined, '', null].includes(scores[index])
                       ? scores[index]
                       : '?'
                   }}
@@ -110,7 +110,7 @@
                 </div>
                 <div class="cell" v-if="topBottom === 'bot'">
                   {{
-                    ![undefined, '', null].includes(score[index])
+                    ![undefined, '', null].includes(scores[index])
                       ? scores[index]
                       : 'X'
                   }}
