@@ -304,7 +304,7 @@ const getNameNumber = ({ name = '', number = '' }) => {
   return `${tempName}${tempNum}`;
 };
 
-const basicCount = 22;
+const basicCount = 23;
 const scoreMapping = [
   {
     key: 'teamIcon',
@@ -355,6 +355,11 @@ const scoreMapping = [
   {
     key: 'gameGroup',
     checkFunc: ({ games = [] }) => (games.some(g => g.group) ? 1 : 0),
+    percent: 60 / basicCount,
+  },
+  {
+    key: 'gameCourt',
+    checkFunc: ({ games = [] }) => (games.some(g => g.court) ? 1 : 0),
     percent: 60 / basicCount,
   },
   {
@@ -460,9 +465,7 @@ const scoreMapping = [
   {
     key: 'gameForcedMode',
     checkFunc: ({ records = [] }) => {
-      return [...records].reverse().some(r => r.isForcedMode)
-        ? 1
-        : 0;
+      return [...records].reverse().some(r => r.isForcedMode) ? 1 : 0;
     },
     percent: 60 / basicCount,
   },

@@ -93,11 +93,15 @@
               >
                 <div>{{ index + 1 }}</div>
                 <div class="cell" v-if="topBottom === 'top'">
-                  {{ scores[index] !== undefined ? scores[index] : '?' }}
+                  {{
+                    ![undefined, '', null].includes(score[index])
+                      ? scores[index]
+                      : '?'
+                  }}
                 </div>
                 <div class="cell">
                   {{
-                    opponentScores[index] !== undefined
+                    ![undefined, '', null].includes(opponentScores[index])
                       ? opponentScores[index]
                       : topBottom === 'top' && index + 1 === inn
                       ? 'X'
@@ -105,7 +109,11 @@
                   }}
                 </div>
                 <div class="cell" v-if="topBottom === 'bot'">
-                  {{ scores[index] !== undefined ? scores[index] : 'X' }}
+                  {{
+                    ![undefined, '', null].includes(score[index])
+                      ? scores[index]
+                      : 'X'
+                  }}
                 </div>
               </div>
             </template>
@@ -164,6 +172,7 @@
               {{ $t('box_group', { g: group.replace(/group|組/gi, '') }) }}
             </div>
             <div v-if="gameType" class="tag">{{ gameType }}</div>
+            <div v-if="court" class="tag">{{ court }}</div>
             <div v-if="place" class="tag">{{ place }}</div>
             <div v-if="time" class="tag">
               {{ time }}
@@ -2062,6 +2071,7 @@ export default {
       period: '',
       league: '',
       group: '',
+      court: '',
       gameType: '',
       place: '',
       time: undefined,
@@ -2659,6 +2669,7 @@ export default {
             period,
             league,
             group,
+            court,
             gameType,
             place,
             coach,
@@ -2694,6 +2705,7 @@ export default {
           this.period = period;
           this.league = league;
           this.group = group;
+          this.court = court;
           this.gameType = [
             this.$t('ttl_fun'),
             this.$t('ttl_regular'),

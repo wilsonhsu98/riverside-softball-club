@@ -187,238 +187,235 @@
     >
       <ad :mode="'games'" />
       <template v-if="Array.isArray(groupGames_)">
-        <template v-for="(item, i) in groupGames_">
-          <div
-            :class="[
-              'row',
-              { first: i === 0, last: i === groupGames.length - 1 },
-            ]"
-            :data-date="item.date"
-            :key="`date_${item.date}`"
-          >
-            <template v-for="sub in item.games">
-              <v-popover
-                v-if="container"
-                placement="bottom"
-                trigger="click"
-                offset="0"
-                class="cell"
-                :delay="{ show: 100, hide: 0 }"
-                :popoverClass="
-                  `box-tip ${unlockGames.includes(sub.game) ? '' : sub.result}`
-                "
-                :open="sub.game === focus_game"
-                :autoHide="true"
-                :key="`game_${sub.game}`"
-                :container="$refs.container"
-                @show="setGame(sub.game)"
-                @auto-hide="focus_game = ''"
-                @close-group="focus_game = ''"
-              >
-                <div class="item">
-                  <div v-if="unlockGames.includes(sub.game)" class="result">
-                    ?
-                  </div>
-                  <div v-else :class="`result ${sub.result}`">
-                    {{ (sub.result && sub.result.slice(0, 1)) || '?' }}
-                    <i v-if="sub.youtubeVideos" class="fa fa-video-camera"></i>
-                  </div>
-                  <div class="name">{{ sub.opponent || sub.game }}</div>
-                  <div v-if="sub.time" class="time">{{ sub.time }}</div>
+        <div
+          v-for="(item, i) in groupGames_"
+          :class="[
+            'row',
+            { first: i === 0, last: i === groupGames.length - 1 },
+          ]"
+          :data-date="item.date"
+          :key="`date_${item.date}`"
+        >
+          <template v-for="sub in item.games">
+            <v-popover
+              v-if="container"
+              placement="bottom"
+              trigger="click"
+              offset="0"
+              class="cell"
+              :delay="{ show: 100, hide: 0 }"
+              :popoverClass="
+                `box-tip ${unlockGames.includes(sub.game) ? '' : sub.result}`
+              "
+              :open="sub.game === focus_game"
+              :autoHide="true"
+              :key="`game_${sub.game}`"
+              :container="$refs.container"
+              @show="setGame(sub.game)"
+              @auto-hide="focus_game = ''"
+              @close-group="focus_game = ''"
+            >
+              <div class="item">
+                <div v-if="unlockGames.includes(sub.game)" class="result">
+                  ?
                 </div>
-                <template slot="popover">
-                  <template v-if="version !== 'import' && topBottom">
-                    <div class="team-versus">
-                      <template v-if="topBottom === 'top'">
-                        <div class="team-name">
-                          <div class="name">{{ useTeam }}</div>
-                          <div
-                            class="score"
-                            v-if="['win_', 'lose_'].includes(sub.result)"
-                          >
-                            {{ sub.result === 'win_' ? 'N' : 0 }}
-                          </div>
-                          <div class="score" v-else>
-                            {{ sumByInn(scores, inn) }}
-                          </div>
+                <div v-else :class="`result ${sub.result}`">
+                  {{ (sub.result && sub.result.slice(0, 1)) || '?' }}
+                  <i v-if="sub.youtubeVideos" class="fa fa-video-camera"></i>
+                </div>
+                <div class="name">{{ sub.opponent || sub.game }}</div>
+                <div v-if="sub.time" class="time">{{ sub.time }}</div>
+              </div>
+              <template slot="popover">
+                <template v-if="version !== 'import' && topBottom">
+                  <div class="team-versus">
+                    <template v-if="topBottom === 'top'">
+                      <div class="team-name">
+                        <div class="name">{{ useTeam }}</div>
+                        <div
+                          class="score"
+                          v-if="['win_', 'lose_'].includes(sub.result)"
+                        >
+                          {{ sub.result === 'win_' ? 'N' : 0 }}
                         </div>
-                        <div class="versus">:</div>
-                        <div class="team-name">
-                          <div
-                            class="score"
-                            v-if="['win_', 'lose_'].includes(sub.result)"
-                          >
-                            {{ sub.result === 'lose_' ? 'N' : 0 }}
-                          </div>
-                          <div class="score" v-else>
-                            {{ sumByInn(opponentScores, inn) }}
-                          </div>
-                          <div class="name">{{ opponent }}</div>
+                        <div class="score" v-else>
+                          {{ sumByInn(scores, inn) }}
+                        </div>
+                      </div>
+                      <div class="versus">:</div>
+                      <div class="team-name">
+                        <div
+                          class="score"
+                          v-if="['win_', 'lose_'].includes(sub.result)"
+                        >
+                          {{ sub.result === 'lose_' ? 'N' : 0 }}
+                        </div>
+                        <div class="score" v-else>
+                          {{ sumByInn(opponentScores, inn) }}
+                        </div>
+                        <div class="name">{{ opponent }}</div>
+                      </div>
+                    </template>
+                    <template v-else>
+                      <div class="team-name">
+                        <div class="name">{{ opponent }}</div>
+                        <div
+                          class="score"
+                          v-if="['win_', 'lose_'].includes(sub.result)"
+                        >
+                          {{ sub.result === 'lose_' ? 'N' : 0 }}
+                        </div>
+                        <div class="score" v-else>
+                          {{ sumByInn(opponentScores, inn) }}
+                        </div>
+                      </div>
+                      <div class="versus">:</div>
+                      <div class="team-name">
+                        <div
+                          class="score"
+                          v-if="['win_', 'lose_'].includes(sub.result)"
+                        >
+                          {{ sub.result === 'win_' ? 'N' : 0 }}
+                        </div>
+                        <div class="score" v-else>
+                          {{ sumByInn(scores, inn) }}
+                        </div>
+                        <div class="name">{{ useTeam }}</div>
+                      </div>
+                    </template>
+                  </div>
+                  <div class="box">
+                    <div class="team">
+                      <div class="cell">&nbsp;</div>
+                      <div class="cell">
+                        {{ topBottom === 'top' ? useTeam : opponent }}
+                      </div>
+                      <div class="cell">
+                        {{ topBottom === 'bot' ? useTeam : opponent }}
+                      </div>
+                    </div>
+                    <div class="gap"></div>
+                    <template v-if="!['win_', 'lose_'].includes(sub.result)">
+                      <div
+                        v-for="(undefined, index) in Array.apply(
+                          null,
+                          Array(inn),
+                        )"
+                        :key="index"
+                        class="inn"
+                      >
+                        <div>{{ index + 1 }}</div>
+                        <div class="cell" v-if="topBottom === 'top'">
+                          {{
+                            scores[index] !== undefined ? scores[index] : '?'
+                          }}
+                        </div>
+                        <div class="cell">
+                          {{
+                            opponentScores[index] !== undefined
+                              ? opponentScores[index]
+                              : topBottom === 'top' && index + 1 === inn
+                              ? 'X'
+                              : '?'
+                          }}
+                        </div>
+                        <div class="cell" v-if="topBottom === 'bot'">
+                          {{
+                            scores[index] !== undefined ? scores[index] : 'X'
+                          }}
+                        </div>
+                      </div>
+                    </template>
+                    <div class="inn" style="margin-left: auto;">
+                      <div class="cell">R</div>
+                      <template v-if="!['win_', 'lose_'].includes(sub.result)">
+                        <div class="cell" v-if="topBottom === 'top'">
+                          {{ score }}
+                        </div>
+                        <div class="cell">
+                          {{ opponentScore }}
+                        </div>
+                        <div class="cell" v-if="topBottom === 'bot'">
+                          {{ score }}
                         </div>
                       </template>
                       <template v-else>
-                        <div class="team-name">
-                          <div class="name">{{ opponent }}</div>
-                          <div
-                            class="score"
-                            v-if="['win_', 'lose_'].includes(sub.result)"
-                          >
-                            {{ sub.result === 'lose_' ? 'N' : 0 }}
-                          </div>
-                          <div class="score" v-else>
-                            {{ sumByInn(opponentScores, inn) }}
-                          </div>
-                        </div>
-                        <div class="versus">:</div>
-                        <div class="team-name">
-                          <div
-                            class="score"
-                            v-if="['win_', 'lose_'].includes(sub.result)"
-                          >
-                            {{ sub.result === 'win_' ? 'N' : 0 }}
-                          </div>
-                          <div class="score" v-else>
-                            {{ sumByInn(scores, inn) }}
-                          </div>
-                          <div class="name">{{ useTeam }}</div>
-                        </div>
-                      </template>
-                    </div>
-                    <div class="box">
-                      <div class="team">
-                        <div class="cell">&nbsp;</div>
-                        <div class="cell">
-                          {{ topBottom === 'top' ? useTeam : opponent }}
-                        </div>
-                        <div class="cell">
-                          {{ topBottom === 'bot' ? useTeam : opponent }}
-                        </div>
-                      </div>
-                      <div class="gap"></div>
-                      <template v-if="!['win_', 'lose_'].includes(sub.result)">
-                        <div
-                          v-for="(undefined, index) in Array.apply(
-                            null,
-                            Array(inn),
-                          )"
-                          :key="index"
-                          class="inn"
-                        >
-                          <div>{{ index + 1 }}</div>
-                          <div class="cell" v-if="topBottom === 'top'">
-                            {{
-                              scores[index] !== undefined ? scores[index] : '?'
-                            }}
-                          </div>
-                          <div class="cell">
-                            {{
-                              opponentScores[index] !== undefined
-                                ? opponentScores[index]
-                                : topBottom === 'top' && index + 1 === inn
-                                ? 'X'
-                                : '?'
-                            }}
-                          </div>
-                          <div class="cell" v-if="topBottom === 'bot'">
-                            {{
-                              scores[index] !== undefined ? scores[index] : 'X'
-                            }}
-                          </div>
-                        </div>
-                      </template>
-                      <div class="inn" style="margin-left: auto;">
-                        <div class="cell">R</div>
-                        <template
-                          v-if="!['win_', 'lose_'].includes(sub.result)"
-                        >
-                          <div class="cell" v-if="topBottom === 'top'">
-                            {{ score }}
-                          </div>
-                          <div class="cell">
-                            {{ opponentScore }}
-                          </div>
-                          <div class="cell" v-if="topBottom === 'bot'">
-                            {{ score }}
-                          </div>
-                        </template>
-                        <template v-else>
-                          <div class="cell" v-if="topBottom === 'top'">
-                            {{ sub.result === 'win_' ? 'N' : 0 }}
-                          </div>
-                          <div class="cell">
-                            {{ sub.result === 'lose_' ? 'N' : 0 }}
-                          </div>
-                          <div class="cell" v-if="topBottom === 'bot'">
-                            {{ sub.result === 'win_' ? 'N' : 0 }}
-                          </div>
-                        </template>
-                      </div>
-                      <div
-                        class="inn"
-                        v-if="!['win_', 'lose_'].includes(sub.result)"
-                      >
-                        <div class="cell">H</div>
                         <div class="cell" v-if="topBottom === 'top'">
-                          {{ hit }}
+                          {{ sub.result === 'win_' ? 'N' : 0 }}
                         </div>
                         <div class="cell">
-                          {{ pitchers.length ? opponentH : '?' }}
+                          {{ sub.result === 'lose_' ? 'N' : 0 }}
                         </div>
                         <div class="cell" v-if="topBottom === 'bot'">
-                          {{ hit }}
+                          {{ sub.result === 'win_' ? 'N' : 0 }}
                         </div>
-                      </div>
-                      <div
-                        class="inn"
-                        v-if="!['win_', 'lose_'].includes(sub.result)"
-                      >
-                        <div class="cell">E</div>
-                        <div class="cell" v-if="topBottom === 'top'">
-                          {{ error === '' ? '?' : error }}
-                        </div>
-                        <div class="cell">
-                          {{ opponentError }}
-                        </div>
-                        <div class="cell" v-if="topBottom === 'bot'">
-                          {{ error === '' ? '?' : error }}
-                        </div>
-                      </div>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div v-if="sub.league && sub.group">
-                      {{
-                        `${sub.league} ${$t('box_group', {
-                          g: sub.group.replace(/group|組/gi, ''),
-                        })}`
-                      }}
-                      <template v-if="sub.period">
-                        {{ `(${sub.period})` }}
                       </template>
-                      <div>{{ sub.game }}</div>
-                      <div>
-                        {{
-                          sub.opponent
-                            ? $t('box_opponent', { opponent: sub.opponent })
-                            : $t('box_forgot_opponent')
-                        }}
+                    </div>
+                    <div
+                      class="inn"
+                      v-if="!['win_', 'lose_'].includes(sub.result)"
+                    >
+                      <div class="cell">H</div>
+                      <div class="cell" v-if="topBottom === 'top'">
+                        {{ hit }}
+                      </div>
+                      <div class="cell">
+                        {{ pitchers.length ? opponentH : '?' }}
+                      </div>
+                      <div class="cell" v-if="topBottom === 'bot'">
+                        {{ hit }}
                       </div>
                     </div>
-                  </template>
-                  <router-link
-                    :to="{
-                      name: isViewMode ? 'v_game' : 'game',
-                      params: { team: $route.params.team, game: sub.game },
-                    }"
-                    tag="button"
-                    class="link-btn"
-                    >{{ $t('btn_view_box') }}
-                  </router-link>
+                    <div
+                      class="inn"
+                      v-if="!['win_', 'lose_'].includes(sub.result)"
+                    >
+                      <div class="cell">E</div>
+                      <div class="cell" v-if="topBottom === 'top'">
+                        {{ error === '' ? '?' : error }}
+                      </div>
+                      <div class="cell">
+                        {{ opponentError }}
+                      </div>
+                      <div class="cell" v-if="topBottom === 'bot'">
+                        {{ error === '' ? '?' : error }}
+                      </div>
+                    </div>
+                  </div>
                 </template>
-              </v-popover>
-            </template>
-          </div>
-        </template>
+                <template v-else>
+                  <div v-if="sub.league && sub.group">
+                    {{
+                      `${sub.league} ${$t('box_group', {
+                        g: sub.group.replace(/group|組/gi, ''),
+                      })}`
+                    }}
+                    <template v-if="sub.period">
+                      {{ `(${sub.period})` }}
+                    </template>
+                    <div>{{ sub.game }}</div>
+                    <div>
+                      {{
+                        sub.opponent
+                          ? $t('box_opponent', { opponent: sub.opponent })
+                          : $t('box_forgot_opponent')
+                      }}
+                    </div>
+                  </div>
+                </template>
+                <router-link
+                  :to="{
+                    name: isViewMode ? 'v_game' : 'game',
+                    params: { team: $route.params.team, game: sub.game },
+                  }"
+                  tag="button"
+                  class="link-btn"
+                  >{{ $t('btn_view_box') }}
+                </router-link>
+              </template>
+            </v-popover>
+          </template>
+        </div>
         <div class="no-game" v-if="groupGames_.length === 0">
           {{ $t('box_empty') }}
         </div>
@@ -1019,6 +1016,11 @@ const queryFields = [
     invertColor: 'rgba(255, 255, 255, 0.8)',
   },
   {
+    field: 'court',
+    color: '#aaaa21',
+    invertColor: 'rgba(255, 255, 255, 0.8)',
+  },
+  {
     field: 'place',
     color: '#17a2b8',
     invertColor: 'rgba(255, 255, 255, 0.8)',
@@ -1190,6 +1192,14 @@ export default {
             invertColor,
           }));
           break;
+        case 'court':
+          this.fieldOptions = this.gameOptions.court.map(({ text, count }) => ({
+            text: `${text}(${count})`,
+            value: `${this.selectedField}:${text}`,
+            color,
+            invertColor,
+          }));
+          break;
         case 'place':
           this.fieldOptions = [
             { text: this.$t('ttl_1st'), value: `${this.selectedField}:1` },
@@ -1234,7 +1244,11 @@ export default {
           break;
         case 'game_tag':
           this.fieldOptions = this.gameOptions.tags.map(({ text, count }) => ({
-            text: `${text === 'hasForcedModeGame' ? this.$t('ttl_forced_mode_game') : text}(${count})`,
+            text: `${
+              text === 'hasForcedModeGame'
+                ? this.$t('ttl_forced_mode_game')
+                : text
+            }(${count})`,
             value: `tags:${text}`,
             color,
             invertColor,

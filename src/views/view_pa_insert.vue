@@ -11,21 +11,28 @@
       <h1>
         <i class="instruction" @click="showInstruction = true"><help /></i>
         {{ $t('add_pa') }}
-        <button class="btn btn-forced" @click="openShowForcedModeDialog" :style="{ visibility: canOpenForcedMode ? 'visible' : 'hidden' }">
-          {{ isForcedMode ? $t('btn_close_forced_mode') : $t('btn_show_forced_mode') }}
+        <button
+          class="btn btn-forced"
+          @click="openShowForcedModeDialog"
+          :style="{ visibility: canOpenForcedMode ? 'visible' : 'hidden' }"
+        >
+          {{
+            isForcedMode
+              ? $t('btn_close_forced_mode')
+              : $t('btn_show_forced_mode')
+          }}
         </button>
       </h1>
       <div style="width: 100%"></div>
       <div class="single-col">
         <div class="separater">
-          <label>{{ isForcedMode ? $t('ttl_current_pa_forced_mode') : $t('ttl_current_pa') }}</label>
+          <label>{{
+            isForcedMode
+              ? $t('ttl_current_pa_forced_mode')
+              : $t('ttl_current_pa')
+          }}</label>
         </div>
-        <div
-          :class="[
-            'current-desc',
-            { show: base['home'].name && !waitRedirect },
-          ]"
-        >
+        <div :class="['current-desc', { show: base['home'].name }]">
           <div class="summary">
             <div class="box">
               <div class="team">
@@ -60,11 +67,17 @@
                     'base',
                     {
                       'has-player': base[b].name,
-                      disabled: !(isBaseNotFulled() || base[b].name || (canOpenForcedMode && isForcedMode)),
+                      disabled: !(
+                        isBaseNotFulled() ||
+                        base[b].name ||
+                        (canOpenForcedMode && isForcedMode)
+                      ),
                     },
                   ]"
                   @click="
-                    (isBaseNotFulled() || base[b].name || (canOpenForcedMode && isForcedMode)) &&
+                    (isBaseNotFulled() ||
+                      base[b].name ||
+                      (canOpenForcedMode && isForcedMode)) &&
                       changePlayer(b)
                   "
                 />
@@ -82,8 +95,34 @@
                   ></div>
                   <span v-else>?</span>
                 </div>
-                <div :class="['out', { selected: out > 0 || (canOpenForcedMode && isForcedMode && predefinedOut > 0), 'forced-mode': canOpenForcedMode && isForcedMode }]" @click="togglePredefinedOut(1)"></div>
-                <div :class="['out', { selected: out > 1 || (canOpenForcedMode && isForcedMode && predefinedOut > 1), 'forced-mode': canOpenForcedMode && isForcedMode }]" @click="togglePredefinedOut(2)"></div>
+                <div
+                  :class="[
+                    'out',
+                    {
+                      selected:
+                        out > 0 ||
+                        (canOpenForcedMode &&
+                          isForcedMode &&
+                          predefinedOut > 0),
+                      'forced-mode': canOpenForcedMode && isForcedMode,
+                    },
+                  ]"
+                  @click="togglePredefinedOut(1)"
+                ></div>
+                <div
+                  :class="[
+                    'out',
+                    {
+                      selected:
+                        out > 1 ||
+                        (canOpenForcedMode &&
+                          isForcedMode &&
+                          predefinedOut > 1),
+                      'forced-mode': canOpenForcedMode && isForcedMode,
+                    },
+                  ]"
+                  @click="togglePredefinedOut(2)"
+                ></div>
               </div>
             </div>
             <div class="next3">
@@ -509,11 +548,12 @@
         :style="spotlightIcon"
       />
       <svg width="100%" height="100%">
-        <rect width="100%" height="100%" mask="url(#multi-hole-mask)"/>
+        <rect width="100%" height="100%" mask="url(#multi-hole-mask)" />
         <mask id="multi-hole-mask">
-          <rect width="100%" height="100%" fill="white" fill-opacity="0.6"/>
-          <rect 
-            v-for="({ top, left, width, height }, i) in spotlights" :key="`spotlight_${i}`"
+          <rect width="100%" height="100%" fill="white" fill-opacity="0.6" />
+          <rect
+            v-for="({ top, left, width, height }, i) in spotlights"
+            :key="`spotlight_${i}`"
             :x="left"
             :y="top"
             :width="width"
@@ -801,7 +841,7 @@
     margin: 0 auto 10px;
     max-width: 300px;
 
-    >span {
+    > span {
       text-align: center;
       color: $row_color;
       font-size: 14px;
@@ -815,7 +855,7 @@
           border-color: $active_bgcolor;
         }
 
-        ~span {
+        ~ span {
           color: $input_font;
 
           &:before {
@@ -860,7 +900,7 @@
       }
     }
 
-    >.btn {
+    > .btn {
       display: block;
       width: 20px;
       height: 20px;
@@ -1001,7 +1041,7 @@
     padding-bottom: 15px;
     position: relative;
 
-    >label {
+    > label {
       position: absolute;
       background-color: var(--card-bg);
       color: $input_font;
@@ -1048,7 +1088,7 @@
       width: 120px;
       justify-content: center;
 
-      >span {
+      > span {
         font-size: 12px;
         text-align: center;
         white-space: nowrap;
@@ -1176,7 +1216,7 @@
   left: 0;
   background-color: rgba(0, 0, 0, 0.5);
 
-  >div {
+  > div {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(2);
@@ -1189,12 +1229,12 @@
       display: flex;
       flex-direction: column;
 
-      &>.wrapper {
+      & > .wrapper {
         transform: scale(2) translateY(-5px);
         transform-origin: center bottom;
         text-align: center;
 
-        &~label {
+        & ~ label {
           color: #fff;
           font-size: 20px;
           white-space: nowrap;
@@ -1228,7 +1268,7 @@
     flex-wrap: wrap;
 
     &::v-deep {
-      .outer-container> :first-child {
+      .outer-container > :first-child {
         left: -35px;
       }
     }
@@ -1324,8 +1364,7 @@
   }
 }
 
-@media only screen and (max-width: 760px),
-(max-height: 480px) {
+@media only screen and (max-width: 760px), (max-height: 480px) {
   .container {
     .step-bar {
       width: 100%;
@@ -1436,7 +1475,6 @@ export default {
       spotlightIcons: [],
       spotlightTimer: undefined,
       showInstruction: false,
-      waitRedirect: false,
       canOpenForcedMode: false,
       showForcedModeDialog: false,
       isForcedMode: false,
@@ -1562,9 +1600,9 @@ export default {
             );
             return find
               ? {
-                ...acc,
-                [b]: this.base[find].name,
-              }
+                  ...acc,
+                  [b]: this.base[find].name,
+                }
               : acc;
           }, {});
           this.onbaseOut =
@@ -1616,17 +1654,14 @@ export default {
           ...(item.onbase !== undefined && { onbase: item.onbase }),
           ...(item.location !== undefined && { location: item.location }),
           ...(item.break !== undefined && { break: item.break }),
-          ...(item.isForcedMode !== undefined && { isForcedMode: item.isForcedMode }),
-          ...(item.predefinedOut !== undefined && { predefinedOut: item.predefinedOut }),
+          ...(item.isForcedMode !== undefined && {
+            isForcedMode: item.isForcedMode,
+          }),
+          ...(item.predefinedOut !== undefined && {
+            predefinedOut: item.predefinedOut,
+          }),
         }));
         tempRecord.length = Math.max(i, tempRecord.length);
-        const breakOrder =
-          this.name !== this.base.home.name &&
-          this.order % this.box[this.box.length - 1].order === 1 &&
-          this.order ===
-          (this.order % this.box[this.box.length - 1].order) +
-          this.box.length -
-          1;
         const orders = tempRecord.slice(0, i).concat(
           {
             inn: this.inn,
@@ -1637,12 +1672,13 @@ export default {
             onbase,
             ...(this.location[0] &&
               !['BB', 'K', 'FOUL'].includes(this.content) && {
-              location: this.location[0],
-            }),
-            ...(this.canOpenForcedMode && this.isForcedMode && {
-              isForcedMode: true,
-              predefinedOut: this.predefinedOut,
-            }),
+                location: this.location[0],
+              }),
+            ...(this.canOpenForcedMode &&
+              this.isForcedMode && {
+                isForcedMode: true,
+                predefinedOut: this.predefinedOut,
+              }),
           },
           tempRecord.slice(i + 1),
         );
@@ -1666,7 +1702,6 @@ export default {
               this.$route.params.order !== 'new' &&
               this.order < this.boxSummary.contents.length
             ) {
-              this.waitRedirect = true;
               this.resetBasic();
               this.setOrder(this.order + 1);
               this.forcast = true;
@@ -1674,7 +1709,6 @@ export default {
                 `/main/games/${team}/${game}/${this.order + 1}`,
               );
             } else {
-              this.waitRedirect = true;
               this.resetBasic();
               this.setOrder(this.order + 1);
               this.forcast = true;
@@ -1826,8 +1860,8 @@ export default {
 
           this.checkModalPlayer(true);
         }
-      } catch(e) {
-        console.log(e)
+      } catch (e) {
+        console.log(e);
         this.alert('發生錯誤: 無法正確計算出下一棒打者').then(() => {
           this.$router.back();
         });
@@ -2200,9 +2234,11 @@ export default {
       this.canOpenForcedMode = false;
     },
     highlight(refs = []) {
-      refs.forEach((ref) => {
+      refs.forEach(ref => {
         const el =
-          this.$refs[ref] instanceof Vue ? this.$refs[ref].$el : this.$refs[ref];
+          this.$refs[ref] instanceof Vue
+            ? this.$refs[ref].$el
+            : this.$refs[ref];
         const { top, left, width, height: h } = el.getBoundingClientRect();
         const height = ref === 'runner' ? h - 20 : h;
         this.spotlights.push({
@@ -2244,7 +2280,7 @@ export default {
     },
     closeShowForcedModeDialog() {
       this.showForcedModeDialog = false;
-      this.highlight(['inn-out-onbase', 'batter'])
+      this.highlight(['inn-out-onbase', 'batter']);
     },
     setForcast(val) {
       this.forcast = val === 'true';
@@ -2328,17 +2364,14 @@ export default {
     },
     spotlights() {
       if (this.spotlights.length > 0) {
-        document.querySelector('.content').style.setProperty('position', 'static');
+        document
+          .querySelector('.content')
+          .style.setProperty('position', 'static');
         document.body.style.setProperty('overflow', 'hidden');
       } else {
         clearTimeout(this.spotlightTimer);
         document.querySelector('.content').style.setProperty('position', '');
         document.body.style.setProperty('overflow', '');
-      }
-    },
-    name(newVal, oldVal) {
-      if (newVal !== oldVal) {
-        this.waitRedirect = false;
       }
     },
   },

@@ -133,9 +133,12 @@ const actions = {
         db
           .collection('accounts')
           .doc(userId)
-          .onSnapshot(snapshot => {
+          .onSnapshot(accountDoc => {
+            if (accountDoc.metadata.hasPendingWrites) {
+              return;
+            }
             window.trackRead('fetchUser: accounts', 1);
-            const data = snapshot.data();
+            const data = accountDoc.data();
             if (data) {
               const {
                 accessToken,
@@ -223,14 +226,17 @@ const actions = {
                         db
                           .collection('requests')
                           .where('teamCode', '==', team.teamCode)
-                          .onSnapshot(requestsCollection => {
+                          .onSnapshot(requestCollection => {
+                            if (requestCollection.metadata.hasPendingWrites) {
+                              return;
+                            }
                             window.trackRead(
                               `fetchUser: listen ${team.teamCode} request`,
-                              requestsCollection.docs.length || 1,
+                              requestCollection.docs.length || 1,
                             );
                             commit(types.SET_TEAM_REQUEST, {
                               teamCode: team.teamCode,
-                              requests: requestsCollection.docs
+                              requests: requestCollection.docs
                                 .map(doc => {
                                   const { timestamp, ...data } = doc.data();
                                   return {

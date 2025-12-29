@@ -357,29 +357,41 @@
         {{ gameId_err }}
       </div>
 
-      <div
-        class="field-wrapper field-wrapper-item"
-        :class="time ? '' : 'empty'"
-        @click="openClockPicker"
-      >
-        <span>{{ $t('ttl_time') }}</span>
-        <label v-if="time" class="time">
-          <i class="fa fa-clock-o"></i>
-          <span>{{ time }}</span>
-          <i class="fa fa-times" @click="clearTime"></i>
-        </label>
-        <vue-clock-picker
-          ref="clockPicker"
-          close-on-overlay
-          close-on-esc
-          v-model="time"
-          :done-text="$t('btn_confirm')"
-          :cancel-text="$t('btn_cancel')"
-          active-color="#408288"
-          disabled-color="inherit"
-          @close="closeClockPicker"
-        >
-        </vue-clock-picker>
+      <div class="field-wrapper">
+        <div class="two-column">
+          <div
+            class="field-wrapper field-wrapper-item"
+            :class="time ? '' : 'empty'"
+            @click="openClockPicker"
+            style="margin-top: auto; height: 40px;"
+          >
+            <span>{{ $t('ttl_time') }}</span>
+            <label v-if="time" class="time">
+              <i class="fa fa-clock-o"></i>
+              <span>{{ time }}</span>
+              <i class="fa fa-times" @click="clearTime"></i>
+            </label>
+            <vue-clock-picker
+              ref="clockPicker"
+              close-on-overlay
+              close-on-esc
+              v-model="time"
+              :done-text="$t('btn_confirm')"
+              :cancel-text="$t('btn_cancel')"
+              active-color="#408288"
+              disabled-color="inherit"
+              @close="closeClockPicker"
+            >
+            </vue-clock-picker>
+          </div>
+          <custom-input
+            type="select"
+            taggable
+            :options="gameOptions.court.map(({ text }) => text)"
+            :name="$t('ttl_court')"
+            v-model="court"
+          />
+        </div>
       </div>
 
       <custom-input
@@ -514,7 +526,11 @@
         type="select"
         taggable
         multiple
-        :options="gameOptions.tags.filter(({ text }) => text !== 'hasForcedModeGame').map(({ text }) => text)"
+        :options="
+          gameOptions.tags
+            .filter(({ text }) => text !== 'hasForcedModeGame')
+            .map(({ text }) => text)
+        "
         :name="$t('ttl_game_tag')"
         :placeholder="$t('pla_game_tag')"
         v-model="tags"
@@ -902,6 +918,7 @@ export default {
       gameId_err: '',
       league: '',
       group: '',
+      court: '',
       useTeam: '',
       useTeam_err: '',
       opponent: '',
@@ -1043,6 +1060,7 @@ export default {
             opponent,
             league,
             group,
+            court,
             gameType,
             place,
             topBottom,
@@ -1069,6 +1087,7 @@ export default {
             opponent,
             league,
             group,
+            court,
             gameType,
             place,
             topBottom,
@@ -1188,9 +1207,9 @@ export default {
       );
     },
     getPosition(name) {
-      return (
-        (Object.entries(this.boxSummary.positions).find(
-          ([, value]) => value === name)) || ['EP'])[0];
+      return (Object.entries(this.boxSummary.positions).find(
+        ([, value]) => value === name,
+      ) || ['EP'])[0];
     },
     setGwrbiInn(val) {
       this.gwrbiInn = val;
@@ -1244,6 +1263,7 @@ export default {
             time,
             league,
             group,
+            court,
             useTeam,
             opponent,
             gameType,
@@ -1277,6 +1297,7 @@ export default {
           this.time = time;
           this.league = league;
           this.group = group;
+          this.court = court;
           this.useTeam = useTeam;
           this.opponent = opponent;
           this.gameType = gameType;
@@ -1284,7 +1305,7 @@ export default {
           this.topBottom = topBottom;
           this.coach = coach;
           this.recorder = recorder;
-          this.tags = (tags || []).filter((tag) => tag !== 'hasForcedModeGame');
+          this.tags = (tags || []).filter(tag => tag !== 'hasForcedModeGame');
           this.pitcher = Array.isArray(pitcher)
             ? {
                 code: pitcher,

@@ -84,7 +84,7 @@
               v-else-if="['teamType'].includes(col)"
               class="cell"
               :class="{ sort: col === sortBy }"
-              :key="`row_teamType_${item.teamCode}`"
+              :key="`row_teamType_${item.teamCode}_${colIndex}`"
             >
               <div class="align-right">
                 {{ columnSet[item[col]] }}
@@ -450,6 +450,7 @@ export default {
         'gameLeague',
         'gameGroup',
         'gameType',
+        'gameCourt',
         'gamePlace',
         'gameTopBottom',
         'gameCoach',
@@ -486,6 +487,7 @@ export default {
         gamePeriod: '區間',
         gameLeague: '聯盟',
         gameGroup: '組別',
+        gameCourt: '球場',
         gameType: '比賽性質',
         gamePlace: '休息區',
         gameTopBottom: '攻守',

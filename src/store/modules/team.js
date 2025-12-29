@@ -544,7 +544,6 @@ const actions = {
       });
   },
   listenTeamChange({ commit, state }, teamCode) {
-    let preUnlockGames;
     if (teamCode) {
       const idbKeyval = dbInit(teamCode);
       if (typeof snapShot.team === 'function') snapShot.team();
@@ -552,7 +551,10 @@ const actions = {
         db
           .collection('teams')
           .doc(teamCode)
-          .onSnapshot(teamDoc => {
+          .onSnapshot(async teamDoc => {
+            if (teamDoc.metadata.hasPendingWrites) {
+              return;
+            }
             if (teamDoc.exists) {
               window.trackRead('listenTeamChange: team', 1);
               const {
@@ -573,67 +575,46 @@ const actions = {
                 })),
               );
 
-              if (
-                preUnlockGames === undefined ||
-                JSON.stringify(preUnlockGames) === JSON.stringify(unlockGames)
-              ) {
-                idbKeyval.getAll().then(localGames => {
-                  // if (['6CMMLMg6adPL3CyUWkWbPzIAYN62', 'M3VzysUPmDbsXX5gLgHsvZt8MEw1'].includes(rootState.userId)) {
-                  //   alert(458);
-                  // }
-                  const localIds = localGames.map(game => game.id);
-                  const gameShouldUpdates = localGames
-                    .filter(
-                      game =>
-                        !game.timestamp ||
-                        (games[game.id] &&
-                          game.timestamp &&
-                          !games[game.id].isEqual(game.timestamp)),
+              const localGames = await idbKeyval.getAll();
+              const localIds = localGames.map(g => g.id);
+              const serverIds = Object.keys(games);
+              const gameShouldDeletes = localGames
+                .filter(g => !serverIds.includes(g.id))
+                .map(g => g.id);
+              const gameShouldUpdates =
+                unlockGames.length > 0
+                  ? unlockGames.filter(
+                      gameId =>
+                        !localIds.includes(gameId) ||
+                        !games[gameId].isEqual(
+                          localGames.find(g => g.id === gameId)?.timestamp,
+                        ),
                     )
-                    .map(game => game.id)
-                    .concat(
-                      Object.keys(games).filter(
-                        game => !localIds.includes(game),
-                      ),
-                    );
-                  // delete
-                  const gameShouldDeletes = localGames
-                    .filter(game => !Object.keys(games).includes(game.id))
-                    .map(game => game.id);
-                  // update if needed
-                  Promise.all(
-                    gameShouldUpdates.map(game =>
-                      db.doc(`teams/${teamCode}/games/${game}`).get(),
-                    ),
-                  ).then(gameDocs => {
-                    window.trackRead(
-                      'listenTeamChange: games need to update',
-                      gameDocs.length || 1,
-                    );
-                    const setGames = gameDocs.map(gameDoc => {
-                      return idbKeyval.set(gameDoc.id, {
-                        id: gameDoc.id,
-                        ...gameDoc.data(),
-                      });
-                    });
-                    const delGames = gameShouldDeletes.map(gameId => {
-                      return idbKeyval.delete(gameId);
-                    });
-                    Promise.all([...setGames, ...delGames])
-                      .then(() => idbKeyval.getAll())
-                      .then(records => {
-                        recordActions.operateGames(
-                          { commit },
-                          records.map(({ id, ...data }) => ({
-                            id,
-                            data: { ...data },
-                          })),
-                        );
-                      });
-                  });
-                });
-              }
-              preUnlockGames = unlockGames;
+                  : [];
+              const deleteTasks = gameShouldDeletes.map(id =>
+                idbKeyval.delete(id),
+              );
+              const updateTasks = gameShouldUpdates.map(id =>
+                db
+                  .doc(`teams/${teamCode}/games/${id}`)
+                  .get()
+                  .then(doc =>
+                    idbKeyval.set(doc.id, { id: doc.id, ...doc.data() }),
+                  ),
+              );
+              window.trackRead(
+                'listenTeamChange: games need to update',
+                updateTasks.length || 1,
+              );
+              await Promise.all([...deleteTasks, ...updateTasks]);
+              const records = await idbKeyval.getAll();
+              recordActions.operateGames(
+                { commit },
+                records.map(({ id, ...data }) => ({
+                  id,
+                  data: { ...data },
+                })),
+              );
 
               const players = Object.keys(players_).map(name => ({
                 name,
@@ -824,12 +805,15 @@ const actions = {
       db
         .collection('requests')
         .where('uid', '==', uid)
-        .onSnapshot(querySnapshot => {
+        .onSnapshot(requestCollection => {
+          if (requestCollection.metadata.hasPendingWrites) {
+            return;
+          }
           window.trackRead(
             'fetchPersonalRequests',
-            querySnapshot.docs.length || 1,
+            requestCollection.docs.length || 1,
           );
-          const requests = querySnapshot.docs
+          const requests = requestCollection.docs
             .map(doc => {
               const { timestamp, ...data } = doc.data();
               return {
@@ -1120,27 +1104,27 @@ const actions = {
         console.log(paths);
         return;
 
-        const batch = db.batch();
-        paths.slice(0, 100).forEach(path => {
-          const [, teamCode, , gameId] = path.split('/');
-          batch.set(
-            db.doc(`teams/${teamCode}`),
-            {
-              games: { [gameId]: timestamp },
-              timestamp,
-            },
-            { merge: true },
-          );
-          batch.set(
-            db.doc(path),
-            {
-              // errors: fieldValue.delete(),
-              timestamp,
-            },
-            { merge: true },
-          );
-        });
-        return batch.commit();
+        // const batch = db.batch();
+        // paths.slice(0, 100).forEach(path => {
+        //   const [, teamCode, , gameId] = path.split('/');
+        //   batch.set(
+        //     db.doc(`teams/${teamCode}`),
+        //     {
+        //       games: { [gameId]: timestamp },
+        //       timestamp,
+        //     },
+        //     { merge: true },
+        //   );
+        //   batch.set(
+        //     db.doc(path),
+        //     {
+        //       // errors: fieldValue.delete(),
+        //       timestamp,
+        //     },
+        //     { merge: true },
+        //   );
+        // });
+        // return batch.commit();
       })
       .then(() => {
         commit(rootTypes.LOADING, false);

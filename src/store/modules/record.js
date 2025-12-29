@@ -870,6 +870,10 @@ const getters = {
               (a, b) => a.text.localeCompare(b.text),
               'zh-TW',
             ),
+            court: concat(acc, item, 'court').sort(
+              (a, b) => a.text.localeCompare(b.text),
+              'zh-TW',
+            ),
             tags: concat(acc, item, 'tags').sort(
               (a, b) => a.text.localeCompare(b.text),
               'zh-TW',
@@ -881,6 +885,7 @@ const getters = {
             opponent: concat(acc, item, 'opponent'),
             league: concat(acc, item, 'league'),
             group: concat(acc, item, 'group'),
+            court: concat(acc, item, 'court'),
             tags: concat(acc, item, 'tags'),
           };
         }
@@ -890,6 +895,7 @@ const getters = {
         opponent: [],
         league: [],
         group: [],
+        court: [],
         tags: [],
       },
     );
@@ -937,6 +943,10 @@ const getters = {
                 (a, b) => a.text.localeCompare(b.text),
                 'zh-TW',
               ),
+              court: concat(acc, item, 'court').sort(
+                (a, b) => a.text.localeCompare(b.text),
+                'zh-TW',
+              ),
               coach: concat(acc, item, 'coach').sort(
                 (a, b) => a.text.localeCompare(b.text),
                 'zh-TW',
@@ -955,6 +965,7 @@ const getters = {
               opponent: concat(acc, item, 'opponent'),
               league: concat(acc, item, 'league'),
               group: concat(acc, item, 'group'),
+              court: concat(acc, item, 'court'),
               coach: concat(acc, item, 'coach'),
               recorder: concat(acc, item, 'recorder'),
               tags: concat(acc, item, 'tags'),
@@ -965,6 +976,7 @@ const getters = {
           opponent: [],
           league: [],
           group: [],
+          court: [],
           coach: [],
           recorder: [],
           tags: [],
