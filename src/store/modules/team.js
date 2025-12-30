@@ -581,16 +581,16 @@ const actions = {
               const gameShouldDeletes = localGames
                 .filter(g => !serverIds.includes(g.id))
                 .map(g => g.id);
-              const gameShouldUpdates =
-                unlockGames.length > 0
-                  ? unlockGames.filter(
-                      gameId =>
-                        !localIds.includes(gameId) ||
-                        !games[gameId].isEqual(
-                          localGames.find(g => g.id === gameId)?.timestamp,
-                        ),
-                    )
-                  : [];
+              const gameShouldUpdates = localGames
+                .filter(
+                  game =>
+                    !game.timestamp ||
+                    (games[game.id] &&
+                      game.timestamp &&
+                      !games[game.id].isEqual(game.timestamp)),
+                )
+                .map(game => game.id)
+                .concat(serverIds.filter(game => !localIds.includes(game)));
               const deleteTasks = gameShouldDeletes.map(id =>
                 idbKeyval.delete(id),
               );
