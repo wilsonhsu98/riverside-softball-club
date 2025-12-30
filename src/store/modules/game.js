@@ -49,7 +49,7 @@ const actions = {
       opponent,
       league,
       group,
-      court,
+      court = '',
       gameType = '',
       place,
       topBottom = '',
