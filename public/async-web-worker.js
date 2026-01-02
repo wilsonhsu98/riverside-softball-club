@@ -43,199 +43,234 @@ const accCalc = (beforePitchers = [], pitchers = [], currentIndex, inn = 7) => {
 };
 
 const genStatistics = (players, records, filterPA, filterGames = []) => {
-  // filterPA = filterPA || 10;
-  const sortRecords = [...records].sort((a, b) => {
-    return (
-      parseInt(
-        (b._table.match(/\d/g) || [b._table]).join('') + (b.order + 10),
-        10,
-      ) -
-      parseInt(
-        (a._table.match(/\d/g) || [a._table]).join('') + (a.order + 10),
-        10,
-      )
-    );
-  });
-  const filterGamesRecords = sortRecords.filter(item =>
-    filterGames.includes(item._table),
-  );
+  const filterGamesSet = new Set(filterGames);
+  const recordsByGame = new Map();
+  const recordsByPlayer = new Map();
+  const recordsByGamePlayer = new Map();
 
-  return players.map(player => {
+  for (const r of records) {
+    if (!filterGamesSet.has(r._table)) continue;
+    if (r.content === 'UNKNOWN') continue;
+
+    // game index
+    if (!recordsByGame.has(r._table)) {
+      recordsByGame.set(r._table, []);
+    }
+    recordsByGame.get(r._table).push(r);
+
+    // player index
+    if (!recordsByPlayer.has(r.name)) {
+      recordsByPlayer.set(r.name, []);
+    }
+    recordsByPlayer.get(r.name).push(r);
+
+    const key = `${r._table}__${r.name}`;
+    if (!recordsByGamePlayer.has(key)) {
+      recordsByGamePlayer.set(key, []);
+    }
+    recordsByGamePlayer.get(key).push(r);
+  }
+
+  // 預算 sort key（避免 regex 重跑）
+  for (const list of recordsByGame.values()) {
+    for (const r of list) {
+      if (r._orderKey == null) {
+        r._orderKey = parseInt(
+          (r._table.match(/\d/g) || [r._table]).join('') + (r.order + 10),
+          10,
+        );
+      }
+    }
+    list.sort((a, b) => b._orderKey - a._orderKey);
+  }
+
+  const result = players.map(player => {
     const name = player.id;
 
-    const top = filterGamesRecords
-      .filter(
-        item =>
-          item.name === name && item.content && item.content !== 'UNKNOWN',
-      )
+    const playerRecords = recordsByPlayer.get(name) || [];
+
+    const top = playerRecords
+      .filter(item => item.content && item.content !== 'UNKNOWN')
       .slice(0, filterPA)
       .map(item => {
-        const onbase = (() => {
-          const next5 = filterGamesRecords
-            .filter(sub => sub._table === item._table)
-            .reverse()
-            .slice(item.order - 1, item.order - 1 + 5)
-            .map(sub => sub.onbase)
-            .reduce((acc, sub) => acc.concat(sub), []);
-          return {
-            r: next5.find(
-              sub => sub && sub.name === item.name && sub.result === 'run',
-            )
-              ? item.name
-              : '',
-          };
-        })();
+        const gameRecords = recordsByGame.get(item._table) || [];
+
+        // next5：直接 slice，不 filter
+        const idx = gameRecords.findIndex(
+          r => r.name === item.name && r.order === item.order,
+        );
+
+        let rName = '';
+        if (idx >= 0) {
+          for (let i = idx + 1; i < idx + 6 && i < gameRecords.length; i++) {
+            const ob = gameRecords[i].onbase;
+            if (
+              Array.isArray(ob) &&
+              ob.some(
+                sub => sub && sub.name === item.name && sub.result === 'run',
+              )
+            ) {
+              rName = item.name;
+              break;
+            }
+          }
+        }
 
         return {
           ...item,
-          r: item.r || onbase.r,
+          r: item.r || rName,
         };
       });
 
     let limit = 1;
-    const games = top
-      .map(item => item._table)
-      .filter((v, i, self) => self.indexOf(v) === i)
-      .map(game => {
-        return filterGamesRecords
-          .filter(
-            item =>
-              item._table === game &&
-              item.name === name &&
-              item.content !== 'UNKNOWN',
-          )
-          .map(item => {
-            return {
-              name: item.name,
-              content: item.content,
-              order: item.order,
-              exclude: limit++ > filterPA,
-              color: formatColor(item.content),
-            };
-          })
-          .concat(game.slice(-6));
-      });
-    const calc = top.reduce(
-      (acc, item) => {
-        const isAB = [
-          '1H',
-          '2H',
-          '3H',
-          'HR',
-          'FO',
-          'GO',
-          'K',
-          'FOUL',
-          'E',
-          'FC',
-          'DP',
-          'TP',
-        ].includes(item.content);
-        const isHit = ['1H', '2H', '3H', 'HR'].includes(item.content);
-        return {
-          pa: acc.pa + 1,
-          ab: acc.ab + (isAB ? 1 : 0),
-          h: acc.h + (isHit ? 1 : 0),
-          ...(Array.isArray(item.onbase) && item.onbase.length && isAB
-            ? {
-                abNo:
-                  acc.abNo +
-                  (!item.onbase[1].name &&
-                  !item.onbase[2].name &&
-                  !item.onbase[3].name
-                    ? 1
-                    : 0),
-                hNo:
-                  acc.hNo +
-                  (!item.onbase[1].name &&
-                  !item.onbase[2].name &&
-                  !item.onbase[3].name &&
-                  isHit
-                    ? 1
-                    : 0),
-                abSP:
-                  acc.abSP +
-                  (item.onbase[2].name || item.onbase[3].name ? 1 : 0),
-                hSP:
-                  acc.hSP +
-                  ((item.onbase[2].name || item.onbase[3].name) && isHit
-                    ? 1
-                    : 0),
-                abFB:
-                  acc.abFB +
-                  (item.onbase[1].name &&
-                  item.onbase[2].name &&
-                  item.onbase[3].name
-                    ? 1
-                    : 0),
-                hFB:
-                  acc.hFB +
-                  (item.onbase[1].name &&
-                  item.onbase[2].name &&
-                  item.onbase[3].name &&
-                  isHit
-                    ? 1
-                    : 0),
-              }
-            : {
-                abNo: acc.abNo,
-                hNo: acc.hNo,
-                abSP: acc.abSP,
-                hSP: acc.hSP,
-                abFB: acc.abFB,
-                hFB: acc.hFB,
-              }),
-          tb: acc.tb + (['1H', '2H', '3H', 'HR'].indexOf(item.content) + 1),
-          tob:
-            acc.tob +
-            (['1H', '2H', '3H', 'HR', 'BB'].includes(item.content) ? 1 : 0),
-          rbi: acc.rbi + (item.rbi || 0),
-          h1: acc.h1 + (item.content === '1H' ? 1 : 0),
-          h2: acc.h2 + (item.content === '2H' ? 1 : 0),
-          h3: acc.h3 + (item.content === '3H' ? 1 : 0),
-          hr: acc.hr + (item.content === 'HR' ? 1 : 0),
-          k: acc.k + (item.content === 'K' ? 1 : 0),
-          bb: acc.bb + (item.content === 'BB' ? 1 : 0),
-          sf: acc.sf + (item.content === 'SF' ? 1 : 0),
-          dp: acc.dp + (item.content === 'DP' ? 1 : 0),
-          r: acc.r + (filterPA && item.r === item.name ? 1 : 0),
-        };
-      },
-      {
-        pa: 0,
-        ab: 0,
-        h: 0,
-        abNo: 0,
-        hNo: 0,
-        abSP: 0,
-        hSP: 0,
-        abFB: 0,
-        hFB: 0,
-        tb: 0,
-        tob: 0,
-        rbi: 0,
-        h1: 0,
-        h2: 0,
-        h3: 0,
-        hr: 0,
-        k: 0,
-        bb: 0,
-        sf: 0,
-        dp: 0,
-        r:
-          filterPA === undefined
-            ? filterGamesRecords.filter(item => {
-                return (
-                  item.r === name ||
-                  (Array.isArray(item.onbase) &&
-                    item.onbase.some(
-                      sub => sub && sub.name === name && sub.result === 'run',
-                    ))
-                );
-              }).length
-            : 0,
-      },
-    );
+    const games = [];
+    const seenGames = new Set();
+
+    for (const item of top) {
+      const game = item._table;
+      if (seenGames.has(game)) continue;
+      seenGames.add(game);
+
+      const key = `${game}__${name}`;
+      const list = recordsByGamePlayer.get(key) || [];
+
+      games.push(
+        list
+          .map(r => ({
+            name: r.name,
+            content: r.content,
+            order: r.order,
+            exclude: limit++ > filterPA,
+            color: formatColor(r.content),
+          }))
+          .concat(game.slice(-6)),
+      );
+    }
+
+    const rCount =
+      filterPA === undefined
+        ? (playerRecords || []).reduce((acc, item) => {
+            if (
+              item.r === name ||
+              (Array.isArray(item.onbase) &&
+                item.onbase.some(
+                  sub => sub && sub.name === name && sub.result === 'run',
+                ))
+            ) {
+              return acc + 1;
+            }
+            return acc;
+          }, 0)
+        : 0;
+    const calc = {
+      pa: 0,
+      ab: 0,
+      h: 0,
+      abNo: 0,
+      hNo: 0,
+      abSP: 0,
+      hSP: 0,
+      abFB: 0,
+      hFB: 0,
+      tb: 0,
+      tob: 0,
+      rbi: 0,
+      h1: 0,
+      h2: 0,
+      h3: 0,
+      hr: 0,
+      k: 0,
+      bb: 0,
+      sf: 0,
+      dp: 0,
+      r: rCount,
+    };
+
+    for (let i = 0; i < top.length; i++) {
+      const item = top[i];
+      const content = item.content;
+
+      calc.pa++;
+
+      const isAB =
+        content === '1H' ||
+        content === '2H' ||
+        content === '3H' ||
+        content === 'HR' ||
+        content === 'FO' ||
+        content === 'GO' ||
+        content === 'K' ||
+        content === 'FOUL' ||
+        content === 'E' ||
+        content === 'FC' ||
+        content === 'DP' ||
+        content === 'TP';
+
+      const isHit =
+        content === '1H' ||
+        content === '2H' ||
+        content === '3H' ||
+        content === 'HR';
+
+      if (isAB) calc.ab++;
+      if (isHit) calc.h++;
+
+      if (Array.isArray(item.onbase) && item.onbase.length && isAB) {
+        const ob1 = item.onbase[1]?.name;
+        const ob2 = item.onbase[2]?.name;
+        const ob3 = item.onbase[3]?.name;
+
+        if (!ob1 && !ob2 && !ob3) {
+          calc.abNo++;
+          if (isHit) calc.hNo++;
+        }
+
+        if (ob2 || ob3) {
+          calc.abSP++;
+          if (isHit) calc.hSP++;
+        }
+
+        if (ob1 && ob2 && ob3) {
+          calc.abFB++;
+          if (isHit) calc.hFB++;
+        }
+      }
+
+      // TB
+      if (isHit) {
+        if (content === '1H') calc.tb += 1;
+        else if (content === '2H') calc.tb += 2;
+        else if (content === '3H') calc.tb += 3;
+        else if (content === 'HR') calc.tb += 4;
+      }
+
+      // TOB
+      if (
+        content === '1H' ||
+        content === '2H' ||
+        content === '3H' ||
+        content === 'HR' ||
+        content === 'BB'
+      ) {
+        calc.tob++;
+      }
+
+      calc.rbi += item.rbi || 0;
+
+      if (content === '1H') calc.h1++;
+      else if (content === '2H') calc.h2++;
+      else if (content === '3H') calc.h3++;
+      else if (content === 'HR') calc.hr++;
+      else if (content === 'K') calc.k++;
+      else if (content === 'BB') calc.bb++;
+      else if (content === 'SF') calc.sf++;
+      else if (content === 'DP') calc.dp++;
+
+      if (filterPA && item.r === item.name) {
+        calc.r++;
+      }
+    }
+
     const {
       pa,
       ab,
@@ -360,6 +395,8 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
       };
     }
   });
+
+  return result;
 };
 
 const genPitcherStatistics = (
@@ -398,7 +435,7 @@ const genPitcherStatistics = (
     { pitchers: [], records: [] },
   );
   const currentPlayers = players.map(p => p.id);
-  return pitchers
+  const result = pitchers
     .filter(name => currentPlayers.includes(name))
     .map(name => {
       const { OUT, R, H, SO, BB, S, B } = records
@@ -487,6 +524,8 @@ const genPitcherStatistics = (
             }),
       };
     });
+
+  return result;
 };
 
 const displayGame = (players, records, errors = [], role) => {
@@ -996,12 +1035,12 @@ const displayGame = (players, records, errors = [], role) => {
   };
 
   const displayedRecords = displayGame_(recordsWithAltRun, records);
-
   return displayedRecords;
 };
 
 const execGenStatistics = state => {
-  return genStatistics(
+  const t0 = performance.now();
+  const result = genStatistics(
     state.players,
     state.records,
     state.unlimitedPA ? undefined : state.top,
@@ -1038,10 +1077,14 @@ const execGenStatistics = state => {
         }
       }
     });
+  const t1 = performance.now();
+  console.log(`[perf] execGenStatistics cost: ${(t1 - t0).toFixed(2)} ms`);
+  return result;
 };
 
 const execGenPitcherStatistics = state => {
-  return genPitcherStatistics(
+  const t0 = performance.now();
+  const result = genPitcherStatistics(
     state.players,
     state.games,
     (state.period.find(item => item.select).games || []).filter(
@@ -1070,19 +1113,52 @@ const execGenPitcherStatistics = state => {
         : b[state.sortBy] - a[state.sortBy];
     }
   });
+  const t1 = performance.now();
+  console.log(
+    `[perf] execGenPitcherStatistics cost: ${(t1 - t0).toFixed(2)} ms`,
+  );
+  return result;
 };
 
 const execItemStats = state => {
-  const currentPlayers = state.players.map(p => p.id);
+  const t0 = performance.now();
+  const currentPlayers = new Set(state.players.map(p => p.id));
+  const playerMap = new Map(state.players.map(p => [p.id, p]));
   const games = (state.period.find(item => item.select).games || []).filter(
     g => !(state.excludedGames || []).includes(g),
   );
+  const gamesSet = new Set(games);
   const minimunPA = games.length * 1.6;
   const records = genStatistics(state.players, state.records, undefined, games);
+  const recordMap = new Map(records.map(r => [r.name, r]));
+  const winCount = {};
+  const gwrbiCount = {};
+  const mvpCount = {};
+
+  state.games.forEach(item => {
+    if (gamesSet.has(item.game) && item.result === 'win' && item.pitcher) {
+      const pitcher = Array.isArray(item.pitcher)
+        ? item.pitcher[0]
+        : item.pitcher;
+      winCount[pitcher] = (winCount[pitcher] || 0) + 1;
+    }
+    if (
+      gamesSet.has(item.game) &&
+      item.result === 'win' &&
+      Array.isArray(item.gwrbi) &&
+      item.gwrbi[0]
+    ) {
+      const batter = item.gwrbi[0];
+      gwrbiCount[batter] = (gwrbiCount[batter] || 0) + 1;
+    }
+    if (gamesSet.has(item.game) && item.mvp && currentPlayers.has(item.mvp)) {
+      mvpCount[item.mvp] = (mvpCount[item.mvp] || 0) + 1;
+    }
+  });
 
   const pitcherGames = state.games.filter(
     item =>
-      games.includes(item.game) &&
+      gamesSet.has(item.game) &&
       Array.isArray(item.pitchers) &&
       item.pitchers.length,
   );
@@ -1132,12 +1208,12 @@ const execItemStats = state => {
       };
     }, {});
   const pitchers = Object.keys(pitcherSet)
-    .filter(name => currentPlayers.includes(name))
+    .filter(name => currentPlayers.has(name))
     .map(name => ({
       ...pitcherSet[name],
       name,
     }));
-  return {
+  const result = {
     AVG: records
       .filter(item => item.PA !== '-' && item.AVG > 0 && item.PA >= minimunPA)
       .sort((a, b) =>
@@ -1180,39 +1256,18 @@ const execItemStats = state => {
         RBI: item.RBI,
         data: item.data,
       })),
-    W: state.games
-      .filter(
-        item =>
-          games.includes(item.game) && item.result === 'win' && item.pitcher,
-      )
-      .map(item =>
-        Array.isArray(item.pitcher) ? item.pitcher[0] : item.pitcher,
-      )
-      .reduce((acc, pitcher, undefined, self) => {
-        if (!acc.find(player => player.pitcher === pitcher)) {
-          return [
-            ...acc,
-            {
-              pitcher,
-              OUT: (pitcherSet[pitcher] || { OUT: 0 }).OUT,
-              W: self.filter(player => player === pitcher).length,
-            },
-          ];
-        }
-        return acc;
-      }, [])
-      .filter(({ pitcher }) => currentPlayers.includes(pitcher))
-      .sort((a, b) =>
-        b['W'] === a['W'] ? a['OUT'] - b['OUT'] : b['W'] - a['W'],
-      )
+    W: Object.entries(winCount)
+      .filter(([pitcher]) => currentPlayers.has(pitcher))
+      .map(([pitcher, W]) => ({
+        pitcher,
+        W,
+        OUT: (pitcherSet[pitcher] || { OUT: 0 }).OUT,
+      }))
+      .sort((a, b) => (b.W === a.W ? a.OUT - b.OUT : b.W - a.W))
       .map(item => ({
         name: item.pitcher,
         W: item.W,
-        data: (
-          state.players.find(player => player.id === item.pitcher) || {
-            data: {},
-          }
-        ).data,
+        data: (playerMap.get(item.pitcher) || { data: {} }).data,
       })),
     SO: pitchers
       .filter(item => item.SO > 0)
@@ -1250,87 +1305,54 @@ const execItemStats = state => {
           state.players.find(player => player.id === item.name) || { data: {} }
         ).data,
       })),
-    GWRBI: state.games
-      .filter(
-        item =>
-          games.includes(item.game) &&
-          item.result === 'win' &&
-          Array.isArray(item.gwrbi) &&
-          item.gwrbi[0],
-      )
-      .map(item => item.gwrbi[0])
-      .reduce((acc, batter, undefined, self) => {
-        if (!acc.find(player => player.batter === batter)) {
-          return [
-            ...acc,
-            {
-              batter,
-              PA: (records.find(item => item.name === batter) || { PA: 0 }).PA,
-              GWRBI: self.filter(player => player === batter).length,
-            },
-          ];
-        }
-        return acc;
-      }, [])
-      .filter(({ batter }) => currentPlayers.includes(batter))
-      .sort((a, b) =>
-        b['GWRBI'] === a['GWRBI'] ? a['PA'] - b['PA'] : b['GWRBI'] - a['GWRBI'],
-      )
+    GWRBI: Object.entries(gwrbiCount)
+      .filter(([batter]) => currentPlayers.has(batter))
+      .map(([batter, GWRBI]) => ({
+        batter,
+        GWRBI,
+        PA: (recordMap.get(batter) || { PA: 0 }).PA,
+      }))
+      .sort((a, b) => (b.GWRBI === a.GWRBI ? a.PA - b.PA : b.GWRBI - a.GWRBI))
       .map(item => ({
         name: item.batter,
         GWRBI: item.GWRBI,
-        data: (
-          state.players.find(player => player.id === item.batter) || {
-            data: {},
-          }
-        ).data,
+        data: (playerMap.get(item.batter) || { data: {} }).data,
       })),
-    MVP: state.games
-      .filter(
-        item =>
-          games.includes(item.game) &&
-          item.mvp &&
-          currentPlayers.includes(item.mvp),
-      )
-      .map(item => item.mvp)
-      .reduce((acc, mvp, undefined, self) => {
-        if (!acc.find(player => player.mvp === mvp)) {
-          return [
-            ...acc,
-            {
-              mvp,
-              PA: (records.find(item => item.name === mvp) || { PA: 0 }).PA,
-              MVP: self.filter(player => player === mvp).length,
-            },
-          ];
-        }
-        return acc;
-      }, [])
-      .sort((a, b) =>
-        b['MVP'] === a['MVP'] ? a['PA'] - b['PA'] : b['MVP'] - a['MVP'],
-      )
+    MVP: Object.entries(mvpCount)
+      .map(([mvp, MVP]) => ({
+        mvp,
+        MVP,
+        PA: (recordMap.get(mvp) || { PA: 0 }).PA,
+      }))
+      .sort((a, b) => (b.MVP === a.MVP ? a.PA - b.PA : b.MVP - a.MVP))
       .map(item => ({
         name: item.mvp,
         MVP: item.MVP,
-        data: (
-          state.players.find(player => player.id === item.mvp) || { data: {} }
-        ).data,
+        data: (playerMap.get(item.mvp) || { data: {} }).data,
       })),
+
     pitcherGameCount: pitcherGames.length,
   };
+  const t1 = performance.now();
+  console.log(`[perf] execItemStats cost: ${(t1 - t0).toFixed(2)} ms`);
+  return result;
 };
 
 const execBox = state => {
+  const t0 = performance.now();
   const boxSummary =
     state.games.length &&
     state.game &&
     state.games.find(item => item.game === state.game);
-  return displayGame(
+  const result = displayGame(
     state.players,
     state.records.filter(item => item._table === state.game),
     boxSummary.errors,
     state.role,
   );
+  const t1 = performance.now();
+  console.log(`[perf] execBox cost: ${(t1 - t0).toFixed(2)} ms`);
+  return result;
 };
 
 self.addEventListener(

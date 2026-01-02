@@ -160,11 +160,16 @@ select::-ms-expand {
 }
 
 .vc-highlight {
-  background-color: $header_bgcolor!important;
+  background-color: $active_bgcolor!important;
 }
 
 .is-today .vc-bar {
-  background-color: $active_bgcolor!important;
+  background-color: $header_bgcolor!important;
+}
+
+.vc-bg-gray-800,
+.vc-bg-gray-900 {
+  background-color: #3a3b3d;
 }
 
 .field-wrapper-children {
