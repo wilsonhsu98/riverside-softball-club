@@ -201,7 +201,6 @@
     <button style="position: fixed; right: 10px; bottom: 10px;" @click="close">
       {{ $t('close_tab_btn') }}
     </button>
-    <div>{{ error }}</div>
   </div>
 </template>
 
@@ -667,12 +666,14 @@ export default {
       'teamList',
       'recentGames',
       'allTeams',
-      'error',
     ]),
   },
   watch: {
     allTeams: {
       handler() {
+        if (!Array.isArray(this.allTeams) || this.allTeams.length === 0) {
+          return;
+        }
         const allTeams_ = this.allTeams
           .map(team => ({
             ...team,
