@@ -84,6 +84,9 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
     }
     list.sort((a, b) => b._orderKey - a._orderKey);
   }
+  for (const list of recordsByPlayer.values()) {
+    list.sort((a, b) => b._orderKey - a._orderKey);
+  }
 
   const result = players.map(player => {
     const name = player.id;
