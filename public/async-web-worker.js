@@ -44,6 +44,7 @@ const accCalc = (beforePitchers = [], pitchers = [], currentIndex, inn = 7) => {
 
 const genStatistics = (players, records, filterPA, filterGames = []) => {
   const filterGamesSet = new Set(filterGames);
+  const filterGamesRecords = records.filter(r => filterGamesSet.has(r._table));
   const recordsByGame = new Map();
   const recordsByPlayer = new Map();
   const recordsByGamePlayer = new Map();
@@ -149,7 +150,7 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
 
     const rCount =
       filterPA === undefined
-        ? (playerRecords || []).reduce((acc, item) => {
+        ? filterGamesRecords.reduce((acc, item) => {
             if (
               item.r === name ||
               (Array.isArray(item.onbase) &&
