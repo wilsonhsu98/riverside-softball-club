@@ -201,6 +201,7 @@
     <button style="position: fixed; right: 10px; bottom: 10px;" @click="close">
       {{ $t('close_tab_btn') }}
     </button>
+    <div>{{ error }}</div>
   </div>
 </template>
 
@@ -275,6 +276,9 @@
           border-color: $current_user_color;
         }
       }
+    }
+    ::v-deep .img-photo {
+      background-color: #fff;
     }
   }
   .cell {
@@ -663,6 +667,7 @@ export default {
       'teamList',
       'recentGames',
       'allTeams',
+      'error',
     ]),
   },
   watch: {

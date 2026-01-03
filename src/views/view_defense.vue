@@ -458,6 +458,8 @@
             border: 1px solid #fff;
             width: 34px;
             height: 34px;
+            top: 0;
+            transform: translateY(0);
           }
           .img-photo {
             text-indent: -34px;

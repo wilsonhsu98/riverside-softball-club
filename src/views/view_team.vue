@@ -515,9 +515,6 @@
     height: 28px;
     margin: 0 3px 0 12px;
     position: relative;
-    &::v-deep .img {
-      top: 0;
-    }
   }
   .player {
     max-width: $max_width;

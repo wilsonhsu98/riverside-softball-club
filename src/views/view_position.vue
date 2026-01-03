@@ -394,6 +394,7 @@
       line-height: 36px;
       box-sizing: border-box;
       display: flex;
+      align-items: center;
       .avatar {
         position: relative;
         display: inline-block;

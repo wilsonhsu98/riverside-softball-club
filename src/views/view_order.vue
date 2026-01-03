@@ -83,7 +83,6 @@
                     .split('|')
                     .join('</li><li>')}</li></ul>`,
                   classes: ['info'],
-                  container: $refs.container,
                 }"
               ></i>
               <i
@@ -599,6 +598,7 @@
       line-height: 36px;
       box-sizing: border-box;
       display: flex;
+      align-items: center;
       .avatar {
         position: relative;
         display: inline-block;

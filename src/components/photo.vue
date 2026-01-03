@@ -38,7 +38,8 @@
   background: 50% 50% no-repeat;
   background-size: cover;
   position: absolute;
-  top: 2px;
+  top: 50%;
+  transform: translateY(-50%);
   left: 0;
   text-align: center;
   line-height: 26px;
@@ -52,7 +53,6 @@
   &-photo {
     text-indent: -32px;
     overflow: hidden;
-    background-color: #fff;
     &:after {
       content: attr(data-alt);
       line-height: 32px;
@@ -72,7 +72,6 @@
   &.medium {
     width: 28px;
     height: 28px;
-    top: 2px;
     line-height: 22px;
     .fa-user-o {
       font-size: 18px;
@@ -99,7 +98,6 @@
   &.small {
     width: 24px;
     height: 24px;
-    top: 1px;
     line-height: 18px;
     .fa-user-o {
       font-size: 16px;

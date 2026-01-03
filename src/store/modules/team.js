@@ -85,6 +85,7 @@ const types = {
   CACHE_TEAMS: 'TEAM/CACHE_TEAMS',
   SET_CLOCK: 'TEAM/SET_CLOCK',
   ENABLE_CLOCK: 'TEAM/ENABLE_CLOCK',
+  SEARCH_ALL_TEAM_ERROR: 'TEAM/SEARCH_ALL_TEAM_ERROR',
 };
 
 const state = {
@@ -111,6 +112,7 @@ const state = {
   cacheTeamsResponse: undefined,
   clock: undefined,
   isClockRunning: false,
+  error: '',
 };
 
 const getters = {
@@ -128,6 +130,7 @@ const getters = {
   allTeams: state => state.allTeams,
   requests: state => state.requests,
   clock: state => state.clock,
+  error: state => state.error,
 };
 
 const actions = {
@@ -986,6 +989,9 @@ const actions = {
         commit(types.SEARCH_RECENT_GAMES, [sum, ...recentGames]);
         commit(types.SEARCH_ALL_TEAM, allTeams);
         commit(rootTypes.LOADING, false);
+      })
+      .catch(e => {
+        commit(types.SEARCH_ALL_TEAM_ERROR, e);
       });
   },
   leaveFromTeam({ commit }, data) {
@@ -1252,6 +1258,9 @@ const mutations = {
   },
   [types.ENABLE_CLOCK](state, data) {
     state.isClockRunning = data;
+  },
+  [types.SEARCH_ALL_TEAM_ERROR](state, data) {
+    state.error = data;
   },
 };
 

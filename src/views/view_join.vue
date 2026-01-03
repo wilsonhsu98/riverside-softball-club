@@ -447,7 +447,7 @@
     height: 26px;
     text-align: left;
     font-size: 12px;
-    color: $row_color;
+    color: var(--games-font-color);
     cursor: pointer;
     vertical-align: middle;
     position: relative;
