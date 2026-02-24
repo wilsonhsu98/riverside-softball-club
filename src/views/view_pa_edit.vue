@@ -550,6 +550,7 @@ import { calcCurrentOut } from '../libs/utils';
 export default {
   data() {
     return {
+      init: true,
       inn: 1,
       out: 0,
       order: '',
@@ -1125,12 +1126,18 @@ export default {
     },
   },
   watch: {
-    box() {
-      this.setPa();
+    box: {
+      handler() {
+        if (this.init) {
+          this.init = false;
+          this.setPa();
+        }
+      },
+      immediate: true,
     },
-    teamInfo() {
-      this.setPa();
-    },
+    // teamInfo() {
+    //   this.setPa();
+    // },
     content(newVal, oldVal) {
       if (oldVal && newVal) {
         this.rbi.one.disabled = true;

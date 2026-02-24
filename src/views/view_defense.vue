@@ -618,6 +618,7 @@ import { sumByInn, accCalc } from '../libs/utils';
 export default {
   data() {
     return {
+      init: true,
       inn: 0,
       topBottom: '',
       useTeam: '',
@@ -1004,7 +1005,8 @@ export default {
   watch: {
     boxSummary: {
       handler() {
-        if (this.boxSummary.game) {
+        if (this.boxSummary.game && this.init) {
+          this.init = false;
           const {
             result,
             scores,

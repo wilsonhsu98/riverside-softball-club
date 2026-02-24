@@ -1734,6 +1734,7 @@ export default {
         this.maxOnbase = 1;
         return;
       }
+      const t0 = performance.now();
       try {
         const last = [...this.boxSummary.contents]
           .reverse()
@@ -1866,6 +1867,8 @@ export default {
           this.$router.back();
         });
       }
+      const t1 = performance.now();
+      console.log(`[perf] setPa cost: ${(t1 - t0).toFixed(2)} ms`);
     },
     checkReJoin(sameOrderPlayers) {
       return sameOrderPlayers.reduceRight((acc, item, i, self) => {
