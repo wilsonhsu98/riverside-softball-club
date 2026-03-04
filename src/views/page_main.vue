@@ -104,6 +104,11 @@
       }}</a>
       <i class="fa fa-times" @click="showUpdateAvailable = false"></i>
     </div>
+    <div v-if="!showUpdateAvailable && showInstallButton" class="update">
+      <span>{{ $t('system_can_install') }}</span>
+      <a class="link" @click="installApp">{{ $t('system_install') }}</a>
+      <i class="fa fa-times" @click="showInstallButton = false"></i>
+    </div>
   </div>
 </template>
 
@@ -476,6 +481,9 @@ export default {
       showAd: '',
       adMode: '',
       showUpdateAvailable: false,
+      deferredPrompt: null,
+      canInstall: false,
+      showInstallButton: false,
     };
   },
   created() {
@@ -483,6 +491,12 @@ export default {
   },
   mounted() {
     // this.shouldShowAd(this.$route);
+    window.addEventListener('beforeinstallprompt', e => {
+      e.preventDefault();
+      this.deferredPrompt = e;
+      this.canInstall = true;
+      this.showInstallButton = true;
+    });
   },
   methods: {
     ...mapActions([
@@ -567,10 +581,33 @@ export default {
           this.checkUpdateAvailable();
         }
       }
+
+      if (this.canInstall && !this.showInstallButton) {
+        window.canInstall = (window.canInstall || 0) + 1;
+        if (window.canInstall % 5 === 0) {
+          this.showInstallButton = true;
+        }
+      }
     },
     hardReload(e) {
       window.location.reload();
       e.preventDefault();
+    },
+    async installApp() {
+      if (!this.deferredPrompt) return;
+
+      this.deferredPrompt.prompt();
+
+      const { outcome } = await this.deferredPrompt.userChoice;
+
+      if (outcome === 'accepted') {
+        console.log('User accepted install');
+      } else {
+        console.log('User dismissed install');
+      }
+
+      this.deferredPrompt = null;
+      this.showInstallButton = false;
     },
   },
   computed: {

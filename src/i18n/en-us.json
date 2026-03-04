@@ -407,6 +407,8 @@
 	"vc-year": "",
 	"system_new_version": "New version available",
 	"system_new_version_reload": "Reload",
+	"system_can_install": "本系統可安裝到主畫面",
+	"system_install": "安裝",
 	"system_privacy_policy": "Privacy Policy",
 	"system_term_of_use": "Terms of Use",
 	"system_mail": "System Mail",

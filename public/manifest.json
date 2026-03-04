@@ -1,0 +1,20 @@
+{
+  "name": "Riverside Softball Club",
+  "short_name": "Softball",
+  "start_url": "/",
+  "display": "fullscreen",
+  "background_color": "#ffffff",
+  "theme_color": "#408288",
+  "icons": [
+    {
+      "src": "/icon_100.png",
+      "sizes": "100x100",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon_1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}
