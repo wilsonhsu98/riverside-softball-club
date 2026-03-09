@@ -354,7 +354,7 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
             ...email,
             accessToken: results.accessToken,
             lineUserID: results.lineUserID,
-            line_photo: results.profilePic,
+            ...(results.profilePic && { line_photo: results.profilePic }),
           },
           { merge: true },
         );
@@ -364,7 +364,7 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
         .auth()
         .updateUser(results.uid, {
           displayName: results.userName,
-          photoURL: results.profilePic,
+          ...(results.profilePic && { photoURL: results.profilePic }),
           password: results.lineUserID,
         })
         .catch(error => {
@@ -373,7 +373,7 @@ router.get(OAUTH_CALLBACK_PATH, (req, res) => {
             return admin.auth().createUser({
               uid: results.uid,
               displayName: results.userName,
-              photoURL: results.profilePic,
+              ...(results.profilePic && { photoURL: results.profilePic }),
             });
           }
           throw error;
