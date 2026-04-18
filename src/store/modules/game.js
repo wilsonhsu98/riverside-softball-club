@@ -100,7 +100,9 @@ const actions = {
             recorder,
             tags,
             result,
-            opponentScores,
+            opponentScores: [...opponentScores].map(v =>
+              v === undefined ? '' : v,
+            ),
             pitcher,
             mvp,
             gwrbi,
@@ -238,9 +240,8 @@ const actions = {
     batch.set(
       db.doc(`teams/${teamCode}/games/${gameId}`),
       {
-        opponentScores: opponentScores.reduce(
-          (acc, v) => [...acc, v === undefined ? '' : v],
-          [],
+        opponentScores: [...opponentScores].map(v =>
+          v === undefined ? '' : v,
         ),
         pitchers: pitchers.map(p => ({
           ...Object.keys(p).reduce((acc, key) => {
