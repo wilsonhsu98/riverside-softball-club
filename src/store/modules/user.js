@@ -133,7 +133,7 @@ const actions = {
         db
           .collection('accounts')
           .doc(userId)
-          .onSnapshot(accountDoc => {
+          .onSnapshot({ includeMetadataChanges: true }, accountDoc => {
             if (accountDoc.metadata.hasPendingWrites) {
               return;
             }
@@ -226,7 +226,7 @@ const actions = {
                         db
                           .collection('requests')
                           .where('teamCode', '==', team.teamCode)
-                          .onSnapshot(requestCollection => {
+                          .onSnapshot({ includeMetadataChanges: true }, requestCollection => {
                             if (requestCollection.metadata.hasPendingWrites) {
                               return;
                             }
