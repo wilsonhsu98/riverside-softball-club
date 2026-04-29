@@ -997,7 +997,7 @@ const actions = {
   initFromLS({ commit }) {
     commit(types.INIT_FROM_LS);
   },
-  operateGames({ commit }, changedData) {
+  async operateGames({ commit }, changedData) {
     const dates = changedData
       .filter(item => item.data.timestamp)
       .map(item => new Date(item.data.timestamp.seconds * 1000));
@@ -1026,58 +1026,46 @@ const actions = {
     commit(types.GET_PERIOD, period);
     commit(types.GET_RECORDS, records);
     commit(types.GET_GAMELIST, period);
-    Promise.all([
-      actions.workerGenStatistics({ commit }),
-      actions.workerGenPitcherStatistics({ commit }),
-      actions.workerItemStats({ commit }),
-      actions.workerBox({ commit }),
-    ]).then(() => {
-      commit(rootTypes.LOADING, false);
-    });
+    await actions.workerGenStatistics({ commit });
+    await actions.workerGenPitcherStatistics({ commit });
+    await actions.workerItemStats({ commit });
+    await actions.workerBox({ commit });
+    commit(rootTypes.LOADING, false);
   },
-  setPeriod({ commit }, value) {
+  async setPeriod({ commit }, value) {
     commit(rootTypes.LOADING, true);
     commit(types.SET_PERIOD, value);
-    Promise.all([
-      actions.workerGenStatistics({ commit }),
-      actions.workerGenPitcherStatistics({ commit }),
-      actions.workerItemStats({ commit }),
-    ]).then(() => {
-      commit(rootTypes.LOADING, false);
-    });
+    await actions.workerGenStatistics({ commit });
+    await actions.workerGenPitcherStatistics({ commit });
+    await actions.workerItemStats({ commit });
+    commit(rootTypes.LOADING, false);
   },
-  setGameTypes({ commit }, value) {
+  async setGameTypes({ commit }, value) {
     commit(rootTypes.LOADING, true);
     commit(types.SET_GAME_TYPES, value);
-    Promise.all([
-      actions.workerGenStatistics({ commit }),
-      actions.workerGenPitcherStatistics({ commit }),
-      actions.workerItemStats({ commit }),
-    ]).then(() => {
-      commit(rootTypes.LOADING, false);
-    });
+    await actions.workerGenStatistics({ commit });
+    await actions.workerGenPitcherStatistics({ commit });
+    await actions.workerItemStats({ commit });
+    commit(rootTypes.LOADING, false);
   },
-  setTop({ commit }, value) {
+  async setTop({ commit }, value) {
     commit(rootTypes.LOADING, true);
     commit(types.SET_TOP, value);
-    actions.workerGenStatistics({ commit }).then(() => {
-      commit(rootTypes.LOADING, false);
-    });
+    await actions.workerGenStatistics({ commit });
+    commit(rootTypes.LOADING, false);
   },
-  setUnlimitedPA({ commit }, value) {
+  async setUnlimitedPA({ commit }, value) {
     commit(rootTypes.LOADING, true);
     commit(types.SET_UNLIMITED_PA, value);
-    actions.workerGenStatistics({ commit }).then(() => {
-      commit(rootTypes.LOADING, false);
-    });
+    await actions.workerGenStatistics({ commit });
+    commit(rootTypes.LOADING, false);
   },
-  setSortBy({ commit }, value) {
+  async setSortBy({ commit }, value) {
     commit(rootTypes.LOADING, true);
     commit(types.SET_SORTBY, value);
     commit(types.SET_COLS, { col: value, visible: true });
-    actions.workerGenStatistics({ commit }).then(() => {
-      commit(rootTypes.LOADING, false);
-    });
+    await actions.workerGenStatistics({ commit });
+    commit(rootTypes.LOADING, false);
   },
   setCheckAll({ commit }, isCheckAll) {
     commit(types.SET_CHECKALL, isCheckAll);
@@ -1085,9 +1073,9 @@ const actions = {
   toggleColumn({ commit }, col) {
     commit(types.SET_COLS, { col });
   },
-  setGame({ commit }, gameDate) {
+  async setGame({ commit }, gameDate) {
     commit(types.SET_GAME, gameDate);
-    actions.workerBox({ commit });
+    await actions.workerBox({ commit });
   },
   setOrder({ commit }, order) {
     commit(types.SET_ORDER, order);
@@ -1107,13 +1095,12 @@ const actions = {
     });
     commit(types.SET_GENSTATISTICS, data);
   },
-  setPitcherSortBy({ commit }, value) {
+  async setPitcherSortBy({ commit }, value) {
     commit(rootTypes.LOADING, true);
     commit(types.SET_PITCHER_SORTBY, value);
     commit(types.SET_PITCHER_COLS, { col: value, visible: true });
-    actions.workerGenPitcherStatistics({ commit }).then(() => {
-      commit(rootTypes.LOADING, false);
-    });
+    await actions.workerGenPitcherStatistics({ commit });
+    commit(rootTypes.LOADING, false);
   },
   setPitcherCheckAll({ commit }, isCheckAll) {
     commit(types.SET_PITCHER_CHECKALL, isCheckAll);
