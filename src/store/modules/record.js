@@ -5,7 +5,7 @@ import {
 } from '../root';
 import { state as teamState, getters as teamGetters } from './team';
 import utils, { sumByInn, accCalc } from '../../libs/utils';
-import { callWorker } from '../../web-worker';
+import { callWorkerQueued } from '../../web-worker';
 
 const formatColor = content => {
   if (['1H', '2H', '3H', 'HR'].includes(content)) {
@@ -1093,7 +1093,7 @@ const actions = {
     commit(types.SET_ORDER, order);
   },
   async workerGenStatistics({ commit }) {
-    const data = await callWorker({
+    const data = await callWorkerQueued({
       cmd: 'GenStatistics',
       players: state.players,
       records: state.records,
@@ -1122,7 +1122,7 @@ const actions = {
     commit(types.SET_PITCHER_COLS, { col });
   },
   async workerGenPitcherStatistics({ commit }) {
-    const data = await callWorker({
+    const data = await callWorkerQueued({
       cmd: 'GenPitcherStatistics',
       players: state.players,
       games: state.games,
@@ -1137,7 +1137,7 @@ const actions = {
     commit(types.SET_PITCHER_GENSTATISTICS, data);
   },
   async workerItemStats({ commit }) {
-    const { pitcherGameCount, ...others } = await callWorker({
+    const { pitcherGameCount, ...others } = await callWorkerQueued({
       cmd: 'ItemStats',
       players: state.players,
       records: state.records,
@@ -1166,7 +1166,7 @@ const actions = {
       // );
       // commit(types.SET_BOX, data);
       // return;
-      const data = await callWorker({
+      const data = await callWorkerQueued({
         cmd: 'Box',
         games: state.games,
         game: state.game,
@@ -1432,7 +1432,7 @@ const mutations = {
 
 const getLastOrderPosition = async newGameId => {
   const getLastOrderPosition_ = async gameId => {
-    const data = await callWorker({
+    const data = await callWorkerQueued({
       cmd: 'Box',
       games: state.games,
       game: gameId,

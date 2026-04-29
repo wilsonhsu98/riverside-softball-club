@@ -23,7 +23,7 @@ function getWorker() {
   return worker;
 }
 
-export function callWorker(payload) {
+function callWorker(payload) {
   return new Promise(resolve => {
     const worker = getWorker();
     const currentId = id++;
@@ -34,5 +34,28 @@ export function callWorker(payload) {
       id: currentId,
       ...payload,
     });
+  });
+}
+
+let running = false;
+const queue = [];
+
+async function runNext() {
+  if (running || !queue.length) return;
+
+  running = true;
+  const { payload, resolve } = queue.shift();
+
+  const result = await callWorker(payload);
+  resolve(result);
+
+  running = false;
+  runNext();
+}
+
+export function callWorkerQueued(payload) {
+  return new Promise(resolve => {
+    queue.push({ payload, resolve });
+    runNext();
   });
 }
