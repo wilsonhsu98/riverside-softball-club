@@ -1,20 +1,38 @@
-const workerCreater = function(cmdObj, callback) {
-  const prevHash = window.localStorage.getItem('version_hash');
-  let worker = new Worker(`async-web-worker.js?${prevHash}`);
+let worker;
+let id = 0;
+const callbacks = new Map();
 
-  worker.addEventListener(
-    'message',
-    e => {
-      if (typeof callback === 'function') {
-        callback(e.data);
+function getWorker() {
+  if (!worker) {
+    const prevHash = window.localStorage.getItem('version_hash');
+    worker = new Worker(`async-web-worker.js?${prevHash}`);
+
+    worker.onmessage = e => {
+      const { id, result } = e.data;
+      const cb = callbacks.get(id);
+      if (cb) {
+        cb(result);
+        callbacks.delete(id);
       }
-      worker.terminate();
-      worker = null;
-    },
-    false,
-  );
+    };
 
-  worker.postMessage(cmdObj);
-};
+    worker.onerror = e => {
+      console.error('worker error', e);
+    };
+  }
+  return worker;
+}
 
-export default workerCreater;
+export function callWorker(payload) {
+  return new Promise(resolve => {
+    const worker = getWorker();
+    const currentId = id++;
+
+    callbacks.set(currentId, resolve);
+
+    worker.postMessage({
+      id: currentId,
+      ...payload,
+    });
+  });
+}

@@ -5,7 +5,7 @@ import {
 } from '../root';
 import { state as teamState, getters as teamGetters } from './team';
 import utils, { sumByInn, accCalc } from '../../libs/utils';
-import workerCreater from '../../web-worker';
+import { callWorker } from '../../web-worker';
 
 const formatColor = content => {
   if (['1H', '2H', '3H', 'HR'].includes(content)) {
@@ -1092,27 +1092,20 @@ const actions = {
   setOrder({ commit }, order) {
     commit(types.SET_ORDER, order);
   },
-  workerGenStatistics({ commit }) {
-    return new Promise(resolve => {
-      workerCreater(
-        {
-          cmd: 'GenStatistics',
-          players: state.players,
-          records: state.records,
-          unlimitedPA: state.unlimitedPA,
-          top: state.top,
-          period: state.period,
-          sortBy: state.sortBy,
-          excludedGames: state.games
-            .filter(g => !state.gameTypes.includes(g.gameType))
-            .map(g => g.game),
-        },
-        data => {
-          commit(types.SET_GENSTATISTICS, data);
-          resolve();
-        },
-      );
+  async workerGenStatistics({ commit }) {
+    const data = await callWorker({
+      cmd: 'GenStatistics',
+      players: state.players,
+      records: state.records,
+      unlimitedPA: state.unlimitedPA,
+      top: state.top,
+      period: state.period,
+      sortBy: state.sortBy,
+      excludedGames: state.games
+        .filter(g => !state.gameTypes.includes(g.gameType))
+        .map(g => g.game),
     });
+    commit(types.SET_GENSTATISTICS, data);
   },
   setPitcherSortBy({ commit }, value) {
     commit(rootTypes.LOADING, true);
@@ -1128,87 +1121,63 @@ const actions = {
   togglePitcherColumn({ commit }, col) {
     commit(types.SET_PITCHER_COLS, { col });
   },
-  workerGenPitcherStatistics({ commit }) {
-    return new Promise(resolve => {
-      workerCreater(
-        {
-          cmd: 'GenPitcherStatistics',
-          players: state.players,
-          games: state.games,
-          period: state.period,
-          sortBy: state.pitcherSortBy,
-          excludedGames: state.games
-            .filter(g => !state.gameTypes.includes(g.gameType))
-            .map(g => g.game),
-          pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
-        },
-        data => {
-          commit(types.SET_PITCHER_GENSTATISTICS, data);
-          resolve();
-        },
-      );
+  async workerGenPitcherStatistics({ commit }) {
+    const data = await callWorker({
+      cmd: 'GenPitcherStatistics',
+      players: state.players,
+      games: state.games,
+      period: state.period,
+      sortBy: state.pitcherSortBy,
+      excludedGames: state.games
+        .filter(g => !state.gameTypes.includes(g.gameType))
+        .map(g => g.game),
+      pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
     });
+
+    commit(types.SET_PITCHER_GENSTATISTICS, data);
   },
-  workerItemStats({ commit }) {
-    return new Promise(resolve => {
-      workerCreater(
-        {
-          cmd: 'ItemStats',
-          players: state.players,
-          records: state.records,
-          period: state.period,
-          games: state.games,
-          excludedGames: state.games
-            .filter(g => !state.gameTypes.includes(g.gameType))
-            .map(g => g.game),
-          pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
-        },
-        data => {
-          const { pitcherGameCount, ...others } = data;
-          commit(types.SET_ITEMSTATS, others);
-          commit(types.SET_SUPPORT_PITCHERS, pitcherGameCount);
-          resolve();
-        },
-      );
+  async workerItemStats({ commit }) {
+    const { pitcherGameCount, ...others } = await callWorker({
+      cmd: 'ItemStats',
+      players: state.players,
+      records: state.records,
+      period: state.period,
+      games: state.games,
+      excludedGames: state.games
+        .filter(g => !state.gameTypes.includes(g.gameType))
+        .map(g => g.game),
+      pitcherInn: teamGetters.teamInfo(teamState).pitcherInn,
     });
+
+    commit(types.SET_ITEMSTATS, others);
+    commit(types.SET_SUPPORT_PITCHERS, pitcherGameCount);
   },
-  workerBox({ commit }) {
-    return new Promise(resolve => {
-      if (
-        state.game &&
-        state.records.some(item => item._table === state.game)
-      ) {
-        // const boxSummary =
-        //   state.games.length &&
-        //   state.game &&
-        //   state.games.find(item => item.game === state.game);
-        // const data = displayGame(
-        //   state.players,
-        //   state.records.filter(item => item._table === state.game),
-        //   boxSummary.errors,
-        //   rootState.role,
-        // );
-        // commit(types.SET_BOX, data);
-        // return;
-        workerCreater(
-          {
-            cmd: 'Box',
-            games: state.games,
-            game: state.game,
-            players: state.players,
-            records: state.records,
-            role: rootState.role,
-          },
-          data => {
-            commit(types.SET_BOX, data);
-            resolve();
-          },
-        );
-      } else {
-        commit(types.SET_BOX, []);
-        resolve();
-      }
-    });
+  async workerBox({ commit }) {
+    if (state.game && state.records.some(item => item._table === state.game)) {
+      // const boxSummary =
+      //   state.games.length &&
+      //   state.game &&
+      //   state.games.find(item => item.game === state.game);
+      // const data = displayGame(
+      //   state.players,
+      //   state.records.filter(item => item._table === state.game),
+      //   boxSummary.errors,
+      //   rootState.role,
+      // );
+      // commit(types.SET_BOX, data);
+      // return;
+      const data = await callWorker({
+        cmd: 'Box',
+        games: state.games,
+        game: state.game,
+        players: state.players,
+        records: state.records,
+        role: rootState.role,
+      });
+      commit(types.SET_BOX, data);
+    } else {
+      commit(types.SET_BOX, []);
+    }
   },
   setBoxDisplay({ commit }, value) {
     commit(types.SET_BOX_DISPLAY, value);
@@ -1462,30 +1431,24 @@ const mutations = {
 };
 
 const getLastOrderPosition = async newGameId => {
-  const getLastOrderPosition_ = gameId =>
-    new Promise(resolve => {
-      workerCreater(
-        {
-          cmd: 'Box',
-          games: state.games,
-          game: gameId,
-          players: teamGetters.teamInfo(teamState).players,
-          records: state.records,
-        },
-        data => {
-          resolve({
-            orders: Array.isArray(data)
-              ? data
-                  .slice(1)
-                  .filter(row => !row.altOrder)
-                  .map(row => ({ name: row.name }))
-              : [],
-            positions: (state.games.find(g => g.game === gameId) || {})
-              .positions,
-          });
-        },
-      );
+  const getLastOrderPosition_ = async gameId => {
+    const data = await callWorker({
+      cmd: 'Box',
+      games: state.games,
+      game: gameId,
+      players: teamGetters.teamInfo(teamState).players,
+      records: state.records,
     });
+    return {
+      orders: Array.isArray(data)
+        ? data
+            .slice(1)
+            .filter(row => !row.altOrder)
+            .map(row => ({ name: row.name }))
+        : [],
+      positions: (state.games.find(g => g.game === gameId) || {}).positions,
+    };
+  };
   let lastGame;
   for (let i = state.games.length - 1; i >= 0; i -= 1) {
     if (

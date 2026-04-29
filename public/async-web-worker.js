@@ -1362,24 +1362,25 @@ const execBox = state => {
   return result;
 };
 
-self.addEventListener(
-  'message',
-  e => {
-    const data = e.data;
-    switch (data.cmd) {
-      case 'GenStatistics':
-        self.postMessage(execGenStatistics(data));
-        break;
-      case 'GenPitcherStatistics':
-        self.postMessage(execGenPitcherStatistics(data));
-        break;
-      case 'ItemStats':
-        self.postMessage(execItemStats(data));
-        break;
-      case 'Box':
-        self.postMessage(execBox(data));
-        break;
-    }
-  },
-  false,
-);
+self.addEventListener('message', e => {
+  const { id, cmd, ...data } = e.data;
+
+  let result;
+
+  switch (cmd) {
+    case 'GenStatistics':
+      result = execGenStatistics(data);
+      break;
+    case 'GenPitcherStatistics':
+      result = execGenPitcherStatistics(data);
+      break;
+    case 'ItemStats':
+      result = execItemStats(data);
+      break;
+    case 'Box':
+      result = execBox(data);
+      break;
+  }
+
+  self.postMessage({ id, result });
+});
