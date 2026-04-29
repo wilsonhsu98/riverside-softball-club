@@ -91,6 +91,15 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
     list.sort((a, b) => b._orderKey - a._orderKey);
   }
 
+  const gameRecordsIndexMap = new Map();
+  for (const [table, list] of recordsByGame.entries()) {
+    const idxMap = new Map();
+    list.forEach((r, i) => {
+      idxMap.set(`${r.name}__${r.order}`, i);
+    });
+    gameRecordsIndexMap.set(table, idxMap);
+  }
+
   const result = players.map(player => {
     const name = player.id;
 
@@ -102,10 +111,10 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
       .map(item => {
         const gameRecords = recordsByGame.get(item._table) || [];
 
-        // next5：直接 slice，不 filter
-        const idx = gameRecords.findIndex(
-          r => r.name === item.name && r.order === item.order,
-        );
+        const idxMap = gameRecordsIndexMap.get(item._table);
+        const idx = idxMap
+          ? idxMap.get(`${item.name}__${item.order}`) ?? -1
+          : -1;
 
         let rName = '';
         if (idx >= 0) {
@@ -411,7 +420,9 @@ const genPitcherStatistics = (
   games,
   filterGames = [],
   pitcherInn = 7,
+  playerMap,
 ) => {
+  const playerMap_ = playerMap || new Map(players.map(p => [p.id, p]));
   const games_ = games.filter(g => filterGames.includes(g.game));
   const alltime = games_.filter(
     g => g.pitcher || (Array.isArray(g.pitchers) && g.pitchers.length),
@@ -441,9 +452,9 @@ const genPitcherStatistics = (
     },
     { pitchers: [], records: [] },
   );
-  const currentPlayers = players.map(p => p.id);
+  const currentPlayersSet = new Set(players.map(p => p.id));
   const result = pitchers
-    .filter(name => currentPlayers.includes(name))
+    .filter(name => currentPlayersSet.has(name))
     .map(name => {
       const { OUT, R, H, SO, BB, S, B } = records
         .filter(p => p.name === name)
@@ -477,7 +488,7 @@ const genPitcherStatistics = (
       );
       return {
         name,
-        data: (players.find(sub => sub.id === name) || { data: {} }).data,
+        data: (playerMap_.get(name) || { data: {} }).data,
         OUT,
         S,
         B,
@@ -1091,6 +1102,7 @@ const execGenStatistics = state => {
 
 const execGenPitcherStatistics = state => {
   const t0 = performance.now();
+  const playerMap = new Map(state.players.map(p => [p.id, p]));
   const result = genPitcherStatistics(
     state.players,
     state.games,
@@ -1098,6 +1110,7 @@ const execGenPitcherStatistics = state => {
       g => !(state.excludedGames || []).includes(g),
     ),
     state.pitcherInn,
+    playerMap,
   ).sort((a, b) => {
     if (b[state.sortBy] === '-' && a[state.sortBy] !== '-') {
       return -1;
@@ -1171,49 +1184,30 @@ const execItemStats = state => {
   );
   const minimunOut = pitcherGames.length * 3;
   const pitcherSet = pitcherGames
-    .map(item => item.pitchers)
-    .flat()
+    .flatMap(item => item.pitchers)
     .reduce((acc, p) => {
-      const samePlayer = acc[p.name] || {
-        BB: 0,
-        H: 0,
-        OUT: 0,
-        R: 0,
-        SO: 0,
+      const prev = acc[p.name] || { BB: 0, H: 0, OUT: 0, R: 0, SO: 0 };
+      acc[p.name] = {
+        BB: prev.BB + sumByInn(p.BB),
+        H: prev.H + sumByInn(p.H),
+        OUT: prev.OUT + sumByInn(p.OUT),
+        R: prev.R + sumByInn(p.R),
+        SO: prev.SO + sumByInn(p.SO),
       };
-      const { BB, H, OUT, R, SO } = {
-        BB: samePlayer.BB + sumByInn(p.BB),
-        H: samePlayer.H + sumByInn(p.H),
-        OUT: samePlayer.OUT + sumByInn(p.OUT),
-        R: samePlayer.R + sumByInn(p.R),
-        SO: samePlayer.SO + sumByInn(p.SO),
-      };
-      const { ERA, WHIP } = accCalc(
-        [],
-        [
-          {
-            BB: [BB],
-            H: [H],
-            OUT: [OUT],
-            R: [R],
-          },
-        ],
-        0,
-        state.pitcherInn,
-      );
-      return {
-        ...acc,
-        [p.name]: {
-          BB,
-          H,
-          OUT,
-          R,
-          SO,
-          ERA,
-          WHIP,
-        },
-      };
+      return acc;
     }, {});
+
+  for (const name of Object.keys(pitcherSet)) {
+    const p = pitcherSet[name];
+    const { ERA, WHIP } = accCalc(
+      [],
+      [{ BB: [p.BB], H: [p.H], OUT: [p.OUT], R: [p.R] }],
+      0,
+      state.pitcherInn,
+    );
+    p.ERA = ERA;
+    p.WHIP = WHIP;
+  }
   const pitchers = Object.keys(pitcherSet)
     .filter(name => currentPlayers.has(name))
     .map(name => ({
@@ -1284,9 +1278,7 @@ const execItemStats = state => {
       .map(item => ({
         name: item.name,
         SO: item.SO,
-        data: (
-          state.players.find(player => player.id === item.name) || { data: {} }
-        ).data,
+        data: (playerMap.get(item.name) || { data: {} }).data,
       })),
     ERA: pitchers
       .filter(item => !['', '∞'].includes(item.ERA) && item.OUT >= minimunOut)
@@ -1296,9 +1288,7 @@ const execItemStats = state => {
       .map(item => ({
         name: item.name,
         ERA: item.ERA,
-        data: (
-          state.players.find(player => player.id === item.name) || { data: {} }
-        ).data,
+        data: (playerMap.get(item.name) || { data: {} }).data,
       })),
     WHIP: pitchers
       .filter(item => item.WHIP !== '-' && item.OUT >= minimunOut)
@@ -1308,9 +1298,7 @@ const execItemStats = state => {
       .map(item => ({
         name: item.name,
         WHIP: item.WHIP,
-        data: (
-          state.players.find(player => player.id === item.name) || { data: {} }
-        ).data,
+        data: (playerMap.get(item.name) || { data: {} }).data,
       })),
     GWRBI: Object.entries(gwrbiCount)
       .filter(([batter]) => currentPlayers.has(batter))
@@ -1366,21 +1354,24 @@ self.addEventListener('message', e => {
   const { id, cmd, ...data } = e.data;
 
   let result;
+  try {
+    switch (cmd) {
+      case 'GenStatistics':
+        result = execGenStatistics(data);
+        break;
+      case 'GenPitcherStatistics':
+        result = execGenPitcherStatistics(data);
+        break;
+      case 'ItemStats':
+        result = execItemStats(data);
+        break;
+      case 'Box':
+        result = execBox(data);
+        break;
+    }
 
-  switch (cmd) {
-    case 'GenStatistics':
-      result = execGenStatistics(data);
-      break;
-    case 'GenPitcherStatistics':
-      result = execGenPitcherStatistics(data);
-      break;
-    case 'ItemStats':
-      result = execItemStats(data);
-      break;
-    case 'Box':
-      result = execBox(data);
-      break;
+    self.postMessage({ id, result });
+  } catch (error) {
+    self.postMessage({ id, error: error.message });
   }
-
-  self.postMessage({ id, result });
 });
