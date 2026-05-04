@@ -52,7 +52,7 @@
   }
   &-photo {
     text-indent: -32px;
-    overflow: hidden;
+    // overflow: hidden;
     &:after {
       content: attr(data-alt);
       line-height: 32px;
