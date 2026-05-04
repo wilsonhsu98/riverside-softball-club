@@ -636,7 +636,11 @@
                       ]"
                     ></div>
                     <div
-                      v-if="editVideoMode && item.data.uid === userId"
+                      v-if="
+                        editVideoMode &&
+                          item.data.uid === userId &&
+                          record.content !== 'new'
+                      "
                       class="edit-mask editable"
                       @click="
                         e => {
@@ -864,7 +868,11 @@
                       ]"
                     ></div>
                     <div
-                      v-if="editVideoMode && item.data.uid === userId"
+                      v-if="
+                        editVideoMode &&
+                          item.data.uid === userId &&
+                          record.content !== 'new'
+                      "
                       class="edit-mask editable"
                       @click="
                         e => {
