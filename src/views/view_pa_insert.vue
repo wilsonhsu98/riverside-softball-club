@@ -1587,7 +1587,7 @@ export default {
 
       return true;
     },
-    edit_() {
+    edit_() { 
       if (this.content && this.validate()) {
         if (
           this.showNextOnbase === false &&
@@ -1662,6 +1662,13 @@ export default {
           }),
         }));
         tempRecord.length = Math.max(i, tempRecord.length);
+        const breakOrder =
+          this.name !== this.base.home.name &&
+          this.order % this.box[this.box.length - 1].order === 1 &&
+          this.order ===
+            (this.order % this.box[this.box.length - 1].order) +
+              this.box.length -
+              1;
         const orders = tempRecord.slice(0, i).concat(
           {
             inn: this.inn,
@@ -1674,6 +1681,7 @@ export default {
               !['BB', 'K', 'FOUL'].includes(this.content) && {
                 location: this.location[0],
               }),
+            ...(breakOrder && { break: true }),
             ...(this.canOpenForcedMode &&
               this.isForcedMode && {
                 isForcedMode: true,
