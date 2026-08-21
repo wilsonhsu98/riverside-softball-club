@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "client",
+      "runtimeExecutable": "env",
+      "runtimeArgs": ["NODE_OPTIONS=--openssl-legacy-provider", "npm", "run", "start:client"],
+      "port": 9527
+    }
+  ]
+}
