@@ -261,9 +261,6 @@ export default {
   }
   .summary {
     margin-top: 2px;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
   }
 }
 
