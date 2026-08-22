@@ -306,6 +306,10 @@
   .btn-container {
     margin: 0 -5px;
     display: flex;
+    width: auto;
+    position: static;
+    background: none;
+    z-index: auto;
     button {
       flex: 0;
       padding: 0 10px;
