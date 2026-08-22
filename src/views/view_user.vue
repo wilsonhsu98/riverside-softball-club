@@ -306,10 +306,6 @@
   .btn-container {
     margin: 0 -5px;
     display: flex;
-    width: auto;
-    position: static;
-    background: none;
-    z-index: auto;
     button {
       flex: 0;
       padding: 0 10px;
@@ -392,6 +388,7 @@
       .btn-container {
         justify-content: center;
         margin: 8px 0;
+        width: 100%;
         > button {
           margin: 0 3px;
         }
