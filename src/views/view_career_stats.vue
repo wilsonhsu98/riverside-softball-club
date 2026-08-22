@@ -32,6 +32,7 @@
             <tbody>
               <template v-for="section in careerSections">
                 <tr
+                  v-if="!section.hideHeader"
                   :key="`${section.key}-header`"
                   class="section-row"
                   :class="[
@@ -208,7 +209,6 @@ export default {
 
 .career-stats {
   padding: 16px 16px 0;
-  font-family: 'Inconsolata', '微軟正黑體', sans-serif;
   overflow-x: hidden;
   box-sizing: border-box;
 }
@@ -225,9 +225,10 @@ export default {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: var(--card-bg, #fff);
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+  background-color: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
+    0 1px 5px 0 rgba(0, 0, 0, 0.12);
   padding: 16px 18px;
   margin-bottom: 16px;
 
@@ -254,13 +255,15 @@ export default {
     min-width: 0;
   }
   .name {
-    font-size: 18px;
-    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
   .summary {
-    font-size: 13px;
-    color: #888;
     margin-top: 2px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
   }
 }
 
@@ -282,7 +285,6 @@ export default {
   border-collapse: collapse;
   min-width: 100%;
   color: var(--table-row-color);
-  font-size: 13px;
   white-space: nowrap;
 
   thead th.cell {
@@ -291,7 +293,7 @@ export default {
     position: sticky;
     top: 0;
     z-index: 4;
-    font-weight: 500;
+    font-weight: normal;
   }
 
   .cell {

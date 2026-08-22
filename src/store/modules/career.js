@@ -204,6 +204,7 @@ const actions = {
         title: '生涯',
         teamType: t.teamType,
         isAggregate: false,
+        hideHeader: true,
         rows: t.rows,
         total: t.total,
       });
