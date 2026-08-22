@@ -141,6 +141,12 @@ const router = new VueRouter({
           meta: { requiresAuth: true, anonymous: true },
         },
         {
+          path: 'career/:uid',
+          name: 'career_stats',
+          component: require('./views/view_career_stats').default,
+          meta: { requiresAuth: true, anonymous: true },
+        },
+        {
           path: 'user',
           name: 'user',
           component: require('./views/view_user').default,

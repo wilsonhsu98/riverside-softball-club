@@ -170,6 +170,9 @@
                 <div>{{ $t(col.name) }}</div>
               </div>
             </template>
+            <div class="cell career" :title="$t('career')">
+              {{ $t('career') }}
+            </div>
           </div>
           <div class="sum-row" v-if="sum.PA > 0">
             <template v-for="(col, colIndex) in displayedCols">
@@ -225,6 +228,7 @@
                 <div class="align-right">{{ sum[col.name] }}</div>
               </div>
             </template>
+            <div class="cell career"></div>
           </div>
           <template v-for="(item, itemIndex) in list">
             <input
@@ -382,6 +386,15 @@
                   <div class="align-right">{{ item[col.name] }}</div>
                 </div>
               </template>
+              <div class="cell career" :data-label="$t('career')">
+                <router-link
+                  v-if="item.data.uid"
+                  :to="{ name: 'career_stats', params: { uid: item.data.uid } }"
+                  :title="$t('career')"
+                >
+                  <i class="fa fa-address-card-o"></i>
+                </router-link>
+              </div>
             </div>
           </template>
         </div>
@@ -541,7 +554,7 @@ i.fa {
   .toggle-row {
     display: block;
     position: absolute;
-    width: 100%;
+    width: calc(100% - 40px);
     height: 36px;
     z-index: 1;
     margin: 0;
@@ -591,6 +604,15 @@ i.fa {
       left: 0 !important;
       z-index: 2;
       cursor: pointer;
+    }
+    &.career {
+      width: 40px;
+      a {
+        color: inherit;
+      }
+      .fa {
+        font-size: 16px;
+      }
     }
     &.name {
       position: sticky !important;

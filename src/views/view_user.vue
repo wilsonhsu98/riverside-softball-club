@@ -19,31 +19,46 @@
             {{ accountInfo.email }}
           </div>
           <div
-            class="btn-container"
+            class="btn-container career-group"
             v-if="
               (teams === null || (Array.isArray(teams) && teams.length)) &&
                 collapse
             "
           >
             <button @click="collapse = false">{{ $t('btn_seldom') }}</button>
-          </div>
-          <div class="btn-container" v-else>
-            <router-link :to="{ path: 'join_team' }" tag="button">
-              {{ $t('join_team') }}
-            </router-link>
-            <router-link :to="{ path: 'create_team' }" tag="button">
-              {{ $t('create_team') }}
-            </router-link>
             <router-link
-              v-if="teams.length > 0"
-              :to="{ path: 'leave_team' }"
+              :to="{ name: 'career_stats', params: { uid: userId } }"
               tag="button"
             >
-              {{ $t('leave_team') }}
+              {{ $t('btn_career') }}
             </router-link>
-            <button class="logout-btn" @click="logout">
-              {{ $t('logout_btn') }}
-            </button>
+          </div>
+          <div class="btn-row" v-else>
+            <div class="btn-container">
+              <router-link :to="{ path: 'join_team' }" tag="button">
+                {{ $t('join_team') }}
+              </router-link>
+              <router-link :to="{ path: 'create_team' }" tag="button">
+                {{ $t('create_team') }}
+              </router-link>
+              <router-link
+                v-if="teams.length > 0"
+                :to="{ path: 'leave_team' }"
+                tag="button"
+              >
+                {{ $t('leave_team') }}
+              </router-link>
+              <button class="logout-btn" @click="logout">
+                {{ $t('logout_btn') }}
+              </button>
+            </div>
+            <router-link
+              :to="{ name: 'career_stats', params: { uid: userId } }"
+              tag="button"
+              class="career-standalone"
+            >
+              {{ $t('btn_career') }}
+            </router-link>
           </div>
           <div class="links">
             <a
@@ -297,6 +312,24 @@
       word-break: keep-all;
     }
   }
+  .btn-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    > .btn-container {
+      flex: 0 0 auto;
+      width: fit-content;
+    }
+  }
+  .career-standalone {
+    flex: 0 0 auto;
+    width: fit-content;
+    padding: 0 10px;
+    word-break: keep-all;
+  }
+  .btn-container + .career-standalone {
+    margin-left: 10px;
+  }
   button {
     background-color: $header_bgcolor;
     padding: 10px 15px;
@@ -357,6 +390,26 @@
         margin: 8px 0;
         > button {
           margin: 0 3px;
+        }
+      }
+      .btn-row {
+        justify-content: center;
+        margin: 8px 0;
+        > .career-standalone {
+          margin: 0 3px;
+        }
+      }
+      .career-group {
+        flex-direction: column;
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+        > button {
+          flex: none;
+        }
+        > button:first-child {
+          margin-top: 8px;
+          margin-bottom: 8px;
         }
       }
     }

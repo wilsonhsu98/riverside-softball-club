@@ -9,6 +9,7 @@ import record from './modules/record';
 import team from './modules/team';
 import user from './modules/user';
 import game from './modules/game';
+import career from './modules/career';
 
 Vue.use(Vuex);
 
@@ -23,6 +24,7 @@ export default new Vuex.Store({
     team,
     user,
     game,
+    career,
   },
   strict: true,
 });
