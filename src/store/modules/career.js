@@ -41,6 +41,15 @@ const STAT_KEYS = [
   'SLG',
   'OPS',
 ];
+const ADVANCED_KEYS = [
+  'LEVEL',
+  'AVG_NO',
+  'AVG_DESC_NO',
+  'AVG_SP',
+  'AVG_DESC_SP',
+  'AVG_FB',
+  'AVG_DESC_FB',
+];
 
 // Run-scoring is annotated on a teammate's at-bat entry (`r` / `onbase[].name`
 // + result:'run'), not on the scoring player's own record. So instead of
@@ -72,12 +81,17 @@ const genStats = (uid, records, games) =>
     excludedGames: [],
   }).then(result => result[0]);
 
-const pickCols = stat =>
-  STAT_KEYS.reduce((acc, key) => {
+const pickCols = stat => {
+  const cols = STAT_KEYS.reduce((acc, key) => {
     const value = stat ? stat[key] : undefined;
     acc[key] = value === undefined || value === '-' ? 0 : value;
     return acc;
   }, {});
+  ADVANCED_KEYS.forEach(key => {
+    cols[key] = stat && stat[key] !== undefined ? stat[key] : '-';
+  });
+  return cols;
+};
 
 const yearOf = table => table.split('::')[1].slice(0, 4);
 

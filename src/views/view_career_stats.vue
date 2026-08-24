@@ -30,11 +30,14 @@
                   class="cell"
                   :class="{
                     sort: col.key === selectedCol,
+                    hover: col.key === hoveredCol && col.key !== selectedCol,
                     year: col.key === 'year',
                   }"
                   @click="selectCol_(col.key)"
+                  @mouseenter="hoverCol_(col.key)"
+                  @mouseleave="hoverCol_(null)"
                 >
-                  {{ col.label }}
+                  <div>{{ col.label }}</div>
                 </th>
               </tr>
             </thead>
@@ -70,7 +73,12 @@
                     v-for="col in cols"
                     :key="`${section.key}-${row.year}-${col.key}`"
                     class="cell"
-                    :class="{ sort: col.key === selectedCol }"
+                    :class="{
+                      sort: col.key === selectedCol,
+                      hover: col.key === hoveredCol && col.key !== selectedCol,
+                      advance: advanceCols.includes(col.key),
+                      center: centerCols.includes(col.key),
+                    }"
                   >
                     <template v-if="col.key === 'year'">
                       {{ row.year }}
@@ -79,6 +87,10 @@
                         class="unlocked-dot"
                         title="含未鎖定比賽,為即時計算"
                       />
+                    </template>
+                    <template v-else-if="advanceCols.includes(col.key)">
+                      <div>{{ formatCol(row, col.key) }}</div>
+                      <div>({{ formatDesc(row, col.key) }})</div>
                     </template>
                     <template v-else>{{ formatCol(row, col.key) }}</template>
                   </td>
@@ -95,7 +107,12 @@
                     v-for="col in cols"
                     :key="`${section.key}-total-${col.key}`"
                     class="cell"
-                    :class="{ sort: col.key === selectedCol }"
+                    :class="{
+                      sort: col.key === selectedCol,
+                      hover: col.key === hoveredCol && col.key !== selectedCol,
+                      advance: advanceCols.includes(col.key),
+                      center: centerCols.includes(col.key),
+                    }"
                   >
                     <template v-if="col.key === 'year'">
                       總計
@@ -104,6 +121,10 @@
                         class="unlocked-dot"
                         title="含未鎖定比賽,為即時計算"
                       />
+                    </template>
+                    <template v-else-if="advanceCols.includes(col.key)">
+                      <div>{{ formatCol(section.total, col.key) }}</div>
+                      <div>({{ formatDesc(section.total, col.key) }})</div>
                     </template>
                     <template v-else>{{
                       formatCol(section.total, col.key)
@@ -141,15 +162,24 @@ const COLS = [
   { key: 'OBP', label: '上壘率' },
   { key: 'SLG', label: '長打率' },
   { key: 'OPS', label: 'OPS' },
+  { key: 'LEVEL', label: '三圍' },
+  { key: 'AVG_NO', label: '壘上無人' },
+  { key: 'AVG_SP', label: '得點圈' },
+  { key: 'AVG_FB', label: '滿壘' },
 ];
 const RATE_COLS = ['AVG', 'OBP', 'SLG', 'OPS'];
+const ADVANCE_COLS = ['AVG_NO', 'AVG_SP', 'AVG_FB'];
+const CENTER_COLS = ['AVG', 'OBP', 'SLG', 'OPS', 'LEVEL'];
 
 export default {
   data() {
     return {
       cols: COLS,
+      advanceCols: ADVANCE_COLS,
+      centerCols: CENTER_COLS,
       tableHeight: 0,
       selectedCol: null,
+      hoveredCol: null,
     };
   },
   computed: {
@@ -194,11 +224,19 @@ export default {
       if (key === 'year') return;
       this.selectedCol = key;
     },
+    hoverCol_(key) {
+      this.hoveredCol = key === 'year' ? null : key;
+    },
     formatCol(row, key) {
       const value = row[key];
-      if (!RATE_COLS.includes(key)) return value;
+      if (!RATE_COLS.includes(key) && !ADVANCE_COLS.includes(key)) {
+        return value;
+      }
       if (typeof value !== 'number') return '-';
-      return value.toFixed(3).replace(/^(-?)0\./, '$1.');
+      return value.toFixed(3);
+    },
+    formatDesc(row, key) {
+      return row[key.replace('_', '_DESC_')] || '0-0';
     },
     detectRect() {
       if (!this.$refs.tableWrapper) return;
@@ -307,9 +345,16 @@ export default {
     top: 0;
     z-index: 4;
     font-weight: normal;
+    text-align: center;
     cursor: pointer;
     &.year {
       cursor: initial;
+    }
+    &:nth-child(2n + 3):not(.sort) {
+      opacity: 1;
+      > div {
+        opacity: 0.6;
+      }
     }
   }
 
@@ -320,6 +365,25 @@ export default {
     box-sizing: border-box;
     &.sort {
       color: $error_color;
+    }
+    &.hover {
+      color: rgba($error_color, 0.7);
+    }
+    &.center {
+      text-align: center;
+    }
+    &.advance > div {
+      display: inline-block;
+      vertical-align: top;
+      &:first-child {
+        width: 55px;
+        text-align: right;
+      }
+      &:last-child {
+        margin-left: 5px;
+        width: 75px;
+        text-align: left;
+      }
     }
   }
 
@@ -385,6 +449,9 @@ export default {
   }
   .total-row .cell.sort {
     color: $error_color !important;
+  }
+  .total-row .cell.hover {
+    color: rgba($error_color, 0.7) !important;
   }
 }
 
