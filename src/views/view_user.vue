@@ -51,11 +51,18 @@
               <button class="logout-btn" @click="logout">
                 {{ $t('logout_btn') }}
               </button>
+              <router-link
+                :to="{ name: 'career_stats', params: { uid: userId } }"
+                tag="button"
+                class="career-web"
+              >
+                {{ $t('btn_career') }}
+              </router-link>
             </div>
             <router-link
               :to="{ name: 'career_stats', params: { uid: userId } }"
               tag="button"
-              class="career-standalone"
+              class="career-mobile"
             >
               {{ $t('btn_career') }}
             </router-link>
@@ -321,14 +328,12 @@
       width: fit-content;
     }
   }
-  .career-standalone {
+  .career-mobile {
     flex: 0 0 auto;
     width: fit-content;
     padding: 0 10px;
     word-break: keep-all;
-  }
-  .btn-container + .career-standalone {
-    margin-left: 10px;
+    display: none;
   }
   button {
     background-color: $header_bgcolor;
@@ -396,9 +401,6 @@
       .btn-row {
         justify-content: center;
         margin: 8px 0;
-        > .career-standalone {
-          margin: 0 3px;
-        }
       }
       .career-group {
         flex-direction: column;
@@ -424,6 +426,12 @@
       right: 10px;
       transform-origin: right center;
       transform: scale(0.7);
+    }
+    .career-web {
+      display: none;
+    }
+    .career-mobile {
+      display: inline-block;
     }
   }
 }
