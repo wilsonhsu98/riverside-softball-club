@@ -24,7 +24,16 @@
           <table class="sticky-table">
             <thead>
               <tr>
-                <th v-for="col in cols" :key="`header_${col.key}`" class="cell">
+                <th
+                  v-for="col in cols"
+                  :key="`header_${col.key}`"
+                  class="cell"
+                  :class="{
+                    sort: col.key === selectedCol,
+                    year: col.key === 'year',
+                  }"
+                  @click="selectCol_(col.key)"
+                >
                   {{ col.label }}
                 </th>
               </tr>
@@ -61,6 +70,7 @@
                     v-for="col in cols"
                     :key="`${section.key}-${row.year}-${col.key}`"
                     class="cell"
+                    :class="{ sort: col.key === selectedCol }"
                   >
                     <template v-if="col.key === 'year'">
                       {{ row.year }}
@@ -85,6 +95,7 @@
                     v-for="col in cols"
                     :key="`${section.key}-total-${col.key}`"
                     class="cell"
+                    :class="{ sort: col.key === selectedCol }"
                   >
                     <template v-if="col.key === 'year'">
                       總計
@@ -138,6 +149,7 @@ export default {
     return {
       cols: COLS,
       tableHeight: 0,
+      selectedCol: null,
     };
   },
   computed: {
@@ -177,6 +189,10 @@ export default {
     ...mapActions(['fetchCareerStats', 'clearCareer']),
     back_() {
       this.$router.back();
+    },
+    selectCol_(key) {
+      if (key === 'year') return;
+      this.selectedCol = key;
     },
     formatCol(row, key) {
       const value = row[key];
@@ -291,6 +307,10 @@ export default {
     top: 0;
     z-index: 4;
     font-weight: normal;
+    cursor: pointer;
+    &.year {
+      cursor: initial;
+    }
   }
 
   .cell {
@@ -298,6 +318,9 @@ export default {
     text-align: right;
     padding: 0 10px;
     box-sizing: border-box;
+    &.sort {
+      color: $error_color;
+    }
   }
 
   .cell:first-child {
@@ -359,6 +382,9 @@ export default {
   .total-row.aggregate.baseball .cell {
     background: #2c3a66;
     color: #fff;
+  }
+  .total-row .cell.sort {
+    color: $error_color !important;
   }
 }
 
