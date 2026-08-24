@@ -12,7 +12,7 @@
       :data-alt="nameNumber"
     />
     <img
-      v-if="photo"
+      v-if="showPhoto"
       class="img img-photo"
       :class="{
         small: size === 'small',
@@ -20,7 +20,7 @@
       }"
       :src="$cacheImg(photo)"
       onload="this.style.display = 'inline-block'"
-      onerror="this.style.display = 'none'"
+      @error="handleError"
     />
   </div>
 </template>
@@ -132,6 +132,15 @@ export default {
   computed: {
     nameNumber() {
       return getNameNumber({ name: this.name, number: this.number });
+    },
+    showPhoto() {
+      return !!this.photo && !this.$imgFailed(this.photo);
+    },
+  },
+  methods: {
+    handleError(e) {
+      this.$markImgFailed(this.photo);
+      e.target.style.display = 'none';
     },
   },
 };

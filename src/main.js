@@ -2,7 +2,7 @@ import Vue from 'vue';
 import store from './store';
 import router from './router';
 import i18n from './i18n';
-import { cacheImg } from './libs/utils';
+import { cacheImg, isImgFailed, markImgFailed } from './libs/utils';
 import VueTagsInput from '@johmun/vue-tags-input';
 import VTooltip from 'v-tooltip';
 import VCalendar from 'v-calendar';
@@ -78,6 +78,8 @@ Vue.use({
   install() {
     Vue.cacheImg = cacheImg;
     Vue.prototype.$cacheImg = cacheImg;
+    Vue.prototype.$imgFailed = isImgFailed;
+    Vue.prototype.$markImgFailed = markImgFailed;
   },
 });
 Vue.config.productionTip = false;

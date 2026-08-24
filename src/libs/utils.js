@@ -216,6 +216,16 @@ const cacheImg = url => {
   }
 };
 
+// Tracked separately from `cache` above: this records URLs whose actual
+// displayed <img> failed to load, so repeat renders (re-sorting, revisiting
+// a list, etc.) can skip straight to a fallback instead of re-attempting a
+// known-broken request every time. Note this must NOT be inferred from
+// toDataURL()'s canvas-conversion failures — some avatar CDNs block the
+// crossOrigin canvas read while the plain <img> display still works fine.
+const failedImgUrls = new Set();
+const isImgFailed = url => failedImgUrls.has(url);
+const markImgFailed = url => failedImgUrls.add(url);
+
 function scrollTo(element) {
   // check is dom node
   if (!!element && element.nodeType === 1) {
@@ -579,6 +589,8 @@ export default {
 
 export {
   cacheImg,
+  isImgFailed,
+  markImgFailed,
   scrollTo,
   formatContent,
   formatColor,
