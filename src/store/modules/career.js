@@ -125,14 +125,12 @@ const actions = {
     const account = accountDoc.data() || {};
     const teamCodes = account.teams || [];
 
-    const teamsWithData = [];
-
-    for (const teamCode of teamCodes) {
+    const fetchTeamData = async teamCode => {
       const teamDoc = await db
         .collection('teams')
         .doc(teamCode)
         .get();
-      if (!teamDoc.exists) continue;
+      if (!teamDoc.exists) return null;
       const {
         players = {},
         unlockGames = [],
@@ -142,7 +140,7 @@ const actions = {
       const nameInTeam = Object.keys(players).find(
         name => players[name].uid === uid,
       );
-      if (!nameInTeam) continue;
+      if (!nameInTeam) return null;
 
       const gameCollection = await db
         .collection(`teams/${teamCode}/games`)
@@ -162,7 +160,7 @@ const actions = {
       const playerGameIds = [
         ...new Set(records.filter(r => r.name === uid).map(r => r._table)),
       ];
-      if (!playerGameIds.length) continue;
+      if (!playerGameIds.length) return null;
 
       const unlockGamesPrefixed = unlockGames.map(id => `${teamCode}::${id}`);
       const rows = await buildRows(
@@ -179,7 +177,7 @@ const actions = {
         unlocked: playerGameIds.some(id => unlockGamesPrefixed.includes(id)),
       };
 
-      teamsWithData.push({
+      return {
         teamCode,
         teamName: teamName || teamCode,
         teamType,
@@ -190,8 +188,12 @@ const actions = {
         rows,
         total,
         firstYear: rows.length ? rows[0].year : '9999',
-      });
-    }
+      };
+    };
+
+    const teamsWithData = (
+      await Promise.all(teamCodes.map(fetchTeamData))
+    ).filter(Boolean);
 
     const totalTeamCount = teamsWithData.length;
     const distinctSports = [...new Set(teamsWithData.map(t => t.teamType))];
