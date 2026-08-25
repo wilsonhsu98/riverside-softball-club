@@ -37,7 +37,7 @@
                   @mouseenter="hoverCol_(col.key)"
                   @mouseleave="hoverCol_(null)"
                 >
-                  <div>{{ col.label }}</div>
+                  {{ col.label }}
                 </th>
               </tr>
             </thead>
@@ -350,11 +350,8 @@ export default {
     &.year {
       cursor: initial;
     }
-    &:nth-child(2n + 3):not(.sort) {
-      opacity: 1;
-      > div {
-        opacity: 0.6;
-      }
+    &:nth-child(2n + 3):not(.sort):not(.hover) {
+      color: rgba($header_color, 0.6);
     }
   }
 
