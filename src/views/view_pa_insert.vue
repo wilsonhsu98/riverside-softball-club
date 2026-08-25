@@ -796,6 +796,8 @@
           text-align: center;
           margin-right: 2px;
           font-size: 12px;
+          overflow: hidden;
+          border-radius: 5px;
 
           &.red {
             background-color: var(--hit);
@@ -814,6 +816,7 @@
           }
 
           &.current {
+            transform: scale(130%) translateX(4px);
             animation: currentContent 1s linear infinite;
           }
 
