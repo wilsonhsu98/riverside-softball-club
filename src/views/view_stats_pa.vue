@@ -134,8 +134,15 @@
     </div>
     <div ref="sticky-table-wrapper">
       <simplebar
+        ref="simplebar"
         class="sticky-table-wrapper"
-        :style="{ maxHeight: `${tableHeight}px` }"
+        :style="{
+          height:
+            toggleTarget && expandedHeight !== null
+              ? `${expandedHeight}px`
+              : 'auto',
+          maxHeight: `${tableHeight}px`,
+        }"
       >
         <div class="sticky-table">
           <div class="header-row">
@@ -462,6 +469,7 @@ i.fa {
 }
 
 .sticky-table-wrapper {
+  transition: height 0.2s ease-in-out;
   ::-webkit-scrollbar {
     display: none;
   }
@@ -998,6 +1006,7 @@ export default {
       sum: {},
       conditionContainerHeight: 0,
       chartHeight: {},
+      expandedHeight: null,
     };
   },
   created() {},
@@ -1038,15 +1047,44 @@ export default {
           };
     },
     toggleRadio(e, target) {
+      // .chart panels are absolutely positioned, so expanding/collapsing one
+      // doesn't resize the table and never triggers SimpleBar's own
+      // ResizeObserver/MutationObserver — recalculate manually so it re-checks
+      // overflow and unlocks scrolling when the table wasn't already overflowing.
+      const simplebar = this.$refs.simplebar && this.$refs.simplebar.SimpleBar;
+      const chartId = e.target.id.replace('chk_', 'chart_');
+      const chartEl = document.querySelector(`#${chartId}`);
       if (this.toggleTarget === target) {
         this.toggleTarget = null;
+        this.expandedHeight = null;
+        setTimeout(() => simplebar && simplebar.recalculate(), 250);
       } else {
         this.toggleTarget = target;
+        // The chart panel's top is a fixed (static) position independent of
+        // its current height, and its fully-expanded height was already
+        // measured by detectRect() — so the final container size is known
+        // immediately, without waiting for the 0.2s expand transition to
+        // finish. Setting it now lets the container grow in step with the
+        // chart instead of snapping afterwards.
+        const tableEl = document.querySelector('.sticky-table');
+        if (tableEl) {
+          const wrapperTop = this.$refs[
+            'sticky-table-wrapper'
+          ].getBoundingClientRect().top;
+          const naturalHeight = tableEl.getBoundingClientRect().height;
+          const chartTop = chartEl
+            ? chartEl.getBoundingClientRect().top - wrapperTop
+            : 0;
+          const chartBottom = chartTop + (this.chartHeight[target] || 0);
+          this.expandedHeight = Math.min(
+            this.tableHeight,
+            Math.ceil(Math.max(naturalHeight, chartBottom)),
+          );
+        }
         setTimeout(() => {
-          document
-            .querySelector(`#${e.target.id.replace('chk_', 'chart_')}`)
-            .focus();
-        }, 100);
+          if (simplebar) simplebar.recalculate();
+          if (chartEl) chartEl.focus();
+        }, 250);
       }
     },
     collapseSearch(event) {
