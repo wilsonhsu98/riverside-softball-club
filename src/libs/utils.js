@@ -304,13 +304,14 @@ const getNameNumber = ({ name = '', number = '' }) => {
       .toUpperCase()
       .replace(/[A-Z]/g, s => String.fromCharCode(s.charCodeAt(0) + 0xfee0));
   })();
-  const tempNum = number
-    ? `${number}`.length === 1
-      ? `${number}`.replace(/[0-9]/g, s =>
-          String.fromCharCode(s.charCodeAt(0) + 0xfee0),
-        )
-      : number
-    : '';
+  const tempNum =
+    number !== '' && number !== undefined && number !== null
+      ? `${number}`.length === 1
+        ? `${number}`.replace(/[0-9]/g, s =>
+            String.fromCharCode(s.charCodeAt(0) + 0xfee0),
+          )
+        : number
+      : '';
   return `${tempName}${tempNum}`;
 };
 
