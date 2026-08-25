@@ -147,6 +147,12 @@ const router = new VueRouter({
           meta: { requiresAuth: true, anonymous: true },
         },
         {
+          path: 'career/:teamCode/:playerName',
+          name: 'career_stats_team',
+          component: require('./views/view_career_stats').default,
+          meta: { requiresAuth: true, anonymous: true },
+        },
+        {
           path: 'user',
           name: 'user',
           component: require('./views/view_user').default,
@@ -295,6 +301,21 @@ router.beforeEach((to, from, next) => {
     next({ path: '/main/user' });
   } else {
     next();
+  }
+});
+
+// Tracks whether the current tab has actually navigated within this app
+// before (as opposed to landing directly on the current page — a pasted
+// link, a new tab, or a same-tab link click from an outside site). The
+// first resolved navigation is the initial page load itself, so
+// `hasHistory` only flips true starting from the second one; from then on
+// `$router.back()` is guaranteed to land on an in-app, same-origin route.
+router.hasHistory = false;
+let resolvedCount = 0;
+router.afterEach(() => {
+  resolvedCount += 1;
+  if (resolvedCount > 1) {
+    router.hasHistory = true;
   }
 });
 

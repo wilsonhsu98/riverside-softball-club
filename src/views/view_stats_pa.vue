@@ -387,11 +387,7 @@
                 </div>
               </template>
               <div class="cell career" :data-label="$t('career')">
-                <router-link
-                  v-if="item.data.uid"
-                  :to="{ name: 'career_stats', params: { uid: item.data.uid } }"
-                  :title="$t('career')"
-                >
+                <router-link :to="careerLink(item)" :title="$t('career')">
                   <i class="fa fa-address-card-o"></i>
                 </router-link>
               </div>
@@ -1029,6 +1025,17 @@ export default {
     ]),
     formatValue(value) {
       return value !== '-' ? value.toFixed(3) : value;
+    },
+    careerLink(item) {
+      return item.data.uid
+        ? { name: 'career_stats', params: { uid: item.data.uid } }
+        : {
+            name: 'career_stats_team',
+            params: {
+              teamCode: this.$route.params.team,
+              playerName: item.name,
+            },
+          };
     },
     toggleRadio(e, target) {
       if (this.toggleTarget === target) {

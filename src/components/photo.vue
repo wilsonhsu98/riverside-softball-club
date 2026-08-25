@@ -8,8 +8,9 @@
       :class="{
         small: size === 'small',
         medium: size === 'medium',
+        'icon-fallback': iconFallback,
       }"
-      :data-alt="nameNumber"
+      :data-alt="iconFallback ? '' : nameNumber"
     />
     <img
       v-if="showPhoto"
@@ -67,6 +68,11 @@
       text-align: center;
       text-indent: 0;
       font-size: 12px;
+    }
+    &.icon-fallback:after {
+      content: '\f007';
+      font-family: 'FontAwesome';
+      font-size: 16px;
     }
   }
   &.medium {
@@ -128,7 +134,7 @@
 import { getNameNumber } from '../libs/utils';
 
 export default {
-  props: ['name', 'number', 'photo', 'size'],
+  props: ['name', 'number', 'photo', 'size', 'iconFallback'],
   computed: {
     nameNumber() {
       return getNameNumber({ name: this.name, number: this.number });

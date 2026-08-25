@@ -1,11 +1,15 @@
 <template>
   <div class="career-stats">
-    <mobile-header @back="back_" />
+    <mobile-header v-on="headerListeners" />
     <div v-if="careerLoading" class="loading">讀取中...</div>
     <template v-else>
       <div class="player-card">
         <div class="photo-wrap">
-          <photo :name="careerPlayerName" :photo="careerPhoto" />
+          <photo
+            :name="careerPlayerName"
+            :photo="careerPhoto"
+            :icon-fallback="true"
+          />
         </div>
         <div class="info">
           <div class="name">{{ careerPlayerName || '球員生涯統計' }}</div>
@@ -189,8 +193,8 @@ export default {
       'careerPhoto',
       'careerSections',
     ]),
-    uid() {
-      return this.$route.params.uid;
+    headerListeners() {
+      return this.$router.hasHistory ? { back: this.back_ } : {};
     },
     teamCount() {
       return this.careerSections.filter(section => !section.isAggregate).length;
@@ -201,8 +205,19 @@ export default {
         .reduce((acc, section) => acc + section.total.G, 0);
     },
   },
-  created() {
-    this.fetchCareerStats(this.uid);
+  // `career_stats` and `career_stats_team` are different route records that
+  // both render this component, so vue-router treats switching between them
+  // as leave+enter rather than update — even though Vue's patching reuses
+  // the same instance instead of remounting it. beforeRouteEnter covers
+  // that case (and the first-ever load, replacing a created() hook that
+  // would otherwise only run once); beforeRouteUpdate covers staying on the
+  // same route record with different params (e.g. one uid link to another).
+  beforeRouteEnter(to, from, next) {
+    next(vm => vm.loadCareer(to));
+  },
+  beforeRouteUpdate(to, from, next) {
+    this.loadCareer(to);
+    next();
   },
   mounted() {
     window.addEventListener('resize', this.detectRect);
@@ -216,7 +231,17 @@ export default {
     this.detectRect();
   },
   methods: {
-    ...mapActions(['fetchCareerStats', 'clearCareer']),
+    ...mapActions(['fetchCareerStats', 'fetchTeamCareerStats', 'clearCareer']),
+    loadCareer(route) {
+      if (route.name === 'career_stats_team') {
+        this.fetchTeamCareerStats({
+          teamCode: route.params.teamCode,
+          playerName: route.params.playerName,
+        });
+      } else {
+        this.fetchCareerStats(route.params.uid);
+      }
+    },
     back_() {
       this.$router.back();
     },
@@ -299,7 +324,7 @@ export default {
         text-indent: -100px;
         &:after {
           line-height: 100px;
-          font-size: 36px;
+          font-size: 67px;
         }
       }
     }

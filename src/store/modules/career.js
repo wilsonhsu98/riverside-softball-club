@@ -124,6 +124,29 @@ const buildRows = async (
   return rows;
 };
 
+const buildTeamStats = async (
+  playerId,
+  records,
+  queryGameIds,
+  playerGameIds,
+  unlockGamesPrefixed,
+) => {
+  const rows = await buildRows(
+    playerId,
+    records,
+    queryGameIds,
+    playerGameIds,
+    unlockGamesPrefixed,
+  );
+  const totalStat = await genStats(playerId, records, queryGameIds);
+  const total = {
+    G: playerGameIds.length,
+    ...pickCols(totalStat),
+    unlocked: playerGameIds.some(id => unlockGamesPrefixed.includes(id)),
+  };
+  return { rows, total };
+};
+
 const actions = {
   clearCareer({ commit }) {
     commit(types.CLEAR_CAREER);
@@ -177,19 +200,13 @@ const actions = {
       if (!playerGameIds.length) return null;
 
       const unlockGamesPrefixed = unlockGames.map(id => `${teamCode}::${id}`);
-      const rows = await buildRows(
+      const { rows, total } = await buildTeamStats(
         uid,
         records,
         queryGameIds,
         playerGameIds,
         unlockGamesPrefixed,
       );
-      const totalStat = await genStats(uid, records, queryGameIds);
-      const total = {
-        G: playerGameIds.length,
-        ...pickCols(totalStat),
-        unlocked: playerGameIds.some(id => unlockGamesPrefixed.includes(id)),
-      };
 
       return {
         teamCode,
@@ -253,17 +270,12 @@ const actions = {
           const combinedUnlockGamesPrefixed = teamsOfSport.flatMap(
             t => t.unlockGamesPrefixed,
           );
-          const rows = await buildRows(
+          const { rows, total } = await buildTeamStats(
             uid,
             combinedRecords,
             combinedQueryGameIds,
             combinedPlayerGameIds,
             combinedUnlockGamesPrefixed,
-          );
-          const totalStat = await genStats(
-            uid,
-            combinedRecords,
-            combinedQueryGameIds,
           );
           sections.push({
             key: `aggregate-${sport}`,
@@ -274,13 +286,7 @@ const actions = {
             teamType: sport,
             isAggregate: true,
             rows,
-            total: {
-              G: combinedPlayerGameIds.length,
-              ...pickCols(totalStat),
-              unlocked: combinedPlayerGameIds.some(id =>
-                combinedUnlockGamesPrefixed.includes(id),
-              ),
-            },
+            total,
           });
         }
       }
@@ -291,6 +297,68 @@ const actions = {
       photo: account.photo || '',
       sections,
     });
+    commit(types.SET_LOADING, false);
+  },
+  // For a player with no account (no uid) — their identity only exists
+  // within this one team's roster, so there's no cross-team lookup to do:
+  // query this team directly by its roster-local name.
+  async fetchTeamCareerStats({ commit }, { teamCode, playerName }) {
+    commit(types.SET_LOADING, true);
+    commit(types.CLEAR_CAREER);
+
+    const teamDoc = await db
+      .collection('teams')
+      .doc(teamCode)
+      .get();
+    const {
+      players = {},
+      unlockGames = [],
+      teamType = 'softball',
+    } = teamDoc.exists ? teamDoc.data() : {};
+
+    if (!teamDoc.exists || !players[playerName]) {
+      commit(types.SET_CAREER, { playerName: '', photo: '', sections: [] });
+      commit(types.SET_LOADING, false);
+      return;
+    }
+
+    const gameCollection = await db.collection(`teams/${teamCode}/games`).get();
+    const validDocs = gameCollection.docs.filter(doc =>
+      Array.isArray(doc.data().orders),
+    );
+    const records = validDocs.flatMap(doc =>
+      doc.data().orders.map(item => ({
+        ...item,
+        _table: `${teamCode}::${doc.id}`,
+      })),
+    );
+    const queryGameIds = validDocs.map(doc => `${teamCode}::${doc.id}`);
+    const playerGameIds = [
+      ...new Set(records.filter(r => r.name === playerName).map(r => r._table)),
+    ];
+
+    const unlockGamesPrefixed = unlockGames.map(id => `${teamCode}::${id}`);
+    const sections = [];
+    if (playerGameIds.length) {
+      const { rows, total } = await buildTeamStats(
+        playerName,
+        records,
+        queryGameIds,
+        playerGameIds,
+        unlockGamesPrefixed,
+      );
+      sections.push({
+        key: teamCode,
+        title: '生涯',
+        teamType,
+        isAggregate: false,
+        hideHeader: true,
+        rows,
+        total,
+      });
+    }
+
+    commit(types.SET_CAREER, { playerName, photo: '', sections });
     commit(types.SET_LOADING, false);
   },
 };
