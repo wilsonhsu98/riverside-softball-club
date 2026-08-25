@@ -71,7 +71,11 @@
                   v-for="(row, index) in section.rows"
                   :key="`${section.key}-${row.year}`"
                   class="normal-row"
-                  :class="{ odd: index % 2 === 1 }"
+                  :class="{
+                    odd: index % 2 === 1,
+                    clickable: row.locations.length,
+                  }"
+                  @click="openLocation_(row, row.year)"
                 >
                   <td
                     v-for="col in cols"
@@ -104,8 +108,12 @@
                   class="normal-row total-row"
                   :class="[
                     section.teamType,
-                    { aggregate: section.isAggregate },
+                    {
+                      aggregate: section.isAggregate,
+                      clickable: section.total.locations.length,
+                    },
                   ]"
+                  @click="openLocation_(section.total, '總計')"
                 >
                   <td
                     v-for="col in cols"
@@ -141,6 +149,32 @@
         </simplebar>
       </div>
     </template>
+    <div
+      v-if="coordinates.values.length"
+      class="location-modal"
+      @click="closeLocation_"
+    >
+      <div class="location-content">
+        <coordination
+          :no_track="true"
+          :values="coordinates.values"
+          :displayMode="locationDisplayMode"
+          :avatar="careerPhoto"
+          :player="careerPlayerName"
+          :corner-label="cornerLabel"
+          @click.native.stop
+        />
+        <i
+          class="fa mode-toggle"
+          :class="{
+            'fa-map-marker': ['dot', 'heatmap'].includes(locationDisplayMode),
+            'fa-percent': locationDisplayMode === 'percentage',
+            heatmap: locationDisplayMode === 'heatmap',
+          }"
+          @click.stop="locationDisplayCount += 1"
+        ></i>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -184,7 +218,15 @@ export default {
       tableHeight: 0,
       selectedCol: null,
       hoveredCol: null,
+      coordinates: { values: [], year: '' },
+      locationDisplayMode: 'dot', // [dot, heatmap, percentage]
+      locationDisplayCount: 0,
     };
+  },
+  watch: {
+    locationDisplayCount(count) {
+      this.locationDisplayMode = ['dot', 'heatmap', 'percentage'][count % 3];
+    },
   },
   computed: {
     ...mapGetters([
@@ -203,6 +245,15 @@ export default {
       return this.careerSections
         .filter(section => !section.isAggregate)
         .reduce((acc, section) => acc + section.total.G, 0);
+    },
+    cornerLabel() {
+      if (!this.coordinates.year) return '';
+      const modeWord = {
+        dot: '落點',
+        heatmap: '熱點',
+        percentage: '落點機率',
+      }[this.locationDisplayMode];
+      return `${this.coordinates.year}${modeWord}`;
     },
   },
   // `career_stats` and `career_stats_team` are different route records that
@@ -233,6 +284,9 @@ export default {
   methods: {
     ...mapActions(['fetchCareerStats', 'fetchTeamCareerStats', 'clearCareer']),
     loadCareer(route) {
+      this.coordinates = { values: [], year: '' };
+      this.locationDisplayCount = 0;
+      this.locationDisplayMode = 'dot';
       if (route.name === 'career_stats_team') {
         this.fetchTeamCareerStats({
           teamCode: route.params.teamCode,
@@ -241,6 +295,13 @@ export default {
       } else {
         this.fetchCareerStats(route.params.uid);
       }
+    },
+    openLocation_(row, year) {
+      if (!row.locations.length) return;
+      this.coordinates = { values: row.locations, year };
+    },
+    closeLocation_() {
+      this.coordinates = { values: [], year: '' };
     },
     back_() {
       this.$router.back();
@@ -426,6 +487,9 @@ export default {
     &:not(.odd):not(.total-row) .cell {
       background-color: var(--table-row-even);
     }
+    &.clickable {
+      cursor: pointer;
+    }
   }
 
   .section-row .cell {
@@ -489,5 +553,41 @@ export default {
   border-radius: 50%;
   background: #e0994a;
   margin-left: 4px;
+}
+
+.location-modal {
+  position: fixed;
+  z-index: 10;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.location-content {
+  display: inline-block;
+  text-align: right;
+}
+
+.mode-toggle {
+  display: inline-block;
+  margin-top: 5px;
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  font-size: 18px;
+  text-align: center;
+  color: #fff;
+  background-color: $active_bgcolor;
+  border-radius: 4px;
+  cursor: pointer;
+  box-sizing: border-box;
+  &.heatmap {
+    background-color: $error_color;
+  }
 }
 </style>

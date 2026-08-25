@@ -90,6 +90,7 @@ const pickCols = stat => {
   ADVANCED_KEYS.forEach(key => {
     cols[key] = stat && stat[key] !== undefined ? stat[key] : '-';
   });
+  cols.locations = stat && Array.isArray(stat.locations) ? stat.locations : [];
   return cols;
 };
 

@@ -92,6 +92,7 @@ export default {
     'player',
     'positions',
     'fileNamePrefix',
+    'cornerLabel',
   ],
   emits: ['change'],
   data() {
@@ -797,6 +798,19 @@ export default {
               base - (6 / 100) * base,
             );
           }
+        }
+        // 左下角文字標籤(例如年度 + 目前顯示模式)
+        if (this.cornerLabel) {
+          ctx.font = `${avatarRadius * 0.9}px Arial`;
+          ctx.shadowColor = 'white';
+          ctx.shadowBlur = (1 / 100) * base;
+          ctx.fillStyle = avatarBorderColor;
+          ctx.textAlign = 'left';
+          ctx.fillText(
+            this.cornerLabel,
+            (5 / 100) * base,
+            base - (6 / 100) * base,
+          );
         }
       }
 
