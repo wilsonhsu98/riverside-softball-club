@@ -338,7 +338,11 @@ export default {
         .map(header => header.getBoundingClientRect())
         .filter(rect => rect.bottom >= window.innerHeight - 1)
         .reduce((max, rect) => Math.max(max, rect.height), 0);
-      this.tableHeight = window.innerHeight - top - bottomBarHeight - 20;
+      this.tableHeight =
+        window.innerHeight -
+        top -
+        bottomBarHeight -
+        (bottomBarHeight ? 10 : 20);
     },
   },
 };
@@ -348,7 +352,6 @@ export default {
 @import '../scss/variable';
 
 .career-stats {
-  padding: 16px 16px 0;
   overflow-x: hidden;
   box-sizing: border-box;
 }
@@ -370,7 +373,7 @@ export default {
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
     0 1px 5px 0 rgba(0, 0, 0, 0.12);
   padding: 16px 18px;
-  margin-bottom: 16px;
+  margin: 20px 0;
 
   .photo-wrap {
     position: relative;
@@ -414,7 +417,10 @@ export default {
 
 @media only screen and (max-width: 760px), (max-height: 480px) {
   .career-stats {
-    padding: 66px 16px 0;
+    padding: 60px 10px 0;
+  }
+  .player-card {
+    margin: 0 0 10px 0;
   }
 }
 
