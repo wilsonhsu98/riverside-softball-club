@@ -169,10 +169,13 @@
                 class="cell"
                 :class="{
                   sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
                   [col.name]: true,
                 }"
                 :title="$t(col.name)"
                 @click="setSortBy_(col.name)"
+                @mouseenter="hoverCol_(col.name)"
+                @mouseleave="hoverCol_(null)"
               >
                 <div>{{ $t(col.name) }}</div>
               </div>
@@ -198,7 +201,10 @@
               <div
                 v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
                 class="cell advance"
-                :class="{ sort: col.name === sortBy }"
+                :class="{
+                  sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
+                }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
@@ -210,7 +216,10 @@
               <div
                 v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
                 class="cell"
-                :class="{ sort: col.name === sortBy }"
+                :class="{
+                  sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
+                }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
@@ -219,7 +228,10 @@
               <div
                 v-else-if="col.name === 'LEVEL'"
                 class="cell"
-                :class="{ sort: col.name === sortBy }"
+                :class="{
+                  sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
+                }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
@@ -228,7 +240,10 @@
               <div
                 v-else
                 class="cell"
-                :class="{ sort: col.name === sortBy }"
+                :class="{
+                  sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
+                }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
@@ -358,7 +373,10 @@
                 <div
                   v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
                   class="cell advance"
-                  :class="{ sort: col.name === sortBy }"
+                  :class="{
+                    sort: col.name === sortBy,
+                    hover: col.name === hoveredCol && col.name !== sortBy,
+                  }"
                   :data-label="$t(col.name)"
                   :key="`row_${item.name}_${colIndex}`"
                 >
@@ -368,7 +386,10 @@
                 <div
                   v-else-if="['AVG', 'OBP', 'SLG', 'OPS'].includes(col.name)"
                   class="cell"
-                  :class="{ sort: col.name === sortBy }"
+                  :class="{
+                    sort: col.name === sortBy,
+                    hover: col.name === hoveredCol && col.name !== sortBy,
+                  }"
                   :data-label="$t(col.name)"
                   :key="`row_${item.name}_${colIndex}`"
                 >
@@ -377,7 +398,10 @@
                 <div
                   v-else-if="col.name === 'LEVEL'"
                   class="cell"
-                  :class="{ sort: col.name === sortBy }"
+                  :class="{
+                    sort: col.name === sortBy,
+                    hover: col.name === hoveredCol && col.name !== sortBy,
+                  }"
                   :data-label="$t(col.name)"
                   :key="`row_${item.name}_${colIndex}`"
                 >
@@ -386,7 +410,10 @@
                 <div
                   v-else
                   class="cell"
-                  :class="{ sort: col.name === sortBy }"
+                  :class="{
+                    sort: col.name === sortBy,
+                    hover: col.name === hoveredCol && col.name !== sortBy,
+                  }"
                   :data-label="$t(col.name)"
                   :key="`row_${item.name}_${colIndex}`"
                 >
@@ -511,7 +538,7 @@ i.fa {
         z-index: 5;
         cursor: initial;
       }
-      &:nth-child(2n + 3):not(.sort) {
+      &:nth-child(2n + 3):not(.sort):not(.hover) {
         opacity: 1;
         > div {
           opacity: 0.6;
@@ -547,7 +574,7 @@ i.fa {
         z-index: 5;
         cursor: initial;
       }
-      &:nth-child(2n + 3):not(.sort) {
+      &:nth-child(2n + 3):not(.sort):not(.hover) {
         opacity: 1;
         > div {
           opacity: 0.6;
@@ -663,6 +690,9 @@ i.fa {
     &.sort {
       color: $error_color;
     }
+    &.hover {
+      color: rgba($error_color, 0.7);
+    }
     &.level {
       display: none;
     }
@@ -681,7 +711,8 @@ i.fa {
     }
     .align-right {
       margin: auto;
-      width: 30px;
+      padding-left: 5px;
+      padding-right: 5px;
       text-align: right;
       direction: rtl;
     }
@@ -1007,6 +1038,7 @@ export default {
       conditionContainerHeight: 0,
       chartHeight: {},
       expandedHeight: null,
+      hoveredCol: null,
     };
   },
   created() {},
@@ -1118,6 +1150,9 @@ export default {
         this.toggleTarget = null;
         this.setSortBy(sortItem);
       }
+    },
+    hoverCol_(name) {
+      this.hoveredCol = name;
     },
     setCheckAll_(isCheckAll) {
       this.toggleTarget = null;

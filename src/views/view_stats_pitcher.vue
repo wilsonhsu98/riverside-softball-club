@@ -147,6 +147,7 @@
                 class="cell"
                 :class="{
                   sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
                   [col.name]: true,
                 }"
                 :title="
@@ -155,6 +156,8 @@
                     : $t(col.name)
                 "
                 @click="setSortBy_(col.name)"
+                @mouseenter="hoverCol_(col.name)"
+                @mouseleave="hoverCol_(null)"
               >
                 <div>{{ getPitcherCol(col.name) }}</div>
               </div>
@@ -177,7 +180,10 @@
               <!-- <div
                 v-else-if="['ERA', 'WHIP'].includes(col.name)"
                 class="cell"
-                :class="{ sort: col.name === sortBy }"
+                :class="{
+                  sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
+                }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
@@ -186,7 +192,10 @@
               <div
                 v-else-if="['S%', 'PIP', 'K7', 'BB7', 'H7'].includes(col.name)"
                 class="cell"
-                :class="{ sort: col.name === sortBy }"
+                :class="{
+                  sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
+                }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
@@ -199,7 +208,10 @@
                   ['GS', 'IP', 'H', 'R', 'NP', 'BB', 'SO'].includes(col.name)
                 "
                 class="cell"
-                :class="{ sort: col.name === sortBy }"
+                :class="{
+                  sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
+                }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
@@ -210,7 +222,10 @@
               <div
                 v-else
                 class="cell"
-                :class="{ sort: col.name === sortBy }"
+                :class="{
+                  sort: col.name === sortBy,
+                  hover: col.name === hoveredCol && col.name !== sortBy,
+                }"
                 :data-label="$t(col.name)"
                 :key="`row_sum_${colIndex}`"
               >
@@ -252,7 +267,10 @@
                     ['S%', 'PIP', 'K7', 'BB7', 'H7'].includes(col.name)
                   "
                   class="cell"
-                  :class="{ sort: col.name === sortBy }"
+                  :class="{
+                    sort: col.name === sortBy,
+                    hover: col.name === hoveredCol && col.name !== sortBy,
+                  }"
                   :data-label="$t(col.name)"
                   :key="`row_${item.name}_${colIndex}`"
                 >
@@ -263,7 +281,10 @@
                 <div
                   v-else
                   class="cell"
-                  :class="{ sort: col.name === sortBy }"
+                  :class="{
+                    sort: col.name === sortBy,
+                    hover: col.name === hoveredCol && col.name !== sortBy,
+                  }"
                   :data-label="$t(col.name)"
                   :key="`row_${item.name}_${colIndex}`"
                 >
@@ -369,7 +390,7 @@ i.fa {
         z-index: 5;
         cursor: initial;
       }
-      &:nth-child(2n + 3):not(.sort) {
+      &:nth-child(2n + 3):not(.sort):not(.hover) {
         opacity: 1;
         > div {
           opacity: 0.6;
@@ -406,7 +427,7 @@ i.fa {
         z-index: 5;
         cursor: initial;
       }
-      &:nth-child(2n + 3):not(.sort) {
+      &:nth-child(2n + 3):not(.sort):not(.hover) {
         opacity: 1;
         > div {
           opacity: 0.6;
@@ -490,8 +511,12 @@ i.fa {
     &.sort {
       color: $error_color;
     }
+    &.hover {
+      color: rgba($error_color, 0.7);
+    }
     .align-right {
       margin: auto;
+      padding-left: 5px;
       padding-right: 5px;
       /* width: 30px; */
       text-align: right;
@@ -689,6 +714,7 @@ export default {
       tableHeight: 0,
       sum: {},
       conditionContainerHeight: 0,
+      hoveredCol: null,
     };
   },
   created() {},
@@ -734,6 +760,9 @@ export default {
         this.toggleTarget = null;
         this.setSortBy(sortItem);
       }
+    },
+    hoverCol_(name) {
+      this.hoveredCol = name;
     },
     setCheckAll_(isCheckAll) {
       this.toggleTarget = null;
