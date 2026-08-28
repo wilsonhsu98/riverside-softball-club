@@ -44,15 +44,41 @@ const accCalc = (beforePitchers = [], pitchers = [], currentIndex, inn = 7) => {
 
 const genStatistics = (players, records, filterPA, filterGames = []) => {
   const filterGamesSet = new Set(filterGames);
-  const filterGamesRecords = records.filter(r => filterGamesSet.has(r._table));
   const recordsByGame = new Map();
   const recordsByPlayer = new Map();
   const recordsByGamePlayer = new Map();
 
+  // 單次掃描：算好每人得分次數 + 排序用的 _orderKey，避免之後每位球員各自重新掃一次全部 records
+  const runCountByName = new Map();
+  const filteredRecords = [];
   for (const r of records) {
     if (!filterGamesSet.has(r._table)) continue;
+
+    const runNames = r.r ? new Set([r.r]) : new Set();
+    if (Array.isArray(r.onbase)) {
+      for (const sub of r.onbase) {
+        if (sub && sub.result === 'run') runNames.add(sub.name);
+      }
+    }
+    for (const rn of runNames) {
+      runCountByName.set(rn, (runCountByName.get(rn) || 0) + 1);
+    }
+
     if (r.content === 'UNKNOWN') continue;
 
+    if (r._orderKey == null) {
+      r._orderKey = parseInt(
+        (r._table.match(/\d/g) || [r._table]).join('') + (r.order + 10),
+        10,
+      );
+    }
+    filteredRecords.push(r);
+  }
+
+  // 排序一次即可：之後依序塞進各個 bucket，順序自然沿用（sort 是 stable 的）
+  filteredRecords.sort((a, b) => b._orderKey - a._orderKey);
+
+  for (const r of filteredRecords) {
     // game index
     if (!recordsByGame.has(r._table)) {
       recordsByGame.set(r._table, []);
@@ -70,25 +96,6 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
       recordsByGamePlayer.set(key, []);
     }
     recordsByGamePlayer.get(key).push(r);
-  }
-
-  // 預算 sort key（避免 regex 重跑）
-  for (const list of recordsByGame.values()) {
-    for (const r of list) {
-      if (r._orderKey == null) {
-        r._orderKey = parseInt(
-          (r._table.match(/\d/g) || [r._table]).join('') + (r.order + 10),
-          10,
-        );
-      }
-    }
-    list.sort((a, b) => b._orderKey - a._orderKey);
-  }
-  for (const list of recordsByPlayer.values()) {
-    list.sort((a, b) => b._orderKey - a._orderKey);
-  }
-  for (const list of recordsByGamePlayer.values()) {
-    list.sort((a, b) => b._orderKey - a._orderKey);
   }
 
   const gameRecordsIndexMap = new Map();
@@ -163,21 +170,7 @@ const genStatistics = (players, records, filterPA, filterGames = []) => {
       );
     }
 
-    const rCount =
-      filterPA === undefined
-        ? filterGamesRecords.reduce((acc, item) => {
-            if (
-              item.r === name ||
-              (Array.isArray(item.onbase) &&
-                item.onbase.some(
-                  sub => sub && sub.name === name && sub.result === 'run',
-                ))
-            ) {
-              return acc + 1;
-            }
-            return acc;
-          }, 0)
-        : 0;
+    const rCount = filterPA === undefined ? runCountByName.get(name) || 0 : 0;
     const calc = {
       pa: 0,
       ab: 0,
@@ -423,53 +416,97 @@ const genPitcherStatistics = (
   playerMap,
 ) => {
   const playerMap_ = playerMap || new Map(players.map(p => [p.id, p]));
-  const games_ = games.filter(g => filterGames.includes(g.game));
-  const alltime = games_.filter(
-    g => g.pitcher || (Array.isArray(g.pitchers) && g.pitchers.length),
-  );
-  const legacy = games_.filter(
-    g =>
-      g.pitcher &&
-      (!Array.isArray(g.pitchers) ||
-        (Array.isArray(g.pitchers) && g.pitchers.length === 0)),
-  );
-  const current = games_.filter(
-    g => Array.isArray(g.pitchers) && g.pitchers.length,
-  );
-  const { pitchers, records } = alltime.reduce(
-    (acc, g) => {
-      return {
-        pitchers: [
-          ...acc.pitchers,
-          Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher,
-          ...(Array.isArray(g.pitchers) ? g.pitchers.map(p => p.name) : []),
-        ].filter((n, i, self) => n && self.indexOf(n) === i),
-        records: [
-          ...acc.records,
-          ...(Array.isArray(g.pitchers) ? g.pitchers : []),
-        ],
-      };
-    },
-    { pitchers: [], records: [] },
-  );
+  const filterGamesSet = new Set(filterGames);
+  const games_ = games.filter(g => filterGamesSet.has(g.game));
+
+  const alltime = [];
+  const legacy = [];
+  const current = [];
+  for (const g of games_) {
+    const hasPitchers = Array.isArray(g.pitchers) && g.pitchers.length > 0;
+    if (g.pitcher || hasPitchers) alltime.push(g);
+    if (g.pitcher && !hasPitchers) legacy.push(g);
+    if (hasPitchers) current.push(g);
+  }
+
+  // 單次掃描累積每位投手的數據/場次，避免之後每位投手各自重新掃一次全部場次（原本是 O(投手數 x 場次)）
+  const pitcherNamesSeen = new Set();
+  const pitchers = [];
+  const statsByName = new Map();
+  const winCountByName = new Map();
+  const loseCountByName = new Map();
+  const gCountByName = new Map();
+  const gsCountByName = new Map();
+
+  const registerName = name => {
+    if (name && !pitcherNamesSeen.has(name)) {
+      pitcherNamesSeen.add(name);
+      pitchers.push(name);
+    }
+  };
+
+  for (const g of alltime) {
+    const primary = Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher;
+    registerName(primary);
+    if (primary) {
+      if (g.result === 'win') {
+        winCountByName.set(primary, (winCountByName.get(primary) || 0) + 1);
+      } else if (g.result === 'lose') {
+        loseCountByName.set(primary, (loseCountByName.get(primary) || 0) + 1);
+      }
+    }
+    if (Array.isArray(g.pitchers)) {
+      for (const p of g.pitchers) {
+        registerName(p.name);
+        const prev = statsByName.get(p.name) || {
+          OUT: 0,
+          R: 0,
+          H: 0,
+          SO: 0,
+          BB: 0,
+          S: 0,
+          B: 0,
+        };
+        statsByName.set(p.name, {
+          OUT: prev.OUT + sumByInn(p.OUT),
+          R: prev.R + sumByInn(p.R),
+          H: prev.H + sumByInn(p.H),
+          SO: prev.SO + sumByInn(p.SO),
+          BB: prev.BB + sumByInn(p.BB),
+          S: prev.S + sumByInn(p.S),
+          B: prev.B + sumByInn(p.B),
+        });
+      }
+    }
+  }
+  for (const g of legacy) {
+    const primary = Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher;
+    if (!primary) continue;
+    gCountByName.set(primary, (gCountByName.get(primary) || 0) + 1);
+  }
+  for (const g of current) {
+    for (const n of new Set(g.pitchers.map(p => p.name))) {
+      gCountByName.set(n, (gCountByName.get(n) || 0) + 1);
+    }
+    const first = (g.pitchers[0] || {}).name;
+    if (first) {
+      gsCountByName.set(first, (gsCountByName.get(first) || 0) + 1);
+    }
+  }
+
   const currentPlayersSet = new Set(players.map(p => p.id));
   const result = pitchers
     .filter(name => currentPlayersSet.has(name))
     .map(name => {
-      const { OUT, R, H, SO, BB, S, B } = records
-        .filter(p => p.name === name)
-        .reduce(
-          (acc, p) => ({
-            OUT: acc.OUT + sumByInn(p.OUT),
-            R: acc.R + sumByInn(p.R),
-            H: acc.H + sumByInn(p.H),
-            SO: acc.SO + sumByInn(p.SO),
-            BB: acc.BB + sumByInn(p.BB),
-            S: acc.S + sumByInn(p.S),
-            B: acc.B + sumByInn(p.B),
-          }),
-          { OUT: 0, R: 0, H: 0, S: 0, SO: 0, BB: 0, B: 0 },
-        );
+      const { OUT, R, H, SO, BB, S, B } = statsByName.get(name) || {
+        OUT: 0,
+        R: 0,
+        H: 0,
+        SO: 0,
+        BB: 0,
+        S: 0,
+        B: 0,
+      };
       const { ERA, WHIP, K7, BB7, H7, PIP } = accCalc(
         [],
         [
@@ -492,22 +529,10 @@ const genPitcherStatistics = (
         OUT,
         S,
         B,
-        W: alltime.filter(
-          g =>
-            (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name &&
-            g.result === 'win',
-        ).length,
-        L: alltime.filter(
-          g =>
-            (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name &&
-            g.result === 'lose',
-        ).length,
+        W: winCountByName.get(name) || 0,
+        L: loseCountByName.get(name) || 0,
         ERA,
-        G:
-          current.filter(g => g.pitchers.some(p => p.name === name)).length +
-          legacy.filter(
-            g => (Array.isArray(g.pitcher) ? g.pitcher[0] : g.pitcher) === name,
-          ).length,
+        G: gCountByName.get(name) || 0,
         ...(OUT === 0
           ? {
               GS: '-',
@@ -525,8 +550,7 @@ const genPitcherStatistics = (
               H7: '-',
             }
           : {
-              GS: current.filter(g => (g.pitchers[0] || {}).name === name)
-                .length,
+              GS: gsCountByName.get(name) || 0,
               IP: `${Math.floor(OUT / 3)}.${OUT % 3}`,
               H,
               R,
@@ -1056,58 +1080,87 @@ const displayGame = (players, records, errors = [], role) => {
   return displayedRecords;
 };
 
+const sortStatisticsBy = (list, sortBy) =>
+  list.sort((a, b) => {
+    if (typeof a[sortBy] < typeof b[sortBy]) {
+      return -1;
+    }
+    if (
+      ['AVG', 'OBP', 'SLG', 'OPS', 'AVG_NO', 'AVG_SP', 'AVG_FB'].includes(
+        sortBy,
+      )
+    ) {
+      return b[sortBy] === a[sortBy]
+        ? b['PA'] - a['PA']
+        : b[sortBy] - a[sortBy];
+    } else if (sortBy === 'LEVEL') {
+      return b[sortBy] === a[sortBy]
+        ? b['PA'] - a['PA']
+        : b[sortBy].localeCompare(a[sortBy]);
+    } else {
+      if (b[sortBy] === 0 && a[sortBy] === 0) {
+        return b['PA'] - a['PA'];
+      } else {
+        return b[sortBy] === a[sortBy]
+          ? a['PA'] - b['PA']
+          : b[sortBy] - a[sortBy];
+      }
+    }
+  });
+
+// 供 execGenStatistics 及 execGenStatisticsBatch 共用：同一份 records 只需傳進 worker 一次，
+// 之後每個區間（年度/總計）都只是換一組 games 重新跑統計，不用各自 postMessage 一次。
+const runGenStatisticsForGames = (state, games) =>
+  sortStatisticsBy(
+    genStatistics(
+      state.players,
+      state.records,
+      state.unlimitedPA ? undefined : state.top,
+      games,
+    ).filter(
+      item => item.PA !== '-' && (state.unlimitedPA || item.PA === state.top),
+    ),
+    state.sortBy,
+  );
+
 const execGenStatistics = state => {
   const t0 = performance.now();
-  const result = genStatistics(
-    state.players,
-    state.records,
-    state.unlimitedPA ? undefined : state.top,
-    (state.period.find(item => item.select).games || []).filter(
-      g => !(state.excludedGames || []).includes(g),
-    ),
-  )
-    .filter(
-      item => item.PA !== '-' && (state.unlimitedPA || item.PA === state.top),
-    )
-    .sort((a, b) => {
-      if (typeof a[state.sortBy] < typeof b[state.sortBy]) {
-        return -1;
-      }
-      if (
-        ['AVG', 'OBP', 'SLG', 'OPS', 'AVG_NO', 'AVG_SP', 'AVG_FB'].includes(
-          state.sortBy,
-        )
-      ) {
-        return b[state.sortBy] === a[state.sortBy]
-          ? b['PA'] - a['PA']
-          : b[state.sortBy] - a[state.sortBy];
-      } else if (state.sortBy === 'LEVEL') {
-        return b[state.sortBy] === a[state.sortBy]
-          ? b['PA'] - a['PA']
-          : b[state.sortBy].localeCompare(a[state.sortBy]);
-      } else {
-        if (b[state.sortBy] === 0 && a[state.sortBy] === 0) {
-          return b['PA'] - a['PA'];
-        } else {
-          return b[state.sortBy] === a[state.sortBy]
-            ? a['PA'] - b['PA']
-            : b[state.sortBy] - a[state.sortBy];
-        }
-      }
-    });
+  const excludedGamesSet = new Set(state.excludedGames || []);
+  const games = (state.period.find(item => item.select).games || []).filter(
+    g => !excludedGamesSet.has(g),
+  );
+  const result = runGenStatisticsForGames(state, games);
   const t1 = performance.now();
   console.log(`[perf] execGenStatistics cost: ${(t1 - t0).toFixed(2)} ms`);
+  return result;
+};
+
+// 一次 postMessage 算多個區間的統計（例如生涯成績頁的每個年度 + 總計），
+// 避免同一支球隊的 records 被重複序列化、重複掃描多次。
+const execGenStatisticsBatch = state => {
+  const t0 = performance.now();
+  const result = state.periods.map(({ key, games }) => ({
+    key,
+    result: runGenStatisticsForGames(state, games),
+  }));
+  const t1 = performance.now();
+  console.log(
+    `[perf] execGenStatisticsBatch (${state.periods.length} periods) cost: ${(
+      t1 - t0
+    ).toFixed(2)} ms`,
+  );
   return result;
 };
 
 const execGenPitcherStatistics = state => {
   const t0 = performance.now();
   const playerMap = new Map(state.players.map(p => [p.id, p]));
+  const excludedGamesSet = new Set(state.excludedGames || []);
   const result = genPitcherStatistics(
     state.players,
     state.games,
     (state.period.find(item => item.select).games || []).filter(
-      g => !(state.excludedGames || []).includes(g),
+      g => !excludedGamesSet.has(g),
     ),
     state.pitcherInn,
     playerMap,
@@ -1144,8 +1197,9 @@ const execItemStats = state => {
   const t0 = performance.now();
   const currentPlayers = new Set(state.players.map(p => p.id));
   const playerMap = new Map(state.players.map(p => [p.id, p]));
+  const excludedGamesSet = new Set(state.excludedGames || []);
   const games = (state.period.find(item => item.select).games || []).filter(
-    g => !(state.excludedGames || []).includes(g),
+    g => !excludedGamesSet.has(g),
   );
   const gamesSet = new Set(games);
   const minimunPA = games.length * 1.6;
@@ -1358,6 +1412,9 @@ self.addEventListener('message', e => {
     switch (cmd) {
       case 'GenStatistics':
         result = execGenStatistics(data);
+        break;
+      case 'GenStatisticsBatch':
+        result = execGenStatisticsBatch(data);
         break;
       case 'GenPitcherStatistics':
         result = execGenPitcherStatistics(data);

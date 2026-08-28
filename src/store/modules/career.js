@@ -3,7 +3,8 @@ import { callWorkerQueued } from '../../web-worker';
 
 const types = {
   SET_LOADING: 'CAREER/SET_LOADING',
-  SET_CAREER: 'CAREER/SET_CAREER',
+  SET_CAREER_PROFILE: 'CAREER/SET_CAREER_PROFILE',
+  SET_CAREER_SECTIONS: 'CAREER/SET_CAREER_SECTIONS',
   CLEAR_CAREER: 'CAREER/CLEAR_CAREER',
 };
 
@@ -69,17 +70,20 @@ const renameInTeamRecords = (orders, nameInTeam, uid, table) =>
     _table: table,
   }));
 
-const genStats = (uid, records, games) =>
+// 一次 postMessage 算完所有區間（每個年度 + 總計），而不是每個年度各自呼叫一次
+// worker——後者會把同一份 records（可能是整支球隊的生涯紀錄）重複序列化、重複掃描 N 次。
+const genStatsBatch = (uid, records, periods) =>
   callWorkerQueued({
-    cmd: 'GenStatistics',
+    cmd: 'GenStatisticsBatch',
     players: [{ id: uid, data: {} }],
     records,
     unlimitedPA: true,
     top: 999999,
-    period: [{ period: 'career', select: true, games }],
     sortBy: 'PA',
-    excludedGames: [],
-  }).then(result => result[0]);
+    periods,
+  }).then(
+    results => new Map(results.map(({ key, result }) => [key, result[0]])),
+  );
 
 const pickCols = stat => {
   const cols = STAT_KEYS.reduce((acc, key) => {
@@ -102,28 +106,7 @@ const yearOf = table => table.split('::')[1].slice(0, 4);
 // another batter's record in a game they have no plate appearance in (e.g. a
 // pinch-run-only appearance) gets silently dropped. `playerGameIds` is only
 // used to decide which years to show and to compute "G" (games played).
-const buildRows = async (
-  uid,
-  records,
-  queryGameIds,
-  playerGameIds,
-  unlockGamesPrefixed,
-) => {
-  const years = [...new Set(playerGameIds.map(yearOf))].sort();
-  const rows = [];
-  for (const year of years) {
-    const yearQueryGameIds = queryGameIds.filter(id => yearOf(id) === year);
-    const yearPlayerGameIds = playerGameIds.filter(id => yearOf(id) === year);
-    const stat = await genStats(uid, records, yearQueryGameIds);
-    rows.push({
-      year,
-      G: yearPlayerGameIds.length,
-      ...pickCols(stat),
-      unlocked: yearPlayerGameIds.some(id => unlockGamesPrefixed.includes(id)),
-    });
-  }
-  return rows;
-};
+const TOTAL_KEY = '__total__';
 
 const buildTeamStats = async (
   playerId,
@@ -132,17 +115,27 @@ const buildTeamStats = async (
   playerGameIds,
   unlockGamesPrefixed,
 ) => {
-  const rows = await buildRows(
-    playerId,
-    records,
-    queryGameIds,
-    playerGameIds,
-    unlockGamesPrefixed,
-  );
-  const totalStat = await genStats(playerId, records, queryGameIds);
+  const years = [...new Set(playerGameIds.map(yearOf))].sort();
+  const periods = years.map(year => ({
+    key: year,
+    games: queryGameIds.filter(id => yearOf(id) === year),
+  }));
+  periods.push({ key: TOTAL_KEY, games: queryGameIds });
+
+  const statsByKey = await genStatsBatch(playerId, records, periods);
+
+  const rows = years.map(year => {
+    const yearPlayerGameIds = playerGameIds.filter(id => yearOf(id) === year);
+    return {
+      year,
+      G: yearPlayerGameIds.length,
+      ...pickCols(statsByKey.get(year)),
+      unlocked: yearPlayerGameIds.some(id => unlockGamesPrefixed.includes(id)),
+    };
+  });
   const total = {
     G: playerGameIds.length,
-    ...pickCols(totalStat),
+    ...pickCols(statsByKey.get(TOTAL_KEY)),
     unlocked: playerGameIds.some(id => unlockGamesPrefixed.includes(id)),
   };
   return { rows, total };
@@ -162,6 +155,12 @@ const actions = {
       .get();
     const account = accountDoc.data() || {};
     const teamCodes = account.teams || [];
+
+    // 帳號資料一拿到就先顯示名字/頭像，不用等全部球隊的比賽紀錄都讀完
+    commit(types.SET_CAREER_PROFILE, {
+      playerName: account.name || '',
+      photo: account.photo || '',
+    });
 
     const fetchTeamData = async teamCode => {
       const teamDoc = await db
@@ -293,11 +292,7 @@ const actions = {
       }
     }
 
-    commit(types.SET_CAREER, {
-      playerName: account.name || '',
-      photo: account.photo || '',
-      sections,
-    });
+    commit(types.SET_CAREER_SECTIONS, { sections });
     commit(types.SET_LOADING, false);
   },
   // For a player with no account (no uid) — their identity only exists
@@ -306,6 +301,8 @@ const actions = {
   async fetchTeamCareerStats({ commit }, { teamCode, playerName }) {
     commit(types.SET_LOADING, true);
     commit(types.CLEAR_CAREER);
+    // 名字是從路由參數來的，不用等任何非同步請求就能先顯示
+    commit(types.SET_CAREER_PROFILE, { playerName, photo: '' });
 
     const teamDoc = await db
       .collection('teams')
@@ -318,7 +315,7 @@ const actions = {
     } = teamDoc.exists ? teamDoc.data() : {};
 
     if (!teamDoc.exists || !players[playerName]) {
-      commit(types.SET_CAREER, { playerName: '', photo: '', sections: [] });
+      commit(types.SET_CAREER_SECTIONS, { sections: [] });
       commit(types.SET_LOADING, false);
       return;
     }
@@ -359,7 +356,7 @@ const actions = {
       });
     }
 
-    commit(types.SET_CAREER, { playerName, photo: '', sections });
+    commit(types.SET_CAREER_SECTIONS, { sections });
     commit(types.SET_LOADING, false);
   },
 };
@@ -368,9 +365,11 @@ const mutations = {
   [types.SET_LOADING](state, value) {
     state.loading = value;
   },
-  [types.SET_CAREER](state, { playerName, photo, sections }) {
+  [types.SET_CAREER_PROFILE](state, { playerName, photo }) {
     state.playerName = playerName;
     state.photo = photo;
+  },
+  [types.SET_CAREER_SECTIONS](state, { sections }) {
     state.sections = sections;
   },
   [types.CLEAR_CAREER](state) {
