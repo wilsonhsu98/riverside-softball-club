@@ -1,24 +1,27 @@
 <template>
   <div class="career-stats">
     <mobile-header v-on="headerListeners" />
-    <div v-if="careerLoading" class="loading">讀取中...</div>
-    <template v-else>
-      <div class="player-card">
-        <div class="photo-wrap">
-          <photo
-            :name="careerPlayerName"
-            :photo="careerPhoto"
-            :icon-fallback="true"
-          />
-        </div>
-        <div class="info">
-          <div class="name">{{ careerPlayerName || '球員生涯統計' }}</div>
-          <div class="summary">
-            生涯跨隊統計 · 共 {{ teamCount }} 支球隊 · {{ totalGames }} 場比賽
-          </div>
+    <loading :style="{ visibility: careerLoading ? 'visible' : 'hidden' }" />
+    <div class="player-card">
+      <div class="photo-wrap">
+        <photo
+          :name="careerPlayerName"
+          :photo="careerPhoto"
+          :icon-fallback="true"
+        />
+      </div>
+      <div class="info">
+        <div class="name">{{ careerPlayerName || '球員生涯統計' }}</div>
+        <div
+          class="summary"
+          :style="{ visibility: careerLoading ? 'hidden' : 'visible' }"
+        >
+          生涯跨隊統計 · 共 {{ teamCount }} 支球隊 · {{ totalGames }} 場比賽
         </div>
       </div>
+    </div>
 
+    <template v-if="!careerLoading">
       <div v-if="!careerSections.length" class="empty">查無比賽紀錄</div>
       <div v-else ref="tableWrapper">
         <simplebar
@@ -100,7 +103,12 @@
                       <div>{{ formatCol(row, col.key) }}</div>
                       <div>({{ formatDesc(row, col.key) }})</div>
                     </template>
-                    <template v-else>{{ formatCol(row, col.key) }}</template>
+                    <template v-else-if="centerCols.includes(col.key)">{{
+                      formatCol(row, col.key)
+                    }}</template>
+                    <div v-else class="align-right">
+                      {{ formatCol(row, col.key) }}
+                    </div>
                   </td>
                 </tr>
                 <tr
@@ -138,9 +146,12 @@
                       <div>{{ formatCol(section.total, col.key) }}</div>
                       <div>({{ formatDesc(section.total, col.key) }})</div>
                     </template>
-                    <template v-else>{{
+                    <template v-else-if="centerCols.includes(col.key)">{{
                       formatCol(section.total, col.key)
                     }}</template>
+                    <div v-else class="align-right">
+                      {{ formatCol(section.total, col.key) }}
+                    </div>
                   </td>
                 </tr>
               </template>
@@ -250,10 +261,10 @@ export default {
       if (!this.coordinates.year) return '';
       const modeWord = {
         dot: '落點',
-        heatmap: '熱點',
+        heatmap: '熱區',
         percentage: '落點機率',
       }[this.locationDisplayMode];
-      return `${this.coordinates.year}${modeWord}`;
+      return `${this.coordinates.year} ${modeWord}`;
     },
   },
   // `career_stats` and `career_stats_team` are different route records that
@@ -356,7 +367,6 @@ export default {
   box-sizing: border-box;
 }
 
-.loading,
 .empty {
   padding: 40px 0;
   text-align: center;
@@ -450,7 +460,7 @@ export default {
   .cell {
     line-height: 36px;
     text-align: right;
-    padding: 0 10px;
+    padding: 0 5px;
     box-sizing: border-box;
     &.sort {
       color: $error_color;
@@ -460,6 +470,13 @@ export default {
     }
     &.center {
       text-align: center;
+    }
+    .align-right {
+      margin: auto;
+      padding-left: 5px;
+      padding-right: 5px;
+      text-align: right;
+      direction: rtl;
     }
     &.advance > div {
       display: inline-block;
