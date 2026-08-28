@@ -3,7 +3,15 @@
     <div v-if="no_track" class="mobile-download">
       {{ $t('msg_mobile_download') }}
     </div>
-    <img ref="img" :src="imgSrc" @mousedown="trackXY" :disabled="disabled" />
+    <img
+      ref="img"
+      :src="imgSrc"
+      :style="
+        fixedSize ? { width: `${fixedSize}px`, height: `${fixedSize}px` } : {}
+      "
+      @mousedown="trackXY"
+      :disabled="disabled"
+    />
     <slot></slot>
     <i v-if="fileNamePrefix" class="fa fa-download" @click="download"></i>
   </div>

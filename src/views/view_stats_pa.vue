@@ -253,32 +253,27 @@
             <div class="cell career"></div>
           </div>
           <template v-for="(item, itemIndex) in list">
-            <input
-              :key="`chk_${item.name}`"
-              :id="`chk_${item.name}`"
-              type="radio"
-              name="expand"
-              class="toggle-row non-input"
-              :checked="toggleTarget === item.name"
-              @click="e => toggleRadio(e, item.name)"
-            />
             <div
               class="normal-row"
-              :class="{ current: item.data.uid === userId }"
+              :class="{
+                current: item.data.uid === userId,
+                expanded: toggleTarget === item.name,
+                odd: itemIndex % 2 === 1,
+              }"
               :key="`div_${item.name}`"
+              @click="toggleRadio(item.name)"
             >
               <template v-for="(col, colIndex) in displayedCols">
-                <label
+                <div
                   v-if="col.name === 'Rank'"
                   :key="`row_${item.name}_${colIndex}`"
-                  :for="`chk_${item.name}`"
                   class="cell rank"
-                  ><div class="align-right">{{ itemIndex + 1 }}</div></label
                 >
-                <label
+                  <div class="align-right">{{ itemIndex + 1 }}</div>
+                </div>
+                <div
                   v-else-if="col.name === 'name'"
                   :key="`row_${item.name}_${colIndex}`"
-                  :for="`chk_${item.name}`"
                   class="cell name"
                 >
                   <div class="player">
@@ -291,15 +286,16 @@
                     <span>{{ item.name }}</span>
                   </div>
                   <div
-                    v-if="item.listByGame.length && lazy"
+                    v-if="item.listByGame.length && revealedCharts[item.name]"
                     class="chart"
+                    :class="{ expanded: toggleTarget === item.name }"
                     tabIndex="-1"
                     :id="`chart_${item.name}`"
                     :style="{
                       width: `${chartWidth}px`,
                       '--height': `${chartHeight[item.name]}px`,
                     }"
-                    @click="e => e.preventDefault()"
+                    @click.stop
                   >
                     <div class="chart-wrapper">
                       <simplebar
@@ -369,7 +365,7 @@
                       ></i>
                     </div>
                   </div>
-                </label>
+                </div>
                 <div
                   v-else-if="['AVG_NO', 'AVG_SP', 'AVG_FB'].includes(col.name)"
                   class="cell advance"
@@ -420,7 +416,7 @@
                   <div class="align-right">{{ item[col.name] }}</div>
                 </div>
               </template>
-              <div class="cell career" :data-label="$t('career')">
+              <div class="cell career" :data-label="$t('career')" @click.stop>
                 <router-link :to="careerLink(item)" :title="$t('career')">
                   <i class="fa fa-address-card-o"></i>
                 </router-link>
@@ -582,31 +578,17 @@ i.fa {
       }
     }
   }
-  .toggle-row {
-    display: block;
-    position: absolute;
-    width: calc(100% - 40px);
-    height: 36px;
-    z-index: 1;
-    margin: 0;
-    opacity: 0;
-    cursor: pointer;
-    &:checked + .normal-row {
-      .cell.name {
-        z-index: 3;
-      }
-      .chart {
-        height: var(--height);
-      }
-    }
-  }
   .normal-row {
     display: table-row;
-    &:nth-child(4n + 4) .cell {
+    cursor: pointer;
+    &:not(.odd) .cell {
       background-color: var(--table-row-even);
     }
-    &:nth-child(4n + 2) .cell {
+    &.odd .cell {
       background-color: var(--table-row-odd);
+    }
+    &.expanded .cell.name {
+      z-index: 3;
     }
     &.current {
       color: $current_user_color;
@@ -727,6 +709,16 @@ i.fa {
 
     height: 0;
     transition: height 0.2s ease-in-out;
+    // Height is driven by this Vue-bound class rather than the
+    // toggle-row's :checked sibling selector: a real click flips the
+    // radio's native `checked` synchronously, before Vue's own patch can
+    // apply toggleTarget — so an about-to-open panel could already match
+    // `:checked` the instant it's inserted, with no "before" frame left
+    // for the transition to animate from. `.expanded` only ever changes
+    // when toggleTarget does, fully in Vue's control.
+    &.expanded {
+      height: var(--height, auto);
+    }
 
     font-size: 12px;
     padding: 0;
@@ -964,7 +956,7 @@ i.fa {
     /* iOS 11.2 */
   }
   .sticky-table {
-    .toggle-row:checked + .normal-row .chart {
+    .chart.expanded {
       left: -42px;
 
       width: 100vw !important;
@@ -1017,9 +1009,19 @@ const clickEvent = (() => {
   if ('ontouchstart' in document.documentElement === true) return 'touchstart';
   else return 'click';
 })();
+// Matches the location chart's `fixedSize` prop and the chart-inner height
+// below — whenever a row has location data, its chart panel is always
+// exactly this tall, no measurement needed.
+const LOCATION_CHART_SIZE = 144;
 
 export default {
   data() {
+    // Plain instance property, not component data: ResizeObserver instances
+    // shouldn't be made reactive, and there's one per revealed chart panel.
+    // Set here rather than in created() because the `list` watcher below
+    // runs with immediate:true, which fires during initState() — before
+    // created() — and already needs this to exist.
+    this.chartResizeObservers = {};
     return {
       toggleSearch: false,
       toggleTarget: null,
@@ -1029,7 +1031,7 @@ export default {
         avatar: '',
         player: '',
       },
-      lazy: false,
+      revealedCharts: {},
       chartWidth: 0,
       tableHeight: 0,
       locationDisplayMode: 'dot', // [dot, heatmap, percentage]
@@ -1041,11 +1043,7 @@ export default {
       hoveredCol: null,
     };
   },
-  created() {},
   mounted() {
-    setTimeout(() => {
-      this.lazy = true;
-    }, 500);
     document.addEventListener(clickEvent, this.collapseSearch, true);
     window.addEventListener('resize', this.requestAnimationFrame);
     this.detectRect();
@@ -1053,6 +1051,9 @@ export default {
   beforeDestroy() {
     document.removeEventListener(clickEvent, this.collapseSearch);
     window.removeEventListener('resize', this.requestAnimationFrame);
+    Object.values(this.chartResizeObservers).forEach(observer =>
+      observer.disconnect(),
+    );
   },
   methods: {
     ...mapActions([
@@ -1078,46 +1079,118 @@ export default {
             },
           };
     },
-    toggleRadio(e, target) {
+    toggleRadio(target) {
       // .chart panels are absolutely positioned, so expanding/collapsing one
       // doesn't resize the table and never triggers SimpleBar's own
       // ResizeObserver/MutationObserver — recalculate manually so it re-checks
       // overflow and unlocks scrolling when the table wasn't already overflowing.
       const simplebar = this.$refs.simplebar && this.$refs.simplebar.SimpleBar;
-      const chartId = e.target.id.replace('chk_', 'chart_');
-      const chartEl = document.querySelector(`#${chartId}`);
+      const chartId = `chart_${target}`;
       if (this.toggleTarget === target) {
         this.toggleTarget = null;
         this.expandedHeight = null;
         setTimeout(() => simplebar && simplebar.recalculate(), 250);
-      } else {
-        this.toggleTarget = target;
-        // The chart panel's top is a fixed (static) position independent of
-        // its current height, and its fully-expanded height was already
-        // measured by detectRect() — so the final container size is known
-        // immediately, without waiting for the 0.2s expand transition to
-        // finish. Setting it now lets the container grow in step with the
-        // chart instead of snapping afterwards.
-        const tableEl = document.querySelector('.sticky-table');
-        if (tableEl) {
-          const wrapperTop = this.$refs[
-            'sticky-table-wrapper'
-          ].getBoundingClientRect().top;
-          const naturalHeight = tableEl.getBoundingClientRect().height;
-          const chartTop = chartEl
-            ? chartEl.getBoundingClientRect().top - wrapperTop
-            : 0;
-          const chartBottom = chartTop + (this.chartHeight[target] || 0);
-          this.expandedHeight = Math.min(
-            this.tableHeight,
-            Math.ceil(Math.max(naturalHeight, chartBottom)),
-          );
-        }
-        setTimeout(() => {
-          if (simplebar) simplebar.recalculate();
-          if (chartEl) chartEl.focus();
-        }, 250);
+        return;
       }
+      const openNow = () => {
+        this.toggleTarget = target;
+        this.$nextTick(() => {
+          const chartEl = document.querySelector(`#${chartId}`);
+          this.watchChartHeight(target, chartEl);
+          // The chart panel's top is a fixed (static) position independent
+          // of its current height, and its natural height is already known
+          // from the live DOM — so the final container size is known
+          // immediately, without waiting for the 0.2s expand transition to
+          // finish. Setting it now lets the container grow in step with
+          // the chart instead of snapping afterwards.
+          this.updateExpandedHeight(chartEl);
+          setTimeout(() => {
+            if (simplebar) simplebar.recalculate();
+            if (chartEl) chartEl.focus();
+          }, 250);
+        });
+      };
+
+      if (this.revealedCharts[target]) {
+        openNow();
+        return;
+      }
+
+      // A first reveal has no measured chartHeight yet, so it would
+      // normally pop open instead of animating in — except when this row
+      // has a location diagram, in which case the height isn't actually
+      // unknown: chart-inner is pinned to 144px right below whenever
+      // locations exist, matching coordination's own fixedSize="144"
+      // prop, so the panel is always exactly 144px tall in that case
+      // regardless of what's still drawing inside it.
+      const item = this.list.find(row => row.name === target);
+      if (item && item.locations.length) {
+        this.$set(this.chartHeight, target, LOCATION_CHART_SIZE);
+      }
+      // A CSS transition only animates a change to an element that's
+      // already been painted — inserting a brand-new element already
+      // ".expanded" (i.e. setting toggleTarget in the same tick as
+      // revealedCharts) gives the browser no "before" frame to animate
+      // from, so it would just appear at its final height instantly
+      // however early chartHeight was set. Mount it collapsed first, let
+      // that paint, then flip toggleTarget on the next frame so there's
+      // an actual 0 -> height change for the transition to animate.
+      this.$set(this.revealedCharts, target, true);
+      this.$nextTick(() => {
+        requestAnimationFrame(openNow);
+      });
+    },
+    updateExpandedHeight(chartEl) {
+      const tableEl = document.querySelector('.sticky-table');
+      if (!tableEl || !this.$refs['sticky-table-wrapper']) return;
+      const wrapperTop = this.$refs[
+        'sticky-table-wrapper'
+      ].getBoundingClientRect().top;
+      const naturalHeight = tableEl.getBoundingClientRect().height;
+      const chartTop = chartEl
+        ? chartEl.getBoundingClientRect().top - wrapperTop
+        : 0;
+      const chartBottom =
+        chartTop + (chartEl ? chartEl.getBoundingClientRect().height : 0);
+      this.expandedHeight = Math.min(
+        this.tableHeight,
+        Math.ceil(Math.max(naturalHeight, chartBottom)),
+      );
+    },
+    // A chart panel's real height isn't knowable up front on a first
+    // reveal: the location chart clips the player's avatar into its
+    // canvas, which means waiting on an image load of unpredictable
+    // length (instant from cache, seconds on a flaky mobile connection,
+    // or never if the host errors) — there's no fixed delay or frame
+    // count that reliably covers that. A ResizeObserver sidesteps the
+    // guessing entirely: it fires whenever the content's actual size
+    // changes, whatever the cause, so chartHeight — and with it the CSS
+    // height transition — self-corrects the moment the real size is
+    // known, instead of caching a premature, wrong reading.
+    watchChartHeight(target, chartEl) {
+      if (
+        this.chartResizeObservers[target] ||
+        !chartEl ||
+        typeof ResizeObserver === 'undefined'
+      ) {
+        return;
+      }
+      const content = chartEl.querySelector('.chart-wrapper');
+      if (!content) return;
+      const observer = new ResizeObserver(entries => {
+        const height = entries[entries.length - 1].contentRect.height;
+        // Guard against a same-value re-set: it's a no-op for chartHeight,
+        // but assigning it still schedules a reactive update that fires
+        // a spurious zero-length "height" transition right as the real
+        // expand transition is finishing up.
+        if (!height || this.chartHeight[target] === height) return;
+        this.$set(this.chartHeight, target, height);
+        if (this.toggleTarget === target) {
+          this.updateExpandedHeight(chartEl);
+        }
+      });
+      observer.observe(content);
+      this.chartResizeObservers[target] = observer;
     },
     collapseSearch(event) {
       if (
@@ -1182,17 +1255,11 @@ export default {
       const { height } = this.$refs.conditionContainer.getBoundingClientRect();
       this.conditionContainerHeight = height;
       this.$refs.conditionContainer.style.height = '';
-
-      setTimeout(() => {
-        const chartHeight = {};
-        Array.from(document.querySelectorAll('.chart')).forEach(ele => {
-          ele.style.height = 'auto';
-          const { height } = ele.getBoundingClientRect();
-          chartHeight[ele.id.replace('chart_', '')] = height;
-          ele.style.height = '';
-        });
-        this.chartHeight = chartHeight;
-      }, 500);
+      // chartHeight itself is no longer measured here — each revealed
+      // chart panel's own ResizeObserver (see watchChartHeight) keeps it
+      // correct continuously, including through async content like the
+      // location chart's avatar image load, which this one-shot pass
+      // can't reliably wait out.
     },
     requestAnimationFrame() {
       window.requestAnimationFrame(this.detectRect);
@@ -1284,10 +1351,30 @@ export default {
           },
         );
 
-        this.lazy = false;
+        // 只針對「已經展開過」的列強制重掛，讓 chart/coordination 反映新資料；
+        // 大多數列從沒展開過、revealedCharts 是空的，這裡就完全不用做事。
+        const revealed = this.revealedCharts;
+        const wasOpen = this.toggleTarget;
+        Object.values(this.chartResizeObservers).forEach(observer =>
+          observer.disconnect(),
+        );
+        this.chartResizeObservers = {};
+        this.revealedCharts = {};
         setTimeout(() => {
-          this.lazy = true;
+          this.revealedCharts = revealed;
           this.detectRect();
+          // Everything else re-attaches its ResizeObserver lazily, the
+          // next time toggleRadio runs for it — but the currently-open
+          // row's panel is visible right now with no click coming to
+          // trigger that, so it needs to happen immediately here instead.
+          if (wasOpen) {
+            this.$nextTick(() => {
+              this.watchChartHeight(
+                wasOpen,
+                document.querySelector(`#chart_${wasOpen}`),
+              );
+            });
+          }
         }, 500);
       },
       immediate: true,
