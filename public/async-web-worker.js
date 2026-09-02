@@ -1193,6 +1193,30 @@ const execGenPitcherStatistics = state => {
   return result;
 };
 
+// 生涯投手成績用：仿 execGenStatisticsBatch，同一份 games 只傳一次，每個年度＋總計
+// 各自帶自己的 game id 清單重算，不用像生涯頁那樣每個區間各自 postMessage 一次。
+const execGenPitcherStatisticsBatch = state => {
+  const t0 = performance.now();
+  const playerMap = new Map(state.players.map(p => [p.id, p]));
+  const result = state.periods.map(({ key, games }) => ({
+    key,
+    result: genPitcherStatistics(
+      state.players,
+      state.games,
+      games,
+      state.pitcherInn,
+      playerMap,
+    ),
+  }));
+  const t1 = performance.now();
+  console.log(
+    `[perf] execGenPitcherStatisticsBatch (${
+      state.periods.length
+    } periods) cost: ${(t1 - t0).toFixed(2)} ms`,
+  );
+  return result;
+};
+
 const execItemStats = state => {
   const t0 = performance.now();
   const currentPlayers = new Set(state.players.map(p => p.id));
@@ -1418,6 +1442,9 @@ self.addEventListener('message', e => {
         break;
       case 'GenPitcherStatistics':
         result = execGenPitcherStatistics(data);
+        break;
+      case 'GenPitcherStatisticsBatch':
+        result = execGenPitcherStatisticsBatch(data);
         break;
       case 'ItemStats':
         result = execItemStats(data);

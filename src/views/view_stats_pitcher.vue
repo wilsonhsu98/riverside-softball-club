@@ -162,6 +162,9 @@
                 <div>{{ getPitcherCol(col.name) }}</div>
               </div>
             </template>
+            <div class="cell career" :title="$t('career')">
+              {{ $t('career') }}
+            </div>
           </div>
           <div class="sum-row" v-if="sum.G > 0">
             <template v-for="(col, colIndex) in displayedCols">
@@ -232,6 +235,7 @@
                 <div class="align-right">{{ sum[col.name] }}</div>
               </div>
             </template>
+            <div class="cell career"></div>
           </div>
           <template v-for="(item, itemIndex) in list">
             <div
@@ -291,6 +295,11 @@
                   <div class="align-right">{{ item[col.name] }}</div>
                 </div>
               </template>
+              <div class="cell career" @click.stop>
+                <router-link :to="careerLink(item)" :title="$t('career')">
+                  <i class="fa fa-address-card-o"></i>
+                </router-link>
+              </div>
             </div>
           </template>
         </div>
@@ -466,6 +475,15 @@ i.fa {
       position: sticky !important;
       left: 0 !important;
       z-index: 2;
+    }
+    &.career {
+      width: 40px;
+      a {
+        color: inherit;
+      }
+      .fa {
+        font-size: 16px;
+      }
     }
     &.name {
       position: sticky !important;
@@ -736,6 +754,18 @@ export default {
     }),
     formatValue(value, decimal = 3) {
       return value !== '-' ? parseFloat(value).toFixed(decimal) : value;
+    },
+    careerLink(item) {
+      const params = item.data.uid
+        ? { name: 'career_stats', params: { uid: item.data.uid } }
+        : {
+            name: 'career_stats_team',
+            params: {
+              teamCode: this.$route.params.team,
+              playerName: item.name,
+            },
+          };
+      return { ...params, query: { view: 'pitcher' } };
     },
     collapseSearch(event) {
       if (

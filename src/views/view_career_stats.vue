@@ -2,27 +2,47 @@
   <div class="career-stats">
     <mobile-header v-on="headerListeners" />
     <loading :style="{ visibility: careerLoading ? 'visible' : 'hidden' }" />
-    <div class="player-card">
-      <div class="photo-wrap">
-        <photo
-          :name="careerPlayerName"
-          :photo="careerPhoto"
-          :icon-fallback="true"
-        />
-      </div>
-      <div class="info">
-        <div class="name">{{ careerPlayerName || '球員生涯統計' }}</div>
-        <div
-          class="summary"
-          :style="{ visibility: careerLoading ? 'hidden' : 'visible' }"
-        >
-          生涯跨隊統計 · 共 {{ teamCount }} 支球隊 · {{ totalGames }} 場比賽
+    <div class="player-card-wrap">
+      <div class="player-card">
+        <div class="photo-wrap">
+          <photo
+            :name="careerPlayerName"
+            :photo="careerPhoto"
+            :icon-fallback="true"
+          />
         </div>
+        <div class="info">
+          <div class="name">{{ careerPlayerName || '球員生涯統計' }}</div>
+          <div
+            class="summary"
+            :style="{ visibility: careerLoading ? 'hidden' : 'visible' }"
+          >
+            生涯跨隊統計 · 共 {{ teamCount }} 支球隊 · {{ totalGames }} 場比賽
+          </div>
+        </div>
+      </div>
+      <div v-if="showTabSwitch" class="stat-tab-switch">
+        <button
+          type="button"
+          class="tab-btn"
+          :class="{ active: activeTab === 'batting' }"
+          @click="setTab_('batting')"
+        >
+          <span class="full">打擊</span><span class="short">打</span>
+        </button>
+        <button
+          type="button"
+          class="tab-btn"
+          :class="{ active: activeTab === 'pitching' }"
+          @click="setTab_('pitching')"
+        >
+          <span class="full">投手</span><span class="short">投</span>
+        </button>
       </div>
     </div>
 
     <template v-if="!careerLoading">
-      <div v-if="!careerSections.length" class="empty">查無比賽紀錄</div>
+      <div v-if="!hasAnyStats" class="empty">查無比賽紀錄</div>
       <div v-else ref="tableWrapper">
         <simplebar
           class="sticky-table-wrapper"
@@ -49,9 +69,8 @@
               </tr>
             </thead>
             <tbody>
-              <template v-for="section in careerSections">
+              <template v-for="section in activeSections">
                 <tr
-                  v-if="!section.hideHeader"
                   :key="`${section.key}-header`"
                   class="section-row"
                   :class="[
@@ -76,7 +95,7 @@
                   class="normal-row"
                   :class="{
                     odd: index % 2 === 1,
-                    clickable: row.locations.length,
+                    clickable: !!(row.locations && row.locations.length),
                   }"
                   @click="openLocation_(row, row.year)"
                 >
@@ -118,7 +137,10 @@
                     section.teamType,
                     {
                       aggregate: section.isAggregate,
-                      clickable: section.total.locations.length,
+                      clickable: !!(
+                        section.total.locations &&
+                        section.total.locations.length
+                      ),
                     },
                   ]"
                   @click="openLocation_(section.total, '總計')"
@@ -220,15 +242,36 @@ const RATE_COLS = ['AVG', 'OBP', 'SLG', 'OPS'];
 const ADVANCE_COLS = ['AVG_NO', 'AVG_SP', 'AVG_FB'];
 const CENTER_COLS = ['AVG', 'OBP', 'SLG', 'OPS', 'LEVEL'];
 
+const PITCHER_COLS = [
+  { key: 'year', label: '年度' },
+  { key: 'G', label: '出賽' },
+  { key: 'GS', label: '先發' },
+  { key: 'W', label: '勝投' },
+  { key: 'L', label: '敗投' },
+  { key: 'IP', label: '局數' },
+  { key: 'H', label: '安打' },
+  { key: 'R', label: '失分' },
+  { key: 'NP', label: '球數' },
+  { key: 'BB', label: '四壞' },
+  { key: 'SO', label: '奪三振' },
+  { key: 'ERA', label: 'ERA' },
+  { key: 'WHIP', label: 'WHIP' },
+  { key: 'S%', label: '好壞球比' },
+  { key: 'PIP', label: '每局耗球' },
+  { key: 'K7', label: 'K/7' },
+  { key: 'BB7', label: 'BB/7' },
+  { key: 'H7', label: 'H/7' },
+];
+const PITCHER_ONE_DECIMAL_COLS = ['S%', 'PIP', 'K7', 'BB7', 'H7'];
+
 export default {
   data() {
     return {
-      cols: COLS,
-      advanceCols: ADVANCE_COLS,
-      centerCols: CENTER_COLS,
       tableHeight: 0,
       selectedCol: null,
       hoveredCol: null,
+      selectedTab: null,
+      preferredView: 'batting',
       coordinates: { values: [], year: '' },
       locationDisplayMode: 'dot', // [dot, heatmap, percentage]
       locationDisplayCount: 0,
@@ -245,15 +288,46 @@ export default {
       'careerPlayerName',
       'careerPhoto',
       'careerSections',
+      'careerPitcherSections',
     ]),
     headerListeners() {
       return this.$router.hasHistory ? { back: this.back_ } : {};
     },
+    hasBatting() {
+      return this.careerSections.length > 0;
+    },
+    hasPitching() {
+      return this.careerPitcherSections.length > 0;
+    },
+    hasAnyStats() {
+      return this.hasBatting || this.hasPitching;
+    },
+    showTabSwitch() {
+      return this.hasBatting && this.hasPitching;
+    },
+    activeTab() {
+      if (this.showTabSwitch) return this.selectedTab || this.preferredView;
+      return this.hasPitching ? 'pitching' : 'batting';
+    },
+    activeSections() {
+      return this.activeTab === 'pitching'
+        ? this.careerPitcherSections
+        : this.careerSections;
+    },
+    cols() {
+      return this.activeTab === 'pitching' ? PITCHER_COLS : COLS;
+    },
+    advanceCols() {
+      return this.activeTab === 'pitching' ? [] : ADVANCE_COLS;
+    },
+    centerCols() {
+      return this.activeTab === 'pitching' ? [] : CENTER_COLS;
+    },
     teamCount() {
-      return this.careerSections.filter(section => !section.isAggregate).length;
+      return this.activeSections.filter(section => !section.isAggregate).length;
     },
     totalGames() {
-      return this.careerSections
+      return this.activeSections
         .filter(section => !section.isAggregate)
         .reduce((acc, section) => acc + section.total.G, 0);
     },
@@ -298,6 +372,11 @@ export default {
       this.coordinates = { values: [], year: '' };
       this.locationDisplayCount = 0;
       this.locationDisplayMode = 'dot';
+      this.selectedTab = null;
+      this.selectedCol = null;
+      this.hoveredCol = null;
+      this.preferredView =
+        route.query.view === 'pitcher' ? 'pitching' : 'batting';
       if (route.name === 'career_stats_team') {
         this.fetchTeamCareerStats({
           teamCode: route.params.teamCode,
@@ -308,7 +387,7 @@ export default {
       }
     },
     openLocation_(row, year) {
-      if (!row.locations.length) return;
+      if (!row.locations || !row.locations.length) return;
       this.coordinates = { values: row.locations, year };
     },
     closeLocation_() {
@@ -316,6 +395,12 @@ export default {
     },
     back_() {
       this.$router.back();
+    },
+    setTab_(tab) {
+      if (tab === this.activeTab) return;
+      this.selectedTab = tab;
+      this.selectedCol = null;
+      this.hoveredCol = null;
     },
     selectCol_(key) {
       if (key === 'year') return;
@@ -326,6 +411,11 @@ export default {
     },
     formatCol(row, key) {
       const value = row[key];
+      if (this.activeTab === 'pitching') {
+        return PITCHER_ONE_DECIMAL_COLS.includes(key) && value !== '-'
+          ? parseFloat(value).toFixed(1)
+          : value;
+      }
       if (!RATE_COLS.includes(key) && !ADVANCE_COLS.includes(key)) {
         return value;
       }
@@ -373,8 +463,12 @@ export default {
   color: #888;
 }
 
-.player-card {
+.player-card-wrap {
   position: relative;
+  margin: 20px 0 12px 0;
+}
+
+.player-card {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -382,8 +476,7 @@ export default {
   border-radius: 10px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.2),
     0 1px 5px 0 rgba(0, 0, 0, 0.12);
-  padding: 16px 18px;
-  margin: 20px 0;
+  padding: 20px;
 
   .photo-wrap {
     position: relative;
@@ -417,6 +510,36 @@ export default {
   }
 }
 
+.stat-tab-switch {
+  display: inline-flex;
+  margin-top: 12px;
+  background: var(--table-row-odd);
+  border-radius: 22px;
+  padding: 4px;
+  gap: 8px;
+
+  .tab-btn {
+    appearance: none;
+    border: none;
+    background: transparent;
+    color: var(--table-row-color);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    padding: 8px 22px;
+    border-radius: 18px;
+    cursor: pointer;
+    margin: 0;
+    &.active {
+      background: $header_bgcolor_noalpha;
+      color: #fff;
+    }
+  }
+  .short {
+    display: none;
+  }
+}
+
 .sticky-table-wrapper {
   width: 100%;
   box-sizing: border-box;
@@ -429,8 +552,32 @@ export default {
   .career-stats {
     padding: 60px 10px 0;
   }
-  .player-card {
+  .player-card-wrap {
     margin: 0 0 10px 0;
+  }
+  .player-card .info {
+    padding-right: 56px;
+  }
+  .stat-tab-switch {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    margin-top: 0;
+    padding: 2px;
+    background: var(--site-bg);
+    gap: 6px;
+
+    .tab-btn {
+      padding: 3px 0;
+      width: 22px;
+      font-size: 11px;
+    }
+    .full {
+      display: none;
+    }
+    .short {
+      display: inline;
+    }
   }
 }
 
@@ -525,10 +672,10 @@ export default {
     z-index: 6;
   }
   .section-row.softball .cell {
-    background: $header_bgcolor;
+    background: $header_bgcolor_noalpha;
   }
   .section-row.baseball .cell {
-    background: rgba(70, 90, 140, 0.9);
+    background: rgb(70, 90, 140);
   }
   .section-row.aggregate.softball .cell {
     background: #085041;
