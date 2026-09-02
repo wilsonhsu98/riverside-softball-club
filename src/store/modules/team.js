@@ -17,8 +17,31 @@ import { openDB } from 'idb';
 
 const dbInit = teamCode => {
   const tableName = `${teamCode}_games`;
-  const version = window.localStorage.getItem('idb') || 1;
-  const dbPromise = new Promise(resolve => {
+
+  // 每支球隊各自的 object store 是第一次被用到時才用「升版」的方式加進同一個共用的
+  // IndexedDB 資料庫，而每次升版都會讓所有其他球隊已經開著的連線收到 `blocking`、被迫
+  // `close()`——如果那個連線當下正好有 get/set 之類的 transaction 在跑，就會丟出
+  // InvalidStateError: The database connection is closing。這裡讓連線被擠掉時自動用同一個
+  // version 重新打開一個新連線頂替（這次不會再觸發升版，因為 store 早就建立好了），後面呼叫
+  // get/set 等方法時就不會繼續對著一個已關閉的連線送 transaction。
+  let dbPromise;
+  const openAtVersion = v =>
+    openDB(process.env.VUE_APP_PROJECTNAME, v, {
+      upgrade(db, undefined, newVersion) {
+        if (!db.objectStoreNames.contains(tableName)) {
+          window.localStorage.setItem('idb', newVersion);
+          db.createObjectStore(tableName);
+        }
+      },
+      blocking(e) {
+        // https://stackoverflow.com/questions/43215199/indexeddb-onupgradeneeded-event-never-finishes
+        e.target.close();
+        dbPromise = openAtVersion(v);
+      },
+    });
+
+  dbPromise = new Promise(resolve => {
+    const version = window.localStorage.getItem('idb') || 1;
     openDB(process.env.VUE_APP_PROJECTNAME, parseInt(version, 10), {
       blocking(e) {
         // https://stackoverflow.com/questions/43215199/indexeddb-onupgradeneeded-event-never-finishes
@@ -34,41 +57,38 @@ const dbInit = teamCode => {
         }
       })
       .then(v => {
-        openDB(process.env.VUE_APP_PROJECTNAME, v, {
-          upgrade(db, undefined, newVersion) {
-            if (!db.objectStoreNames.contains(tableName)) {
-              window.localStorage.setItem('idb', newVersion);
-              db.createObjectStore(tableName);
-            }
-          },
-          blocking(e) {
-            // https://stackoverflow.com/questions/43215199/indexeddb-onupgradeneeded-event-never-finishes
-            e.target.close();
-          },
-        }).then(db => {
-          resolve(db);
-        });
+        resolve(openAtVersion(v));
       });
   });
 
+  // 就算連線被擠掉的當下重連還沒完成，這個呼叫也不用整個丟出 InvalidStateError 讓外面的
+  // promise chain 中斷——反正 idb 只是本地快取，這次讀寫失敗、下次連線好了再重試就好，不影響
+  // Firestore 那邊的正確性。getAll/keys 的呼叫端會直接對結果做 .map()，所以失敗時要回傳空
+  // 陣列而不是 undefined，不然只是把同一個 crash 換個地方發生。
+  const withConnection = (fn, fallback) =>
+    dbPromise.then(fn).catch(error => {
+      if (error && error.name === 'InvalidStateError') return fallback;
+      throw error;
+    });
+
   return {
-    async get(key) {
-      return (await dbPromise).get(tableName, key);
+    get(key) {
+      return withConnection(db => db.get(tableName, key));
     },
-    async getAll() {
-      return (await dbPromise).getAll(tableName);
+    getAll() {
+      return withConnection(db => db.getAll(tableName), []);
     },
-    async set(key, val) {
-      return (await dbPromise).put(tableName, val, key);
+    set(key, val) {
+      return withConnection(db => db.put(tableName, val, key));
     },
-    async delete(key) {
-      return (await dbPromise).delete(tableName, key);
+    delete(key) {
+      return withConnection(db => db.delete(tableName, key));
     },
-    async clear() {
-      return (await dbPromise).clear(tableName);
+    clear() {
+      return withConnection(db => db.clear(tableName));
     },
-    async keys() {
-      return (await dbPromise).getAllKeys(tableName);
+    keys() {
+      return withConnection(db => db.getAllKeys(tableName), []);
     },
   };
 };
