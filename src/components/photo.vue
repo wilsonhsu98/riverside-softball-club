@@ -19,8 +19,9 @@
         small: size === 'small',
         medium: size === 'medium',
       }"
-      :src="$cacheImg(photo)"
-      onload="this.style.display = 'inline-block'"
+      :style="{ display: loaded ? 'inline-block' : 'none' }"
+      :src="src"
+      @load="loaded = true"
       @error="handleError"
     />
   </div>
@@ -135,6 +136,11 @@ import { getNameNumber } from '../libs/utils';
 
 export default {
   props: ['name', 'number', 'photo', 'size', 'iconFallback'],
+  data() {
+    return {
+      loaded: false,
+    };
+  },
   computed: {
     nameNumber() {
       return getNameNumber({ name: this.name, number: this.number });
@@ -142,11 +148,22 @@ export default {
     showPhoto() {
       return !!this.photo && !this.$imgFailed(this.photo);
     },
+    src() {
+      return this.$cacheImg(this.photo);
+    },
+  },
+  watch: {
+    // Reset visibility whenever the source changes, so the fallback stays
+    // showing (instead of the previous player's photo) until the new one
+    // has actually finished loading.
+    src() {
+      this.loaded = false;
+    },
   },
   methods: {
-    handleError(e) {
+    handleError() {
       this.$markImgFailed(this.photo);
-      e.target.style.display = 'none';
+      this.loaded = false;
     },
   },
 };
