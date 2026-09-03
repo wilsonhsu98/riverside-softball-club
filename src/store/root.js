@@ -8,6 +8,7 @@ import {
 } from '../firebase';
 import router from '../router';
 import config from '../../config';
+import i18n from '../i18n';
 import { state as userState, actions as userActions } from './modules/user';
 import { PROVIDER } from '../constants';
 // const lineLoginUrl = config.line.loginUrl;
@@ -15,7 +16,6 @@ const lineLoginUrl =
   process.env.NODE_ENV === 'production'
     ? config.line.loginUrl
     : 'http://localhost:9000/.netlify/functions/index/line_oauth';
-let isFirst = true;
 let chkLoginStatusDone = false;
 let isLogout = false;
 
@@ -98,12 +98,52 @@ const actions = {
   anonymousLogin({ commit }) {
     window.localStorage.removeItem('currentTeam');
     commit(types.LOADING, true);
-    auth.signInAnonymously();
+    auth.signInAnonymously().catch(error => {
+      console.log('anonymousLogin error');
+      console.log(error);
+      commit(types.LOADING, false);
+      actions.alert({ commit }, i18n.t('msg_login_failed'));
+    });
   },
   loginPopup({ commit }, provider) {
+    commit(types.LOADING, true);
+
+    // Firebase resolves/rejects signInWithPopup's promise by polling the
+    // popup window for closure, which several browsers (especially on
+    // mobile, where the "popup" is really just a second tab) never report
+    // back reliably — leaving the promise pending forever and the login
+    // page stuck on its loading screen. As a safety net, treat the app
+    // regaining focus/visibility as a sign the popup flow ended, and give
+    // up on the promise if it still hasn't settled shortly after.
+    //
+    // Once we've given up, this promise may still settle later — e.g.
+    // Firebase rejects it with auth/cancelled-popup-request the moment a
+    // *newer* loginPopup call starts. `gaveUp` stops that late settlement
+    // from touching loading/token state again, which would otherwise stomp
+    // on whatever the newer attempt just set.
+    let gaveUp = false;
+    const stopWatchingForCancel = () => {
+      window.removeEventListener('focus', watchForCancel);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+    };
+    const watchForCancel = () => {
+      setTimeout(() => {
+        if (gaveUp) return;
+        gaveUp = true;
+        stopWatchingForCancel();
+        commit(types.LOADING, false);
+      }, 1500);
+    };
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') watchForCancel();
+    };
+    window.addEventListener('focus', watchForCancel);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
     auth
       .signInWithPopup(providerMapping[provider])
       .then(result => {
+        stopWatchingForCancel();
         if (result.credential) {
           commit(types.SET_PROVIDERID, result.credential.providerId);
           commit(types.SET_TOKEN, result.credential.accessToken);
@@ -111,8 +151,7 @@ const actions = {
         }
       })
       .catch(error => {
-        if (!isFirst) return; // prevent logout event trigger auth.getRedirectResult()
-        isFirst = false;
+        stopWatchingForCancel();
         if (error.code === 'auth/account-exists-with-different-credential') {
           window.localStorage.setItem(
             'pendingCred',
@@ -125,7 +164,6 @@ const actions = {
                 .get()
                 .then(querySnapshot => {
                   querySnapshot.forEach(doc => {
-                    commit(types.LOADING, true);
                     auth.signInWithEmailAndPassword(
                       error.email,
                       doc.data().lineUserID,
@@ -137,12 +175,13 @@ const actions = {
                 });
             } else {
               actions.loginPopup({ commit }, providers[0]);
-              // auth.signInWithRedirect(providerMapping[providers[0]]);
             }
           });
-        } else {
-          console.log('getRedirectResult error');
-          console.log(error);
+        } else if (!gaveUp) {
+          if (error.code !== 'auth/popup-closed-by-user') {
+            console.log('loginPopup error');
+            console.log(error);
+          }
           commit(types.CLEAN_TOKEN);
           commit(types.LOADING, false);
         }

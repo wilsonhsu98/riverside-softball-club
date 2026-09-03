@@ -307,6 +307,8 @@ select::-ms-expand {
   --tip-t-color: #{$tip_t_color};
   --tip-l-color: #{$tip_l_color};
   --tip-n-color: #{$tip_n_color};
+
+  --accent-teal: #{$row_color};
 }
 
 :root.dark {
@@ -346,6 +348,8 @@ select::-ms-expand {
   --tip-t-color: #{$d_nonpa};
   --tip-l-color: #{$d_ng};
   --tip-n-color: rgba(119, 119, 119, 0.8);
+
+  --accent-teal: #{$active_bgcolor};
 
   .container {
     .btn-container {

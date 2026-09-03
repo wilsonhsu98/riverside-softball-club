@@ -1,10 +1,11 @@
 {
-	"login_fb_btn": "使用FaceBook帳號登入",
+	"login_fb_btn": "使用Facebook帳號登入",
 	"login_line_btn": "使用LINE帳號登入",
 	"login_google_btn": "使用Google帳號登入",
-	"login_github_btn": "使用Github帳號登入",
+	"login_github_btn": "使用GitHub帳號登入",
 	"login_anonymous_btn": "匿名路過",
 	"msg_login_before_join": "請先登入系統<br>之後會引導您加入球隊",
+	"msg_login_failed": "登入失敗，請稍後再試",
 	"msg_fb_disallow": "由於FB管控日趨嚴格，之後不再支援FB登入，請使用其它替代方案登入<ul><li>若背後使用相同的email，系統則會判定是同一個使用者，仍可使用原來綁定的球員</li><li>若背後使用不同的email，可以透過重新加入球隊來綁定原來的球員，但需要經過隊上管理者審核通過</li><ul>",
 	"auto": "自動",
 	"logout_btn": "登出",
