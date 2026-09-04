@@ -11,7 +11,7 @@ const db = firebase.firestore();
 const timestamp = firebase.firestore.FieldValue.serverTimestamp();
 const f_timestamp = firebase.firestore.Timestamp;
 const fieldValue = firebase.firestore.FieldValue;
-db.settings({});
+db.settings({ merge: true });
 
 // provider.addScope('public_profile');
 // provider.addScope('user_birthday');
@@ -28,18 +28,22 @@ const credentialMapping = {
   [PROVIDER.google]: token =>
     firebase.auth.GoogleAuthProvider.credential(null, token),
   [PROVIDER.fb]: token => firebase.auth.FacebookAuthProvider.credential(token),
-  [PROVIDER.github]: token => firebase.auth.GithubAuthProvider.credential(token),
+  [PROVIDER.github]: token =>
+    firebase.auth.GithubAuthProvider.credential(token),
 };
 
 const messaging = (() => {
-  if (firebase.messaging.isSupported()) {
+  if (!firebase.messaging.isSupported()) return null;
+  try {
     const fmsg = firebase.messaging();
     fmsg.usePublicVapidKey(
       'BFeaTTT1Dh8RoYytjYuMk3BktHvFDYrkZfDiRUlNtQyT8YbKpX5DnQU7rHq0x4YdP-xACIttBDFl6Tngy-v0BKw',
     );
     return fmsg;
+  } catch (e) {
+    // config.firebase has no appId, which firebase@8's messaging module now validates strictly
+    return null;
   }
-  return null;
 })();
 
 export {
