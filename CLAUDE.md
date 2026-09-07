@@ -61,3 +61,7 @@ Locale strings live in `src/i18n/{en-us,zh-tw}.json`, loaded via `vue-i18n` ([sr
 ### Auto-registered components
 
 [src/main.js](src/main.js) globally registers every `.vue` file directly under `src/components/` (via `require.context`, PascalCase-derived from filename) plus every entry in [src/components/icon.js](src/components/icon.js) as inline-template icon components — new top-level components in that folder don't need manual registration, but nested folders under `components/` are not picked up (`, false` in the context call).
+
+## Dependency security upgrades
+
+[SECURITY_UPGRADE_PLAN.md](SECURITY_UPGRADE_PLAN.md) tracks the remaining Dependabot alerts and a staged plan to close them (each stage requires a major-version bump or a real code change, so they were deliberately deferred rather than rushed). Before doing any dependency/security work in this repo — including "fix the vulnerabilities" style requests — read that file first, follow its phase order, and update its "進度紀錄" section when a phase is completed.
