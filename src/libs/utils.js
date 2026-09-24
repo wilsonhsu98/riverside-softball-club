@@ -199,10 +199,26 @@ function toDataURL(src, callback, outputFormat) {
     img.src = src;
   }
 }
-const cache = {};
+// Both stores below are capped, least-recently-used caches — every distinct
+// photo/icon URL the app has ever shown in this tab would otherwise pile up
+// (as a full base64 copy, in cache's case) for as long as the tab stays
+// open. `touch` re-inserts a key so Map/Set iteration order (used as LRU
+// order) reflects recency, then evicts the oldest entry past the cap.
+const MAX_IMG_CACHE_SIZE = 200;
+const touch = (store, key, value) => {
+  store.delete(key);
+  store.set ? store.set(key, value) : store.add(key);
+  if (store.size > MAX_IMG_CACHE_SIZE) {
+    store.delete(store.keys().next().value);
+  }
+};
+
+const cache = new Map();
 const cacheImg = url => {
-  if (cache[url]) {
-    return cache[url];
+  if (cache.has(url)) {
+    const dataUrl = cache.get(url);
+    touch(cache, url, dataUrl);
+    return dataUrl;
   } else {
     // if (!/\.(gif|jpg|jpeg|tiff|png)$/i.test(url)) {
     //   toDataURL(url, dataUrl => {
@@ -210,7 +226,7 @@ const cacheImg = url => {
     //   });
     // }
     toDataURL(url, dataUrl => {
-      cache[url] = dataUrl;
+      touch(cache, url, dataUrl);
     });
     return url;
   }
@@ -224,7 +240,7 @@ const cacheImg = url => {
 // crossOrigin canvas read while the plain <img> display still works fine.
 const failedImgUrls = new Set();
 const isImgFailed = url => failedImgUrls.has(url);
-const markImgFailed = url => failedImgUrls.add(url);
+const markImgFailed = url => touch(failedImgUrls, url);
 
 function scrollTo(element) {
   // check is dom node
