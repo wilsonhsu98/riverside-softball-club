@@ -169,6 +169,13 @@ const getters = {
   clock: state => state.clock,
 };
 
+// The team-doc listener below re-enters its `if (clock)` branch on every
+// unrelated write to the team doc (roster edits, new games, etc.) for as
+// long as a clock is active, which would otherwise spawn another
+// concurrent requestAnimationFrame loop each time. This guard makes sure
+// only one tick loop is ever scheduled at a time.
+let clockLoopActive = false;
+
 const actions = {
   editTeam({ commit }, data) {
     const { code: teamCode, nextAction } = data;
@@ -696,10 +703,15 @@ const actions = {
                       commit(types.SET_CLOCK, formattedTime);
                     }
                     window.requestAnimationFrame(executeClock);
+                  } else {
+                    clockLoopActive = false;
                   }
                 };
                 commit(types.ENABLE_CLOCK, true);
-                window.requestAnimationFrame(executeClock);
+                if (!clockLoopActive) {
+                  clockLoopActive = true;
+                  window.requestAnimationFrame(executeClock);
+                }
               } else {
                 commit(types.SET_CLOCK, undefined);
                 commit(types.ENABLE_CLOCK, false);
