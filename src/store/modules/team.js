@@ -90,7 +90,26 @@ const dbInit = teamCode => {
     keys() {
       return withConnection(db => db.getAllKeys(tableName), []);
     },
+    close() {
+      return withConnection(db => db.close()).catch(() => {});
+    },
   };
+};
+
+// dbInit() opens a live IndexedDB connection that's only ever closed if a
+// *different* teamCode's version upgrade forces it out — reusing it for
+// repeat calls on the same team, and explicitly closing it before switching
+// teams, keeps listenTeamChange() from leaking one connection per switch.
+let cachedIdbTeamCode = null;
+let cachedIdbKeyval = null;
+const getTeamIdbKeyval = teamCode => {
+  if (cachedIdbTeamCode === teamCode && cachedIdbKeyval) {
+    return cachedIdbKeyval;
+  }
+  if (cachedIdbKeyval) cachedIdbKeyval.close();
+  cachedIdbTeamCode = teamCode;
+  cachedIdbKeyval = dbInit(teamCode);
+  return cachedIdbKeyval;
 };
 
 const types = {
@@ -565,7 +584,7 @@ const actions = {
   },
   listenTeamChange({ commit, state }, teamCode) {
     if (teamCode) {
-      const idbKeyval = dbInit(teamCode);
+      const idbKeyval = getTeamIdbKeyval(teamCode);
       if (typeof snapShot.team === 'function') snapShot.team();
       snapShotReconnect.team = () =>
         db

@@ -491,12 +491,13 @@ export default {
   },
   mounted() {
     // this.shouldShowAd(this.$route);
-    window.addEventListener('beforeinstallprompt', e => {
-      e.preventDefault();
-      this.deferredPrompt = e;
-      this.canInstall = true;
-      this.showInstallButton = true;
-    });
+    window.addEventListener('beforeinstallprompt', this.captureInstallPrompt);
+  },
+  beforeDestroy() {
+    window.removeEventListener(
+      'beforeinstallprompt',
+      this.captureInstallPrompt,
+    );
   },
   methods: {
     ...mapActions([
@@ -507,6 +508,12 @@ export default {
       'confirm',
       'checkUpdateAvailable',
     ]),
+    captureInstallPrompt(e) {
+      e.preventDefault();
+      this.deferredPrompt = e;
+      this.canInstall = true;
+      this.showInstallButton = true;
+    },
     alertYes() {
       this.alertPromiseResolve();
       this.alert('');

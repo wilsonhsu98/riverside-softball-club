@@ -172,6 +172,23 @@ const actions = {
               const currentTeamsContext = JSON.stringify(teamRoles);
               if (currentTeamsContext !== preTeamsContext) {
                 preTeamsContext = currentTeamsContext;
+
+                // tear down request listeners for teams the user is no
+                // longer a manager of, so they don't keep getting
+                // resurrected by the visibilitychange reconnect logic
+                const managerTeamCodes = new Set(
+                  Object.keys(teamRoles || {}).filter(
+                    teamCode => teamRoles[teamCode] === 'manager',
+                  ),
+                );
+                Object.keys(snapShotRequest).forEach(teamCode => {
+                  if (managerTeamCodes.has(teamCode)) return;
+                  if (typeof snapShotRequest[teamCode] === 'function')
+                    snapShotRequest[teamCode]();
+                  delete snapShotRequest[teamCode];
+                  delete snapShotRequestReconnect[teamCode];
+                });
+
                 if (
                   typeof teamRoles === 'object' &&
                   Object.keys(teamRoles).length

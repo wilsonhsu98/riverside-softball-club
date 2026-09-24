@@ -204,6 +204,9 @@ export default {
   },
   beforeDestroy() {
     window.removeEventListener('resize', this.requestAnimationFrame);
+    if (this.player && typeof this.player.destroy === 'function') {
+      this.player.destroy();
+    }
   },
   methods: {
     opened() {
@@ -232,6 +235,9 @@ export default {
       }
     },
     initPlayer() {
+      if (this.player && typeof this.player.destroy === 'function') {
+        this.player.destroy();
+      }
       this.player = new window.YT.Player('player', {
         height: '100%',
         width: '100%',
@@ -298,7 +304,10 @@ export default {
       this.end_ = 100;
       this.range = 0;
       this.$emit('close');
-      // this.player && this.player.destroy && this.player.destroy();
+      if (this.player && typeof this.player.destroy === 'function') {
+        this.player.destroy();
+        this.player = null;
+      }
     },
     clear() {
       this.$emit('clear', {
@@ -355,7 +364,6 @@ export default {
         // console.log('video_')
         this.start_ = 0;
         this.end_ = 100;
-        this.player.destroy();
         this.initPlayer();
       }
     },
