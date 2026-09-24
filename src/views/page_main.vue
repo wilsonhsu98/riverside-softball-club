@@ -378,12 +378,12 @@ header {
         padding: 0;
         color: $header_color;
         .fa {
+          border-radius: 50%;
           display: block;
           width: 40px;
           height: 30px;
           line-height: 30px;
           margin: 0 auto;
-          transition: background-color 0.5s;
           &.carousel > svg {
             margin-top: -2px;
             width: 34px;
@@ -404,13 +404,13 @@ header {
         margin-top: -15px;
         .fa {
           background-color: $active_bgcolor;
-          border-radius: 50%;
           width: 40px;
           height: 40px;
           line-height: 42px;
           margin-bottom: 3px;
           color: $current_user_color;
           opacity: 0.9;
+          transition: background-color 1s;
           &.carousel > svg {
             margin-top: 0;
             height: 40px;
