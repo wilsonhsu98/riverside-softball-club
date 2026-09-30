@@ -147,7 +147,10 @@
 }
 
 .login-card {
-  width: 268px;
+  // Sized to whichever button's label is widest (see .signin-btn below)
+  // instead of a guessed fixed width, so a larger system font size (or
+  // future copy changes) can't force button text into an awkward wrap.
+  width: fit-content;
   max-width: 100%;
   box-sizing: border-box;
   background-color: var(--card-bg);
@@ -165,7 +168,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  width: 220px;
+  width: 100%;
 
   &-line {
     flex: 1;
@@ -213,7 +216,6 @@
   font-weight: 500;
   height: auto;
   line-height: normal;
-  max-width: 220px;
   min-height: 40px;
   padding: 8px 16px 8px 50px;
   text-align: left;
