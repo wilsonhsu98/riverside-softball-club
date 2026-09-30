@@ -206,58 +206,73 @@ const actions = {
   },
   lineLoginRedirect({ commit }, token) {
     commit(types.LOADING, true);
-    auth.signInWithCustomToken(token).then(result => {
-      const user = result.user;
-      if (user) {
-        commit(types.SET_PROVIDERID, 'password');
-        commit(types.SET_TOKEN, token);
-        commit(types.SET_USERID, user.uid);
-        commit(types.SET_ANONYMOUS, false);
+    // Must be set before signInWithCustomToken below, not inside its
+    // .then(): chkLoginStatus's onAuthStateChanged listener (registered
+    // at app startup) fires for this same sign-in, usually before this
+    // action's own .then() runs. If providerId is still empty when it
+    // fires, it treats this as a logged-out state, wipes the token, and
+    // bounces back to /login — even though LINE + Firebase both
+    // succeeded.
+    commit(types.SET_PROVIDERID, 'password');
+    auth
+      .signInWithCustomToken(token)
+      .then(result => {
+        const user = result.user;
+        if (user) {
+          commit(types.SET_TOKEN, token);
+          commit(types.SET_USERID, user.uid);
+          commit(types.SET_ANONYMOUS, false);
 
-        const refPlayerDoc = db.collection('accounts').doc(user.uid);
-        refPlayerDoc
-          .get()
-          .then(doc => {
-            window.trackRead('lineLoginRedirect', 1);
-            const data = doc.exists ? doc.data() : {};
+          const refPlayerDoc = db.collection('accounts').doc(user.uid);
+          refPlayerDoc
+            .get()
+            .then(doc => {
+              window.trackRead('lineLoginRedirect', 1);
+              const data = doc.exists ? doc.data() : {};
 
-            return {
-              ...data,
-              accessToken: state.token,
-              name: data.name || user.displayName,
-              photo: data.photo || user.photoURL,
-            };
-          })
-          .then(res => {
-            const { accessToken, ...other } = res;
-            commit(types.SET_ACCOUNT_INFO, { ...other });
-            return refPlayerDoc.set(
-              {
-                accessToken,
-                name: res.name,
-                photo: res.photo,
-                line_photo: user.photoURL,
-              },
-              {
-                merge: true,
-              },
-            );
-          })
-          .then(() => {
-            userActions.fetchUser({ commit });
-            // commit(types.SET_USERNAME, snapshot.docs[0].id);
-            const next =
-              JSON.parse(window.localStorage.getItem('next_url')) || {};
-            if (next.hasOwnProperty('fullPath')) {
-              router.push(next);
-              window.localStorage.removeItem('next_url');
-            } else {
-              router.push('/main/user');
-            }
-            commit(types.LOADING, false);
-          });
-      }
-    });
+              return {
+                ...data,
+                accessToken: state.token,
+                name: data.name || user.displayName,
+                photo: data.photo || user.photoURL,
+              };
+            })
+            .then(res => {
+              const { accessToken, ...other } = res;
+              commit(types.SET_ACCOUNT_INFO, { ...other });
+              return refPlayerDoc.set(
+                {
+                  accessToken,
+                  name: res.name,
+                  photo: res.photo,
+                  line_photo: user.photoURL,
+                },
+                {
+                  merge: true,
+                },
+              );
+            })
+            .then(() => {
+              userActions.fetchUser({ commit });
+              // commit(types.SET_USERNAME, snapshot.docs[0].id);
+              const next =
+                JSON.parse(window.localStorage.getItem('next_url')) || {};
+              if (next.hasOwnProperty('fullPath')) {
+                router.push(next);
+                window.localStorage.removeItem('next_url');
+              } else {
+                router.push('/main/user');
+              }
+              commit(types.LOADING, false);
+            });
+        }
+      })
+      .catch(error => {
+        console.log('lineLoginRedirect error');
+        console.log(error);
+        commit(types.CLEAN_TOKEN);
+        commit(types.LOADING, false);
+      });
   },
   chkLoginStatus({ commit }) {
     if (chkLoginStatusDone) return;
