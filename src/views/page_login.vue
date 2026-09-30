@@ -272,11 +272,13 @@
     .fa {
       display: inline-block;
       position: absolute;
+      top: 50%;
       left: 16px;
       width: 20px;
       height: 20px;
       text-align: center;
       font-size: 21px;
+      transform: translateY(-50%);
     }
   }
   &:focus {
