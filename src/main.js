@@ -157,6 +157,19 @@ window.addEventListener('themeChange', () => {
 });
 
 const render = () => {
+  // This app only ever routes off the hash, so a query string can only be
+  // leftover ?code=&state= (or similar) from the LINE OAuth redirect chain
+  // — never something the app itself needs. Drop it before Vue Router
+  // resolves the initial route so it doesn't linger in the address bar
+  // (and doesn't get echoed back into the next lineLogin() redirect's
+  // `from` param, see store/root.js).
+  if (window.location.search) {
+    window.history.replaceState(
+      null,
+      '',
+      window.location.pathname + window.location.hash,
+    );
+  }
   new Promise(resolve => {
     resolve(
       new Vue({
