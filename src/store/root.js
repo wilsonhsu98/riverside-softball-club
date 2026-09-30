@@ -440,7 +440,17 @@ const actions = {
             commit(types.LOADING, false);
           });
       } else {
-        if (isLogout === true || router.history.current.params.custom) {
+        // router.history.current only reflects the URL once the route's
+        // (lazy-loaded) component has resolved, which loses this race
+        // against Firebase restoring its "no user yet" state on a slow
+        // connection: onAuthStateChanged(null) fires here while
+        // history.current is still the pre-navigation START route, so
+        // .params.custom reads as undefined even though the address bar
+        // already shows the custom-login URL. Check the actual URL
+        // instead — this router has no `mode: 'history'`, so that's the
+        // hash, not the path.
+        const isCustomLoginUrl = /^#\/login\/[^/]+/.test(window.location.hash);
+        if (isLogout === true || isCustomLoginUrl) {
           isLogout = false;
           commit(types.LOADING, true);
         } else {
