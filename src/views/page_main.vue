@@ -104,10 +104,17 @@
       }}</a>
       <i class="fa fa-times" @click="showUpdateAvailable = false"></i>
     </div>
-    <div v-if="!showUpdateAvailable && showInstallButton" class="update">
+    <div
+      v-if="
+        !showUpdateAvailable &&
+          installPromptMode === 'native' &&
+          installPromptVisible
+      "
+      class="update"
+    >
       <span>{{ $t('system_can_install') }}</span>
       <a class="link" @click="installApp">{{ $t('system_install') }}</a>
-      <i class="fa fa-times" @click="showInstallButton = false"></i>
+      <i class="fa fa-times" @click="installPromptVisible = false"></i>
     </div>
   </div>
 </template>
@@ -472,6 +479,12 @@ header {
 <script>
 import { mapGetters, mapActions } from 'vuex';
 import defaultIcon from '../images/icon.png';
+import {
+  isRunningStandalone,
+  isInstallPromptDismissed,
+  detectInstallPlatform,
+  waitForInstallPrompt,
+} from '../libs/utils';
 
 export default {
   data() {
@@ -482,8 +495,8 @@ export default {
       adMode: '',
       showUpdateAvailable: false,
       deferredPrompt: null,
-      canInstall: false,
-      showInstallButton: false,
+      installPromptMode: 'none',
+      installPromptVisible: false,
     };
   },
   created() {
@@ -491,13 +504,7 @@ export default {
   },
   mounted() {
     // this.shouldShowAd(this.$route);
-    window.addEventListener('beforeinstallprompt', this.captureInstallPrompt);
-  },
-  beforeDestroy() {
-    window.removeEventListener(
-      'beforeinstallprompt',
-      this.captureInstallPrompt,
-    );
+    this.determineInstallPromptMode();
   },
   methods: {
     ...mapActions([
@@ -508,11 +515,18 @@ export default {
       'confirm',
       'checkUpdateAvailable',
     ]),
-    captureInstallPrompt(e) {
-      e.preventDefault();
-      this.deferredPrompt = e;
-      this.canInstall = true;
-      this.showInstallButton = true;
+    async determineInstallPromptMode() {
+      if (isRunningStandalone() || isInstallPromptDismissed()) {
+        return;
+      }
+      const event = await waitForInstallPrompt();
+      if (event) {
+        this.deferredPrompt = event;
+        this.installPromptMode = 'native';
+      } else {
+        this.installPromptMode = detectInstallPlatform();
+      }
+      this.installPromptVisible = this.installPromptMode !== 'none';
     },
     alertYes() {
       this.alertPromiseResolve();
@@ -589,10 +603,10 @@ export default {
         }
       }
 
-      if (this.canInstall && !this.showInstallButton) {
+      if (this.installPromptMode !== 'none' && !this.installPromptVisible) {
         window.canInstall = (window.canInstall || 0) + 1;
         if (window.canInstall % 5 === 0) {
-          this.showInstallButton = true;
+          this.installPromptVisible = true;
         }
       }
     },
@@ -614,7 +628,7 @@ export default {
       }
 
       this.deferredPrompt = null;
-      this.showInstallButton = false;
+      this.installPromptVisible = false;
     },
   },
   computed: {

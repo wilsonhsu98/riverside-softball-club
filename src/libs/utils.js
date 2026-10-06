@@ -598,6 +598,51 @@ const calcCurrentOut = (
   };
 };
 
+const INSTALL_PROMPT_DISMISSED_KEY = 'installPromptDismissed';
+
+const isRunningStandalone = () =>
+  window.navigator.standalone === true ||
+  window.matchMedia('(display-mode: standalone)').matches;
+
+const isInstallPromptDismissed = () =>
+  window.localStorage.getItem(INSTALL_PROMPT_DISMISSED_KEY) === '1';
+
+const dismissInstallPromptForever = () => {
+  window.localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, '1');
+};
+
+// iPadOS reports itself as a desktop Mac in the UA string, so a real iPad
+// must be told apart from a Mac via its (Macs have none) touch points.
+const detectInstallPlatform = () => {
+  const ua = window.navigator.userAgent;
+  const isIPadOS =
+    window.navigator.platform === 'MacIntel' &&
+    window.navigator.maxTouchPoints > 1;
+  if (/iPhone|iPad|iPod/.test(ua) || isIPadOS) return 'ios';
+  if (/Android/.test(ua)) return 'android';
+  if (/Mac/.test(window.navigator.platform)) return 'mac';
+  if (/Win/.test(window.navigator.platform)) return 'windows';
+  return 'other';
+};
+
+const waitForInstallPrompt = (timeoutMs = 3000) =>
+  new Promise(resolve => {
+    let settled = false;
+    const finish = event => {
+      if (settled) return;
+      settled = true;
+      window.removeEventListener('beforeinstallprompt', onPrompt);
+      clearTimeout(timer);
+      resolve(event);
+    };
+    const onPrompt = e => {
+      e.preventDefault();
+      finish(e);
+    };
+    const timer = setTimeout(() => finish(null), timeoutMs);
+    window.addEventListener('beforeinstallprompt', onPrompt);
+  });
+
 export default {
   parseGame,
   genGameList,
@@ -620,4 +665,9 @@ export {
   accCalc,
   cleanData,
   calcCurrentOut,
+  isRunningStandalone,
+  isInstallPromptDismissed,
+  dismissInstallPromptForever,
+  detectInstallPlatform,
+  waitForInstallPrompt,
 };
