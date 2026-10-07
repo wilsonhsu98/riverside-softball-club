@@ -651,6 +651,7 @@ export default {
     },
     dismissInstallForever() {
       dismissInstallPromptForever();
+      this.installPromptMode = 'none';
       this.installPromptVisible = false;
     },
   },
