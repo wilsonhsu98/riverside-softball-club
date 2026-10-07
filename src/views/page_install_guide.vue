@@ -12,6 +12,9 @@
               class="step-icon"
               v-html="ICONS[step.titleIcon]"
             ></span>
+            <span v-if="step.titleImage" class="step-icon">
+              <img :src="step.titleImage" alt="" />
+            </span>
           </p>
           <p v-if="step.noteParts" class="step-note">
             <template v-for="(part, pi) in step.noteParts">
@@ -69,6 +72,11 @@ ol {
     width: 16px;
     height: 16px;
   }
+  ::v-deep img {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+  }
 }
 .step-note {
   margin: 4px 0 0;
@@ -123,7 +131,7 @@ const GUIDES = {
         titleIcon: 'plus',
       },
       { title: 'install_guide_ios_s4_title' },
-      { title: 'install_guide_ios_s5_title' },
+      { title: 'install_guide_ios_s5_title', titleImage: '/icon_100.png' },
     ],
     footnote: 'install_guide_ios_footnote',
   },
@@ -143,7 +151,7 @@ const GUIDES = {
         title: 'install_guide_android_s4_title',
         note: 'install_guide_android_s4_note',
       },
-      { title: 'install_guide_android_s5_title' },
+      { title: 'install_guide_android_s5_title', titleImage: '/icon_100.png' },
     ],
     footnote: 'install_guide_android_footnote',
   },
@@ -162,7 +170,7 @@ const GUIDES = {
         ],
       },
       { title: 'install_guide_mac_s3_title' },
-      { title: 'install_guide_mac_s4_title' },
+      { title: 'install_guide_mac_s4_title', titleImage: '/icon_100.png' },
     ],
     footnote: 'install_guide_mac_footnote',
   },
