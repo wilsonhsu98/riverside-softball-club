@@ -94,7 +94,7 @@ ol {
 <script>
 const ICONS = {
   share:
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11 V20 H19 V11"/><path d="M12 2 V14"/><path d="M8 6 L12 2 L16 6"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16 V20 H20 V16"/><path d="M12 2 V14"/><path d="M8 6 L12 2 L16 6"/></svg>',
   plus:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 4 V20"/><path d="M4 12 H20"/></svg>',
   menu:
