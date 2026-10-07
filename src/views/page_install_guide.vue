@@ -88,6 +88,10 @@ ol {
   opacity: 0.65;
   font-size: 13px;
   line-height: 1.5;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
   .step-icon {
     opacity: 1;
   }
