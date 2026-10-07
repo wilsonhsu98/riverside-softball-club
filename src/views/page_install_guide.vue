@@ -102,7 +102,7 @@ const ICONS = {
   download:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16 V20 H20 V16"/><path d="M12 2 V14"/><path d="M8 10 L12 14 L16 10"/></svg>',
   dock:
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 15 H20"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2" fill="currentColor" stroke="none"/></svg>',
 };
 
 const GUIDES = {
