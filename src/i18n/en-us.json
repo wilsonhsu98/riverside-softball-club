@@ -436,6 +436,7 @@
 	"install_guide_android_s4_title": "在跳出來的視窗點「安裝」",
 	"install_guide_android_s4_note": "Chrome 有時候會自己從螢幕下緣彈出安裝提示,直接點那個也一樣。",
 	"install_guide_android_s5_title": "從主畫面或應用程式清單打開",
+	"install_guide_android_footnote": "整份選單都找不到安裝選項的話,代表這個瀏覽器不支援。",
 	"install_guide_mac_s1_title": "用 Safari 開啟本系統",
 	"install_guide_mac_s1_note": "其他瀏覽器(Chrome、Edge、Firefox)都沒有這個功能。",
 	"install_guide_mac_s2_title": "點選單列的「檔案」,選「加入 Dock」",

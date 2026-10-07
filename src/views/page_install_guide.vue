@@ -145,7 +145,7 @@ const GUIDES = {
       },
       { title: 'install_guide_android_s5_title' },
     ],
-    footnote: null,
+    footnote: 'install_guide_android_footnote',
   },
   mac: {
     steps: [
