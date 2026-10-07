@@ -614,10 +614,14 @@ export default {
         }
       }
 
-      if (this.installPromptMode !== 'none' && !this.installPromptVisible) {
+      if (!this.installPromptVisible && !isInstallPromptDismissed()) {
         window.canInstall = (window.canInstall || 0) + 1;
         if (window.canInstall % 5 === 0) {
-          this.installPromptVisible = true;
+          if (this.installPromptMode === 'none') {
+            this.determineInstallPromptMode();
+          } else {
+            this.installPromptVisible = true;
+          }
         }
       }
     },
