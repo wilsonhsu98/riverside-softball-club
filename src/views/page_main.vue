@@ -104,14 +104,7 @@
       }}</a>
       <i class="fa fa-times" @click="showUpdateAvailable = false"></i>
     </div>
-    <div
-      v-if="
-        !showUpdateAvailable &&
-          installPromptMode !== 'none' &&
-          installPromptVisible
-      "
-      class="update"
-    >
+    <div v-if="showInstallBanner" class="update">
       <span class="update-body">
         <span>{{ $t('system_can_install') }}</span>
         <span class="update-actions">
@@ -681,6 +674,14 @@ export default {
       'updateAvailable',
       'clock',
     ]),
+    showInstallBanner() {
+      return (
+        !this.showUpdateAvailable &&
+        this.installPromptMode !== 'none' &&
+        this.installPromptVisible &&
+        this.$route.name !== 'install_guide'
+      );
+    },
   },
   watch: {
     $route(to, from) {
