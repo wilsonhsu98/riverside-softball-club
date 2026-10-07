@@ -57,6 +57,10 @@ ol {
   margin: 0;
   font-weight: 500;
   color: var(--basic-font-color);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
 }
 .step-icon {
   display: inline-flex;
