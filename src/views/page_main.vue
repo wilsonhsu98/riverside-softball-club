@@ -614,7 +614,11 @@ export default {
         }
       }
 
-      if (!this.installPromptVisible && !isInstallPromptDismissed()) {
+      if (
+        !isRunningStandalone() &&
+        !this.installPromptVisible &&
+        !isInstallPromptDismissed()
+      ) {
         window.canInstall = (window.canInstall || 0) + 1;
         if (window.canInstall % 5 === 0) {
           if (this.installPromptMode === 'none') {
@@ -651,6 +655,7 @@ export default {
       }
 
       this.deferredPrompt = null;
+      this.installPromptMode = 'none';
       this.installPromptVisible = false;
     },
     dismissInstallForever() {
