@@ -194,6 +194,12 @@ const router = new VueRouter({
           component: () => import('./views/view_policy.vue'),
           meta: { requiresAuth: false },
         },
+        {
+          path: 'install',
+          name: 'install_guide',
+          component: () => import('./views/page_install_guide.vue'),
+          meta: { requiresAuth: false },
+        },
       ],
     },
     {
