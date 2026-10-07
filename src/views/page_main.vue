@@ -107,13 +107,20 @@
     <div
       v-if="
         !showUpdateAvailable &&
-          installPromptMode === 'native' &&
+          installPromptMode !== 'none' &&
           installPromptVisible
       "
       class="update"
     >
-      <span>{{ $t('system_can_install') }}</span>
-      <a class="link" @click="installApp">{{ $t('system_install') }}</a>
+      <span class="update-body">
+        <span>{{ $t('system_can_install') }}</span>
+        <span class="update-actions">
+          <a class="link" @click="onInstallClick">{{ $t('system_install') }}</a>
+          <a class="link" @click="dismissInstallForever">{{
+            $t('system_install_dismiss')
+          }}</a>
+        </span>
+      </span>
       <i class="fa fa-times" @click="installPromptVisible = false"></i>
     </div>
   </div>
@@ -300,9 +307,22 @@ header {
   border-radius: 4px;
   display: flex;
   align-items: center;
+  gap: 20px;
+  white-space: nowrap;
+  .update-body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 20px;
+    flex: 1;
+    min-width: 0;
+  }
+  .update-actions {
+    display: flex;
+    gap: 20px;
+  }
   a {
     cursor: pointer;
-    margin: 0 20px;
   }
   i.fa {
     font-size: 30px;
@@ -469,9 +489,6 @@ header {
 
     left: 0;
     border-radius: 0;
-    i.fa {
-      margin-left: auto;
-    }
   }
 }
 </style>
@@ -482,6 +499,7 @@ import defaultIcon from '../images/icon.png';
 import {
   isRunningStandalone,
   isInstallPromptDismissed,
+  dismissInstallPromptForever,
   detectInstallPlatform,
   waitForInstallPrompt,
 } from '../libs/utils';
@@ -614,7 +632,15 @@ export default {
       window.location.reload();
       e.preventDefault();
     },
-    async installApp() {
+    async onInstallClick() {
+      if (this.installPromptMode !== 'native') {
+        this.$router.push({
+          name: 'install_guide',
+          query: { platform: this.installPromptMode },
+        });
+        return;
+      }
+
       if (!this.deferredPrompt) return;
 
       this.deferredPrompt.prompt();
@@ -628,6 +654,10 @@ export default {
       }
 
       this.deferredPrompt = null;
+      this.installPromptVisible = false;
+    },
+    dismissInstallForever() {
+      dismissInstallPromptForever();
       this.installPromptVisible = false;
     },
   },

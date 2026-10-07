@@ -412,6 +412,7 @@
 	"system_new_version_reload": "重新整理",
 	"system_can_install": "本系統可安裝到主畫面",
 	"system_install": "安裝",
+	"system_install_dismiss": "不再顯示",
 	"system_privacy_policy": "隱私政策",
 	"system_term_of_use": "使用條款",
 	"system_mail": "系統信箱",
