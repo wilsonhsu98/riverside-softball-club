@@ -23,6 +23,7 @@
                 v-html="ICONS[part.icon]"
               ></span>
             </template>
+            。
           </p>
           <p v-else-if="step.note" class="step-note">{{ $t(step.note) }}</p>
         </li>
@@ -60,7 +61,6 @@ ol {
   justify-content: center;
   width: 22px;
   height: 22px;
-  margin-left: 4px;
   border: 1px solid currentColor;
   border-radius: 4px;
   vertical-align: middle;
@@ -102,7 +102,7 @@ const ICONS = {
   download:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16 V20 H20 V16"/><path d="M12 2 V14"/><path d="M8 10 L12 14 L16 10"/></svg>',
   dock:
-    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="10" rx="2"/><path d="M4 19 H20"/></svg>',
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M4 15 H20"/></svg>',
 };
 
 const GUIDES = {
