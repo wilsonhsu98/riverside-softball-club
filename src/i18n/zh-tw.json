@@ -439,7 +439,8 @@
 	"install_guide_mac_s1_title": "用 Safari 開啟本系統",
 	"install_guide_mac_s1_note": "其他瀏覽器(Chrome、Edge、Firefox)都沒有這個功能。",
 	"install_guide_mac_s2_title": "點選單列的「檔案」,選「加入 Dock」",
-	"install_guide_mac_s2_note": "也可以點網址列旁的分享按鈕,選同樣的選項。",
+	"install_guide_mac_s2_note1": "也可以點網址列旁的分享按鈕",
+	"install_guide_mac_s2_note2": ",在選單裡選「加入 Dock」。",
 	"install_guide_mac_s3_title": "確認名稱後,點「加入」",
 	"install_guide_mac_s4_title": "之後可以在 Dock 或啟動台找到圖示打開",
 	"install_guide_mac_footnote": "這個功能需要 macOS Sonoma(14)以上的 Safari,版本太舊的話選單裡不會有這個選項。"

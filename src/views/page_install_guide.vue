@@ -6,14 +6,25 @@
       <ol>
         <li v-for="(step, i) in guide.steps" :key="i">
           <p class="step-title">
-            {{ $t(step[0]) }}
+            {{ $t(step.title) }}
             <span
-              v-if="step[2]"
+              v-if="step.titleIcon"
               class="step-icon"
-              v-html="ICONS[step[2]]"
+              v-html="ICONS[step.titleIcon]"
             ></span>
           </p>
-          <p v-if="step[1]" class="step-note">{{ $t(step[1]) }}</p>
+          <p v-if="step.noteParts" class="step-note">
+            <template v-for="(part, pi) in step.noteParts">
+              {{ $t(part.text) }}
+              <span
+                v-if="part.icon"
+                :key="pi"
+                class="step-icon"
+                v-html="ICONS[part.icon]"
+              ></span>
+            </template>
+          </p>
+          <p v-else-if="step.note" class="step-note">{{ $t(step.note) }}</p>
         </li>
       </ol>
       <p v-if="guide.footnote" class="footnote">{{ $t(guide.footnote) }}</p>
@@ -65,6 +76,9 @@ ol {
   opacity: 0.65;
   font-size: 13px;
   line-height: 1.5;
+  .step-icon {
+    opacity: 1;
+  }
 }
 .footnote {
   margin: 20px 0 0;
@@ -87,39 +101,68 @@ const ICONS = {
     '<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg>',
   download:
     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 16 V20 H20 V16"/><path d="M12 2 V14"/><path d="M8 10 L12 14 L16 10"/></svg>',
+  dock:
+    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="7" y="3" width="10" height="10" rx="2"/><path d="M4 19 H20"/></svg>',
 };
 
 const GUIDES = {
   ios: {
     steps: [
-      ['install_guide_ios_s1_title', 'install_guide_ios_s1_note'],
-      ['install_guide_ios_s2_title', 'install_guide_ios_s2_note', 'share'],
-      ['install_guide_ios_s3_title', 'install_guide_ios_s3_note', 'plus'],
-      ['install_guide_ios_s4_title', null],
-      ['install_guide_ios_s5_title', null],
+      {
+        title: 'install_guide_ios_s1_title',
+        note: 'install_guide_ios_s1_note',
+      },
+      {
+        title: 'install_guide_ios_s2_title',
+        note: 'install_guide_ios_s2_note',
+        titleIcon: 'share',
+      },
+      {
+        title: 'install_guide_ios_s3_title',
+        note: 'install_guide_ios_s3_note',
+        titleIcon: 'plus',
+      },
+      { title: 'install_guide_ios_s4_title' },
+      { title: 'install_guide_ios_s5_title' },
     ],
     footnote: 'install_guide_ios_footnote',
   },
   android: {
     steps: [
-      ['install_guide_android_s1_title', 'install_guide_android_s1_note'],
-      ['install_guide_android_s2_title', null, 'menu'],
-      [
-        'install_guide_android_s3_title',
-        'install_guide_android_s3_note',
-        'download',
-      ],
-      ['install_guide_android_s4_title', 'install_guide_android_s4_note'],
-      ['install_guide_android_s5_title', null],
+      {
+        title: 'install_guide_android_s1_title',
+        note: 'install_guide_android_s1_note',
+      },
+      { title: 'install_guide_android_s2_title', titleIcon: 'menu' },
+      {
+        title: 'install_guide_android_s3_title',
+        note: 'install_guide_android_s3_note',
+        titleIcon: 'download',
+      },
+      {
+        title: 'install_guide_android_s4_title',
+        note: 'install_guide_android_s4_note',
+      },
+      { title: 'install_guide_android_s5_title' },
     ],
     footnote: null,
   },
   mac: {
     steps: [
-      ['install_guide_mac_s1_title', 'install_guide_mac_s1_note'],
-      ['install_guide_mac_s2_title', 'install_guide_mac_s2_note', 'plus'],
-      ['install_guide_mac_s3_title', null],
-      ['install_guide_mac_s4_title', null],
+      {
+        title: 'install_guide_mac_s1_title',
+        note: 'install_guide_mac_s1_note',
+      },
+      {
+        title: 'install_guide_mac_s2_title',
+        titleIcon: 'download',
+        noteParts: [
+          { text: 'install_guide_mac_s2_note1', icon: 'share' },
+          { text: 'install_guide_mac_s2_note2', icon: 'dock' },
+        ],
+      },
+      { title: 'install_guide_mac_s3_title' },
+      { title: 'install_guide_mac_s4_title' },
     ],
     footnote: 'install_guide_mac_footnote',
   },
