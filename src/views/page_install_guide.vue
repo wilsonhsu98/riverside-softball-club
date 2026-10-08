@@ -41,7 +41,7 @@
 
 ol {
   margin: 10px 0 0;
-  padding-left: 22px;
+  padding-left: 26px;
   li {
     margin-bottom: 18px;
     &::marker {
